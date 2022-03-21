@@ -1,5 +1,9 @@
 import os
-import matplotlib.pyplot as plt
+from io import BytesIO
+import matplotlib
+matplotlib.use('agg') # non interactive with fast api
+
+from matplotlib import pyplot as plt
 from PIL import Image
 import numpy as np
 import clip
@@ -7,7 +11,7 @@ from collections import OrderedDict
 import torch
 
 from clip_util import enable_gpu, load_model_defaults, run_preprocess
-
+from noun_list import lots_of_classes
 class CLIP:
     """Init clip, then configure the classifier type, then set the required img/class/prompt parameters"""
     def __init__(self):
@@ -34,7 +38,7 @@ class CLIP:
 
         for filename in [filename for filename in os.listdir(image_dir_path) if filename.endswith(".png") or filename.endswith(".jpg")]:
             name = os.path.splitext(filename)[0]
-            if name not in self.descriptions:
+            if name not in self.descriptions: # how to use without name?
                 continue #skip by restarting next for iteration
 
             image = Image.open(os.path.join(image_dir_path, filename)).convert("RGB")
@@ -56,21 +60,21 @@ class CLIP:
     def set_processed_images(self, processed_images):
         self.images_rgb = processed_images # as tensors
 
-    def encode_images_from_local(self):
-        image_input = torch.tensor(np.stack(self.images_rgb))
+    def encode_images_from_local(self, img_tensor):
+        image_input = torch.tensor(img_tensor)
         with torch.no_grad():
             image_features = self.model.encode_image(image_input).float().cpu()
         #normalise
-        image_features /= image_features.norm(dim=-1, keepdim=True)
-        return image_features
+        self.image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+        return self.image_features
 
-    def encode_text_classes(self):
-        text_tokens = clip.tokenize(["This is " + desc for desc in self.classes])
+    def encode_text_classes(self, token_list):
+        text_tokens = clip.tokenize(token_list)
         with torch.no_grad():
             text_features = self.model.encode_text(text_tokens).float().cpu()
         #normalise
-        text_features /= text_features.norm(dim=-1, keepdim=True)
-        return text_features
+        self.text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+        return self.text_features
 
     def get_cosine_simalarity(self, text_features, image_features):
         return text_features.cpu().numpy() @ image_features.cpu().numpy().T
@@ -95,10 +99,35 @@ class CLIP:
         plt.ylim([count + 0.5, -2])
 
         plt.title("Cosine similarity between text and image features", size=20)
+        plt.savefig('my_plot.png')
 
-    def create_image_classifier(self, similarity):
-        values, indices = similarity[0].topk(5)
-        return (values, indices)
+    def create_zero_shot_image_classifier(self):
+        classes = lots_of_classes()
+        self.encode_text_classes(classes)
+        text_probs = (100.0 * self.image_features @ self.text_features.T).softmax(dim=-1)
+        top_probs, top_labels = text_probs.cpu().topk(5, dim=-1)
+        plt.figure(figsize=(16, 16))
+
+        for i, image in enumerate(self.local_images):
+            plt.subplot(4, 4, 2 * i + 1)
+            plt.imshow(image)
+            plt.axis("off")
+
+            plt.subplot(4, 4, 2 * i + 2)
+            y = np.arange(top_probs.shape[-1])
+            plt.grid()
+            plt.barh(y, top_probs[i])
+            plt.gca().invert_yaxis()
+            plt.gca().set_axisbelow(True)
+            plt.yticks(y, [classes[index] for index in top_labels[i].numpy()])
+            plt.xlabel("probability")
+
+        plt.subplots_adjust(wspace=0.5)
+        plt.savefig('zero-shot-classify.png')
+
+    # def create_image_classifier(self, similarity):
+    #     values, indices = similarity[0].topk(5)
+    #     return (values, indices)
 
     def create_text_classifier(self):
         return

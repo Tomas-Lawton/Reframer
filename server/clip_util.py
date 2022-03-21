@@ -9,7 +9,7 @@ def enable_gpu():
     return
 
 def load_model_defaults():
-    clip.available_models()
+    print(f"Select from these models: \n{clip.available_models()}")
     model, preprocess = clip.load("ViT-B/32")
     # model.cuda().eval()
     input_resolution = model.visual.input_resolution
