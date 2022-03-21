@@ -3,6 +3,8 @@ from typing import Optional
 from fastapi import FastAPI
 from factory import CLIP
 
+import skimage
+
 app = FastAPI()
 clip_factory = CLIP()
 
@@ -18,8 +20,15 @@ def read_root():
     "horse": "a black-and-white silhouette of a horse", 
     "coffee": "a cup of coffee on a saucer"
     })
-    clip_factory.convert_local_images("local_images")
-    return {"Hello": str(clip_factory.images_rgb)}
+
+    # clip_factory.convert_local_images("local_images")
+    clip_factory.convert_local_images(skimage.data_dir)
+    image_features = clip_factory.encode_images_from_local() 
+    text_features = clip_factory.encode_text_classes()
+    similarity = clip_factory.get_cosine_simalarity(text_features, image_features)
+    # return {"Hello": str(clip_factory.images_rgb)}
+    clip_factory.plot_test(similarity)
+    return {"Hello": str(similarity)}
 
 
 @app.get("/items/{item_id}")
