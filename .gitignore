@@ -1,0 +1,5 @@
+server/local_images
+server/__pycache__
+server/env
+
+drawapp/node_modules
