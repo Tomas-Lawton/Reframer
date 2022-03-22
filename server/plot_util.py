@@ -5,16 +5,17 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 def plot_cosines(clip_model): # change to just model
-    description_count = len(clip_model.descriptions)
     similarity = clip_model.similarity
     images = clip_model.unprocessed_images
     classes = clip_model.classes
+    count = len(classes)
 
     plt.figure(figsize=(20, 14))
     plt.imshow(similarity, vmin=0.1, vmax=0.3)
     # plt.colorbar()
-    plt.yticks(range(description_count), classes, fontsize=18)
+    plt.yticks(range(count), classes, fontsize=18)
     plt.xticks([])
+
     for i, image in enumerate(images):
         plt.imshow(image, extent=(i - 0.5, i + 0.5, -1.6, -0.6), origin="lower")
     for x in range(similarity.shape[1]):
@@ -24,8 +25,8 @@ def plot_cosines(clip_model): # change to just model
     for side in ["left", "top", "right", "bottom"]:
         plt.gca().spines[side].set_visible(False)
 
-    plt.xlim([-0.5, description_count - 0.5])
-    plt.ylim([description_count + 0.5, -2])
+    plt.xlim([-0.5, count - 0.5])
+    plt.ylim([count + 0.5, -2])
 
     plt.title("Cosine similarity between text and image features", size=20)
     plt.savefig('plot/my_plot.png')

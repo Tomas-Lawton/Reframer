@@ -60,22 +60,10 @@ def classify_zero_shot_image():
 def classify_text_from_image(prompt: str):
     prompt = prompt.replace('-', ' ')
     clip_factory.prepare_images("local_images/", False, False)
-#####
-    multiply_test = [prompt] * 4
-    clip_factory.classes = multiply_test
-    clip_factory.encode_text_classes(multiply_test)
-######
-
-    # clip_factory.encode_fixed_prompt(f"{prompt}") # refactor?
+    clip_factory.encode_fixed_prompt(prompt)
     clip_factory.encode_image_tensors(np.stack(clip_factory.images_rgb)) 
-    # get most likely image from highest cosine similarity
     clip_factory.classify_text_with_local_image()
-
-    #FIX THIS !!!!!!!!!!!!!! happens because of the need for a descreiption to be set
-    clip_factory.set_image_descriptions({"one" : "image", "2" : "image", "3" : "image", "4" : "image"})
     plot_cosines(clip_factory)
-
-    # plot_zero_shot_images(clip_factory)
     return {"Hello": "World"}
 
 # @app.get("/items/{item_id}")
