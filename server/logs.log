@@ -1,0 +1,81 @@
+INFO:root:Select from these models: 
+['RN50', 'RN101', 'RN50x4', 'RN50x16', 'RN50x64', 'ViT-B/32', 'ViT-B/16', 'ViT-L/14']
+INFO:root:Preprocess complete
+INFO:root:Model ready
+INFO:uvicorn.error:Started server process [36877]
+INFO:uvicorn.error:Waiting for application startup.
+INFO:uvicorn.error:Application startup complete.
+INFO:uvicorn.error:Shutting down
+INFO:uvicorn.error:Waiting for application shutdown.
+INFO:uvicorn.error:Application shutdown complete.
+INFO:uvicorn.error:Finished server process [36877]
+INFO:root:Select from these models: 
+['RN50', 'RN101', 'RN50x4', 'RN50x16', 'RN50x64', 'ViT-B/32', 'ViT-B/16', 'ViT-L/14']
+INFO:root:Preprocess complete
+INFO:root:Model ready
+INFO:uvicorn.error:Started server process [36933]
+INFO:uvicorn.error:Waiting for application startup.
+INFO:uvicorn.error:Application startup complete.
+INFO:uvicorn.error:Shutting down
+INFO:uvicorn.error:Waiting for application shutdown.
+INFO:uvicorn.error:Application shutdown complete.
+INFO:uvicorn.error:Finished server process [36933]
+INFO:root:Select from these models: 
+['RN50', 'RN101', 'RN50x4', 'RN50x16', 'RN50x64', 'ViT-B/32', 'ViT-B/16', 'ViT-L/14']
+INFO:root:Preprocess complete
+INFO:root:Model ready
+INFO:uvicorn.error:Started server process [37000]
+INFO:uvicorn.error:Waiting for application startup.
+INFO:uvicorn.error:Application startup complete.
+INFO:uvicorn.error:Shutting down
+INFO:uvicorn.error:Waiting for application shutdown.
+INFO:uvicorn.error:Application shutdown complete.
+INFO:uvicorn.error:Finished server process [37000]
+INFO:root:Select from these models: 
+['RN50', 'RN101', 'RN50x4', 'RN50x16', 'RN50x64', 'ViT-B/32', 'ViT-B/16', 'ViT-L/14']
+INFO:root:Preprocess complete
+INFO:root:Model ready
+INFO:uvicorn.error:Started server process [37054]
+INFO:uvicorn.error:Waiting for application startup.
+INFO:uvicorn.error:Application startup complete.
+INFO:uvicorn.error:Shutting down
+INFO:uvicorn.error:Waiting for application shutdown.
+INFO:uvicorn.error:Application shutdown complete.
+INFO:uvicorn.error:Finished server process [37054]
+INFO:root:Select from these models: 
+['RN50', 'RN101', 'RN50x4', 'RN50x16', 'RN50x64', 'ViT-B/32', 'ViT-B/16', 'ViT-L/14']
+INFO:root:Preprocess complete
+INFO:root:Model ready
+INFO:uvicorn.error:Started server process [37097]
+INFO:uvicorn.error:Waiting for application startup.
+INFO:uvicorn.error:Application startup complete.
+INFO:uvicorn.error:Shutting down
+INFO:uvicorn.error:Waiting for application shutdown.
+INFO:uvicorn.error:Application shutdown complete.
+INFO:uvicorn.error:Finished server process [37097]
+2022-03-22 16:09:28,126 INFO root MainThread : Select from these models: 
+['RN50', 'RN101', 'RN50x4', 'RN50x16', 'RN50x64', 'ViT-B/32', 'ViT-B/16', 'ViT-L/14']
+2022-03-22 16:09:32,210 INFO root MainThread : Preprocess complete
+2022-03-22 16:09:32,211 INFO root MainThread : Model ready
+2022-03-22 16:09:32,213 INFO uvicorn.error MainThread : Started server process [37240]
+2022-03-22 16:09:32,214 INFO uvicorn.error MainThread : Waiting for application startup.
+2022-03-22 16:09:32,214 INFO uvicorn.error MainThread : Application startup complete.
+2022-03-22 16:12:55,436 INFO uvicorn.error MainThread : Shutting down
+2022-03-22 16:12:55,538 INFO uvicorn.error MainThread : Waiting for application shutdown.
+2022-03-22 16:12:55,539 INFO uvicorn.error MainThread : Application shutdown complete.
+2022-03-22 16:12:55,539 INFO uvicorn.error MainThread : Finished server process [37240]
+2022-03-22 16:12:58,192 INFO root MainThread : Torch version: 1.9.0
+2022-03-22 16:12:58,192 INFO root MainThread : Select from these models: 
+['RN50', 'RN101', 'RN50x4', 'RN50x16', 'RN50x64', 'ViT-B/32', 'ViT-B/16', 'ViT-L/14']
+2022-03-22 16:13:02,126 INFO root MainThread : Model parameters: 151,277,313
+2022-03-22 16:13:02,128 INFO root MainThread : Input resolution: 224
+2022-03-22 16:13:02,128 INFO root MainThread : Context length: 77
+2022-03-22 16:13:02,128 INFO root MainThread : Vocab size: 49408
+2022-03-22 16:13:02,128 INFO root MainThread : Model ready
+2022-03-22 16:13:02,130 INFO uvicorn.error MainThread : Started server process [37351]
+2022-03-22 16:13:02,130 INFO uvicorn.error MainThread : Waiting for application startup.
+2022-03-22 16:13:02,131 INFO uvicorn.error MainThread : Application startup complete.
+2022-03-22 16:14:47,648 INFO uvicorn.error MainThread : Shutting down
+2022-03-22 16:14:47,751 INFO uvicorn.error MainThread : Waiting for application shutdown.
+2022-03-22 16:14:47,751 INFO uvicorn.error MainThread : Application shutdown complete.
+2022-03-22 16:14:47,751 INFO uvicorn.error MainThread : Finished server process [37351]
