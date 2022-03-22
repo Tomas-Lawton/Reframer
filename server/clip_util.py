@@ -3,13 +3,12 @@ import torch
 import clip
 import logging
 
-def enable_gpu():
-    # do an enviromnet check here
+def load_model_defaults():
     logging.info(f"Torch version: {torch.__version__}")
     assert torch.__version__.split(".") >= ["1", "7", "1"], "PyTorch 1.7.1 or later is required"
-    return
 
-def load_model_defaults():
+    # TODO: Add option to use gpu or cpu depending on machine and torch on model load
+
     logging.info(f"Select from these models: \n{clip.available_models()}")
     model, preprocess = clip.load("ViT-B/32")
     # model.cuda().eval()

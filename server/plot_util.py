@@ -3,11 +3,11 @@ matplotlib.use('agg') # non interactive with fast api
 
 from matplotlib import pyplot as plt
 
-def plot_cosines(descriptions, images, similarity):
+def plot_cosines(description_count, images, classes, similarity):
     plt.figure(figsize=(20, 14))
     plt.imshow(similarity, vmin=0.1, vmax=0.3)
     # plt.colorbar()
-    plt.yticks(range(count), self.classes, fontsize=18)
+    plt.yticks(range(description_count), classes, fontsize=18)
     plt.xticks([])
     for i, image in enumerate(images):
         plt.imshow(image, extent=(i - 0.5, i + 0.5, -1.6, -0.6), origin="lower")
@@ -18,13 +18,13 @@ def plot_cosines(descriptions, images, similarity):
     for side in ["left", "top", "right", "bottom"]:
         plt.gca().spines[side].set_visible(False)
 
-    plt.xlim([-0.5, count - 0.5])
-    plt.ylim([count + 0.5, -2])
+    plt.xlim([-0.5, description_count - 0.5])
+    plt.ylim([description_count + 0.5, -2])
 
     plt.title("Cosine similarity between text and image features", size=20)
-    plt.savefig('my_plot.png')
+    plt.savefig('plot/my_plot.png')
 
-def plot_zero_shot_images(images):
+def plot_zero_shot_images(images, classes):
     plt.figure(figsize=(16, 16))
     for i, image in enumerate(images):
         plt.subplot(4, 4, 2 * i + 1)
@@ -40,4 +40,4 @@ def plot_zero_shot_images(images):
         plt.yticks(y, [classes[index] for index in top_labels[i].numpy()])
         plt.xlabel("probability")
     plt.subplots_adjust(wspace=0.5)
-    plt.savefig('zero-shot-classify.png')
+    plt.savefig('plot/zero-shot-classify.png')
