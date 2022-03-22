@@ -4,6 +4,12 @@ matplotlib.use('agg') # non interactive with fast api
 from matplotlib import pyplot as plt
 import numpy as np
 
+def plot_image(image):
+    plt.figure(figsize=(20, 14))
+    plt.imshow(image)
+    plt.title("High cosine similarity image", size=20)
+    plt.savefig('plot/text_classify.png')
+
 def plot_cosines(clip_model): # change to just model
     similarity = clip_model.similarity
     images = clip_model.unprocessed_images

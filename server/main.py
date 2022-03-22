@@ -1,10 +1,11 @@
+from email.mime import image
 from typing import Optional
 from fastapi import FastAPI
 from factory import CLIP
 import skimage
 import numpy as np
 import logging
-from plot_util import plot_cosines, plot_zero_shot_images
+from plot_util import plot_cosines, plot_zero_shot_images, plot_image
 
 # add filename='logs.log'
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG, format=f'APP LOGGING: %(levelname)s %(name)s %(threadName)s : %(message)s')
@@ -63,7 +64,14 @@ def classify_text_from_image(prompt: str):
     clip_factory.encode_fixed_prompt(prompt)
     clip_factory.encode_image_tensors(np.stack(clip_factory.images_rgb)) 
     clip_factory.classify_text_with_local_image()
-    plot_cosines(clip_factory)
+    
+    image_values = clip_factory.similarity[0].tolist()
+    logging.info("image_values, ", image_values)
+    top_index = np.argsort(image_values)[-1:][0]
+    print("top_1_idx: ", top_index)
+    top_image = clip_factory.unprocessed_images[top_index]
+    plot_image(top_image)
+    # plot_cosines(clip_factory) # how to fix? how to extract top image
     return {"Hello": "World"}
 
 # @app.get("/items/{item_id}")
