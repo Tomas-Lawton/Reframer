@@ -2,8 +2,14 @@ import matplotlib
 matplotlib.use('agg') # non interactive with fast api
 
 from matplotlib import pyplot as plt
+import numpy as np
 
-def plot_cosines(description_count, images, classes, similarity):
+def plot_cosines(clip_model): # change to just model
+    description_count = len(clip_model.descriptions)
+    similarity = clip_model.similarity
+    images = clip_model.unprocessed_images
+    classes = clip_model.classes
+
     plt.figure(figsize=(20, 14))
     plt.imshow(similarity, vmin=0.1, vmax=0.3)
     # plt.colorbar()
@@ -24,7 +30,11 @@ def plot_cosines(description_count, images, classes, similarity):
     plt.title("Cosine similarity between text and image features", size=20)
     plt.savefig('plot/my_plot.png')
 
-def plot_zero_shot_images(images, classes):
+def plot_zero_shot_images(clip_model):
+    top_probs, top_labels = clip_model.similarity.cpu().topk(5, dim=-1)
+    images = clip_model.unprocessed_images
+    classes = clip_model.classes
+
     plt.figure(figsize=(16, 16))
     for i, image in enumerate(images):
         plt.subplot(4, 4, 2 * i + 1)
