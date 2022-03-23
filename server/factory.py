@@ -90,9 +90,9 @@ class CLIP:
     def calc_cosine_similarities(self, apply_scaleing=False):
         """Calculates the cosines for every image with every caption (square of cosines)"""
         if apply_scaleing:
-            self.similarity = (100.0 *  self.text_features @ self.image_features.T).softmax(dim=-1)
+            self.similarity = (100.0 *  self.image_features @ self.text_features.T).softmax(dim=-1)
         else:
-            self.similarity = self.text_features.cpu().numpy() @ self.image_features.cpu().numpy().T
+            self.similarity = self.image_features.cpu().numpy() @ self.text_features.cpu().numpy().T
 
 #   self.similarity = self.image_features @ self.text_features.T
 # # # # # # Text classifier

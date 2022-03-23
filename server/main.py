@@ -49,13 +49,14 @@ def classify_zero_shot_dataset():
     return {"Hello": "World"}
 
 @app.get("/classify_zero_shot_image")
-def classify_zero_shot_image():
-    clip_factory.prepare_single_image("local_images/single_images/cat_sketch.jpg") # or skimage.data_dir
+def read_item(target: str = "cat"):
+    image_path = f"local_images/single_images/{target}.jpg"
+    clip_factory.prepare_single_image(image_path) # or skimage.data_dir
     clip_factory.encode_image_tensors(np.stack(clip_factory.images_rgb)) 
     clip_factory.encode_text_classes(["This is " + desc for desc in clip_factory.classes])
     clip_factory.calc_cosine_similarities(True)
     plot_zero_shot_images(clip_factory)
-    return {"Hello": "World"}
+    return {"Hello": target}
 
 @app.get("/text_classify/directory/{prompt}")
 def classify_text_from_image(prompt: str):
@@ -72,7 +73,7 @@ def classify_text_from_image(prompt: str):
     top_image = clip_factory.unprocessed_images[top_index]
     plot_image(top_image)
     # plot_cosines(clip_factory) # how to fix? how to extract top image
-    return {"Hello": "World"}
+    return {"Hello": "{prompt}"}
 
 # @app.get("/items/{item_id}")
 # def read_item(item_id: int, q: Optional[str] = None):
