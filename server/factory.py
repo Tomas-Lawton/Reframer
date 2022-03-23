@@ -116,9 +116,6 @@ class CLIP:
 
 
 
-
-
-
 #It is possible to chain results by feeding the output(s) of one encoder to the other or by looping.
 
 class Image_Classifier:

@@ -58,8 +58,22 @@ def read_item(target: str = "cat"):
     plot_zero_shot_images(clip_factory)
     return {"Hello": target}
 
-@app.get("/text_classify/directory/{prompt}")
+@app.get("/classify_text/directory/{prompt}")
 def classify_text_from_image(prompt: str):
+    prompt = prompt.replace('-', ' ')
+    clip_factory.prepare_images(skimage.data_dir, False, False) # or skimage.data_dir
+    clip_factory.encode_fixed_prompt(prompt)
+    clip_factory.encode_image_tensors(np.stack(clip_factory.images_rgb)) 
+    clip_factory.calc_cosine_similarities_for_image(True)
+    
+    image_values = clip_factory.similarity[0].tolist()
+    top_index = np.argsort(image_values)[-1:][0]
+    top_image = clip_factory.unprocessed_images[top_index]
+    plot_image(top_image)
+    return {"Hello": "{prompt}"}
+
+@app.get("/classify_text/gan/{prompt}")
+def classify_text_from_gan(prompt: str):
     prompt = prompt.replace('-', ' ')
     clip_factory.prepare_images(skimage.data_dir, False, False) # or skimage.data_dir
     clip_factory.encode_fixed_prompt(prompt)
