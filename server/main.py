@@ -33,7 +33,7 @@ def classify_dataset():
     clip_factory.prepare_images("local_images", True, False) # or skimage.data_dir
     clip_factory.encode_image_tensors(np.stack(clip_factory.images_rgb)) 
     clip_factory.encode_text_classes(["This is " + desc for desc in clip_factory.classes])
-    clip_factory.calc_cosine_similarities(False)
+    clip_factory.calc_cosine_similarities_for_text(False)
     plot_cosines(clip_factory)
     return {"Hello": "World"}
 
@@ -43,8 +43,8 @@ def classify_zero_shot_dataset():
     clip_factory.prepare_images("local_images", False, True) # or skimage.data_dir
     clip_factory.encode_image_tensors(np.stack(clip_factory.images_rgb)) 
     clip_factory.encode_text_classes(["This is " + desc for desc in clip_factory.classes])
-    clip_factory.calc_cosine_similarities(True)
-    clip_factory.calc_cosine_similarities(True)
+    clip_factory.calc_cosine_similarities_for_text(True)
+    clip_factory.calc_cosine_similarities_for_text(True)
     plot_zero_shot_images(clip_factory)
     return {"Hello": "World"}
 
@@ -54,25 +54,22 @@ def read_item(target: str = "cat"):
     clip_factory.prepare_single_image(image_path) # or skimage.data_dir
     clip_factory.encode_image_tensors(np.stack(clip_factory.images_rgb)) 
     clip_factory.encode_text_classes(["This is " + desc for desc in clip_factory.classes])
-    clip_factory.calc_cosine_similarities(True)
+    clip_factory.calc_cosine_similarities_for_text(True)
     plot_zero_shot_images(clip_factory)
     return {"Hello": target}
 
 @app.get("/text_classify/directory/{prompt}")
 def classify_text_from_image(prompt: str):
     prompt = prompt.replace('-', ' ')
-    clip_factory.prepare_images("local_images/", False, False)
+    clip_factory.prepare_images(skimage.data_dir, False, False) # or skimage.data_dir
     clip_factory.encode_fixed_prompt(prompt)
     clip_factory.encode_image_tensors(np.stack(clip_factory.images_rgb)) 
-    clip_factory.classify_text_with_local_image()
+    clip_factory.calc_cosine_similarities_for_image(True)
     
     image_values = clip_factory.similarity[0].tolist()
-    logging.info("image_values, ", image_values)
     top_index = np.argsort(image_values)[-1:][0]
-    print("top_1_idx: ", top_index)
     top_image = clip_factory.unprocessed_images[top_index]
     plot_image(top_image)
-    # plot_cosines(clip_factory) # how to fix? how to extract top image
     return {"Hello": "{prompt}"}
 
 # @app.get("/items/{item_id}")

@@ -87,36 +87,19 @@ class CLIP:
         self.classes = [prompt]
         return self.encode_text_classes([prompt])
 
-    def calc_cosine_similarities(self, apply_scaleing=False):
-        """Calculates the cosines for every image with every caption (square of cosines)"""
+    def calc_cosine_similarities_for_text(self, apply_scaleing=False):
+        """Calculates the cosines for caption with every image (square of cosines)"""
         if apply_scaleing:
             self.similarity = (100.0 *  self.image_features @ self.text_features.T).softmax(dim=-1)
         else:
             self.similarity = self.image_features.cpu().numpy() @ self.text_features.cpu().numpy().T
 
-#   self.similarity = self.image_features @ self.text_features.T
-# # # # # # Text classifier
-    def predict_directory_image_from_prompt(self, image_dir_path):
-        # set image mode
-        # get the images with prepare_images with descriptions set to false, 
-        # process the images
-        # encode the text and the image
-        # find the most similar image to given prompt
-        # using the locally processed images.
-        return
-
-    def classify_text_with_local_image(self):
-        self.calc_cosine_similarities()
-        self.similarity = (100.0 * self.text_features @ self.image_features.T).softmax(dim=-1) # switch terms gives the images
-        # logging.warning(similarity)
-        # values, indices = similarity[0].topk(1) # use similarity 1 for image and pick the best
-        # logging.info(values)
-        # logging.info(indices)
-
-        # logging.info("\nTop predictions:\n")
-        # for value, index in zip(values, indices):
-        #     logging.info(f"Image {index}: {100 * value.item():.2f}%")
-        return 
+    def calc_cosine_similarities_for_image(self, apply_scaleing=False): # how to do this without flipping???
+        """Calculates the cosines for every image with every caption (square of cosines)"""
+        if apply_scaleing:
+            self.similarity = (100.0 *  self.text_features @ self.image_features.T).softmax(dim=-1)
+        else:
+            self.similarity = self.text_features.cpu().numpy() @ self.image_features.cpu().numpy().T
 
     def gan_image_from_prompt(self):
         return
