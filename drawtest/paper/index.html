@@ -17,19 +17,23 @@
             tool.onMouseDown = function(event) {
                 myPath = new paper.Path({
                     strokeColor: 'black',
-                    strokeWidth: 5,
+                    strokeWidth: 10,
                     // selected: true,
                     strokeCap: 'round'
                 });
+
                 myPath.add(event.point);
-                myPath.add(event.point); //in case no drag means no line segment
+                // myPath.add({
+                //     ...event.point,
+                //     x: event.point.x + .001 //this seems to be fine with the coordinate system
+                // }); //in case no drag means no line segment
                 console.log('down')
             }
 
             tool.onMouseDrag = function(event) {
                 myPath.add(event.point);
                 // myPath.smooth()
-                console.log(event.point)
+                // console.log(event.point)
             }
 
             const svg = `
@@ -87,25 +91,30 @@
 `;
 
             tool.onMouseUp = function(event) {
+                myPath.simplify()
+
                 // Get path data
-                const paths = myPath.exportSVG();
+                const pathStrokes = myPath.exportSVG();
                 // console.log(paths)
-                console.log(myPath.pathData);
+                // console.log(myPath.pathData);
                 // console.log(myPath.pathData.replace(/,/g, ' '));
+
+                console.log(paper.project.exportSVG());
+
 
                 // can you list all paths?
                 console.log(paper.project.getItems()[0]._children); // is an array of paths and can get segments or pathData
 
                 // read path from an svg ???? can use string or dom node 
-                paper.project.importSVG(svg)
-                console.log(svg)
+                // paper.project.importSVG(svg)
+                // console.log(svg)
 
                 //draw path
-                var pathData = 'm 54.473683,133.57894 c 2.309053,6.52389 5.103384,12.88691 9.947368,18.00001 1.602465,1.69148 7.516862,3.36572 9,3.78947 8.215344,2.34724 20.231724,5.06339 28.894739,2.8421 3.21552,-0.82449 6.03091,-2.77861 9,-4.26315 8.27335,-4.13668 15.89845,-8.52099 21.31579,-16.10527';
-                var path = new paper.Path(pathData);
-                path.strokeColor = 'red';
-                path.scale(5);
-                myPath.simplify()
+                // var pathData = 'm 54.473683,133.57894 c 2.309053,6.52389 5.103384,12.88691 9.947368,18.00001 1.602465,1.69148 7.516862,3.36572 9,3.78947 8.215344,2.34724 20.231724,5.06339 28.894739,2.8421 3.21552,-0.82449 6.03091,-2.77861 9,-4.26315 8.27335,-4.13668 15.89845,-8.52099 21.31579,-16.10527';
+                // var path = new paper.Path(pathData);
+                // path.strokeColor = 'red';
+                // path.scale(5);
+
             }
 
         }
@@ -114,6 +123,10 @@
 
 <body>
     <canvas id="myCanvas" resize></canvas>
+    <div id="ui-overlay">
+        <button id="clear">Clear</button>
+    </div>
+
 </body>
 
 </html>
