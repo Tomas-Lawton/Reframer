@@ -41,4 +41,5 @@ canvas[resize] {
     -ms-transform: translateX(-50%);
     transform: translateX(-50%);
     margin-bottom: 20px;
+    pointer-events: auto;
 }
