@@ -13,7 +13,7 @@ class CLIP:
     """Init clip, then configure the classifier type, then set the required img/class/prompt parameters"""
 
     def __init__(self):
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.device = "cuda" if torch.cuda.is_available() else "cpu" #todo pass to load_modal
         model, preprocess = load_model_defaults()
         run_preprocess(preprocess)
         self.model = model

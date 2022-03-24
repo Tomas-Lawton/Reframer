@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pen-sketch"></script>
+
+</head>
+
+<body>
+    <svg>
+        <text x="50%" y="50%" text-anchor="middle">SVG PEN SKETCH DEMO</text>
+        <text x="50%" y="53%" text-anchor="middle"># of strokes on screen: <tspan id="stroke-count">0</tspan></text>
+    </svg>
+
+    <script src="../dist/svg-pen-sketch.js"></script>
+    <script>
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function updateStrokeAmnt() {
+            let strokeAmnt = document.querySelectorAll("path").length;
+            document.querySelector("#stroke-count").innerHTML = strokeAmnt;
+        }
+
+        window.onload = _ => {
+            try {
+                let svgSketch = SvgPenSketch.default;
+
+                // Prep the svg element to be drawn on
+                const canvas = new svgSketch(document.querySelector("svg"), {
+                    "stroke": "black",
+                    "stroke-width": "10px"
+                });
+
+                // Callbacks can be set for various events
+                canvas.penDownCallback = (path, event) => {
+                    // Set a random color for the stroke 
+                    let color = getRandomColor();
+                    path.style.stroke = color;
+
+                    // Console log the pointer location
+                    console.log(`Pointer location = (${event.offsetX},${event.offsetY}) @ ${event.timeStamp}`);
+                };
+                canvas.eraserDownCallback = (removedPaths, event) => {
+                    if (removedPaths.length > 0)
+                        console.log("Removed strokes", removedPaths);
+                }
+                canvas.penUpCallback = updateStrokeAmnt;
+                canvas.eraserUpCallback = updateStrokeAmnt;
+            } catch (err) {
+                // Display the error
+                console.error(err);
+
+                // Show build-suggestion text 
+                let textElement = document.querySelector("text:nth-child(2)");
+                textElement.innerHTML = `Make sure you built the project for this demo to work`;
+                textElement.setAttribute("font-style", "italic");
+
+                // Update the color randomly
+                setInterval(_ => {
+                    console.log("test");
+                    textElement.style.fill = getRandomColor();
+                }, 500);
+            }
+        }
+    </script>
+</body>
+
+<style>
+    svg {
+        width: 100%;
+        height: 100%;
+    }
+    
+    svg text {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        transition: all 0.5s ease-in-out;
+    }
+</style>
+
+</html>

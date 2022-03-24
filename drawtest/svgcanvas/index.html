@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.0.0/fabric.min.js"></script>
+
+<body>
+    <div class="fabric-canvas-wrapper">
+        <canvas id="canvas"></canvas>
+    </div>
+    <button type="button" id="btn" onclick="myFunction()"> Export&Import SVG</button>
+    <!-- <div id="export"></div> -->
+
+    <script>
+        canvas = new fabric.Canvas("canvas", {
+            width: window.innerWidth,
+            height: window.innerHeight
+        });
+        canvas.isDrawingMode = true;
+
+
+        const ctx = canvas.getContext("2d");
+
+        document.addEventListener("mouseup", () => {
+            canvas.toSVG();
+        });
+
+        var path = new fabric.Path('m 112.26316,83.842105 c 0,7.578947 0,15.157894 0,22.736845', {
+            stroke: 'red',
+            strokeWidth: 5,
+            fill: false,
+            originX: 'left',
+            originY: 'top'
+        });
+
+        var path1 = new fabric.Path('m 74.842104,84.315788 c 0,7.578948 0,15.157895 0,22.736842', {
+            stroke: 'red',
+            strokeWidth: 5,
+            fill: false,
+            originX: 'left',
+            originY: 'top'
+        });
+
+        var path2 = new fabric.Path('m 54.473683,133.57894 c 2.309053,6.52389 5.103384,12.88691 9.947368,18.00001 1.602465,1.69148 7.516862,3.36572 9,3.78947 8.215344,2.34724 20.231724,5.06339 28.894739,2.8421 3.21552,-0.82449 6.03091,-2.77861 9,-4.26315 8.27335,-4.13668 15.89845,-8.52099 21.31579,-16.10527', {
+            stroke: 'red',
+            strokeWidth: 5,
+            fill: false,
+            originX: 'left',
+            originY: 'top'
+        });
+        canvas.add(path);
+        canvas.add(path1);
+        canvas.add(path2);
+    </script>
+</body>
+
+</html>

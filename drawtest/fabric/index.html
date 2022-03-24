@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script src="fabric.js"></script>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <button type="button" id="btn" onclick="myFunction()"> Export&Import SVG</button>
+    <div id="export"></div>
+
+    <script>
+        canvas = new fabric.Canvas("canvas");
+        canvas.isDrawingMode = true
+        console.log(canvas)
+        const ctx = canvas.getContext("2d");
+        let coord = {
+            x: 0,
+            y: 0
+        };
+
+        function myFunction() {
+            console.log('test')
+            svg = canvas.toSVG();
+            console.log(svg)
+        }
+
+        document.addEventListener("mouseup", () => {
+            svg = canvas.toSVG();
+        });
+    </script>
+    <!-- toSVG -->
+</body>
+
+</html>
