@@ -7,11 +7,18 @@ from svgpathtools import svg2paths # add to package
 
 import logging
 
+class DrawingPath():
+    def __init__(self, path, color, width, num_segments):
+        self.path = path
+        self.color = color
+        self.width = width
+        self.num_segments = num_segments
+
 def load_model_defaults():
     logging.info(f"Torch version: {torch.__version__}")
     assert torch.__version__.split(".") >= ["1", "7", "1"], "PyTorch 1.7.1 or later is required"
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     logging.info(f"These clip models are available: \n{clip.available_models()}")
     model, preprocess = clip.load('ViT-B/32', device, jit=False)
     input_resolution = model.visual.input_resolution

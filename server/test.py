@@ -8,8 +8,9 @@ from clip_util import get_noun_data, get_drawing_paths, area_mask, save_data
 from render_design import add_shape_groups, load_vars, render_save_img, build_random_curves
 
 class Clip_Draw_Optimiser:
-    """These inputs are defaults and can have methods for setting them after the inital start up"""
+    # PARAMETERS  
     def __init__(self, device, model):
+        """These inputs are defaults and can have methods for setting them after the inital start up"""
         # Set up parent
         self.device = device
         self.model = model
@@ -43,7 +44,7 @@ class Clip_Draw_Optimiser:
         pydiffvg.set_print_timing(False)
         pydiffvg.set_use_gpu(torch.cuda.is_available())
         pydiffvg.set_device(device)
-
+        
         # Configure image Augmentation Transformation
         if self.normalize_clip:
             self.augment_trans = transforms.Compose([

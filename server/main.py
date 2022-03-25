@@ -13,7 +13,7 @@ logging.basicConfig(encoding='utf-8', level=logging.DEBUG, format=f'APP LOGGING:
 
 app = FastAPI()
 clip_factory = Clip_Factory()
-clip_factory.start_clip_draw();
+clip_factory.create_clip_draw();
 
 @app.get("/")
 def read_root():
@@ -74,16 +74,11 @@ def classify_text_from_image(prompt: str):
     return {"Hello": "{prompt}"}
 
 @app.get("/activate_clip_draw/")
-def classify_text_from_gan():
-    # encode model
-    prompt = ['A drawing of a red chair.']
+def activate_clip_draw():
+    prompts = ['A drawing of a red chair.']
     neg_prompts = ['A badly drawn sketch.', 'Many ugly, messy drawings.']
     nouns = get_noun_data()
-    prompt_features = clip_factory.encode_text_classes(prompt)
-    neg_prompt_features = clip_factory.encode_text_classes(neg_prompts)
-    noun_features = clip_factory.encode_text_classes(nouns)
-
-
+    clip_factory.start_clip_draw(prompts, neg_prompts, nouns);
     return {"Hello": "World"}
 
 

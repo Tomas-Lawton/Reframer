@@ -101,12 +101,18 @@ class Clip_Factory:
         else:
             self.similarity = text_features.cpu().numpy() @ image_features.cpu().numpy().T
 
-    def start_clip_draw(self):
+    def create_clip_draw(self):
         self.clip_draw_optimiser = Clip_Draw_Optimiser(self.device, self.model)
-        self.clip_draw_optimiser.activate()
-        self.clip_draw_optimiser.end() # change to an event
         return
 
+    def start_clip_draw(self, prompts, neg_prompts, nouns):
+        prompt_features = self.encode_text_classes(prompts)
+        neg_prompt_features = self.encode_text_classes(neg_prompts)
+        noun_features = self.encode_text_classes(nouns)
+        self.clip_draw_optimiser.set_text_features(prompt_features, neg_prompt_features, noun_features)
+        self.clip_draw_optimiser.activate()
+        self.clip_draw_optimiser.end() # change to event
+        return
 
 
 
