@@ -54,18 +54,12 @@ class Clip_Draw_Optimiser:
             self.augment_trans = transforms.Compose([
             transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
             transforms.RandomResizedCrop(self.canvas_w, scale=(0.7,0.9))])
-        return self 
+        return 
 
     def set_text_features(self, text_features, neg_text_features, nouns_features):
         self.text_features = text_features
         self.neg_text_features = neg_text_features
-        self.noun_features = noun_features
-        return
-
-    # call whenever some new event happens
-    def end(self):
-        pydiffvg.imwrite(img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+time_str+'.png', gamma=1)
-        save_data(time_str, self)
+        self.nouns_features = nouns_features
         return
 
     def activate(self):
@@ -196,6 +190,8 @@ class Clip_Draw_Optimiser:
                     print("\nTop predictions:\n")
                     for value, index in zip(values, indices):
                         print(f"{nouns[index]:>16s}: {100 * value.item():.2f}%")
+        pydiffvg.imwrite(img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+time_str+'.png', gamma=1)
+        save_data(time_str, self)
         return
     # def use_svg_from_file(self, path_input):
     #     return

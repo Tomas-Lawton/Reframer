@@ -8,9 +8,8 @@ from clip_util import get_noun_data, get_drawing_paths, area_mask, save_data
 from render_design import add_shape_groups, load_vars, render_save_img, build_random_curves
 
 class Clip_Draw_Optimiser:
-    # PARAMETERS  
+    """These inputs are defaults and can have methods for setting them after the inital start up"""
     def __init__(self, device, model):
-        """These inputs are defaults and can have methods for setting them after the inital start up"""
         # Set up parent
         self.device = device
         self.model = model
@@ -44,7 +43,7 @@ class Clip_Draw_Optimiser:
         pydiffvg.set_print_timing(False)
         pydiffvg.set_use_gpu(torch.cuda.is_available())
         pydiffvg.set_device(device)
-        
+
         # Configure image Augmentation Transformation
         if self.normalize_clip:
             self.augment_trans = transforms.Compose([
@@ -60,13 +59,7 @@ class Clip_Draw_Optimiser:
     def set_text_features(self, text_features, neg_text_features, nouns_features):
         self.text_features = text_features
         self.neg_text_features = neg_text_features
-        self.noun_features = noun_features
-        return
-
-    # call whenever some new event happens
-    def end(self):
-        pydiffvg.imwrite(img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+time_str+'.png', gamma=1)
-        save_data(time_str, self)
+        self.nouns_features = nouns_features
         return
 
     def activate(self):
@@ -197,6 +190,8 @@ class Clip_Draw_Optimiser:
                     print("\nTop predictions:\n")
                     for value, index in zip(values, indices):
                         print(f"{nouns[index]:>16s}: {100 * value.item():.2f}%")
+        pydiffvg.imwrite(img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+time_str+'.png', gamma=1)
+        save_data(time_str, self)
         return
     # def use_svg_from_file(self, path_input):
     #     return

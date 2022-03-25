@@ -37,11 +37,12 @@ def run_preprocess(preprocess):
     return
 
 def get_noun_data():
-    with open('data/nouns.txt', 'r') as f:
+    with open('data/noun_list.txt', 'r') as f:
         nouns = f.readline()
         f.close()
     nouns = nouns.split(" ")
     return ["a drawing of a " + x for x in nouns]
+    # return ["a drawing of a " + x for x in nouns[0::100]]
 
 
 def get_drawing_paths(path_to_svg_file):
