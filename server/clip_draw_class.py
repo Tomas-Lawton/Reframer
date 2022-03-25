@@ -6,7 +6,7 @@ import numpy as np
 # make a util directory???
 from clip_util import get_noun_data, get_drawing_paths, area_mask, save_data
 from render_design import add_shape_groups, load_vars, render_save_img, build_random_curves
-
+import logging
 class Clip_Draw_Optimiser:
     """These inputs are defaults and can have methods for setting them after the inital start up"""
     def __init__(self, model):
@@ -175,23 +175,23 @@ class Clip_Draw_Optimiser:
 
             # This is just to check out the progress
             if t % 50 == 0:
-                print('render loss:', loss.item())
-                print('l_points: ', l_points.item())
-                print('l_colors: ', l_colors.item())
-                print('l_widths: ', l_widths.item())
-                print('l_img: ', l_img.item())
+                logging.info(f"render loss: {loss.item()}")
+                logging.info(f"l_points: {l_points.item()}")
+                logging.info(f"l_colors: {l_colors.item()}")
+                logging.info(f"l_widths: {l_widths.item()}")
+                logging.info(f"l_img: {l_img.item()}")
                 # for l in l_style:
                 #     print('l_style: ', l.item())
-                print('iteration:', t)
+                logging.info(f"iteration: {t}")
                 with torch.no_grad():
                     pydiffvg.imwrite(img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+time_str+'.png', gamma=1)
                     im_norm = image_features / image_features.norm(dim=-1, keepdim=True)
                     noun_norm = self.nouns_features / self.nouns_features.norm(dim=-1, keepdim=True)
                     similarity = (100.0 * im_norm @ noun_norm.T).softmax(dim=-1)
                     values, indices = similarity[0].topk(5)
-                    print("\nTop predictions:\n")
+                    logging.info("\nTop predictions:\n")
                     for value, index in zip(values, indices):
-                        print(f"{nouns[index]:>16s}: {100 * value.item():.2f}%")
+                        logging.info(f"{nouns[index]:>16s}: {100 * value.item():.2f}%")
         pydiffvg.imwrite(img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+time_str+'.png', gamma=1)
         save_data(time_str, self)
         return

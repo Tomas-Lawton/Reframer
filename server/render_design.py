@@ -4,11 +4,9 @@ import pickle
 import random
 
 def render_save_img(path_list, canvas_height, canvas_width):
-
     # Initialize Curves
     shapes = []
     shape_groups = []
-
     # First the ones from my drawing
     for dpath in path_list:
         num_control_points = torch.zeros(dpath.num_segments, dtype = torch.int32) + 2
