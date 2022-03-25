@@ -9,9 +9,8 @@ from render_design import add_shape_groups, load_vars, render_save_img, build_ra
 
 class Clip_Draw_Optimiser:
     """These inputs are defaults and can have methods for setting them after the inital start up"""
-    def __init__(self, device, model):
+    def __init__(self, model):
         # Set up parent
-        self.device = device
         self.model = model
         # Partial sketch
         self.svg_path = 'data/drawing_flower_vase.svg'
@@ -32,7 +31,7 @@ class Clip_Draw_Optimiser:
         self.w_colors = 0.1
         self.w_widths = 0.01
         self.w_img = 0.01
-        self.w_full_img = 0.001
+        # self.w_full_img = 0.001
         self.drawing_area = {
             'x0': 0.0,
             'x1': 1.0,
@@ -40,10 +39,11 @@ class Clip_Draw_Optimiser:
             'y1': 1.0
         }
         # Configure rasterisor
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         pydiffvg.set_print_timing(False)
         pydiffvg.set_use_gpu(torch.cuda.is_available())
         pydiffvg.set_device(device)
-
+        
         # Configure image Augmentation Transformation
         if self.normalize_clip:
             self.augment_trans = transforms.Compose([
@@ -64,6 +64,7 @@ class Clip_Draw_Optimiser:
 
     def activate(self):
         # SET UP IMAGE STEP ----------------------
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         path_list = get_drawing_paths(self.svg_path) # update with new method
         shapes, shape_groups = render_save_img(path_list, self.canvas_w, self.canvas_h)
         shapes_rnd, shape_groups_rnd = build_random_curves(
@@ -103,7 +104,7 @@ class Clip_Draw_Optimiser:
             self.drawing_area['x1'],
             self.drawing_area['y0'],
             self.drawing_area['y1'],
-            ).to(self.device)
+            ).to(device)
 
         # Optimizers
         points_optim = torch.optim.Adam(points_vars, lr=0.5)
@@ -112,6 +113,7 @@ class Clip_Draw_Optimiser:
 
         # RUN MAIN OPTIMISER LOOP ____------------
         time_str = datetime.datetime.today().strftime("%Y_%m_%d_%H_%M_%S")
+        nouns = get_noun_data() # could add to clip class?
         for t in range(self.num_iter):
 
             points_optim.zero_grad()
@@ -139,7 +141,7 @@ class Clip_Draw_Optimiser:
             for n in range(NUM_AUGS):
                 img_augs.append(self.augment_trans(img))
             im_batch = torch.cat(img_augs)
-            image_features = model.encode_image(im_batch)
+            image_features = self.model.encode_image(im_batch)
             for n in range(NUM_AUGS):
                 loss -= torch.cosine_similarity(self.text_features, image_features[n:n+1], dim=1)
                 if self.use_neg_prompts:

@@ -102,7 +102,7 @@ class Clip_Factory:
             self.similarity = text_features.cpu().numpy() @ image_features.cpu().numpy().T
 
     def create_clip_draw(self):
-        self.clip_draw_optimiser = Clip_Draw_Optimiser(self.device, self.model)
+        self.clip_draw_optimiser = Clip_Draw_Optimiser(self.model)
         return
 
     def start_clip_draw(self, prompts, neg_prompts, nouns):
