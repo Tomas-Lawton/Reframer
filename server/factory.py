@@ -5,19 +5,20 @@ import clip
 from collections import OrderedDict
 import torch
 
-from clip_util import load_model_defaults, run_preprocess
-from noun_list import lots_of_classes
+from clip_util import load_model_defaults, run_preprocess, get_noun_data
+from clip_draw_class import Clip_Draw_Optimiser
 
 import logging
-class CLIP:
+class Clip_Factory:
     """Init clip, then configure the classifier type, then set the required img/class/prompt parameters"""
 
     def __init__(self):
-        self.device = "cuda" if torch.cuda.is_available() else "cpu" #todo pass to load_modal
-        model, preprocess = load_model_defaults()
-        run_preprocess(preprocess)
+        device, model, preprocess = load_model_defaults()
+        self.device = device
         self.model = model
         self.preprocess = preprocess
+
+        run_preprocess(preprocess)
         logging.info("Model ready")
 
     def set_image_descriptions(self, description_map):
@@ -36,7 +37,7 @@ class CLIP:
 
     def prepare_single_image(self, image_path):
         """Zero shot always uses all classes"""
-        self.set_clip_classes(lots_of_classes())
+        self.set_clip_classes(get_noun_data())
         image = Image.open(image_path).convert("RGB")
         self.set_unprocessed_images([image])
         self.set_processed_images([self.preprocess(image)])
@@ -67,48 +68,71 @@ class CLIP:
                 self.set_clip_classes(classes)
         else:
             if use_all_classes:
-                self.set_clip_classes(lots_of_classes())
+                self.set_clip_classes(get_noun_data())
 
     def encode_image_tensors(self, img_tensor):
         image_input = torch.tensor(img_tensor)
         with torch.no_grad():
             image_features = self.model.encode_image(image_input).float().cpu() #normalise add to device
-        self.image_features = image_features / image_features.norm(dim=-1, keepdim=True)
-        return self.image_features
-
-    def encode_text_classes(self, token_list):
-        text_tokens = clip.tokenize(token_list)
-        with torch.no_grad():
-            text_features = self.model.encode_text(text_tokens).float().cpu() #normalise
-        self.text_features = text_features / text_features.norm(dim=-1, keepdim=True)
-        return self.text_features
+            return image_features / image_features.norm(dim=-1, keepdim=True)
 
     def encode_fixed_prompt(self, prompt):
         self.classes = [prompt]
         return self.encode_text_classes([prompt])
 
-    def calc_cosine_similarities_for_text(self, apply_scaleing=False):
+    def encode_text_classes(self, token_list):
+        text_tokens = clip.tokenize(token_list)
+        with torch.no_grad():
+            text_features = self.model.encode_text(text_tokens).float().cpu() #normalise
+            return text_features / text_features.norm(dim=-1, keepdim=True)
+
+    def calc_cosine_similarities_for_text(self, text_features, image_features, apply_scaleing=False):
         """Calculates the cosines for caption with every image (square of cosines)"""
         if apply_scaleing:
-            self.similarity = (100.0 *  self.image_features @ self.text_features.T).softmax(dim=-1)
+            self.similarity = (100.0 *  image_features @ text_features.T).softmax(dim=-1)
         else:
-            self.similarity = self.image_features.cpu().numpy() @ self.text_features.cpu().numpy().T
+            self.similarity = image_features.cpu().numpy() @ text_features.cpu().numpy().T
 
-    def calc_cosine_similarities_for_image(self, apply_scaleing=False): # how to do this without flipping???
+    # how to refactor this? !!!UBIU!BGIOUBG:POUBG
+    def calc_cosine_similarities_for_image(self, text_features, image_features, apply_scaleing=False): # how to do this without flipping???
         """Calculates the cosines for every image with every caption (square of cosines)"""
         if apply_scaleing:
-            self.similarity = (100.0 *  self.text_features @ self.image_features.T).softmax(dim=-1)
+            self.similarity = (100.0 *  text_features @ image_features.T).softmax(dim=-1)
         else:
-            self.similarity = self.text_features.cpu().numpy() @ self.image_features.cpu().numpy().T
+            self.similarity = text_features.cpu().numpy() @ image_features.cpu().numpy().T
 
-    def gan_image_from_prompt(self):
+    def start_clip_draw(self):
+        self.clip_draw_optimiser = Clip_Draw_Optimiser(self.device, self.model)
+        self.clip_draw_optimiser.activate()
+        self.clip_draw_optimiser.end() # change to an event
         return
 
-    def bezier_image_from_prompt(self):
-        return
 
-    def create_text_classifier(self, mode):
-        return
+
+
+# CLIP Setup step -------------------
+# MAKE SURE CLIP IS SET TO ZERO SHOT
+
+
+
+
+
+
+
+
+
+
+    # def gan_image_from_prompt(self):
+    #     return
+
+    # def bezier_image_from_prompt(self):
+    #     return
+
+    # def create_text_classifier(self, mode):
+    #     return
+
+
+
 
 
 
