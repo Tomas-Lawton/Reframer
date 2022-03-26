@@ -1,6 +1,6 @@
 diffvg==0.0.1
-uvicorn 
-fastapi
+fastapi "uvicorn[standard]"
+websockets
 numpy
 ftfy
 regex
