@@ -13,3 +13,4 @@ matplotlib
 Pillow
 diffvg==0.0.1
 svgpathtools
+setuptools

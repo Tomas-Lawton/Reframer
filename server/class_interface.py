@@ -1,18 +1,19 @@
 import os
 from PIL import Image
-import numpy as np
 import clip
-from collections import OrderedDict
 import torch
 
 from clip_util import load_model_defaults, run_preprocess, get_noun_data
-from clip_draw_class import Clip_Draw_Optimiser
+from clip_draw import Clip_Draw_Optimiser
 
 import logging
-class Clip_Factory:
+class Clip_Class:
     """Init clip, then configure the classifier type, then set the required img/class/prompt parameters"""
-
+    __instance = None
     def __init__(self):
+        if Clip_Class.__instance != None:  # Should this all be refactored to not be a "class instance" since it is only used once?
+            raise Exception("Clip is already instantiated.")
+        
         device, model, preprocess = load_model_defaults()
         self.device = device
         self.model = model
@@ -20,6 +21,7 @@ class Clip_Factory:
 
         run_preprocess(preprocess)
         logging.info("Model ready")
+        Clip_Class.__instance == self 
 
     def set_image_descriptions(self, description_map):
         """Ensure every description has an image whose name matches the description list"""
@@ -76,10 +78,6 @@ class Clip_Factory:
             image_features = self.model.encode_image(image_input).float().cpu() #normalise add to device
             return image_features / image_features.norm(dim=-1, keepdim=True)
 
-    def encode_fixed_prompt(self, prompt):
-        self.classes = [prompt]
-        return self.encode_text_classes([prompt])
-
     def encode_text_classes(self, token_list):
         text_tokens = clip.tokenize(token_list)
         with torch.no_grad():
@@ -111,7 +109,7 @@ class Clip_Factory:
         noun_features = self.encode_text_classes(nouns)
         self.clip_draw_optimiser.set_text_features(prompt_features, neg_prompt_features, noun_features)
         self.clip_draw_optimiser.activate()
-        self.clip_draw_optimiser.end() # change to event
+        # self.clip_draw_optimiser.end() # change to event
         return
 
 

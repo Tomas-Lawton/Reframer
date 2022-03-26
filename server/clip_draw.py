@@ -7,9 +7,13 @@ import numpy as np
 from clip_util import get_noun_data, get_drawing_paths, area_mask, save_data
 from render_design import add_shape_groups, load_vars, render_save_img, build_random_curves
 import logging
+
 class Clip_Draw_Optimiser:
-    """These inputs are defaults and can have methods for setting them after the inital start up"""
+    __instance = None
     def __init__(self, model):
+        """These inputs are defaults and can have methods for setting them after the inital start up"""
+        if Clip_Draw_Optimiser.__instance != None:  # Should this all be refactored to not be a "class instance" since it is only used once?
+            raise Exception("Clip is already instantiated.")
         # Set up parent
         self.model = model
         # Partial sketch
@@ -54,6 +58,8 @@ class Clip_Draw_Optimiser:
             self.augment_trans = transforms.Compose([
             transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
             transforms.RandomResizedCrop(self.canvas_w, scale=(0.7,0.9))])
+        logging.info("Drawer ready")
+        Clip_Draw_Optimiser.__instance == self 
         return 
 
     def set_text_features(self, text_features, neg_text_features, nouns_features):
