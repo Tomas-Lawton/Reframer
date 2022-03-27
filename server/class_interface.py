@@ -110,7 +110,7 @@ class Clip_Class:
     def create_clip_draw(self, encode_nouns):
         noun_features = []
         if encode_nouns:
-            logging.info("Option set to encode nouns")
+            logging.info("Encoding nouns")
             nouns = get_noun_data()
             noun_features = self.encode_text_classes(nouns)
         self.clip_draw_optimiser = Clip_Draw_Optimiser(self.model, noun_features)
@@ -121,7 +121,7 @@ class Clip_Class:
             prompt_features = self.encode_text_classes(prompts)
             neg_prompt_features = self.encode_text_classes(neg_prompts)
         except:
-            logging.error("Failed to get (+/-) prompt features")
+            logging.error("Failed to get encoded prompt features")
 
         try:
             self.clip_draw_optimiser.set_text_features(prompt_features, neg_prompt_features)

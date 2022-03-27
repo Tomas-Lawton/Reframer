@@ -69,7 +69,7 @@ class Clip_Draw_Optimiser:
         logging.info("Updated CLIP prompt features")
         return
 
-
+    # HOW TO ABORT WITH NEW PROMPT?
     def activate(self):
         # SET UP IMAGE STEP ----------------------
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
