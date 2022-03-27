@@ -33,7 +33,7 @@ def load_model_defaults():
 
 def run_preprocess(preprocess):
     preprocess
-    print("Preprocess complete")
+    logging.info("Preprocess complete")
     return
 
 def get_noun_data():
@@ -84,7 +84,7 @@ def get_drawing_paths(path_to_svg_file):
 
     
         path_list.append(DrawingPath(path, color, width, num_segments))
-    # print(path, color, width, num_segments)    
+    # logging.info(path, color, width, num_segments)    
     return path_list
 
 def save_data(time_str, draw_class):

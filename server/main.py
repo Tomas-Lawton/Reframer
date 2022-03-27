@@ -3,17 +3,18 @@ from fastapi.responses import HTMLResponse
 import skimage
 import numpy as np
 import logging
+import json
 
 from class_interface import Clip_Class
 from plot_util import plot_cosines, plot_zero_shot_images, plot_image
-from clip_util import get_noun_data
 
+# check environment var
 # add filename='logs.log'
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG, format=f'APP LOGGING: %(levelname)s %(name)s %(threadName)s : %(message)s')
 
 app = FastAPI(title = "Clip Draw Backend")
 clip_class = Clip_Class()
-clip_class.create_clip_draw();
+clip_class.create_clip_draw(True) #encode nouns or nah
 
 @app.get("/classify_dataset")
 def classify_dataset():
@@ -73,53 +74,74 @@ def classify_text_from_image(prompt: str):
 def activate_clip_draw():
     prompts = ['A drawing of a red chair.']
     neg_prompts = ['A badly drawn sketch.', 'Many ugly, messy drawings.']
-    nouns = get_noun_data()
-    clip_class.start_clip_draw(prompts, neg_prompts, nouns);
+    clip_class.start_clip_draw(prompts, neg_prompts);
     return {"Hello": "World"}
 
 
-html = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Chat</title>
-    </head>
-    <body>
-        <h1>WebSocket Chat</h1>
-        <form action="" onsubmit="sendMessage(event)">
-            <input type="text" id="messageText" autocomplete="off"/>
-            <button>Send</button>
-        </form>
-        <ul id='messages'>
-        </ul>
-        <script>
-            const ws = new WebSocket('ws://localhost:8000/ws');
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages')
-                var message = document.createElement('li')
-                var content = document.createTextNode(event.data)
-                message.appendChild(content)
-                messages.appendChild(message)
-            };
-            function sendMessage(event) {
-                var input = document.getElementById("messageText")
-                ws.send(input.value)
-                input.value = ''
-                event.preventDefault()
-            }
-        </script>
-    </body>
-</html>
-"""
+# html = """
+# <!DOCTYPE html>
+# <html>
+#     <head>
+#         <title>Chat</title>
+#     </head>
+#     <body>
+#         <h1>WebSocket Chat</h1>
+#         <form action="" onsubmit="sendMessage(event)">
+#             <input type="text" id="messageText" autocomplete="off"/>
+#             <button>Send</button>
+#         </form>
+#         <ul id='messages'>
+#         </ul>
+#         <script>
+#             const ws = new WebSocket('ws://localhost:8080/ws');
+#             ws.onmessage = function(event) {
+#                 var messages = document.getElementById('messages')
+#                 var message = document.createElement('li')
+#                 var content = document.createTextNode(event.data)
+#                 message.appendChild(content)
+#                 messages.appendChild(message)
+#             };
+#             function sendMessage(event) {
+#                 var input = document.getElementById("messageText")
+#                 ws.send(input.value)
+#                 input.value = ''
+#                 event.preventDefault()
+#             }
+#         </script>
+#     </body>
+# </html>
+# """
+
+
+# @app.get("/")
+# async def get():
+#     return HTMLResponse(html)
 
 
 @app.get("/")
 async def get():
-    return HTMLResponse(html)
+    return {"Hello": "World"}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     while True:
         data = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {data}")
+        data = json.loads(data)
+
+        if data["type"] == "message":
+            content = data["content"] # could refactor to include pos and neg prompt or array of prompts
+            logging.info(f"Setting clip prompt: {content}")
+        
+            try:
+                clip_class.start_clip_draw([content]) # optional negative prompt as 2nd arg
+            except:
+                logging.error("Failed to start clip draw")
+
+            return_msg = json.dumps({
+                "type": "message",
+                "content": f"Current prompt: {content}"
+            })
+            await websocket.send_text(return_msg)
+            logging.info(f"Prompt Success: {data}")
+

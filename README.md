@@ -1,5 +1,7 @@
 # BE Web Application/Server Code
 
+Setup and run project with source setup.sh
+
 Fast api prevents a business logic layer to interact for processing input from the web interface frontend. The server instantiates the CLIP model and can be configured as an image classifier or text classifier. Outputs come in the form of images or classes and can be fed back to the CLIP handler as new inputs.
 
 The plot utility file helps with testing different aspects of the model.

@@ -79,10 +79,18 @@ class Clip_Class:
             return image_features / image_features.norm(dim=-1, keepdim=True)
 
     def encode_text_classes(self, token_list):
-        text_tokens = clip.tokenize(token_list)
-        with torch.no_grad():
-            text_features = self.model.encode_text(text_tokens).float().cpu() #normalise
-            return text_features / text_features.norm(dim=-1, keepdim=True)
+            tokens = []
+            if token_list != []:
+                try:
+                    tokens = clip.tokenize(token_list)
+                except:
+                    logging.error(f"Failed to tokenize: {token_list}")
+            if tokens == []:
+                return tokens
+
+            with torch.no_grad():
+                text_features = self.model.encode_text(tokens).float().cpu() #normalise
+                return text_features / text_features.norm(dim=-1, keepdim=True)
 
     def calc_cosine_similarities_for_text(self, text_features, image_features, apply_scaleing=False):
         """Calculates the cosines for caption with every image (square of cosines)"""
@@ -99,19 +107,38 @@ class Clip_Class:
         else:
             self.similarity = text_features.cpu().numpy() @ image_features.cpu().numpy().T
 
-    def create_clip_draw(self):
-        self.clip_draw_optimiser = Clip_Draw_Optimiser(self.model)
+    def create_clip_draw(self, encode_nouns):
+        noun_features = []
+        if encode_nouns:
+            logging.info("Option set to encode nouns")
+            nouns = get_noun_data()
+            noun_features = self.encode_text_classes(nouns)
+        self.clip_draw_optimiser = Clip_Draw_Optimiser(self.model, noun_features)
         return
 
-    def start_clip_draw(self, prompts, neg_prompts, nouns):
-        prompt_features = self.encode_text_classes(prompts)
-        neg_prompt_features = self.encode_text_classes(neg_prompts)
-        noun_features = self.encode_text_classes(nouns)
-        self.clip_draw_optimiser.set_text_features(prompt_features, neg_prompt_features, noun_features)
-        self.clip_draw_optimiser.activate()
+    def start_clip_draw(self, prompts, neg_prompts = []):
+        try:
+            prompt_features = self.encode_text_classes(prompts)
+            neg_prompt_features = self.encode_text_classes(neg_prompts)
+        except:
+            logging.error("Failed to get (+/-) prompt features")
+
+        try:
+            self.clip_draw_optimiser.set_text_features(prompt_features, neg_prompt_features)
+        except:
+            logging.error("Failed to encode text features in clip")
+        
+        try:
+            self.clip_draw_optimiser.activate()
+        except:
+            logging.error("Failed to activate clip draw")
         # self.clip_draw_optimiser.end() # change to event
         return
 
+    def restart_clip_draw(self):
+        """Use old classes to guide image"""
+        self.clip_draw_optimiser.activate()
+        return
 
 
 # CLIP Setup step -------------------

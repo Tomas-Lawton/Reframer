@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Input Prompt</h1>
+    <form>
+        <input type="text" id="messageText" autocomplete="off" />
+        <button id="send-prompt">Send</button>
+    </form>
+    <h2 id="message"></h2>
+    <button id="start-draw">CLIP Draw</button>
+
+
+    <script>
+        const ws = new WebSocket('ws://localhost:8000/ws');
+        ws.onmessage = function(event) {
+            const message = document.getElementById('message');
+            const {
+                type,
+                content
+            } = JSON.parse(event.data);
+            if (type === "message") {
+                message.innerHTML = content
+            }
+
+            // parse stroke information
+        };
+
+        const sendMessage = (e) => {
+            var input = document.getElementById("messageText")
+            const msg = JSON.stringify({
+                "type": "message",
+                "content": input.value
+            })
+            ws.send(msg);
+            input.value = ''
+            e.preventDefault()
+        }
+
+        document.getElementById("send-prompt").addEventListener("click", (e) => {
+            sendMessage(e)
+        })
+        document.getElementById("start-draw").addEventListener("click", (e) => {
+            sendMessage(e)
+        })
+    </script>
+</body>
+
+</html>

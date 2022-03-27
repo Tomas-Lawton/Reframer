@@ -10,7 +10,7 @@ import logging
 
 class Clip_Draw_Optimiser:
     __instance = None
-    def __init__(self, model):
+    def __init__(self, model, noun_features):
         """These inputs are defaults and can have methods for setting them after the inital start up"""
         if Clip_Draw_Optimiser.__instance != None:  # Should this all be refactored to not be a "class instance" since it is only used once?
             raise Exception("Clip is already instantiated.")
@@ -21,7 +21,7 @@ class Clip_Draw_Optimiser:
         # Array set as arrays
         self.text_features = []
         self.neg_text_features = []
-        self.nouns_features = []
+        self.nouns_features = noun_features
         self.use_neg_prompts = False
         self.normalize_clip = True
         # Canvas parameters
@@ -42,6 +42,7 @@ class Clip_Draw_Optimiser:
             'y0': 0.5,
             'y1': 1.0
         }
+        self.update_frequency = 5
         # Configure rasterisor
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         pydiffvg.set_print_timing(False)
@@ -62,11 +63,12 @@ class Clip_Draw_Optimiser:
         Clip_Draw_Optimiser.__instance == self 
         return 
 
-    def set_text_features(self, text_features, neg_text_features, nouns_features):
+    def set_text_features(self, text_features, neg_text_features = []):
         self.text_features = text_features
         self.neg_text_features = neg_text_features
-        self.nouns_features = nouns_features
+        logging.info("Updated CLIP prompt features")
         return
+
 
     def activate(self):
         # SET UP IMAGE STEP ----------------------
@@ -180,7 +182,7 @@ class Clip_Draw_Optimiser:
                 group.stroke_color.data.clamp_(0.0, 1.0)
 
             # This is just to check out the progress
-            if t % 50 == 0:
+            if t % self.update_frequency == 0:
                 logging.info(f"render loss: {loss.item()}")
                 logging.info(f"l_points: {l_points.item()}")
                 logging.info(f"l_colors: {l_colors.item()}")
@@ -191,15 +193,20 @@ class Clip_Draw_Optimiser:
                 logging.info(f"iteration: {t}")
                 with torch.no_grad():
                     pydiffvg.imwrite(img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+time_str+'.png', gamma=1)
-                    im_norm = image_features / image_features.norm(dim=-1, keepdim=True)
-                    noun_norm = self.nouns_features / self.nouns_features.norm(dim=-1, keepdim=True)
-                    similarity = (100.0 * im_norm @ noun_norm.T).softmax(dim=-1)
-                    values, indices = similarity[0].topk(5)
-                    logging.info("\nTop predictions:\n")
-                    for value, index in zip(values, indices):
-                        logging.info(f"{nouns[index]:>16s}: {100 * value.item():.2f}%")
+                    # Calc similarity to noun classes.
+                    if self.nouns_features != []:
+                        im_norm = image_features / image_features.norm(dim=-1, keepdim=True)
+                        noun_norm = self.nouns_features / self.nouns_features.norm(dim=-1, keepdim=True)
+                        similarity = (100.0 * im_norm @ noun_norm.T).softmax(dim=-1)
+                        values, indices = similarity[0].topk(5)
+                        logging.info("\nTop predictions:\n")
+                        for value, index in zip(values, indices):
+                            logging.info(f"{nouns[index]:>16s}: {100 * value.item():.2f}%")
         pydiffvg.imwrite(img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+time_str+'.png', gamma=1)
         save_data(time_str, self)
         return
-    # def use_svg_from_file(self, path_input):
+
+
+
+           # def use_svg_from_file(self, path_input):
     #     return
