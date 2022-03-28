@@ -76,11 +76,17 @@ class Clip_Draw_Optimiser:
         self.is_stopping = True
 
     # HOW TO ABORT WITH NEW PROMPT?
-    def activate(self):
+    def activate(self, path_string = None):
         self.is_active = True
         # SET UP IMAGE STEP ----------------------
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        path_list = get_drawing_paths(self.svg_path) # update with new method
+
+        # extract_paths = []
+        # if path_string != None:
+
+        # path_list = extract_paths
+
+        # path_list = get_drawing_paths(self.svg_path) # update with new method
         shapes, shape_groups = render_save_img(path_list, self.canvas_w, self.canvas_h)
         shapes_rnd, shape_groups_rnd = build_random_curves(
             self.num_paths,

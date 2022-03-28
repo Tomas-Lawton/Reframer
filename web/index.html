@@ -12,7 +12,9 @@
 </head>
 
 <body>
-    <canvas id="canvas" resize></canvas>
+    <div id="contain-canvas">
+        <canvas id="canvas" resize></canvas>
+    </div>
     <div id="control-panel">
         <h1>Input Prompt</h1>
         <form id="send-prompt">
@@ -34,10 +36,15 @@
     </div> -->
 
     <script>
+        const targetHeight = 224;
+        const scaleFactor = targetHeight / window.innerHeight; // scale as a square, innerHeight smaller than width
+
         const canvas = new fabric.Canvas("canvas", {
-            width: window.innerWidth,
-            height: window.innerHeight
+            width: window.innerHeight,
+            height: window.innerHeight,
+            backgroundColor: '#FAFAFA'
         });
+
         const ctx = canvas.getContext("2d");
         canvas.isDrawingMode = true;
         const brush = canvas.freeDrawingBrush;
@@ -55,7 +62,6 @@
             brush.color = color.rgbaString;
             console.log(brush)
         };
-
         document.getElementById("width-slider").oninput = function() {
             brush.width = parseInt(this.value, 10);
         }
@@ -63,6 +69,7 @@
             canvas.clear();
         })
 
+        // Drawing
         document.addEventListener("mouseup", () => {
             setTimeout(() => exportCanvasSvg(), 0);
             // setTimeout(() => getAllPaths(), 0);
@@ -80,8 +87,9 @@
         }
 
         const exportCanvasSvg = () => {
-            svg = canvas.toSVG();
-            // console.log(svg)
+
+            svg = scaledCanvas.toSVG();
+            console.log(svg)
         }
 
         const readPathArray = (pathArray) => {
@@ -89,37 +97,39 @@
                 writePath(path);
             }
         }
-        const writePath = (pathString) => {
-            var path = new fabric.Path('m 112.26316,83.842105 c 0,7.578947 0,15.157894 0,22.736845', {
-                stroke: 'red',
-                strokeWidth: 5,
-                fill: false,
-                originX: 'left',
-                originY: 'top'
-            });
 
-            var path1 = new fabric.Path('m 74.842104,84.315788 c 0,7.578948 0,15.157895 0,22.736842', {
-                stroke: 'red',
-                strokeWidth: 5,
-                fill: false,
-                originX: 'left',
-                originY: 'top'
-            });
 
-            var path2 = new fabric.Path('m 54.473683,133.57894 c 2.309053,6.52389 5.103384,12.88691 9.947368,18.00001 1.602465,1.69148 7.516862,3.36572 9,3.78947 8.215344,2.34724 20.231724,5.06339 28.894739,2.8421 3.21552,-0.82449 6.03091,-2.77861 9,-4.26315 8.27335,-4.13668 15.89845,-8.52099 21.31579,-16.10527', {
-                stroke: 'red',
-                strokeWidth: 5,
-                fill: false,
-                originX: 'left',
-                originY: 'top'
-            });
+        // const writePath = (pathString) => {
+        //     var path = new fabric.Path('m 112.26316,83.842105 c 0,7.578947 0,15.157894 0,22.736845', {
+        //         stroke: 'red',
+        //         strokeWidth: 5,
+        //         fill: false,
+        //         originX: 'left',
+        //         originY: 'top'
+        //     });
 
-            var obj = fabric.util.groupSVGElements([path, path1, path2]);
-            canvas.add(obj);
-            obj.center();
+        //     var path1 = new fabric.Path('m 74.842104,84.315788 c 0,7.578948 0,15.157895 0,22.736842', {
+        //         stroke: 'red',
+        //         strokeWidth: 5,
+        //         fill: false,
+        //         originX: 'left',
+        //         originY: 'top'
+        //     });
 
-        }
-        writePath();
+        //     var path2 = new fabric.Path('m 54.473683,133.57894 c 2.309053,6.52389 5.103384,12.88691 9.947368,18.00001 1.602465,1.69148 7.516862,3.36572 9,3.78947 8.215344,2.34724 20.231724,5.06339 28.894739,2.8421 3.21552,-0.82449 6.03091,-2.77861 9,-4.26315 8.27335,-4.13668 15.89845,-8.52099 21.31579,-16.10527', {
+        //         stroke: 'red',
+        //         strokeWidth: 5,
+        //         fill: false,
+        //         originX: 'left',
+        //         originY: 'top'
+        //     });
+
+        //     var obj = fabric.util.groupSVGElements([path, path1, path2]);
+        //     canvas.add(obj);
+        //     obj.center();
+        // }
+        // writePath();
+
         const updatePath = () => {
             // remove specific object and redraw it. would have to maintain the index somehow. draw and generated paths would be tracked in a seperate array.
             // change or delete and redraw

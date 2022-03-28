@@ -57,6 +57,10 @@ body {
     pointer-events: auto;
 } */
 
+#contain-canvas {
+    margin-left: 600px;
+}
+
 canvas[resize] {
     width: 100%;
     height: 100%;

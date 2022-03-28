@@ -101,12 +101,13 @@
                 myPath.simplify()
                     // Get path data
                 const pathStrokes = myPath.exportSVG();
+                // console.log(pathStrokes)
                 // console.log(paths)
                 // console.log(myPath.pathData);
                 // console.log(myPath.pathData.replace(/,/g, ' '));
                 console.log(paper.project.exportSVG());
                 // can you list all paths?
-                console.log(paper.project.getItems()[0]._children); // is an array of paths and can get segments or pathData
+                // console.log(paper.project.getItems()[0]._children); // is an array of paths and can get segments or pathData
                 // read path from an svg ???? can use string or dom node 
                 // paper.project.importSVG(svg)
                 // console.log(svg)
