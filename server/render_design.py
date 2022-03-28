@@ -39,7 +39,7 @@ def render_save_img(path_list, canvas_height, canvas_width):
     for group in shape_groups:
         group.stroke_color.requires_grad = True
         color_vars.append(group.stroke_color)
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
     img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(img.shape[0], img.shape[1], 3, device = pydiffvg.get_device()) * (1 - img[:, :, 3:4])
     
     with open('tmp/img0.pkl', 'wb') as f:

@@ -8,6 +8,8 @@ from clip_util import get_noun_data, get_drawing_paths, area_mask, save_data
 from render_design import add_shape_groups, load_vars, render_save_img, build_random_curves
 import logging
 
+from fastapi import WebSocket
+import json
 class Clip_Draw_Optimiser:
     __instance = None
     def __init__(self, model, noun_features):
@@ -81,12 +83,14 @@ class Clip_Draw_Optimiser:
         # SET UP IMAGE STEP ----------------------
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+        # TO DO UPDATE PATH INPUT
+
         # extract_paths = []
         # if path_string != None:
 
         # path_list = extract_paths
 
-        # path_list = get_drawing_paths(self.svg_path) # update with new method
+        path_list = get_drawing_paths(self.svg_path) # update with new method
         shapes, shape_groups = render_save_img(path_list, self.canvas_w, self.canvas_h)
         shapes_rnd, shape_groups_rnd = build_random_curves(
             self.num_paths,
@@ -218,6 +222,14 @@ class Clip_Draw_Optimiser:
                         logging.info("\nTop predictions:\n")
                         for value, index in zip(values, indices):
                             logging.info(f"{nouns[index]:>16s}: {100 * value.item():.2f}%")
+            
+# at this point the whole thing should return to the top with new path data
+            # send_paths_to_client = json.dumps({
+            #     "type": "paths",
+            #     "content": shapes
+            # })
+            # websocket.send_text(send_paths_to_client)
+
         logging.info("Stopping clip drawer")
         pydiffvg.imwrite(img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+time_str+'.png', gamma=1)
         save_data(time_str, self)

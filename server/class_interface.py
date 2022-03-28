@@ -131,7 +131,7 @@ class Clip_Class:
             except:
                 logging.error("Failed to encode text features in clip")
             try:
-                self.clip_draw_optimiser.activate()
+                return self.clip_draw_optimiser.activate()
             except:
                 logging.error("Failed to activate clip draw")
 

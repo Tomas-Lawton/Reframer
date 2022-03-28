@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/451/fabric.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.15/paper-full.min.js"></script>
     <script src="https://unpkg.com/vanilla-picker@2"></script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -16,12 +16,11 @@
         <canvas id="canvas" resize></canvas>
     </div>
     <div id="control-panel">
-        <h1>Input Prompt</h1>
+        <h2 id="message">Input Prompt</h2>
         <form id="send-prompt">
             <input type="text" id="messageText" autocomplete="off" />
             <button>Send</button>
         </form>
-        <h2 id="message"></h2>
         <div id="slider-controls">
             <div id="color-picker"></div>
             <div>
@@ -31,23 +30,58 @@
         </div>
         <button id="clear">Clear</button>
     </div>
-    <!-- <div id="ui-overlay">
-        <button id="clear">Clear</button>
-    </div> -->
 
     <script>
-        const targetHeight = 224;
-        const scaleFactor = targetHeight / window.innerHeight; // scale as a square, innerHeight smaller than width
+        //     const targetHeight = 224;
+        // const scaleFactor = targetHeight / window.innerHeight; // scale as a square, innerHeight smaller than width
+        const canvas = document.getElementById('canvas');
+        canvas.style.background = "#F4F4F4";
+        paper.setup(canvas);
+        let strokeColor = "#402f95";
+        let strokeWidth = 20;
+        let myPath;
+        const tool = new paper.Tool();
 
-        const canvas = new fabric.Canvas("canvas", {
-            width: window.innerHeight,
-            height: window.innerHeight,
-            backgroundColor: '#FAFAFA'
-        });
+        // Drawing Controls
+        tool.onMouseDown = function(event) {
+            myPath = new paper.Path({
+                strokeColor: strokeColor,
+                strokeWidth: strokeWidth,
+                selected: true,
+                strokeCap: 'round',
+                strokeJoin: 'round'
+            });
+            myPath.add(event.point);
+            myPath.add({
+                ...event.point,
+                x: event.point.x + .001 //this is ok because path gets simplified
+            }); //in case no drag means no line segment
+            myPath.draw();
+            isMoveStart = true;
+        }
 
-        const ctx = canvas.getContext("2d");
-        canvas.isDrawingMode = true;
-        const brush = canvas.freeDrawingBrush;
+        tool.onMouseDrag = function(event) {
+            myPath.add(event.point);
+            myPath.smooth();
+            // console.log(event.point)
+        }
+
+        tool.onMouseUp = function(event) {
+            myPath.simplify()
+            const pathStrokes = myPath.exportSVG();
+            // console.log(myPath.pathData);
+            console.log(paper.project.exportSVG());
+            console.log(paper.project.getItems()[0]._children); // is an array of paths and can get segments or pathData
+
+            // paper.project.importSVG(svg)
+            // console.log(svg)
+            //draw path
+            // var pathData = 'm 54.473683,133.57894 c 2.309053,6.52389 5.103384,12.88691 9.947368,18.00001 1.602465,1.69148 7.516862,3.36572 9,3.78947 8.215344,2.34724 20.231724,5.06339 28.894739,2.8421 3.21552,-0.82449 6.03091,-2.77861 9,-4.26315 8.27335,-4.13668 15.89845,-8.52099 21.31579,-16.10527';
+            // var path = new paper.Path(pathData);
+            // path.strokeColor = 'red';
+            // path.scale(5);
+        }
+
 
         // Color picker
         const picker = new Picker({
@@ -58,82 +92,16 @@
             editor: false,
             editorFormat: 'hex' // or 'rgb', 'hsl'
         });
+        picker.setColor("#402f95");
         picker.onChange = (color) => {
-            brush.color = color.rgbaString;
-            console.log(brush)
+            strokeColor = color.rgbaString;
         };
         document.getElementById("width-slider").oninput = function() {
-            brush.width = parseInt(this.value, 10);
+            strokeWidth = parseInt(this.value, 10);
         }
         document.getElementById("clear").addEventListener("click", () => {
-            canvas.clear();
+            paper.project.clear()
         })
-
-        // Drawing
-        document.addEventListener("mouseup", () => {
-            setTimeout(() => exportCanvasSvg(), 0);
-            // setTimeout(() => getAllPaths(), 0);
-            setTimeout(() => getLastPath(), 0);
-        });
-
-        const getLastPath = () => {
-            const obj = canvas._objects[canvas._objects.length - 1];
-            // console.log('last path: ', obj)
-        }
-
-        const getAllPaths = () => {
-            canvas.forEachObject((i) => console.log(i));
-            canvas.forEachObject((i) => console.log(i.toSVG()));
-        }
-
-        const exportCanvasSvg = () => {
-
-            svg = scaledCanvas.toSVG();
-            console.log(svg)
-        }
-
-        const readPathArray = (pathArray) => {
-            for (const path in pathArray) {
-                writePath(path);
-            }
-        }
-
-
-        // const writePath = (pathString) => {
-        //     var path = new fabric.Path('m 112.26316,83.842105 c 0,7.578947 0,15.157894 0,22.736845', {
-        //         stroke: 'red',
-        //         strokeWidth: 5,
-        //         fill: false,
-        //         originX: 'left',
-        //         originY: 'top'
-        //     });
-
-        //     var path1 = new fabric.Path('m 74.842104,84.315788 c 0,7.578948 0,15.157895 0,22.736842', {
-        //         stroke: 'red',
-        //         strokeWidth: 5,
-        //         fill: false,
-        //         originX: 'left',
-        //         originY: 'top'
-        //     });
-
-        //     var path2 = new fabric.Path('m 54.473683,133.57894 c 2.309053,6.52389 5.103384,12.88691 9.947368,18.00001 1.602465,1.69148 7.516862,3.36572 9,3.78947 8.215344,2.34724 20.231724,5.06339 28.894739,2.8421 3.21552,-0.82449 6.03091,-2.77861 9,-4.26315 8.27335,-4.13668 15.89845,-8.52099 21.31579,-16.10527', {
-        //         stroke: 'red',
-        //         strokeWidth: 5,
-        //         fill: false,
-        //         originX: 'left',
-        //         originY: 'top'
-        //     });
-
-        //     var obj = fabric.util.groupSVGElements([path, path1, path2]);
-        //     canvas.add(obj);
-        //     obj.center();
-        // }
-        // writePath();
-
-        const updatePath = () => {
-            // remove specific object and redraw it. would have to maintain the index somehow. draw and generated paths would be tracked in a seperate array.
-            // change or delete and redraw
-        }
 
         const ws = new WebSocket('ws://localhost:8000/ws');
         ws.onmessage = function(event) {
@@ -144,6 +112,9 @@
             } = JSON.parse(event.data);
             if (type === "message") {
                 message.innerHTML = content
+            }
+            if (type === "paths") {
+                console.log(content);
             }
             // parse stroke information
         };
@@ -162,6 +133,32 @@
         document.getElementById("send-prompt").addEventListener("submit", (e) => {
             sendMessage(e)
         })
+
+
+
+        const getLastPath = () => {
+
+        }
+
+        const getPaths = () => {
+
+        }
+
+        const exportCanvasSvg = () => {
+
+        }
+
+        const readSvgString = () => {
+
+        }
+
+        const writePathArray = () => {
+
+        }
+
+        const writePath = (pathString) => {
+
+        }
     </script>
 </body>
 
