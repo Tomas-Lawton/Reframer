@@ -43,6 +43,8 @@ class Clip_Draw_Optimiser:
             'y1': 1.0
         }
         self.update_frequency = 5
+        self.is_stopping = False
+        self.is_active = False
         # Configure rasterisor
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         pydiffvg.set_print_timing(False)
@@ -69,8 +71,13 @@ class Clip_Draw_Optimiser:
         logging.info("Updated CLIP prompt features")
         return
 
+    def stop_clip_draw(self):
+        logging.info("Stopping Clip draw")
+        self.is_stopping = True
+
     # HOW TO ABORT WITH NEW PROMPT?
     def activate(self):
+        self.is_active = True
         # SET UP IMAGE STEP ----------------------
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         path_list = get_drawing_paths(self.svg_path) # update with new method
@@ -121,9 +128,12 @@ class Clip_Draw_Optimiser:
 
         # RUN MAIN OPTIMISER LOOP ____------------
         time_str = datetime.datetime.today().strftime("%Y_%m_%d_%H_%M_%S")
-        nouns = get_noun_data() # could add to clip class?
+        if self.nouns_features != []:
+            nouns = get_noun_data() # could add to clip class?
         for t in range(self.num_iter):
-
+            if self.is_stopping:
+                break
+            logging.info("Running draw optimiser")
             points_optim.zero_grad()
             width_optim.zero_grad()
             color_optim.zero_grad()
@@ -202,8 +212,12 @@ class Clip_Draw_Optimiser:
                         logging.info("\nTop predictions:\n")
                         for value, index in zip(values, indices):
                             logging.info(f"{nouns[index]:>16s}: {100 * value.item():.2f}%")
+        logging.info("Stopping clip drawer")
         pydiffvg.imwrite(img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+time_str+'.png', gamma=1)
         save_data(time_str, self)
+        self.is_active = False
+        self.is_stopping = False
+        logging.info("Drawer ready for restart")
         return
 
 

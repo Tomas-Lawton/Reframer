@@ -14,7 +14,7 @@ logging.basicConfig(encoding='utf-8', level=logging.DEBUG, format=f'APP LOGGING:
 
 app = FastAPI(title = "Clip Draw Backend")
 clip_class = Clip_Class()
-clip_class.create_clip_draw(True) #encode nouns or nah
+clip_class.create_clip_draw(False) #encode nouns or nah
 
 @app.get("/classify_dataset")
 def classify_dataset():
@@ -131,8 +131,8 @@ async def websocket_endpoint(websocket: WebSocket):
 
         if data["type"] == "message":
             content = data["content"] # could refactor to include pos and neg prompt or array of prompts
-            logging.info(f"Setting clip prompt: {content}")
-        
+            
+            logging.info(f"Setting clip prompt: {content}")        
             try:
                 clip_class.start_clip_draw([content]) # optional negative prompt as 2nd arg
             except:
