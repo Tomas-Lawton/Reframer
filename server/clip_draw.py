@@ -4,12 +4,10 @@ import torchvision.transforms as transforms
 import datetime
 import numpy as np
 # make a util directory???
-from clip_util import get_noun_data, get_drawing_paths, area_mask, save_data
+from clip_util import get_noun_data, get_drawing_paths, area_mask, save_data, get_drawing_paths_string
 from render_design import add_shape_groups, load_vars, render_save_img, build_random_curves
 import logging
 
-from fastapi import WebSocket
-import json
 class Clip_Draw_Optimiser:
     __instance = None
     def __init__(self, model, noun_features):
@@ -20,6 +18,7 @@ class Clip_Draw_Optimiser:
         self.model = model
         # Partial sketch
         self.svg_path = 'data/drawing_flower_vase.svg'
+        self.svg_string = ''
         # Array set as arrays
         self.text_features = []
         self.neg_text_features = []
@@ -37,7 +36,7 @@ class Clip_Draw_Optimiser:
         self.w_colors = 0.1
         self.w_widths = 0.01
         self.w_img = 0.01
-        # self.w_full_img = 0.001
+        self.w_full_img = 0.001
         self.drawing_area = {
             'x0': 0.0,
             'x1': 1.0,
@@ -47,6 +46,7 @@ class Clip_Draw_Optimiser:
         self.update_frequency = 5
         self.is_stopping = False
         self.is_active = False
+        self.nouns = get_noun_data()
         # Configure rasterisor
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         pydiffvg.set_print_timing(False)
@@ -78,21 +78,21 @@ class Clip_Draw_Optimiser:
         self.is_stopping = True
 
     # HOW TO ABORT WITH NEW PROMPT?
-    def activate(self, path_string = None):
+    def activate(self, use_user_paths):
         self.is_active = True
         # SET UP IMAGE STEP ----------------------
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-        # TO DO UPDATE PATH INPUT
+        # path_list = []
+        if use_user_paths:
+            # get_drawing_paths_string(self.svg_string)
+            self.svg_path = 'data/interface_paths.svg'
+            # to do: update util containing self.svg_path
+        
+        path_list = get_drawing_paths(self.svg_path, "sketch")
 
-        # extract_paths = []
-        # if path_string != None:
-
-        # path_list = extract_paths
-
-        path_list = get_drawing_paths(self.svg_path) # update with new method
-        shapes, shape_groups = render_save_img(path_list, self.canvas_w, self.canvas_h)
-        shapes_rnd, shape_groups_rnd = build_random_curves(
+        self.shapes, self.shape_groups = render_save_img(path_list, self.canvas_w, self.canvas_h)
+        self.shapes_rnd, self.shape_groups_rnd = build_random_curves(
             self.num_paths,
             self.canvas_w,
             self.canvas_h,
@@ -101,28 +101,28 @@ class Clip_Draw_Optimiser:
             self.drawing_area['y0'],
             self.drawing_area['y1'],
             )
-        shapes += shapes_rnd
-        shape_groups = add_shape_groups(shape_groups, shape_groups_rnd)
+        self.shapes += self.shapes_rnd
+        self.shape_groups = add_shape_groups(self.shape_groups, self.shape_groups_rnd)
 
-        points_vars0, stroke_width_vars0, color_vars0, img0 = load_vars()
+        self.points_vars0, self.stroke_width_vars0, self.color_vars0, self.img0 = load_vars()
 
-        points_vars = []
-        stroke_width_vars = []
-        color_vars = []
-        for path in shapes:
+        self.points_vars = []
+        self.stroke_width_vars = []
+        self.color_vars = []
+        for path in self.shapes:
             path.points.requires_grad = True
-            points_vars.append(path.points)
+            self.points_vars.append(path.points)
             path.stroke_width.requires_grad = True
-            stroke_width_vars.append(path.stroke_width)
-        for group in shape_groups:
+            self.stroke_width_vars.append(path.stroke_width)
+        for group in self.shape_groups:
             group.stroke_color.requires_grad = True
-            color_vars.append(group.stroke_color)
+            self.color_vars.append(group.stroke_color)
 
         scene_args = pydiffvg.RenderFunction.serialize_scene(\
-            self.canvas_w, self.canvas_h, shapes, shape_groups)
-        render = pydiffvg.RenderFunction.apply
+            self.canvas_w, self.canvas_h, self.shapes, self.shape_groups)
+        self.render = pydiffvg.RenderFunction.apply
 
-        mask = area_mask(
+        self.mask = area_mask(
             self.canvas_w,
             self.canvas_h,
             self.drawing_area['x0'],
@@ -132,43 +132,42 @@ class Clip_Draw_Optimiser:
             ).to(device)
 
         # Optimizers
-        points_optim = torch.optim.Adam(points_vars, lr=0.5)
-        width_optim = torch.optim.Adam(stroke_width_vars, lr=0.1)
-        color_optim = torch.optim.Adam(color_vars, lr=0.01)
+        self.points_optim = torch.optim.Adam(self.points_vars, lr=0.5)
+        self.width_optim = torch.optim.Adam(self.stroke_width_vars, lr=0.1)
+        self.color_optim = torch.optim.Adam(self.color_vars, lr=0.01)
 
         # RUN MAIN OPTIMISER LOOP ____------------
-        time_str = datetime.datetime.today().strftime("%Y_%m_%d_%H_%M_%S")
-        if self.nouns_features != []:
-            nouns = get_noun_data() # could add to clip class?
-        for t in range(self.num_iter):
-            if self.is_stopping:
-                break
+        self.time_str = datetime.datetime.today().strftime("%Y_%m_%d_%H_%M_%S")
+        
+    def run_draw_iteration(self, iteration):
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") #REFACTORRRRRR
+        if iteration < self.num_iter:
             logging.info("Running draw optimiser")
-            points_optim.zero_grad()
-            width_optim.zero_grad()
-            color_optim.zero_grad()
+            self.points_optim.zero_grad()
+            self.width_optim.zero_grad()
+            self.color_optim.zero_grad()
             scene_args = pydiffvg.RenderFunction.serialize_scene(\
-                self.canvas_w, self.canvas_h, shapes, shape_groups)
-            img = render(self.canvas_w, self.canvas_h, 2, 2, t, None, *scene_args)
-            img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(img.shape[0], img.shape[1], 3, device = pydiffvg.get_device()) * (1 - img[:, :, 3:4])
+                self.canvas_w, self.canvas_h, self.shapes, self.shape_groups)
+            self.img = self.render(self.canvas_w, self.canvas_h, 2, 2, iteration, None, *scene_args)
+            self.img = self.img[:, :, 3:4] * self.img[:, :, :3] + torch.ones(self.img.shape[0], self.img.shape[1], 3, device = pydiffvg.get_device()) * (1 - self.img[:, :, 3:4])
 
             if self.w_img >0:
-                l_img = torch.norm((img-img0.to(device))*mask).view(1)
+                self.l_img = torch.norm((self.img-self.img0.to(device))*self.mask).view(1)
             else:
-                l_img = torch.tensor([0], device=device)
+                self.l_img = torch.tensor([0], device=device)
 
-            img = img[:, :, :3]
-            img = img.unsqueeze(0)
-            img = img.permute(0, 3, 1, 2) # NHWC -> NCHW
+            self.img = self.img[:, :, :3]
+            self.img = self.img.unsqueeze(0)
+            self.img = self.img.permute(0, 3, 1, 2) # NHWC -> NCHW
 
             loss = 0
-            loss += self.w_img*l_img.item()
+            loss += self.w_img*(self.l_img.item())
 
             NUM_AUGS = 4
-            img_augs = []
+            self.img_augs = []
             for n in range(NUM_AUGS):
-                img_augs.append(self.augment_trans(img))
-            im_batch = torch.cat(img_augs)
+                self.img_augs.append(self.augment_trans(self.img))
+            im_batch = torch.cat(self.img_augs)
             image_features = self.model.encode_image(im_batch)
             for n in range(NUM_AUGS):
                 loss -= torch.cosine_similarity(self.text_features, image_features[n:n+1], dim=1)
@@ -180,11 +179,11 @@ class Clip_Draw_Optimiser:
             l_widths = 0
             l_colors = 0
             
-            for k, points0 in enumerate(points_vars0):
-                l_points += torch.norm(points_vars[k]-points0)
-                l_colors += torch.norm(color_vars[k]-color_vars0[k])
-                l_widths += torch.norm(stroke_width_vars[k]-stroke_width_vars0[k])
-            
+            for k, points0 in enumerate(self.points_vars0):
+                l_points += torch.norm(self.points_vars[k]-points0)
+                l_colors += torch.norm(self.color_vars[k]-self.color_vars0[k])
+                l_widths += torch.norm(self.stroke_width_vars[k]-self.stroke_width_vars0[k])
+
             loss += self.w_points*l_points
             loss += self.w_colors*l_colors
             loss += self.w_widths*l_widths   
@@ -193,26 +192,26 @@ class Clip_Draw_Optimiser:
             loss.backward()
 
             # Take a gradient descent step.
-            points_optim.step() # at this point path is updated ? should be able to stream this to fe in real time
-            width_optim.step()
-            color_optim.step()
-            for path in shapes:
+            self.points_optim.step() # at this point path is updated ? should be able to stream this to fe in real time
+            self.width_optim.step()
+            self.color_optim.step()
+            for path in self.shapes:
                 path.stroke_width.data.clamp_(1.0, self.max_width)
-            for group in shape_groups:
+            for group in self.shape_groups:
                 group.stroke_color.data.clamp_(0.0, 1.0)
 
             # This is just to check out the progress
-            if t % self.update_frequency == 0:
+            if iteration % self.update_frequency == 0:
                 logging.info(f"render loss: {loss.item()}")
                 logging.info(f"l_points: {l_points.item()}")
                 logging.info(f"l_colors: {l_colors.item()}")
                 logging.info(f"l_widths: {l_widths.item()}")
-                logging.info(f"l_img: {l_img.item()}")
+                logging.info(f"self.l_img: {self.l_img.item()}")
                 # for l in l_style:
                 #     print('l_style: ', l.item())
-                logging.info(f"iteration: {t}")
+                logging.info(f"Iteration: {iteration}")
                 with torch.no_grad():
-                    pydiffvg.imwrite(img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+time_str+'.png', gamma=1)
+                    pydiffvg.imwrite(self.img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+self.time_str+'.png', gamma=1)
                     # Calc similarity to noun classes.
                     if self.nouns_features != []:
                         im_norm = image_features / image_features.norm(dim=-1, keepdim=True)
@@ -221,18 +220,14 @@ class Clip_Draw_Optimiser:
                         values, indices = similarity[0].topk(5)
                         logging.info("\nTop predictions:\n")
                         for value, index in zip(values, indices):
-                            logging.info(f"{nouns[index]:>16s}: {100 * value.item():.2f}%")
-            
-# at this point the whole thing should return to the top with new path data
-            # send_paths_to_client = json.dumps({
-            #     "type": "paths",
-            #     "content": shapes
-            # })
-            # websocket.send_text(send_paths_to_client)
+                            logging.info(f"{self.nouns[index]:>16s}: {100 * value.item():.2f}%")
+        return self.shapes
+            # at this point the whole thing should return to the top with new path data
 
+    def clip_has_stopped(self):
         logging.info("Stopping clip drawer")
-        pydiffvg.imwrite(img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+time_str+'.png', gamma=1)
-        save_data(time_str, self)
+        pydiffvg.imwrite(self.img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+self.time_str+'.png', gamma=1)
+        save_data(self.time_str, self)
         self.is_active = False
         self.is_stopping = False
         logging.info("Drawer ready for restart")

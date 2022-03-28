@@ -115,7 +115,7 @@ class Clip_Class:
             noun_features = self.encode_text_classes(nouns)
         self.clip_draw_optimiser = Clip_Draw_Optimiser(self.model, noun_features)
 
-    def start_clip_draw(self, prompts, neg_prompts = []):
+    def start_clip_draw(self, prompts, use_user_paths, neg_prompts = []):
         """Check if it's running and if it is, wait for it to stop before starting again."""
         if self.clip_draw_optimiser.is_active:
             self.clip_draw_optimiser.stop_clip_draw()
@@ -131,13 +131,13 @@ class Clip_Class:
             except:
                 logging.error("Failed to encode text features in clip")
             try:
-                return self.clip_draw_optimiser.activate()
+                return self.clip_draw_optimiser.activate(use_user_paths)
             except:
                 logging.error("Failed to activate clip draw")
 
-    def restart_last_drawer(self):
+    def restart_last_drawer(self, use_user_paths):
         """Use old classes to guide image"""
-        self.clip_draw_optimiser.activate()
+        self.clip_draw_optimiser.activate(use_user_paths)
 
 
 # CLIP Setup step -------------------

@@ -86,27 +86,21 @@ async def websocket_endpoint(websocket: WebSocket):
     while True:
         data = await websocket.receive_text()
         data = json.loads(data)
+        
+        # Right the paths to file
+        if data["type"] == "paths":
+            svg_string = data["content"]
+            clip_class.clip_draw_optimiser.svg_string = svg_string
+            # can also triggure clip draw from here
 
+        # Get the user prompt
         if data["type"] == "message":
             content = data["content"] # could refactor to include pos and neg prompt or array of prompts
-            
             logging.info(f"Setting clip prompt: {content}")        
             try:
-                clip_class.start_clip_draw([content]) # optional negative prompt as 2nd arg
+                clip_class.start_clip_draw([content], True) # optional args
             except:
                 logging.error("Failed to start clip draw")
-
-
-            # iteration = 0
-            # while clip_class.clip_draw_optimiser.is_active:
-            #     # Run the optimisation loop and update the data here so it can be sent over socket.
-            #     path_data = clip_class.clip_draw_optimiser.run_draw_iteration(iteration)
-            #     send_paths_to_client = json.dumps({
-            #         "type": "paths",
-            #         "content": path_data
-            #     })
-            #     websocket.send_text(send_paths_to_client)
-            #     iteration += 1
 
             return_msg = json.dumps({
                 "type": "message",
@@ -114,6 +108,20 @@ async def websocket_endpoint(websocket: WebSocket):
             })
             await websocket.send_text(return_msg)
             logging.info(f"Prompt Success: {data}")
+
+        # Send back paths
+        # iteration = 0
+        # while clip_class.clip_draw_optimiser.is_active:
+        #     # Run the optimisation loop and update the data here so it can be sent over socket.
+        #     path_data = clip_class.clip_draw_optimiser.run_draw_iteration(iteration)
+        #     if path_data != None:
+        #         send_paths_to_client = json.dumps({
+        #             "type": "paths",
+        #             "content": "hello"
+        #         })
+        #         # await websocket.send_text(send_paths_to_client)
+        #         iteration += 1
+        #         logging.info("Sent paths through socket")
 
             
 
