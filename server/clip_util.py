@@ -4,6 +4,7 @@ import clip
 
 import torch
 from svgpathtools import svg2paths # add to package
+from PIL import ImageColor
 
 import logging
 
@@ -51,10 +52,10 @@ def get_drawing_paths_string(svg):
 
 def get_drawing_paths(path_to_svg_file, location):
     path_list = []
-    print('reading, ', path_to_svg_file)
+    # print('reading, ', path_to_svg_file)
     paths, attributes = svg2paths(path_to_svg_file)
-    print('here 2')
-    print(attributes)
+    # print('here 2')
+    # print(attributes)
     # stroke, stroke-opacity, stroke-width. these only come up in a drawing where you change these aspects
     # to do fix the stopping clip function because it's weird
     if location == "local":
@@ -71,34 +72,57 @@ def get_drawing_paths(path_to_svg_file, location):
                     if x[:8] == 'stroke:#':
                         hex_code = x[8:]
                         color = list(int(hex_code[i:i+2], 16)/255 for i in (0, 2, 4))
-            color.append(opacity)
-            color = torch.tensor(color)
-            width = torch.tensor(width)
-            try:
-                [x_a, x_b] = att['d'].split('c')
-            except:
-                [x_a, x_b] = att['d'].split('C')
-            x0 = [float(x) for x in x_a[2:].split(',')]
-            points = [xx.split(',') for xx in x_b[1:].split(' ')]
-            points = [[float(x), float(y)] for [x,y] in points] 
-            path = [x0]+points
-            num_segments = len(path)//3
+            path = parse_points(att)
             path = torch.tensor(path)
             v0 = torch.tensor([0,0])
             for k in range(path.size(0)):
                 path[k,:] += v0
                 if k%3 == 0:
                     v0 = path[k,:]
+            num_segments = len(path)//3
+            color.append(opacity)
+            color = torch.tensor(color)
+            width = torch.tensor(width)
+            logging.info(f"Creating path: \nColor:  {color}\nWidth: {stroke_width}\nSegments: {num_segments}\n")
             path_list.append(DrawingPath(path, color, width, num_segments))
     if location == "sketch":
-        print('loading paths')
-        try:
-            for att in attributes:
-                path_list.append(DrawingPath(att['d'], att['stroke'], att['stroke-width'], len(att['d'].split(','))//3))
-        except:
-            logging.error("Problem parsing the paths")
+        logging.info('Loading paths')
+        for att in attributes:
+            logging.info(att)
+            color_code = att['stroke'] or '#000000'
+            color_code.lstrip('#')
+            color = [0, 0, 0, 1]
+            for i, val in enumerate(ImageColor.getrgb(color_code)):
+                color[i] = float(val/256)
+            if 'stroke-opacity' in att:
+                color[3] = float(att['stroke-opacity'])
+            color = torch.tensor(color)
+
+            stroke_width = 15
+            if 'stroke-width' in att:
+                stroke_width = float(att['stroke-width'])
+            stroke_width = torch.tensor(stroke_width)
+
+            num_segments = len(att['d'].split(','))//3
+
+            path = parse_points(att)
+            path = torch.tensor(path)
+            v0 = torch.tensor([0,0])
+            for k in range(path.size(0)):
+                path[k,:] += v0
+                if k%3 == 0:
+                    v0 = path[k,:]
+            logging.info(f"Creating path: \nColor:  {color}\nWidth: {stroke_width}\nSegments: {num_segments}\n")
+            path_list.append(DrawingPath(path, color, stroke_width, num_segments))
     logging.info(f"Returning list of paths: \n {path_list}")    
     return path_list
+
+def parse_points(att):
+    [x_a, x_b] = att['d'].split('c')
+    x0 = [float(x) for x in x_a[2:].split(',')]
+    points = [xx.split(',') for xx in x_b[1:].split(' ')]
+    points = [[float(x), float(y)] for [x,y] in points] 
+    return [x0]+points
 
 def save_data(time_str, draw_class):
     with open('results/'+time_str+'.txt', 'w') as f:

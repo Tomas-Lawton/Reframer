@@ -18,17 +18,21 @@
     <div id="control-panel">
         <h2 id="message">Input Prompt</h2>
         <form id="send-prompt">
-            <input type="text" id="messageText" autocomplete="off" />
+            <input type="text" id="messageText" />
             <button>Send</button>
         </form>
         <div id="slider-controls">
             <div id="color-picker"></div>
-            <div>
+            <div id="prompt-input">
                 <input type="range" id="width-slider" value="20" min="1" max="40">
                 <label>Width</label>
             </div>
         </div>
-        <button id="clear">Clear</button>
+        <button class="pen-mode" id="pen" value="pen">Pen</button>
+        <button class="pen-mode" id="select" value="select">Select</button>
+        <button class="pen-mode" id="erase" value="erase">Erasor</button>
+        <button class="pen-mode" id="undo" value="undo">Undo</button>
+        <button class="pen-mode" id="clear" value="clear">Clear</button>
     </div>
 
     <script>
@@ -40,46 +44,65 @@
         let strokeColor = "#402f95";
         let strokeWidth = 20;
         let myPath;
-        const tool = new paper.Tool();
+        let penMode = "pen";
 
         // Drawing Controls
-        tool.onMouseDown = function(event) {
-            myPath = new paper.Path({
-                strokeColor: strokeColor,
-                strokeWidth: strokeWidth,
-                selected: true,
-                strokeCap: 'round',
-                strokeJoin: 'round'
+        document.querySelectorAll(".pen-mode").forEach(elem => {
+            elem.addEventListener("click", () => {
+                penMode = elem.value;
             });
-            myPath.add(event.point);
-            myPath.add({
-                ...event.point,
-                x: event.point.x + .001 //this is ok because path gets simplified
-            }); //in case no drag means no line segment
-            myPath.draw();
-            isMoveStart = true;
+        });
+
+        const tool = new paper.Tool();
+        tool.onMouseDown = function(event) {
+            if (penMode === "pen") {
+                myPath = new paper.Path({
+                    strokeColor: strokeColor,
+                    strokeWidth: strokeWidth,
+                    strokeCap: 'round',
+                    strokeJoin: 'round'
+                });
+                myPath.add(event.point);
+                myPath.add({
+                    ...event.point,
+                    x: event.point.x + .001 //this is ok because path gets simplified
+                }); //in case no drag means no line segment
+                myPath.draw();
+                isMoveStart = true;
+            }
         }
 
         tool.onMouseDrag = function(event) {
-            myPath.add(event.point);
-            myPath.smooth();
-            // console.log(event.point)
+            if (penMode === "pen") {
+                myPath.add(event.point);
+                myPath.smooth();
+            }
         }
 
         tool.onMouseUp = function(event) {
-            myPath.simplify()
-            const pathStrokes = myPath.exportSVG();
-            // console.log(myPath.pathData);
-            console.log(paper.project.exportSVG());
-            console.log(paper.project.getItems()[0]._children); // is an array of paths and can get segments or pathData
+            if (penMode === "pen") {
+                myPath.simplify()
+                console.log(myPath)
+                console.log(paper.project.exportSVG());
+                // myPath.selected = true;
 
-            // paper.project.importSVG(svg)
-            // console.log(svg)
-            //draw path
-            // var pathData = 'm 54.473683,133.57894 c 2.309053,6.52389 5.103384,12.88691 9.947368,18.00001 1.602465,1.69148 7.516862,3.36572 9,3.78947 8.215344,2.34724 20.231724,5.06339 28.894739,2.8421 3.21552,-0.82449 6.03091,-2.77861 9,-4.26315 8.27335,-4.13668 15.89845,-8.52099 21.31579,-16.10527';
-            // var path = new paper.Path(pathData);
-            // path.strokeColor = 'red';
-            // path.scale(5);
+                // myPath.selected = true;
+                // const pathStrokes = myPath.exportSVG();
+                // console.log(myPath.pathData);
+                sendPaths(paper.project.exportSVG({
+                    asString: true
+                }));
+
+
+                // console.log(paper.project.getItems()[0]._children); // is an array of paths and can get segments or pathData
+                // paper.project.importSVG(svg)
+                // console.log(svg)
+                //draw path
+                // var pathData = 'm 54.473683,133.57894 c 2.309053,6.52389 5.103384,12.88691 9.947368,18.00001 1.602465,1.69148 7.516862,3.36572 9,3.78947 8.215344,2.34724 20.231724,5.06339 28.894739,2.8421 3.21552,-0.82449 6.03091,-2.77861 9,-4.26315 8.27335,-4.13668 15.89845,-8.52099 21.31579,-16.10527';
+                // var path = new paper.Path(pathData);
+                // path.strokeColor = 'red';
+                // path.scale(5);
+            }
         }
 
 
@@ -105,6 +128,7 @@
 
         const ws = new WebSocket('ws://localhost:8000/ws');
         ws.onmessage = function(event) {
+            // console.log(event)
             const message = document.getElementById('message');
             const {
                 type,
@@ -113,13 +137,13 @@
             if (type === "message") {
                 message.innerHTML = content
             }
-            if (type === "paths") {
-                console.log(content);
-            }
             // parse stroke information
+            // if (type === "paths") {
+            //     console.log(content);
+            // }
         };
 
-        const sendMessage = (e) => {
+        const sendPrompt = (e) => {
             var input = document.getElementById("messageText")
             const msg = JSON.stringify({
                 "type": "message",
@@ -130,35 +154,17 @@
             e.preventDefault()
         }
 
+        const sendPaths = (svgStr) => {
+            const msg = JSON.stringify({
+                "type": "paths",
+                "content": svgStr
+            })
+            ws.send(msg);
+        }
+
         document.getElementById("send-prompt").addEventListener("submit", (e) => {
-            sendMessage(e)
+            sendPrompt(e)
         })
-
-
-
-        const getLastPath = () => {
-
-        }
-
-        const getPaths = () => {
-
-        }
-
-        const exportCanvasSvg = () => {
-
-        }
-
-        const readSvgString = () => {
-
-        }
-
-        const writePathArray = () => {
-
-        }
-
-        const writePath = (pathString) => {
-
-        }
     </script>
 </body>
 
