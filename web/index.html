@@ -6,10 +6,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.15/paper-full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
-    <script src="https://unpkg.com/vanilla-picker@2"></script>
     <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/vanilla-picker@2"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/paperjs/paper.js/6feff32254b6ba077d1e56d0ecf3f40be5ca594a/dist/paper-full.js"></script>
+    <script type="text/javascript" src="offset.js"></script>
 </head>
 
 <body>
@@ -54,22 +55,29 @@
     </div>
 
     <div id="button-panel">
-        <i class="fa-solid fa-pen fa-fw pen-mode" id="pen" value="pen"></i>
-        <i class="fa-solid fa-arrow-pointer fa-fw pen-mode" id="select" value="select"></i>
-        <i class="fa-solid fa-eraser fa-fw pen-mode" id="erase" value="erase"></i>
-        <i class="fa-solid fa-clock-rotate-left fa-fw" id="undo" value="undo"></i>
-        <i class="fa-solid fa-rotate-right fa-fw" id="redo" value="undo"></i>
-        <i class="fa-solid fa-trash fa-fw" id="delete" value="delete"></i>
+        <i class="fa-solid fa-pen fa-fw pen-mode" id="pen"></i>
+        <i class="fa-solid fa-arrow-pointer fa-fw pen-mode" id="select"></i>
+        <i class="fa-solid fa-wand-magic-sparkles fa-fw pen-mode" id="lasso"></i>
+        <i class="fa-solid fa-eraser fa-fw pen-mode" id="erase"></i>
+        <i class="fa-solid fa-clock-rotate-left fa-fw" id="undo"></i>
+        <i class="fa-solid fa-rotate-right fa-fw" id="redo"></i>
+        <i class="fa-solid fa-trash fa-fw" id="delete"></i>
     </div>
 
-    <script>
+
+    <script type="text/javascript">
         //     const targetHeight = 224;
         // const scaleFactor = targetHeight / window.innerHeight; // scale as a square, innerHeight smaller than width
+        paper.install(window);
+
         const modal = document.getElementById("modal");
         const canvas = document.getElementById('canvas');
-        canvas.style.background = "#F4F4F4";
-
+        const backgroundColor = "#F4F4F4"
+        canvas.style.background = backgroundColor;
         paper.setup(canvas);
+
+        const topLayer = new Layer(); //for drawing + erase mask
+
         let strokeColor = "#402f95";
         let strokeWidth = 20;
         let myPath;
@@ -79,56 +87,29 @@
         redoStack = [];
         // undoStack.push({"type": 'addPath', 'id': newPath.id});
 
-
-
-        // Drawing Controls
-        document.querySelectorAll(".pen-mode").forEach(elem => {
-            elem.addEventListener("click", () => {
-                penMode = elem.id;
-                console.log(penMode)
-            });
-        });
-
-        const tool = new paper.Tool();
+        const tool = new Tool();
         tool.onMouseDown = function(event) {
             if (penMode === "select") {
-                segment = path = null;
+                path = null;
                 var hitResult = paper.project.hitTest(event.point, {
                     segments: true,
                     stroke: true,
-                    // fill: true,
                     // tolerance: 5
                 });
                 if (!hitResult) {
-                    currentSelectedPath.selected = false;
-                    currentSelectedPath = null;
+                    topLayer.getItems().forEach(path => {
+                        console.log(path)
+                        path.selected = false;
+                    });
                     return;
                 }
-                // if (event.modifiers.shift) {
-                //     if (hitResult.type == 'segment') {
-                //         hitResult.segment.remove();
-                //     };
-                //     return;
-                // }
                 if (hitResult) {
                     path = hitResult.item;
-                    path.selected = true;
-                    if (currentSelectedPath) {
-                        currentSelectedPath.selected = false;
-                    }
-                    currentSelectedPath = path;
-                    console.log(hitResult);
-                    // if (hitResult.type == 'segment') {
-                    //     segment = hitResult.segment;
-                    // } else if (hitResult.type == 'stroke') {
-                    //     var location = hitResult.location;
-                    //     segment = path.insert(location.index + 1, event.point);
-                    //     path.smooth();
-                    // }
+                    path.selected = true; //fix so that this happens with no drag but with drag it won't toggle !path.selected
                 }
             }
             if (penMode === "pen") {
-                myPath = new paper.Path({
+                myPath = new Path({
                     strokeColor: strokeColor,
                     strokeWidth: strokeWidth,
                     strokeCap: 'round',
@@ -142,20 +123,28 @@
             }
         }
         tool.onMouseDrag = function(event) {
-            // if (penMode === "select") {
-            //     if (currentSelectedPath) {
-            //         console.log(currentSelectedPath)
-            //         currentSelectedPath.position += event.delta;
-            //     }
-            // }
             if (penMode === "pen") {
                 myPath.add(event.point);
                 myPath.smooth();
+            }
+            if (penMode === "select") {
+                const selectedPaths = topLayer.getItems().filter(path => path.selected); // all selected
+                console.log(selectedPaths)
+                selectedPaths.forEach(path => {
+                    path.position.x += event.delta.x;
+                    path.position.y += event.delta.y;
+                })
             }
         }
         tool.onMouseUp = function(event) {
             if (penMode === "pen") {
                 myPath.simplify()
+                    // myPath.onMouseDrag = (e) => {
+                    //     if (myPath.selected === true && penMode === "select") { //refactor so all selected paths
+                    //         myPath.position.x += e.delta.x;
+                    //         myPath.position.y += e.delta.y;
+                    //     }
+                    // }
                 console.log(myPath)
                 console.log(paper.project.exportSVG());
                 // myPath.selected = true;
@@ -170,11 +159,136 @@
                 // console.log(svg)
                 //draw path
                 // var pathData = 'm 54.473683,133.57894 c 2.309053,6.52389 5.103384,12.88691 9.947368,18.00001 1.602465,1.69148 7.516862,3.36572 9,3.78947 8.215344,2.34724 20.231724,5.06339 28.894739,2.8421 3.21552,-0.82449 6.03091,-2.77861 9,-4.26315 8.27335,-4.13668 15.89845,-8.52099 21.31579,-16.10527';
-                // var path = new paper.Path(pathData);
+                // var path = new Path(pathData);
                 // path.strokeColor = 'red';
                 // path.scale(5);
             }
         }
+
+
+        const eraseTool = new Tool();
+        // eraseTool.minDistance = 10;
+        let erasePath;
+        let tmpGroup;
+        let mask;
+
+        eraseTool.onMouseDown = function(event) {
+            erasePath = new Path({
+                strokeWidth: strokeWidth * paper.project.view.pixelRatio,
+                strokeCap: 'round',
+                strokeJoin: 'round',
+                strokeColor: backgroundColor
+            })
+            tmpGroup = new Group({
+                children: topLayer.removeChildren(),
+                blendMode: 'source-out',
+                insert: false
+            })
+            mask = new Group({
+                children: [erasePath, tmpGroup],
+                blendMode: 'source-over'
+            })
+        }
+        eraseTool.onMouseDrag = function(event) {
+            console.log("erasing")
+            erasePath.add(event.point)
+
+        }
+        eraseTool.onMouseUp = function(event) {
+            if (erasePath.segments.length > 0) {
+                erasePath.simplify()
+
+                var eraseRadius = (strokeWidth * view.pixelRatio) / 2
+
+                // find the offset path on each side of the line
+                // this uses routines in the offset.js file
+                var outerPath = OffsetUtils.offsetPath(erasePath, eraseRadius)
+                var innerPath = OffsetUtils.offsetPath(erasePath, -eraseRadius)
+                erasePath.remove() // done w/ this now
+
+                outerPath.insert = false
+                innerPath.insert = false
+                innerPath.reverse() // reverse one path so we can combine them end-to-end
+
+                // create a new path and connect the two offset paths into one shape
+                var deleteShape = new Path({
+                    closed: true,
+                    insert: false
+                })
+                deleteShape.addSegments(outerPath.segments)
+                deleteShape.addSegments(innerPath.segments)
+
+                // create round endcaps for the shape
+                // as they aren't included in the offset paths
+                var endCaps = new CompoundPath({
+                    children: [
+                        new Path.Circle({
+                            center: erasePath.firstSegment.point,
+                            radius: eraseRadius
+                        }),
+                        new Path.Circle({
+                            center: erasePath.lastSegment.point,
+                            radius: eraseRadius
+                        })
+                    ],
+                    insert: false
+                })
+
+                // unite the shape with the endcaps
+                // this also removes all overlaps from the stroke
+                deleteShape = deleteShape.unite(endCaps)
+                deleteShape.simplify()
+
+                // grab all the items from the tmpGroup in the mask group
+                var items = tmpGroup.getItems({
+                    overlapping: deleteShape.bounds
+                })
+
+                items.forEach(function(item) {
+                    var result = item.subtract(deleteShape, {
+                            trace: false,
+                            insert: false
+                        }) // probably need to detect closed vs open path and tweak these settings
+
+                    if (result.children) {
+                        // if result is compoundShape, yoink the individual paths out
+                        item.parent.insertChildren(item.index, result.removeChildren())
+                        item.remove()
+                    } else {
+                        if (result.length === 0) {
+                            // a fully erased path will still return a 0-length path object
+                            item.remove()
+                        } else {
+                            item.replaceWith(result)
+                        }
+                    }
+                })
+                topLayer.addChildren(tmpGroup.removeChildren())
+                mask.remove()
+            }
+
+        }
+
+        // Drawing Controls
+        document.querySelectorAll(".pen-mode").forEach(elem => {
+            elem.addEventListener("click", () => {
+                penMode = elem.id;
+                if (penMode === "erase") {
+                    console.log(paper.tools)
+                    paper.tools[1].activate()
+                }
+                if (penMode === "pen" || penMode === "select") {
+                    paper.tools[0].activate()
+                }
+                if (penMode === "lasso") {
+                    paper.tools[0].activate()
+                        // Not sure what it does yet?
+                }
+                console.log(penMode)
+            });
+        });
+
+
         document.body.addEventListener('keydown', function(event) {
             if (event.keyCode == 8) {
                 deletePath();
