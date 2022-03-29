@@ -110,20 +110,20 @@ async def websocket_endpoint(websocket: WebSocket):
                 "content": f"{content}"
             })
             await websocket.send_text(return_msg)
-            logging.info(f"Prompt Success: {data}")
+            logging.info(f"Ready to draw: {content}")
 
-            # iteration = 0
-            # while clip_class.clip_draw_optimiser.is_active:
-            #     # Run the optimisation loop and update the data here so it can be sent over socket.
-            #     path_data = clip_class.clip_draw_optimiser.run_draw_iteration(iteration)
-            #     # if path_data != None:
-            #     #     send_paths_to_client = json.dumps({
-            #     #         "type": "paths",
-            #     #         "content": "hello"
-            #     #     })
-            #     #     await websocket.send_text(send_paths_to_client)
-            #     iteration += 1
-            #     # logging.info("Sent paths through socket")
+            iteration = 0
+            while clip_class.clip_draw_optimiser.is_active:
+                # Run the optimisation loop and update the data here so it can be sent over socket.
+                path_data = clip_class.clip_draw_optimiser.run_draw_iteration(iteration)
+                # if path_data != None:
+                #     send_paths_to_client = json.dumps({
+                #         "type": "paths",
+                #         "content": "hello"
+                #     })
+                #     await websocket.send_text(send_paths_to_client)
+                iteration += 1
+                # logging.info("Sent paths through socket")
 
 
 

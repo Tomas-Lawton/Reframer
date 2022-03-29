@@ -86,7 +86,7 @@ class Clip_Draw_Optimiser:
         if use_user_paths:
             # get_drawing_paths_string(self.svg_string)
             self.svg_path = 'data/interface_paths.svg'
-        
+        logging.info('Parsing SVG paths')
         path_list = get_drawing_paths(self.svg_path, "local")
         logging.info('Configuring shapes')
         self.shapes, self.shape_groups = render_save_img(path_list, self.canvas_w, self.canvas_h)

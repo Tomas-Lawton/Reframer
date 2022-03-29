@@ -52,68 +52,58 @@ def get_drawing_paths_string(svg):
 
 def get_drawing_paths(path_to_svg_file, location):
     path_list = []
-    # print('reading, ', path_to_svg_file)
     paths, attributes = svg2paths(path_to_svg_file)
-    # print('here 2')
-    # print(attributes)
-    # stroke, stroke-opacity, stroke-width. these only come up in a drawing where you change these aspects
-    # to do fix the stopping clip function because it's weird
-    if location == "local":
-        for att in attributes:
-            style = att['style'].split(';')
+    logging.info("Getting the paths")
+
+    for att in attributes:
+        style = att['style'].split(';')
+        logging.info(style)
+        # defaults
+        color = [0, 0, 0, 1]
+        stroke_width = 15
+        color_code = '#000000'
+        opacity = 1
+        # parse values
+        if location == "sketch":
+            if 'stroke' in att:
+                color_code = str(att['stroke'])
+            if 'stroke-opacity' in att:
+                opacity = float(att['stroke-opacity'])
+            if 'stroke-width' in att:
+                stroke_width = float(att['stroke-width'])
+        logging.info("here")
+        if location == "local":
             for x in style:
+                # logging.info(x) # view available styles
                 if len(x) >= 13:
                     if x[:13] == 'stroke-width:':
-                        width = float(x[13:])
+                        stroke_width = float(x[13:])
                 if len(x) >= 15:
                     if x[:15] == 'stroke-opacity:':
                         opacity = float(x[15:])
                 if len(x) >= 8:
-                    if x[:8] == 'stroke:#':
-                        hex_code = x[8:]
-                        color = list(int(hex_code[i:i+2], 16)/255 for i in (0, 2, 4))
-            path = parse_points(att)
-            path = torch.tensor(path)
-            v0 = torch.tensor([0,0])
-            for k in range(path.size(0)):
-                path[k,:] += v0
-                if k%3 == 0:
-                    v0 = path[k,:]
-            num_segments = len(path)//3
-            color.append(opacity)
-            color = torch.tensor(color)
-            width = torch.tensor(width)
-            logging.info(f"Creating path: \nColor:  {color}\nWidth: {stroke_width}\nSegments: {num_segments}\n")
-            path_list.append(DrawingPath(path, color, width, num_segments))
-    if location == "sketch":
-        logging.info('Loading paths')
-        for att in attributes:
-            logging.info(att)
-            color_code = att['stroke'] or '#000000'
-            color_code.lstrip('#')
-            color = [0, 0, 0, 1]
-            for i, val in enumerate(ImageColor.getrgb(color_code)):
-                color[i] = float(val/256)
-            if 'stroke-opacity' in att:
-                color[3] = float(att['stroke-opacity'])
-            color = torch.tensor(color)
+                    if x[:7] == 'stroke:':
+                        print('got stroke')
+                        color_code = str(x[7:])
+        rgb = ImageColor.getrgb(color_code)
+        for i, val in enumerate(rgb):
+            color[i] = float(val/256)
+        color[3] = opacity
 
-            stroke_width = 15
-            if 'stroke-width' in att:
-                stroke_width = float(att['stroke-width'])
-            stroke_width = torch.tensor(stroke_width)
-
-            num_segments = len(att['d'].split(','))//3
-
-            path = parse_points(att)
-            path = torch.tensor(path)
-            v0 = torch.tensor([0,0])
-            for k in range(path.size(0)):
-                path[k,:] += v0
-                if k%3 == 0:
-                    v0 = path[k,:]
-            logging.info(f"Creating path: \nColor:  {color}\nWidth: {stroke_width}\nSegments: {num_segments}\n")
-            path_list.append(DrawingPath(path, color, stroke_width, num_segments))
+        num_segments = len(att['d'].split(','))//3
+        logging.info("Getting the points")
+        path = parse_points(att)
+        path = torch.tensor(path)
+        color = torch.tensor(color)
+        stroke_width = torch.tensor(stroke_width)
+        v0 = torch.tensor([0,0])
+        for k in range(path.size(0)):
+            path[k,:] += v0
+            if k%3 == 0:
+                v0 = path[k,:]
+                
+        logging.info(f"\nCreating path: \nColor:  {color}\nWidth: {stroke_width}\nSegments: {num_segments}\n")
+        path_list.append(DrawingPath(path, color, stroke_width, num_segments))
     logging.info(f"Returning list of paths: \n {path_list}")    
     return path_list
 
