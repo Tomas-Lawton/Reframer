@@ -15,7 +15,7 @@ def render_save_img(path_list, canvas_height, canvas_width):
         points[:, 0] = canvas_width*dpath.path[:,0]
         points[:, 1] = canvas_height*dpath.path[:,1]
         path = pydiffvg.Path(num_control_points = num_control_points,
-                            points = points, stroke_width = stroke_width,
+                            points = points, stroke_width = stroke_width, # first point breaks here !!
                             is_closed = False)
         shapes.append(path)
         path_group = pydiffvg.ShapeGroup(shape_ids = torch.tensor(

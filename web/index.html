@@ -7,11 +7,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.15/paper-full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
     <script src="https://unpkg.com/vanilla-picker@2"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+    <div id="modal">
+        <div id="simple-modal">
+            <div id="modal-status">
+                <h2 id="modal-status">Clearing Canvas</h2>
+                <i id="modal-cross" class="fa-solid fa-xmark"></i>
+            </div>
+            <p>Are you sure you want to delete your drawing? :(</p>
+            <div id="action">
+                <button id="cancel-modal">Cancel</button>
+                <button id="confirm-modal" confirm-action>Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sliding-overlay">
+        <div id="hero-content">
+            <h2>Welcome to Clip draw!</h2>
+            <button id="begin">BEGIN</button>
+        </div>
+    </div>
+
+
     <div id="contain-canvas">
         <canvas id="canvas" resize></canvas>
     </div>
@@ -28,33 +51,82 @@
                 <label>Width</label>
             </div>
         </div>
-        <button class="pen-mode" id="pen" value="pen">Pen</button>
-        <button class="pen-mode" id="select" value="select">Select</button>
-        <button class="pen-mode" id="erase" value="erase">Erasor</button>
-        <button class="pen-mode" id="undo" value="undo">Undo</button>
-        <button class="pen-mode" id="clear" value="clear">Clear</button>
+    </div>
+
+    <div id="button-panel">
+        <i class="fa-solid fa-pen fa-fw pen-mode" id="pen" value="pen"></i>
+        <i class="fa-solid fa-arrow-pointer fa-fw pen-mode" id="select" value="select"></i>
+        <i class="fa-solid fa-eraser fa-fw pen-mode" id="erase" value="erase"></i>
+        <i class="fa-solid fa-clock-rotate-left fa-fw" id="undo" value="undo"></i>
+        <i class="fa-solid fa-rotate-right fa-fw" id="redo" value="undo"></i>
+        <i class="fa-solid fa-trash fa-fw" id="delete" value="delete"></i>
     </div>
 
     <script>
         //     const targetHeight = 224;
         // const scaleFactor = targetHeight / window.innerHeight; // scale as a square, innerHeight smaller than width
+        const modal = document.getElementById("modal");
         const canvas = document.getElementById('canvas');
         canvas.style.background = "#F4F4F4";
+
         paper.setup(canvas);
         let strokeColor = "#402f95";
         let strokeWidth = 20;
         let myPath;
         let penMode = "pen";
+        let currentSelectedPath;
+        undoStack = [];
+        redoStack = [];
+        // undoStack.push({"type": 'addPath', 'id': newPath.id});
+
+
 
         // Drawing Controls
         document.querySelectorAll(".pen-mode").forEach(elem => {
             elem.addEventListener("click", () => {
-                penMode = elem.value;
+                penMode = elem.id;
+                console.log(penMode)
             });
         });
 
         const tool = new paper.Tool();
         tool.onMouseDown = function(event) {
+            if (penMode === "select") {
+                segment = path = null;
+                var hitResult = paper.project.hitTest(event.point, {
+                    segments: true,
+                    stroke: true,
+                    // fill: true,
+                    // tolerance: 5
+                });
+                if (!hitResult) {
+                    currentSelectedPath.selected = false;
+                    currentSelectedPath = null;
+                    return;
+                }
+                // if (event.modifiers.shift) {
+                //     if (hitResult.type == 'segment') {
+                //         hitResult.segment.remove();
+                //     };
+                //     return;
+                // }
+                if (hitResult) {
+                    path = hitResult.item;
+                    path.selected = true;
+                    if (currentSelectedPath) {
+                        currentSelectedPath.selected = false;
+                    }
+                    currentSelectedPath = path;
+                    console.log(hitResult);
+                    // if (hitResult.type == 'segment') {
+                    //     segment = hitResult.segment;
+                    // } else if (hitResult.type == 'stroke') {
+                    //     var location = hitResult.location;
+                    //     segment = path.insert(location.index + 1, event.point);
+                    //     path.smooth();
+                    // }
+                }
+            }
             if (penMode === "pen") {
                 myPath = new paper.Path({
                     strokeColor: strokeColor,
@@ -67,33 +139,32 @@
                     ...event.point,
                     x: event.point.x + .001 //this is ok because path gets simplified
                 }); //in case no drag means no line segment
-                myPath.draw();
-                isMoveStart = true;
             }
         }
-
         tool.onMouseDrag = function(event) {
+            // if (penMode === "select") {
+            //     if (currentSelectedPath) {
+            //         console.log(currentSelectedPath)
+            //         currentSelectedPath.position += event.delta;
+            //     }
+            // }
             if (penMode === "pen") {
                 myPath.add(event.point);
                 myPath.smooth();
             }
         }
-
         tool.onMouseUp = function(event) {
             if (penMode === "pen") {
                 myPath.simplify()
                 console.log(myPath)
                 console.log(paper.project.exportSVG());
                 // myPath.selected = true;
-
                 // myPath.selected = true;
                 // const pathStrokes = myPath.exportSVG();
                 // console.log(myPath.pathData);
                 sendPaths(paper.project.exportSVG({
                     asString: true
                 }));
-
-
                 // console.log(paper.project.getItems()[0]._children); // is an array of paths and can get segments or pathData
                 // paper.project.importSVG(svg)
                 // console.log(svg)
@@ -104,7 +175,30 @@
                 // path.scale(5);
             }
         }
+        document.body.addEventListener('keydown', function(event) {
+            if (event.keyCode == 8) {
+                deletePath();
+                event.preventDefault();
+            }
+            if (event.keyCode == 46) {
+                deletePath();
+                event.preventDefault();
 
+            }
+        });
+
+        const deletePath = () => {
+            if (currentSelectedPath) {
+                currentSelectedPath.remove();
+            }
+            // also push p
+            event.preventDefault();
+        }
+
+        const undo = () => {
+            // pop off last path and push it onto undo stack.
+            // if redo just pop off undo stack.
+        }
 
         // Color picker
         const picker = new Picker({
@@ -122,13 +216,11 @@
         document.getElementById("width-slider").oninput = function() {
             strokeWidth = parseInt(this.value, 10);
         }
-        document.getElementById("clear").addEventListener("click", () => {
-            paper.project.clear()
-        })
+
 
         const ws = new WebSocket('ws://localhost:8000/ws');
         ws.onmessage = function(event) {
-            // console.log(event)
+            console.log(event)
             const message = document.getElementById('message');
             const {
                 type,
@@ -165,6 +257,22 @@
         document.getElementById("send-prompt").addEventListener("submit", (e) => {
             sendPrompt(e)
         })
+        document.getElementById("begin").addEventListener("click", () => {
+            document.getElementById("sliding-overlay").style.bottom = "100%";
+        });
+        document.getElementById("delete").addEventListener("click", () => {
+            modal.style.display = "block";
+        });
+        document.getElementById("cancel-modal").addEventListener("click", () => {
+            modal.style.display = "none";
+        });
+        document.getElementById("modal-cross").addEventListener("click", () => {
+            modal.style.display = "none";
+        });
+        document.getElementById("confirm-modal").addEventListener("click", () => {
+            paper.project.clear()
+            modal.style.display = "none";
+        });
     </script>
 </body>
 

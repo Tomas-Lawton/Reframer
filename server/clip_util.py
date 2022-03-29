@@ -50,29 +50,31 @@ def get_drawing_paths_string(svg):
         f.write(f'{svg}')
         f.close()  
 
-def get_drawing_paths(path_to_svg_file, location):
+def get_drawing_paths(path_to_svg_file, use_user_paths):
     path_list = []
     paths, attributes = svg2paths(path_to_svg_file)
     logging.info("Getting the paths")
-
+    width = 224
+    height = 224
     for att in attributes:
-        style = att['style'].split(';')
-        logging.info(style)
         # defaults
         color = [0, 0, 0, 1]
         stroke_width = 15
         color_code = '#000000'
         opacity = 1
         # parse values
-        if location == "sketch":
-            if 'stroke' in att:
-                color_code = str(att['stroke'])
-            if 'stroke-opacity' in att:
-                opacity = float(att['stroke-opacity'])
-            if 'stroke-width' in att:
-                stroke_width = float(att['stroke-width'])
-        logging.info("here")
-        if location == "local":
+        if use_user_paths:
+            try:
+                if 'stroke' in att:
+                    color_code = str(att['stroke'])
+                if 'stroke-opacity' in att:
+                    opacity = float(att['stroke-opacity'])
+                if 'stroke-width' in att:
+                    stroke_width = float(att['stroke-width'])
+            except:
+                logging.error("Couldn't parse sketch")
+        if not use_user_paths:
+            style = att['style'].split(';')
             for x in style:
                 # logging.info(x) # view available styles
                 if len(x) >= 13:
@@ -92,7 +94,29 @@ def get_drawing_paths(path_to_svg_file, location):
 
         num_segments = len(att['d'].split(','))//3
         logging.info("Getting the points")
-        path = parse_points(att)
+        path = []
+        # dynamically set canvas size for session. ??
+        if not use_user_paths:
+            print(att['d'].split('c'))
+            [x_a, x_b] = att['d'].split('c')
+            x0 = [float(x) for x in x_a[2:].split(',')]
+            points = [xx.split(',') for xx in x_b[1:].split(' ')]
+            points = [[float(x), float(y)] for [x,y] in points] 
+            path = [x0]+points
+        if use_user_paths:
+            spaced_data = att['d'].split('c')
+            x0 = spaced_data[0][2:].split(',') # only thing different is M instead of m
+            curve_list = [spaced_data.split(' ') for spaced_data in spaced_data[1:]] # exclude move to
+            point_list = []
+            for curve in curve_list:
+                for i in range(3):
+                    point_list.append(curve[i])
+            tuple_array = [tuple.split(',') for tuple in point_list] # split each curve by path spaces, then comma for points
+            points_array = [[float(x), float(y)] for [x,y] in tuple_array] 
+            path = [x0]+points_array
+            path = points_array
+        
+        print(f"path\n {path}")
         path = torch.tensor(path)
         color = torch.tensor(color)
         stroke_width = torch.tensor(stroke_width)
@@ -101,18 +125,12 @@ def get_drawing_paths(path_to_svg_file, location):
             path[k,:] += v0
             if k%3 == 0:
                 v0 = path[k,:]
-                
+
         logging.info(f"\nCreating path: \nColor:  {color}\nWidth: {stroke_width}\nSegments: {num_segments}\n")
         path_list.append(DrawingPath(path, color, stroke_width, num_segments))
     logging.info(f"Returning list of paths: \n {path_list}")    
-    return path_list
+    return path_list, width, height
 
-def parse_points(att):
-    [x_a, x_b] = att['d'].split('c')
-    x0 = [float(x) for x in x_a[2:].split(',')]
-    points = [xx.split(',') for xx in x_b[1:].split(' ')]
-    points = [[float(x), float(y)] for [x,y] in points] 
-    return [x0]+points
 
 def save_data(time_str, draw_class):
     with open('results/'+time_str+'.txt', 'w') as f:

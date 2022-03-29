@@ -3,7 +3,6 @@ import skimage
 import numpy as np
 import logging
 import json
-
 from class_interface import Clip_Class
 from plot_util import plot_cosines, plot_zero_shot_images, plot_image
 
@@ -93,14 +92,12 @@ async def websocket_endpoint(websocket: WebSocket):
             clip_class.clip_draw_optimiser.svg_string = svg_string
             # can also triggure clip draw from here
 
-        
-
         # Get the user prompt
         if data["type"] == "message":
             content = data["content"] # could refactor to include pos and neg prompt or array of prompts
             logging.info(f"Setting clip prompt: {content}")        
             try:
-                clip_class.start_clip_draw([content], False) # optional args
+                clip_class.start_clip_draw([content], True) # optional args
                 logging.info("Clip drawer initialised")
             except:
                 logging.error("Failed to start clip draw")
@@ -109,10 +106,11 @@ async def websocket_endpoint(websocket: WebSocket):
                 "type": "message",
                 "content": f"{content}"
             })
-            await websocket.send_text(return_msg)
+            await websocket.send_text({return_msg})
             logging.info(f"Ready to draw: {content}")
 
             iteration = 0
+            #only if is_active is true
             while clip_class.clip_draw_optimiser.is_active:
                 # Run the optimisation loop and update the data here so it can be sent over socket.
                 path_data = clip_class.clip_draw_optimiser.run_draw_iteration(iteration)
@@ -125,7 +123,4 @@ async def websocket_endpoint(websocket: WebSocket):
                 iteration += 1
                 # logging.info("Sent paths through socket")
 
-
-
-            
 

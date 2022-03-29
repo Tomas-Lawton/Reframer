@@ -27,8 +27,6 @@ class Clip_Draw_Optimiser:
         self.normalize_clip = True
         # Canvas parameters
         self.num_paths = 32
-        self.canvas_h = 224
-        self.canvas_w = 224
         self.max_width = 40
         # Algorithm parameters
         self.num_iter = 1001
@@ -52,17 +50,6 @@ class Clip_Draw_Optimiser:
         pydiffvg.set_print_timing(False)
         pydiffvg.set_use_gpu(torch.cuda.is_available())
         pydiffvg.set_device(device)
-        
-        # Configure image Augmentation Transformation
-        if self.normalize_clip:
-            self.augment_trans = transforms.Compose([
-            transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
-            transforms.RandomResizedCrop(self.canvas_w, scale=(0.7,0.9)),
-            transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))]) 
-        else: 
-            self.augment_trans = transforms.Compose([
-            transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
-            transforms.RandomResizedCrop(self.canvas_w, scale=(0.7,0.9))])
         logging.info("Drawer ready")
         Clip_Draw_Optimiser.__instance == self 
         return 
@@ -86,10 +73,24 @@ class Clip_Draw_Optimiser:
         if use_user_paths:
             # get_drawing_paths_string(self.svg_string)
             self.svg_path = 'data/interface_paths.svg'
-        logging.info('Parsing SVG paths')
-        path_list = get_drawing_paths(self.svg_path, "local")
-        logging.info('Configuring shapes')
+        path_list, width, height = get_drawing_paths(self.svg_path, use_user_paths)
+        self.canvas_h = height
+        self.canvas_w = width
+
+        # Configure image Augmentation Transformation
+        if self.normalize_clip:
+            self.augment_trans = transforms.Compose([
+            transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
+            transforms.RandomResizedCrop(self.canvas_w, scale=(0.7,0.9)),
+            transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))]) 
+        else: 
+            self.augment_trans = transforms.Compose([
+            transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
+            transforms.RandomResizedCrop(self.canvas_w, scale=(0.7,0.9))])
+
+        logging.info('Rendering img')
         self.shapes, self.shape_groups = render_save_img(path_list, self.canvas_w, self.canvas_h)
+        print('test')
         self.shapes_rnd, self.shape_groups_rnd = build_random_curves(
             self.num_paths,
             self.canvas_w,
@@ -141,7 +142,7 @@ class Clip_Draw_Optimiser:
         
     def run_draw_iteration(self, iteration):
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") #REFACTORRRRRR
-        if iteration < self.num_iter:
+        if iteration > self.num_iter:
             return -1
         logging.info("Running draw optimiser")
         self.points_optim.zero_grad()
