@@ -45,17 +45,10 @@ def get_noun_data():
     return ["a drawing of a " + x for x in nouns]
     # return ["a drawing of a " + x for x in nouns[0::100]]
 
-def get_drawing_paths_string(svg):
-    with open('data/interface_paths.svg', 'w') as f:
-        f.write(f'{svg}')
-        f.close()  
-
 def get_drawing_paths(path_to_svg_file, use_user_paths):
     path_list = []
     paths, attributes = svg2paths(path_to_svg_file)
     logging.info("Getting the paths")
-    width = 224
-    height = 224
     for att in attributes:
         # defaults
         color = [0, 0, 0, 1]
@@ -129,12 +122,11 @@ def get_drawing_paths(path_to_svg_file, use_user_paths):
         logging.info(f"\nCreating path: \nColor:  {color}\nWidth: {stroke_width}\nSegments: {num_segments}\n")
         path_list.append(DrawingPath(path, color, stroke_width, num_segments))
     logging.info(f"Returning list of paths: \n {path_list}")    
-    return path_list, width, height
+    return path_list
 
 
 def save_data(time_str, draw_class):
     with open('results/'+time_str+'.txt', 'w') as f:
-        f.write('I0: ' +draw_class.svg_path +'\n')
         f.write('prompt: ' +str(draw_class.clip_prompt) +'\n')
         f.write('num paths: ' +str(draw_class.num_paths) +'\n')
         f.write('num_iter: ' +str(draw_class.num_iter) +'\n')

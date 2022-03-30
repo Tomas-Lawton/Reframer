@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, WebSocket, BackgroundTasks
 # WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 import skimage
@@ -6,7 +6,7 @@ import numpy as np
 import logging
 from class_interface import Clip_Class
 from plot_util import plot_cosines, plot_zero_shot_images, plot_image
-
+import json
 # check environment var
 # add filename='logs.log'
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG, format=f'APP LOGGING: %(levelname)s %(name)s %(threadName)s : %(message)s')
@@ -91,39 +91,32 @@ def activate_clip_draw():
     clip_class.start_clip_draw(prompts, False, neg_prompts);
     return {"Hello": "World"}
 
-@app.get("/")
-async def get():
-    return {"Hello": "World"}
-
-
-
 @app.get("/get_latest_paths")
-async def get():
+async def get_latest_paths():
     svg_string = ""
-    with open("results/latest_rendered_paths") as f:
+    with open("results/latest_rendered_paths.svg") as f:
         svg_string = f.read()
+        logging.info(svg_string)
 
+    iteration = 0
+    if (hasattr(clip_class.clip_draw_optimiser, 'iteration')):
+        iteration = clip_class.clip_draw_optimiser.iteration
+    loss = 1
+    if (hasattr(clip_class.clip_draw_optimiser, 'loss')):
+        loss = clip_class.clip_draw_optimiser.loss
     return {
         "svg": svg_string,
-        "iterations": clip_class.clip_draw_optimiser.iteration, 
-        "loss": clip_class.clip_draw_optimiser.loss
+        "iterations": iteration,
+        "loss": loss
     }
 
-@app.post("/update_prompt")
-async def update_prompt(request: Request):
-    request_data = await request.json()
-    content = request_data["content"]
-    logging.info(f"Setting clip prompt: {content}")        
-    try:
-        clip_class.start_clip_draw([content], False) # optional args
-        logging.info("Clip drawer initialised")
-    except:
-        logging.error("Failed to start clip draw")
-    
-    return {
-        "data" : request_data
-    }
 
+
+    #     await websocket.send_text({
+    #             "svg": svg_string,
+    #             "iterations": iteration,
+    #             "loss": loss
+    #     })
 
 # @app.websocket("/ws")
 # async def websocket_endpoint(websocket: WebSocket):
@@ -131,27 +124,38 @@ async def update_prompt(request: Request):
 #     while True:
 #         data = await websocket.receive_text()
 #         data = json.loads(data)
-        
 #         # Right the paths to file
-#         if data["type"] == "paths":
-#             svg_string = data["content"]
-#             clip_class.clip_draw_optimiser.svg_string = svg_string
-#             # can also triggure clip draw from here
+        # if data["type"] == "paths":
+        #     svg_string = data["content"]
+        #     clip_class.clip_draw_optimiser.svg_string = svg_string
+        #     # can also triggure clip draw from here
+#         await websocket.send_text(f"Message text was: hello")
 
-#         # Get the user prompt
-#         # logging.info(f"Ready to draw: {content}")
-#         iteration = 0
-#         #only if is_active is true
-#         # while clip_class.clip_draw_optimiser.is_active:
-#         #     # Run the optimisation loop and update the data here so it can be sent over socket.
-#         #     path_data = clip_class.clip_draw_optimiser.run_draw_iteration(iteration)
-#         #     # if path_data != None:
-#         #     #     send_paths_to_client = json.dumps({
-#         #     #         "type": "paths",
-#         #     #         "content": "hello"
-#         #     #     })
-#         #     #     await websocket.send_text(send_paths_to_client)
-#         #     iteration += 1
-#         #     # logging.info("Sent paths through socket")
 
+def start_clip_draw_background():
+    clip_class.clip_draw_optimiser.run_drawer_iterations()
+
+@app.post("/update_prompt")
+async def update_prompt(request: Request, background_tasks: BackgroundTasks):
+    request_data = await request.json()
+    content = request_data["content"]
+# TESTING -------
+    if hasattr(request_data, "paths"):
+        svg_string = request_data["paths"]
+        with open('data/interface_paths.svg', 'w') as f:
+            f.write(f'{svg_string}')
+            f.close() 
+# TESTING -------
+    logging.info(f"Setting clip prompt: {content}")        
+    try:
+        clip_class.start_clip_draw([content], False) # optional args
+    except:
+        logging.error("Failed to start clip draw")
+    logging.info("Clip drawer initialised")
+    # put in new thread
+    background_tasks.add_task(start_clip_draw_background)
+
+    return {
+        "data" : request_data
+    }
 

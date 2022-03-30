@@ -17,8 +17,6 @@ class Clip_Draw_Optimiser:
         # Set up parent
         self.model = model
         # Partial sketch
-        self.svg_path = 'data/drawing_flower_vase.svg'
-        self.svg_string = ''
         # Array set as arrays
         self.text_features = []
         self.neg_text_features = []
@@ -28,6 +26,8 @@ class Clip_Draw_Optimiser:
         # Canvas parameters
         self.num_paths = 32
         self.max_width = 40
+        self.canvas_h = 224
+        self.canvas_w = 224
         # Algorithm parameters
         self.num_iter = 1001
         self.w_points = 0.01
@@ -70,12 +70,11 @@ class Clip_Draw_Optimiser:
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         logging.info('Parsing SVG paths')
 
+        path_list = []
         if use_user_paths:
-            # get_drawing_paths_string(self.svg_string)
-            self.svg_path = 'data/interface_paths.svg'
-        path_list, width, height = get_drawing_paths(self.svg_path, use_user_paths)
-        self.canvas_h = height
-        self.canvas_w = width
+            path_list = get_drawing_paths('data/interface_paths.svg', use_user_paths)
+        else:
+            path_list = get_drawing_paths('data/drawing_flower_vase.svg', use_user_paths)
 
         # Configure image Augmentation Transformation
         if self.normalize_clip:
@@ -139,21 +138,29 @@ class Clip_Draw_Optimiser:
 
         # refactor
         self.time_str = datetime.datetime.today().strftime("%Y_%m_%d_%H_%M_%S")
+
+    def run_drawer_iterations(self):
+        self.iteration = 0
+        while self.is_active:
+            self.run_iteration(self.iteration)
+            # Return some data
+            self.iteration += 1
         
-    def run_draw_iteration(self, iteration):
+    def run_iteration(self, iteration):
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") #REFACTORRRRRR
         self.iteration = iteration
         if iteration > self.num_iter:
             return -1
-        logging.info("Running draw optimiser")
+        logging.info("Running draw optimiser 0/6")
         self.points_optim.zero_grad()
         self.width_optim.zero_grad()
         self.color_optim.zero_grad()
+        logging.info("Running draw optimiser 1/6")
         scene_args = pydiffvg.RenderFunction.serialize_scene(\
             self.canvas_w, self.canvas_h, self.shapes, self.shape_groups)
         self.img = self.render(self.canvas_w, self.canvas_h, 2, 2, iteration, None, *scene_args)
         self.img = self.img[:, :, 3:4] * self.img[:, :, :3] + torch.ones(self.img.shape[0], self.img.shape[1], 3, device = pydiffvg.get_device()) * (1 - self.img[:, :, 3:4])
-
+        logging.info("Running draw optimiser 2/6")
         if self.w_img >0:
             self.l_img = torch.norm((self.img-self.img0.to(device))*self.mask).view(1)
         else:
@@ -165,7 +172,7 @@ class Clip_Draw_Optimiser:
 
         loss = 0
         loss += self.w_img*(self.l_img.item())
-
+        logging.info("Running draw optimiser 3/6")
         NUM_AUGS = 4
         self.img_augs = []
         for n in range(NUM_AUGS):
@@ -181,7 +188,7 @@ class Clip_Draw_Optimiser:
         l_points = 0
         l_widths = 0
         l_colors = 0
-        
+        logging.info("Running draw optimiser 4/6")
         for k, points0 in enumerate(self.points_vars0):
             l_points += torch.norm(self.points_vars[k]-points0)
             l_colors += torch.norm(self.color_vars[k]-self.color_vars0[k])
@@ -202,6 +209,7 @@ class Clip_Draw_Optimiser:
             path.stroke_width.data.clamp_(1.0, self.max_width)
         for group in self.shape_groups:
             group.stroke_color.data.clamp_(0.0, 1.0)
+        logging.info("Running draw optimiser 5/6")
 
         self.loss = loss.item()
         # This is just to check out the progress
@@ -215,8 +223,7 @@ class Clip_Draw_Optimiser:
             #     print('l_style: ', l.item())
             logging.info(f"Iteration: {iteration}")
             with torch.no_grad():
-                pydiffvg.imwrite(self.img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+self.time_str+'.png', gamma=1)
-                # Calc similarity to noun classes.
+                # pydiffvg.imwrite(self.img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+self.time_str+'.png', gamma=1)
                 if self.nouns_features != []:
                     im_norm = image_features / image_features.norm(dim=-1, keepdim=True)
                     noun_norm = self.nouns_features / self.nouns_features.norm(dim=-1, keepdim=True)
@@ -225,7 +232,8 @@ class Clip_Draw_Optimiser:
                     logging.info("\nTop predictions:\n")
                     for value, index in zip(values, indices):
                         logging.info(f"{self.nouns[index]:>16s}: {100 * value.item():.2f}%")
-                pydiffvg.save_svg('results/latest_rendered_paths.svg', self.canvas_w, self.canvas_h, self.shapes, self.shape_groups)
+                # pydiffvg.save_svg('results/latest_rendered_paths.svg', self.canvas_w, self.canvas_h, self.shapes, self.shape_groups)
+        logging.info("Running draw optimiser 6/6")
         return self.shapes
             # at this point the whole thing should return to the top with new path data
 
