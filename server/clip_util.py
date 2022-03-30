@@ -86,7 +86,6 @@ def get_drawing_paths(path_to_svg_file, use_user_paths):
         color[3] = opacity
 
         num_segments = len(att['d'].split(','))//3
-        logging.info("Getting the points")
         path = []
         # dynamically set canvas size for session. ??
         if not use_user_paths:

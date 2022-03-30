@@ -89,7 +89,7 @@ class Clip_Draw_Optimiser:
 
         logging.info('Rendering img')
         self.shapes, self.shape_groups = render_save_img(path_list, self.canvas_w, self.canvas_h)
-        print('test')
+
         self.shapes_rnd, self.shape_groups_rnd = build_random_curves(
             self.num_paths,
             self.canvas_w,
@@ -149,18 +149,17 @@ class Clip_Draw_Optimiser:
     def run_iteration(self, iteration):
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") #REFACTORRRRRR
         self.iteration = iteration
+        logging.info(iteration)
+
         if iteration > self.num_iter:
             return -1
-        logging.info("Running draw optimiser 0/6")
         self.points_optim.zero_grad()
         self.width_optim.zero_grad()
         self.color_optim.zero_grad()
-        logging.info("Running draw optimiser 1/6")
         scene_args = pydiffvg.RenderFunction.serialize_scene(\
             self.canvas_w, self.canvas_h, self.shapes, self.shape_groups)
         self.img = self.render(self.canvas_w, self.canvas_h, 2, 2, iteration, None, *scene_args)
         self.img = self.img[:, :, 3:4] * self.img[:, :, :3] + torch.ones(self.img.shape[0], self.img.shape[1], 3, device = pydiffvg.get_device()) * (1 - self.img[:, :, 3:4])
-        logging.info("Running draw optimiser 2/6")
         if self.w_img >0:
             self.l_img = torch.norm((self.img-self.img0.to(device))*self.mask).view(1)
         else:
@@ -172,7 +171,6 @@ class Clip_Draw_Optimiser:
 
         loss = 0
         loss += self.w_img*(self.l_img.item())
-        logging.info("Running draw optimiser 3/6")
         NUM_AUGS = 4
         self.img_augs = []
         for n in range(NUM_AUGS):
@@ -188,7 +186,6 @@ class Clip_Draw_Optimiser:
         l_points = 0
         l_widths = 0
         l_colors = 0
-        logging.info("Running draw optimiser 4/6")
         for k, points0 in enumerate(self.points_vars0):
             l_points += torch.norm(self.points_vars[k]-points0)
             l_colors += torch.norm(self.color_vars[k]-self.color_vars0[k])
@@ -209,7 +206,6 @@ class Clip_Draw_Optimiser:
             path.stroke_width.data.clamp_(1.0, self.max_width)
         for group in self.shape_groups:
             group.stroke_color.data.clamp_(0.0, 1.0)
-        logging.info("Running draw optimiser 5/6")
 
         self.loss = loss.item()
         # This is just to check out the progress
@@ -223,7 +219,7 @@ class Clip_Draw_Optimiser:
             #     print('l_style: ', l.item())
             logging.info(f"Iteration: {iteration}")
             with torch.no_grad():
-                # pydiffvg.imwrite(self.img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+self.time_str+'.png', gamma=1)
+                pydiffvg.imwrite(self.img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+self.time_str+'.png', gamma=1)
                 if self.nouns_features != []:
                     im_norm = image_features / image_features.norm(dim=-1, keepdim=True)
                     noun_norm = self.nouns_features / self.nouns_features.norm(dim=-1, keepdim=True)
@@ -232,8 +228,7 @@ class Clip_Draw_Optimiser:
                     logging.info("\nTop predictions:\n")
                     for value, index in zip(values, indices):
                         logging.info(f"{self.nouns[index]:>16s}: {100 * value.item():.2f}%")
-                # pydiffvg.save_svg('results/latest_rendered_paths.svg', self.canvas_w, self.canvas_h, self.shapes, self.shape_groups)
-        logging.info("Running draw optimiser 6/6")
+                pydiffvg.save_svg('results/latest_rendered_paths.svg', self.canvas_w, self.canvas_h, self.shapes, self.shape_groups)
         return self.shapes
             # at this point the whole thing should return to the top with new path data
 

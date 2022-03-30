@@ -388,6 +388,7 @@
                         lastRender.remove();
                     }
                 }
+                console.log("Polling paths")
                 let loadedSvg = topLayer.importSVG(data.svg)
                 loadedSvg.position.x = window.innerWidth / 2;
                 loadedSvg.position.y = window.innerHeight / 2
@@ -423,9 +424,11 @@
                     .then(data => {
                         console.log(data)
                         message.innerHTML = data.data.prompt;
-                        // get the paths 
-                        // pathRenderer();
-                        // setInterval(pathRenderer, 2000)
+
+                        setTimeout(setInterval(pathRenderer, 2000), 2000)
+                            // get the paths 
+                            // pathRenderer();
+                            // setInterval(pathRenderer, 2000)
                     })
                 input.value = ''
             };

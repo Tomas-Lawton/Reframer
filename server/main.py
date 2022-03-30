@@ -7,6 +7,7 @@ import logging
 from class_interface import Clip_Class
 from plot_util import plot_cosines, plot_zero_shot_images, plot_image
 import json
+import aiofiles
 # check environment var
 # add filename='logs.log'
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG, format=f'APP LOGGING: %(levelname)s %(name)s %(threadName)s : %(message)s')
@@ -138,23 +139,18 @@ def start_clip_draw_background():
 @app.post("/update_prompt")
 async def update_prompt(request: Request, background_tasks: BackgroundTasks):
     request_data = await request.json()
-    content = request_data["content"]
-# TESTING -------
-    if hasattr(request_data, "paths"):
-        svg_string = request_data["paths"]
-        with open('data/interface_paths.svg', 'w') as f:
-            f.write(f'{svg_string}')
-            f.close() 
-# TESTING -------
-    logging.info(f"Setting clip prompt: {content}")        
+    prompt = request_data["prompt"]
+    svg_string = request_data["svg"]
+    async with aiofiles.open('data/interface_paths.svg', 'w') as f:
+        await f.write(svg_string)  # async read
+    logging.info(f"Setting clip prompt: {prompt}")        
     try:
-        clip_class.start_clip_draw([content], False) # optional args
+        clip_class.start_clip_draw([prompt], False) # optional args
     except:
         logging.error("Failed to start clip draw")
     logging.info("Clip drawer initialised")
-    # put in new thread
+    # put in new thread in stead so it can be killed when the end point is hit.
     background_tasks.add_task(start_clip_draw_background)
-
     return {
         "data" : request_data
     }
