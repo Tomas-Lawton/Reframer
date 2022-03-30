@@ -87,6 +87,10 @@
         redoStack = [];
         // undoStack.push({"type": 'addPath', 'id': newPath.id});
 
+        function getSelectedPaths() {
+            return topLayer.getItems().filter(path => path.selected)
+        };
+
         const tool = new Tool();
         tool.onMouseDown = function(event) {
             if (penMode === "select") {
@@ -128,7 +132,7 @@
                 myPath.smooth();
             }
             if (penMode === "select") {
-                const selectedPaths = topLayer.getItems().filter(path => path.selected); // all selected
+                const selectedPaths = getSelectedPaths(); // all selected
                 console.log(selectedPaths)
                 selectedPaths.forEach(path => {
                     path.position.x += event.delta.x;
@@ -145,7 +149,6 @@
                     //         myPath.position.y += e.delta.y;
                     //     }
                     // }
-                console.log(myPath)
                 console.log(paper.project.exportSVG());
                 // myPath.selected = true;
                 // myPath.selected = true;
@@ -162,6 +165,10 @@
                 // var path = new Path(pathData);
                 // path.strokeColor = 'red';
                 // path.scale(5);
+                undoStack.push({
+                    type: "draw-event",
+                    data: myPath
+                })
             }
         }
 
@@ -284,28 +291,28 @@
                     paper.tools[0].activate()
                         // Not sure what it does yet?
                 }
+                if (penMode !== "select") {
+                    topLayer.getItems().forEach(path => {
+                        console.log(path)
+                        path.selected = false;
+                    });
+                }
                 console.log(penMode)
             });
         });
 
 
-        document.body.addEventListener('keydown', function(event) {
-            if (event.keyCode == 8) {
-                deletePath();
-                event.preventDefault();
-            }
-            if (event.keyCode == 46) {
-                deletePath();
-                event.preventDefault();
-
-            }
-        });
-
         const deletePath = () => {
-            if (currentSelectedPath) {
-                currentSelectedPath.remove();
+            selected = getSelectedPaths();
+            if (selected.length > 0) {
+                pathList = selected.map(path => path.exportJSON()); //dont use paper ref
+                console.log(pathList)
+                undoStack.push({
+                    type: 'delete-event',
+                    data: pathList
+                });
+                selected.map(path => path.remove())
             }
-            // also push p
             event.preventDefault();
         }
 
@@ -368,6 +375,17 @@
             ws.send(msg);
         }
 
+        document.body.addEventListener('keydown', function(event) { //delete with key
+            if (event.keyCode == 8) {
+                deletePath();
+                event.preventDefault();
+            }
+            if (event.keyCode == 46) {
+                deletePath();
+                event.preventDefault();
+
+            }
+        });
         document.getElementById("send-prompt").addEventListener("submit", (e) => {
             sendPrompt(e)
         })
@@ -386,6 +404,51 @@
         document.getElementById("confirm-modal").addEventListener("click", () => {
             paper.project.clear()
             modal.style.display = "none";
+        });
+        document.getElementById("undo").addEventListener("click", () => {
+            const lastEvent = undoStack.pop();
+            if (lastEvent.type === "draw-event") {
+                const removePath = lastEvent.data; //json not required
+                redoStack.push({
+                    type: "draw-event",
+                    data: removePath.exportJSON()
+                }); //so remove does not remove reference
+                removePath.remove();
+            }
+            if (lastEvent.type === "delete-event") {
+                let pathData = []
+                lastEvent.data.map(redrawPath => {
+                    let item = new Path();
+                    item.importJSON(redrawPath);
+                    pathData.push(item);
+                })
+                redoStack.push({
+                    type: "delete-event",
+                    data: pathData //use ref
+                });
+            }
+            if (lastEvent.type === "erase-event") {
+
+            }
+        });
+        document.getElementById("redo").addEventListener("click", () => {
+            if (redoStack.length > 0) {
+                const lastEvent = redoStack.pop();
+                if (lastEvent.type === "draw-event") {
+                    let item = new Path();
+                    item.importJSON(lastEvent.data)
+                    undoStack.push(lastEvent);
+                }
+                if (lastEvent.type === "delete-event") {
+                    undoStack.push(lastEvent);
+                    lastEvent.data.map(deletePath => {
+                        deletePath.remove();
+                    });
+                }
+                if (lastEvent.type === "erase-event") {
+
+                }
+            }
         });
     </script>
 </body>
