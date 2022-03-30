@@ -93,7 +93,6 @@
         let currentSelectedPath;
         undoStack = [];
         redoStack = [];
-        // undoStack.push({"type": 'addPath', 'id': newPath.id});
 
         function getSelectedPaths() {
             return topLayer.getItems().filter(path => path.selected)
@@ -157,7 +156,7 @@
                 undoStack.push({
                     type: "draw-event",
                     data: myPath
-                })
+                });
             }
         }
 
@@ -364,7 +363,6 @@
         document.getElementById("send-prompt").addEventListener("submit", (e) => {
             var input = document.getElementById("messageText")
             if (input.value !== "") {
-
                 ws.send(JSON.stringify({
                     "type": "message",
                     "content": input.value
@@ -401,13 +399,24 @@
         });
         document.getElementById("undo").addEventListener("click", () => {
             const lastEvent = undoStack.pop();
+            if (!lastEvent) {
+                return;
+            }
             if (lastEvent.type === "draw-event") {
-                const removePath = lastEvent.data; //json not required
+                let thisPath; //json from redo, otherwise path
+                try {
+                    let temp = new Path();
+                    thisPath = temp.importJSON(lastEvent.data);
+                } catch (e) {
+                    thisPath = lastEvent.data;
+                }
+                let copy = thisPath.exportJSON();
                 redoStack.push({
                     type: "draw-event",
-                    data: removePath.exportJSON()
+                    data: copy
                 }); //so remove does not remove reference
-                removePath.remove();
+                thisPath.remove();
+
             }
             if (lastEvent.type === "delete-event") {
                 let pathData = []
