@@ -44,7 +44,7 @@
             <h2 id="message">Lets draw a...</h2>
             <form id="send-prompt">
                 <input type="text" id="messageText" />
-                <button right-button confirm-action>DRAW</button>
+                <button id="draw" right-button confirm-action>DRAW</button>
             </form>
         </div>
     </div>
@@ -73,6 +73,8 @@
         // TO DO REFACTOR TOOLS.
 
         const targetHeight = 224;
+
+        // DOES THE "FRAME" NEED TO BE MOVED?
         const canvasFrame = Math.max(window.innerWidth, window.innerHeight)
         const scaleFactor = targetHeight / canvasFrame; //take larger square so full sketch always captured
         paper.install(window);
@@ -83,6 +85,7 @@
         const buttonPanel = document.getElementById("button-panel");
         const artisticControls = document.getElementById("slider-controls");
         const message = document.getElementById('message');
+        const startCollab = document.getElementById('draw');
 
         const backgroundColor = "#FCFCFC"
         canvas.style.background = backgroundColor;
@@ -97,6 +100,8 @@
         let myPath;
         let penMode = "pen";
         let currentSelectedPath;
+        let collabDrawing = false;
+        let lastRender
         undoStack = [];
         redoStack = [];
 
@@ -126,13 +131,6 @@
                 }
             }
             if (penMode === "pen") {
-                getPathData().then(data => {
-                    console.log(data)
-                    let loadedSvg = topLayer.importSVG(data.svg)
-                    loadedSvg.position.x = window.innerWidth / 2;
-                    loadedSvg.position.y = window.innerHeight / 2
-                    loadedSvg.scale(1 / scaleFactor) // invert for reading back
-                })
                 myPath = new Path({
                     strokeColor: strokeColor,
                     strokeWidth: strokeWidth,
@@ -163,9 +161,7 @@
         tool.onMouseUp = function(event) {
             if (penMode === "pen") {
                 myPath.simplify()
-                sendPaths(paper.project.exportSVG({
-                    asString: true
-                }));
+                    // sendPaths();
                 undoStack.push({
                     type: "draw-event",
                     data: myPath
@@ -353,15 +349,6 @@
         // }
         // };
 
-
-        const sendPaths = (svgStr) => {
-            const msg = JSON.stringify({
-                    "type": "paths",
-                    "content": svgStr
-                })
-                // ws.send(msg);
-        }
-
         document.body.addEventListener('keydown', function(event) { //delete with key
             if (event.keyCode == 8) {
                 deletePath();
@@ -377,10 +364,9 @@
             return fetch(localHost + "/" + 'get_latest_paths')
                 .then(response => response.json())
                 .catch(err => console.log(err));
-            // setInterval(getPathData, 2000)
         }
 
-        async function updatePrompt(url = '', requestData) {
+        async function collabDraw(url = '', requestData) {
             return fetch(url, {
                     method: "POST",
                     body: JSON.stringify(requestData),
@@ -394,16 +380,53 @@
                 .catch(err => console.log(err));
         }
 
+        const pathRenderer = () => {
+            // get new path data by opening for connections
+            getPathData().then(data => {
+                if (collabDrawing) {
+                    if (lastRender) {
+                        lastRender.remove();
+                    }
+                }
+                let loadedSvg = topLayer.importSVG(data.svg)
+                loadedSvg.position.x = window.innerWidth / 2;
+                loadedSvg.position.y = window.innerHeight / 2
+                loadedSvg.scale(1 / scaleFactor) // invert for reading back
+                lastRender = loadedSvg;
+            })
+        }
+
         document.getElementById("send-prompt").addEventListener("submit", (e) => {
             e.preventDefault();
             var input = document.getElementById("messageText");
+            if (!collabDrawing) {
+                if (input.value !== "") {
+                    // startCollab.setAttribute("", "confirm-cancel");
+                    startCollab.innerHTML = "STOP";
+                    collabDrawing = true;
+                }
+            } else {
+                // startCollab.removeAttribute("confirm-cancel")
+                startCollab.innerHTML = "DRAW";
+                collabDrawing = false;
+            }
             if (input.value !== "") {
+                pathData = project.exportSVG({
+                    asString: true
+                });
                 const request = {
-                    "type": "message",
-                    "content": input.value
+                    "prompt": input.value,
+                    "svg": pathData
                 };
-                updatePrompt(localHost + "/update_prompt", request)
-                    .then(prompt => message.innerHTML = prompt.data.content)
+
+                collabDraw(localHost + "/update_prompt", request)
+                    .then(data => {
+                        console.log(data)
+                        message.innerHTML = data.data.prompt;
+                        // get the paths 
+                        // pathRenderer();
+                        // setInterval(pathRenderer, 2000)
+                    })
                 input.value = ''
             };
             // BE a route which just returns the SVG file data. 
@@ -493,11 +516,22 @@
                         deletePath.remove();
                     });
                 }
-                if (lastEvent.type === "erase-event") {
-
-                }
+                if (lastEvent.type === "erase-event") {}
             }
         });
+        // const ws = new WebSocket('ws://localhost:8000/ws');
+        // ws.onmessage = function(event) {
+        //     console.log(event);
+        //     // const message = document.getElementById('message');
+        //     // const {
+        //     //     type,
+        //     //     content
+        //     // } = JSON.parse(event.data);
+        //     // if (type === "paths") {
+        //     //     console.log(content);
+        //     // }
+        // };
+        // ws.send("connected");
     </script>
 </body>
 
