@@ -117,10 +117,9 @@ button[right-button] {
 }
 
 #control-panel {
-    padding: 30px;
-    height: 75px;
+    height: 60px;
     width: 550px;
-    padding: 30px 130px;
+    padding: 15px 130px 40px 130px;
     background-color: #ffffff;
     clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
 }

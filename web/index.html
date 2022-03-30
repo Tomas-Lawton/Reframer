@@ -71,8 +71,10 @@
 
     <script type="text/javascript">
         // TO DO REFACTOR TOOLS.
-        //     const targetHeight = 224;
-        // const scaleFactor = targetHeight / window.innerHeight; // scale as a square, innerHeight smaller than width
+
+        const targetHeight = 224;
+        const canvasFrame = Math.max(window.innerWidth, window.innerHeight)
+        const scaleFactor = targetHeight / canvasFrame; //take larger square so full sketch always captured
         paper.install(window);
 
         const modal = document.getElementById("modal");
@@ -124,6 +126,13 @@
                 }
             }
             if (penMode === "pen") {
+                getPathData().then(data => {
+                    console.log(data)
+                    let loadedSvg = topLayer.importSVG(data.svg)
+                    loadedSvg.position.x = window.innerWidth / 2;
+                    loadedSvg.position.y = window.innerHeight / 2
+                    loadedSvg.scale(1 / scaleFactor) // invert for reading back
+                })
                 myPath = new Path({
                     strokeColor: strokeColor,
                     strokeWidth: strokeWidth,
@@ -347,10 +356,10 @@
 
         const sendPaths = (svgStr) => {
             const msg = JSON.stringify({
-                "type": "paths",
-                "content": svgStr
-            })
-            ws.send(msg);
+                    "type": "paths",
+                    "content": svgStr
+                })
+                // ws.send(msg);
         }
 
         document.body.addEventListener('keydown', function(event) { //delete with key
@@ -361,15 +370,14 @@
             if (event.keyCode == 46) {
                 deletePath();
                 event.preventDefault();
-
             }
         });
 
-        const getPathData = () => {
-            fetch(localHost + "/" + 'get_latest_paths')
+        async function getPathData() {
+            return fetch(localHost + "/" + 'get_latest_paths')
                 .then(response => response.json())
-                .then(data => console.log(data));
-            setInterval(getPathData, 2000)
+                .catch(err => console.log(err));
+            // setInterval(getPathData, 2000)
         }
 
         async function updatePrompt(url = '', requestData) {
