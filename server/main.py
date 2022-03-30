@@ -1,8 +1,9 @@
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, Request
+# WebSocket
+from fastapi.middleware.cors import CORSMiddleware
 import skimage
 import numpy as np
 import logging
-import json
 from class_interface import Clip_Class
 from plot_util import plot_cosines, plot_zero_shot_images, plot_image
 
@@ -11,6 +12,21 @@ from plot_util import plot_cosines, plot_zero_shot_images, plot_image
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG, format=f'APP LOGGING: %(levelname)s %(name)s %(threadName)s : %(message)s')
 
 app = FastAPI(title = "Clip Draw Backend")
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://127.0.0.1:5500",
+    "http://127.0.0.1:8000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 clip_class = Clip_Class()
 clip_class.create_clip_draw(False) #encode nouns or nah
 
@@ -79,48 +95,63 @@ def activate_clip_draw():
 async def get():
     return {"Hello": "World"}
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        data = json.loads(data)
+
+
+@app.get("/get_latest_paths")
+async def get():
+    svg_string = ""
+    with open("results/latest_rendered_paths") as f:
+        svg_string = f.read()
+
+    return {
+        "svg": svg_string,
+        "iterations": clip_class.clip_draw_optimiser.iteration, 
+        "loss": clip_class.clip_draw_optimiser.loss
+    }
+
+@app.post("/update_prompt")
+async def update_prompt(request: Request):
+    request_data = await request.json()
+    content = request_data["content"]
+    logging.info(f"Setting clip prompt: {content}")        
+    try:
+        clip_class.start_clip_draw([content], False) # optional args
+        logging.info("Clip drawer initialised")
+    except:
+        logging.error("Failed to start clip draw")
+    
+    return {
+        "data" : request_data
+    }
+
+
+# @app.websocket("/ws")
+# async def websocket_endpoint(websocket: WebSocket):
+#     await websocket.accept()
+#     while True:
+#         data = await websocket.receive_text()
+#         data = json.loads(data)
         
-        # Right the paths to file
-        if data["type"] == "paths":
-            svg_string = data["content"]
-            clip_class.clip_draw_optimiser.svg_string = svg_string
-            # can also triggure clip draw from here
+#         # Right the paths to file
+#         if data["type"] == "paths":
+#             svg_string = data["content"]
+#             clip_class.clip_draw_optimiser.svg_string = svg_string
+#             # can also triggure clip draw from here
 
-        # Get the user prompt
-        if data["type"] == "message":
-            content = data["content"] # could refactor to include pos and neg prompt or array of prompts
-            logging.info(f"Setting clip prompt: {content}")        
-            try:
-                clip_class.start_clip_draw([content], True) # optional args
-                logging.info("Clip drawer initialised")
-            except:
-                logging.error("Failed to start clip draw")
-
-            return_msg = json.dumps({
-                "type": "message",
-                "content": f"{content}"
-            })
-            await websocket.send_text({return_msg})
-            logging.info(f"Ready to draw: {content}")
-
-            iteration = 0
-            #only if is_active is true
-            while clip_class.clip_draw_optimiser.is_active:
-                # Run the optimisation loop and update the data here so it can be sent over socket.
-                path_data = clip_class.clip_draw_optimiser.run_draw_iteration(iteration)
-                # if path_data != None:
-                #     send_paths_to_client = json.dumps({
-                #         "type": "paths",
-                #         "content": "hello"
-                #     })
-                #     await websocket.send_text(send_paths_to_client)
-                iteration += 1
-                # logging.info("Sent paths through socket")
+#         # Get the user prompt
+#         # logging.info(f"Ready to draw: {content}")
+#         iteration = 0
+#         #only if is_active is true
+#         # while clip_class.clip_draw_optimiser.is_active:
+#         #     # Run the optimisation loop and update the data here so it can be sent over socket.
+#         #     path_data = clip_class.clip_draw_optimiser.run_draw_iteration(iteration)
+#         #     # if path_data != None:
+#         #     #     send_paths_to_client = json.dumps({
+#         #     #         "type": "paths",
+#         #     #         "content": "hello"
+#         #     #     })
+#         #     #     await websocket.send_text(send_paths_to_client)
+#         #     iteration += 1
+#         #     # logging.info("Sent paths through socket")
 
 

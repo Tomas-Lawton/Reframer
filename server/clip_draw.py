@@ -4,7 +4,7 @@ import torchvision.transforms as transforms
 import datetime
 import numpy as np
 # make a util directory???
-from clip_util import get_noun_data, get_drawing_paths, area_mask, save_data, get_drawing_paths_string
+from clip_util import get_noun_data, get_drawing_paths, area_mask, save_data
 from render_design import add_shape_groups, load_vars, render_save_img, build_random_curves
 import logging
 
@@ -142,6 +142,7 @@ class Clip_Draw_Optimiser:
         
     def run_draw_iteration(self, iteration):
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") #REFACTORRRRRR
+        self.iteration = iteration
         if iteration > self.num_iter:
             return -1
         logging.info("Running draw optimiser")
@@ -202,6 +203,7 @@ class Clip_Draw_Optimiser:
         for group in self.shape_groups:
             group.stroke_color.data.clamp_(0.0, 1.0)
 
+        self.loss = loss.item()
         # This is just to check out the progress
         if iteration % self.update_frequency == 0:
             logging.info(f"render loss: {loss.item()}")
@@ -223,6 +225,7 @@ class Clip_Draw_Optimiser:
                     logging.info("\nTop predictions:\n")
                     for value, index in zip(values, indices):
                         logging.info(f"{self.nouns[index]:>16s}: {100 * value.item():.2f}%")
+                pydiffvg.save_svg('results/latest_rendered_paths.svg', self.canvas_w, self.canvas_h, self.shapes, self.shape_groups)
         return self.shapes
             # at this point the whole thing should return to the top with new path data
 

@@ -80,8 +80,12 @@
         const controlPanel = document.getElementById("control-panel");
         const buttonPanel = document.getElementById("button-panel");
         const artisticControls = document.getElementById("slider-controls");
+        const message = document.getElementById('message');
+
         const backgroundColor = "#FCFCFC"
         canvas.style.background = backgroundColor;
+        const localHost = "http://localhost:8000"
+
         paper.setup(canvas);
 
         const topLayer = new Layer(); //for drawing + erase mask
@@ -323,22 +327,22 @@
         }
 
 
-        const ws = new WebSocket('ws://localhost:8000/ws');
-        ws.onmessage = function(event) {
-            console.log(event)
-            const message = document.getElementById('message');
-            const {
-                type,
-                content
-            } = JSON.parse(event.data);
-            if (type === "message") {
-                message.innerHTML = content
-            }
-            // parse stroke information
-            // if (type === "paths") {
-            //     console.log(content);
-            // }
-        };
+        // const ws = new WebSocket('ws://localhost:8000/ws');
+        // ws.onmessage = function(event) {
+        //     console.log(event)
+        // const message = document.getElementById('message');
+        // const {
+        //     type,
+        //     content
+        // } = JSON.parse(event.data);
+        // if (type === "message") {
+        //     message.innerHTML = content
+        // }
+        // parse stroke information
+        // if (type === "paths") {
+        //     console.log(content);
+        // }
+        // };
 
 
         const sendPaths = (svgStr) => {
@@ -360,16 +364,49 @@
 
             }
         });
+
+        const getPathData = () => {
+            fetch(localHost + "/" + 'get_latest_paths')
+                .then(response => response.json())
+                .then(data => console.log(data));
+            setInterval(getPathData, 2000)
+        }
+
+        async function updatePrompt(url = '', requestData) {
+            return fetch(url, {
+                    method: "POST",
+                    body: JSON.stringify(requestData),
+                    cache: 'no-cache',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                })
+                .then(response => response.json())
+                .catch(err => console.log(err));
+        }
+
         document.getElementById("send-prompt").addEventListener("submit", (e) => {
-            var input = document.getElementById("messageText")
+            e.preventDefault();
+            var input = document.getElementById("messageText");
             if (input.value !== "") {
-                ws.send(JSON.stringify({
+                const request = {
                     "type": "message",
                     "content": input.value
-                }));
-            }
-            input.value = ''
-            e.preventDefault();
+                };
+                updatePrompt(localHost + "/update_prompt", request)
+                    .then(prompt => message.innerHTML = prompt.data.content)
+                input.value = ''
+            };
+            // BE a route which just returns the SVG file data. 
+            // instead change to hit the route,
+            // wait and then read 
+
+            // post the message, wait for clip to start up, return success
+            // fe with success begins to read the local file
+            // be continues generating
+
+            // start reading from file, re-read every few seconds.
         })
         document.getElementById("begin").addEventListener("click", () => {
             document.getElementById("sliding-overlay").style.bottom = "100%";
