@@ -103,7 +103,7 @@ button[confirm-action]:hover {
     top: 0;
     right: 0;
     z-index: 10;
-    background-color: rgba(255, 255, 255, 0.881);
+    background-color: rgba(255, 255, 255, 0.716);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -113,6 +113,14 @@ button[confirm-action]:hover {
 
 #control-panel * {
     margin-bottom: 5px;
+}
+
+.picker_done button {
+    display: none;
+}
+
+.picker_sample {
+    display: none;
 }
 
 #button-panel {
@@ -164,6 +172,12 @@ button[confirm-action]:hover {
 
 #button-panel #delete:hover {
     background-color: #f86433;
+}
+
+#width-input {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 

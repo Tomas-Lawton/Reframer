@@ -39,6 +39,7 @@
     <div id="contain-canvas">
         <canvas id="canvas" resize></canvas>
     </div>
+
     <div id="control-panel">
         <h2 id="message">Input Prompt</h2>
         <form id="send-prompt">
@@ -47,9 +48,9 @@
         </form>
         <div id="slider-controls">
             <div id="color-picker"></div>
-            <div id="prompt-input">
-                <input type="range" id="width-slider" value="20" min="1" max="40">
+            <div id="width-input">
                 <label>Width</label>
+                <input type="range" id="width-slider" value="20" min="1" max="40">
             </div>
         </div>
     </div>
@@ -72,7 +73,8 @@
 
         const modal = document.getElementById("modal");
         const canvas = document.getElementById('canvas');
-        const backgroundColor = "#F4F4F4"
+        const controlPanel = document.getElementById("control-panel");
+        const backgroundColor = "#FCFCFC"
         canvas.style.background = backgroundColor;
         paper.setup(canvas);
 
@@ -204,15 +206,9 @@
         eraseTool.onMouseUp = function(event) {
             if (erasePath.segments.length > 0) {
                 erasePath.simplify()
-
                 var eraseRadius = (strokeWidth * view.pixelRatio) / 2
-
-                // find the offset path on each side of the line
-                // this uses routines in the offset.js file
                 var outerPath = OffsetUtils.offsetPath(erasePath, eraseRadius)
                 var innerPath = OffsetUtils.offsetPath(erasePath, -eraseRadius)
-                erasePath.remove() // done w/ this now
-
                 outerPath.insert = false
                 innerPath.insert = false
                 innerPath.reverse() // reverse one path so we can combine them end-to-end
@@ -222,11 +218,9 @@
                     closed: true,
                     insert: false
                 })
-                deleteShape.addSegments(outerPath.segments)
+                deleteShape.addSegments(outerPath.segments) //added to item to end path where erased
                 deleteShape.addSegments(innerPath.segments)
 
-                // create round endcaps for the shape
-                // as they aren't included in the offset paths
                 var endCaps = new CompoundPath({
                     children: [
                         new Path.Circle({
@@ -241,21 +235,21 @@
                     insert: false
                 })
 
-                // unite the shape with the endcaps
-                // this also removes all overlaps from the stroke
+                // // unite the shape with the endcaps
+                // // this also removes all overlaps from the stroke
                 deleteShape = deleteShape.unite(endCaps)
                 deleteShape.simplify()
 
-                // grab all the items from the tmpGroup in the mask group
+                // // grab all the items from the tmpGroup in the mask group
                 var items = tmpGroup.getItems({
                     overlapping: deleteShape.bounds
                 })
 
                 items.forEach(function(item) {
                     var result = item.subtract(deleteShape, {
-                            trace: false,
-                            insert: false
-                        }) // probably need to detect closed vs open path and tweak these settings
+                        trace: false,
+                        insert: false
+                    }); // probably need to detect closed vs open path and tweak these settings
 
                     if (result.children) {
                         // if result is compoundShape, yoink the individual paths out
@@ -270,10 +264,11 @@
                         }
                     }
                 })
+                erasePath.remove() // done w/ this now
+
                 topLayer.addChildren(tmpGroup.removeChildren())
                 mask.remove()
             }
-
         }
 
         // Drawing Controls
@@ -296,6 +291,11 @@
                         console.log(path)
                         path.selected = false;
                     });
+                }
+                if (penMode !== "pen") {
+                    controlPanel.style.display = "none";
+                } else {
+                    controlPanel.style.display = "flex";
                 }
                 console.log(penMode)
             });
