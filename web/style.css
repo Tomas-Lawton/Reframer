@@ -88,17 +88,55 @@ canvas {
     justify-content: flex-end;
 }
 
-button[confirm-action] {
+button[confirm-cancel] {
     background-color: #ff7f55;
-    margin-left: 10px;
+    color: #ffffff;
+}
+
+button[confirm-cancel]:hover {
+    background-color: #f86433;
+}
+
+button[confirm-action] {
+    background-color: #0095ff;
     color: #ffffff;
 }
 
 button[confirm-action]:hover {
-    background-color: #f86433;
+    background-color: #3caeff;
+}
+
+button[right-button] {
+    margin-left: 10px;
 }
 
 #control-panel {
+    padding: 30px;
+    height: 75px;
+    width: 550px;
+    padding: 30px 130px;
+    background-color: #ffffff;
+    clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
+}
+
+#message {
+    text-align: center;
+}
+
+#clip-wrap {
+    filter: drop-shadow(0 5px 10px rgba(129, 129, 129, 0.19)) drop-shadow(0 3px 3px rgba(146, 146, 146, 0.23));
+    position: absolute;
+    top: 0;
+    left: 50%;
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#slider-controls {
     position: absolute;
     top: 0;
     right: 0;
@@ -109,6 +147,10 @@ button[confirm-action]:hover {
     justify-content: center;
     padding: 30px;
     box-shadow: 0 5px 10px rgba(129, 129, 129, 0.19), 0 3px 3px rgba(146, 146, 146, 0.23);
+}
+
+#slider-controls * {
+    margin: 5px 0;
 }
 
 #control-panel * {
@@ -125,15 +167,16 @@ button[confirm-action]:hover {
 
 #button-panel {
     position: absolute;
-    left: 50%;
-    top: 0;
+    /* left: 0; */
     z-index: 10;
     background-color: rgba(255, 255, 255, 0.881);
     display: flex;
-    flex-direction: row;
+    flex-direction: column-reverse;
     padding: 5px;
-    -ms-transform: translateX(-50%);
-    transform: translateX(-50%);
+    /* top: 0; */
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
     box-shadow: 0 5px 10px rgba(129, 129, 129, 0.19), 0 3px 3px rgba(146, 146, 146, 0.23);
     border-radius: 0.5em;
 }

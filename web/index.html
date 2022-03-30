@@ -23,7 +23,7 @@
             <p>Are you sure you want to delete your drawing? :(</p>
             <div id="action">
                 <button id="cancel-modal">Cancel</button>
-                <button id="confirm-modal" confirm-action>Confirm</button>
+                <button id="confirm-modal" confirm-cancel right-button>Confirm</button>
             </div>
         </div>
     </div>
@@ -35,23 +35,25 @@
         </div>
     </div>
 
-
     <div id="contain-canvas">
         <canvas id="canvas" resize></canvas>
     </div>
 
-    <div id="control-panel">
-        <h2 id="message">Input Prompt</h2>
-        <form id="send-prompt">
-            <input type="text" id="messageText" />
-            <button>Send</button>
-        </form>
-        <div id="slider-controls">
-            <div id="color-picker"></div>
-            <div id="width-input">
-                <label>Width</label>
-                <input type="range" id="width-slider" value="20" min="1" max="40">
-            </div>
+    <div id="clip-wrap">
+        <div id="control-panel">
+            <h2 id="message">Lets draw a...</h2>
+            <form id="send-prompt">
+                <input type="text" id="messageText" />
+                <button right-button confirm-action>DRAW</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="slider-controls">
+        <div id="color-picker"></div>
+        <div id="width-input">
+            <label>Width</label>
+            <input type="range" id="width-slider" value="20" min="1" max="40">
         </div>
     </div>
 
@@ -62,11 +64,13 @@
         <i class="fa-solid fa-eraser fa-fw pen-mode" id="erase"></i>
         <i class="fa-solid fa-clock-rotate-left fa-fw" id="undo"></i>
         <i class="fa-solid fa-rotate-right fa-fw" id="redo"></i>
+        <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i>
         <i class="fa-solid fa-trash fa-fw" id="delete"></i>
     </div>
 
 
     <script type="text/javascript">
+        // TO DO REFACTOR TOOLS.
         //     const targetHeight = 224;
         // const scaleFactor = targetHeight / window.innerHeight; // scale as a square, innerHeight smaller than width
         paper.install(window);
@@ -74,12 +78,14 @@
         const modal = document.getElementById("modal");
         const canvas = document.getElementById('canvas');
         const controlPanel = document.getElementById("control-panel");
+        const buttonPanel = document.getElementById("button-panel");
+        const artisticControls = document.getElementById("slider-controls");
         const backgroundColor = "#FCFCFC"
         canvas.style.background = backgroundColor;
         paper.setup(canvas);
 
         const topLayer = new Layer(); //for drawing + erase mask
-
+        let buttonControlLeft = true;
         let strokeColor = "#402f95";
         let strokeWidth = 20;
         let myPath;
@@ -145,28 +151,9 @@
         tool.onMouseUp = function(event) {
             if (penMode === "pen") {
                 myPath.simplify()
-                    // myPath.onMouseDrag = (e) => {
-                    //     if (myPath.selected === true && penMode === "select") { //refactor so all selected paths
-                    //         myPath.position.x += e.delta.x;
-                    //         myPath.position.y += e.delta.y;
-                    //     }
-                    // }
-                console.log(paper.project.exportSVG());
-                // myPath.selected = true;
-                // myPath.selected = true;
-                // const pathStrokes = myPath.exportSVG();
-                // console.log(myPath.pathData);
                 sendPaths(paper.project.exportSVG({
                     asString: true
                 }));
-                // console.log(paper.project.getItems()[0]._children); // is an array of paths and can get segments or pathData
-                // paper.project.importSVG(svg)
-                // console.log(svg)
-                //draw path
-                // var pathData = 'm 54.473683,133.57894 c 2.309053,6.52389 5.103384,12.88691 9.947368,18.00001 1.602465,1.69148 7.516862,3.36572 9,3.78947 8.215344,2.34724 20.231724,5.06339 28.894739,2.8421 3.21552,-0.82449 6.03091,-2.77861 9,-4.26315 8.27335,-4.13668 15.89845,-8.52099 21.31579,-16.10527';
-                // var path = new Path(pathData);
-                // path.strokeColor = 'red';
-                // path.scale(5);
                 undoStack.push({
                     type: "draw-event",
                     data: myPath
@@ -174,16 +161,14 @@
             }
         }
 
-
         const eraseTool = new Tool();
-        // eraseTool.minDistance = 10;
         let erasePath;
         let tmpGroup;
         let mask;
 
         eraseTool.onMouseDown = function(event) {
             erasePath = new Path({
-                strokeWidth: strokeWidth * paper.project.view.pixelRatio,
+                strokeWidth: strokeWidth * view.pixelRatio,
                 strokeCap: 'round',
                 strokeJoin: 'round',
                 strokeColor: backgroundColor
@@ -293,9 +278,9 @@
                     });
                 }
                 if (penMode !== "pen") {
-                    controlPanel.style.display = "none";
+                    artisticControls.style.display = "none";
                 } else {
-                    controlPanel.style.display = "flex";
+                    artisticControls.style.display = "flex";
                 }
                 console.log(penMode)
             });
@@ -356,16 +341,6 @@
             // }
         };
 
-        const sendPrompt = (e) => {
-            var input = document.getElementById("messageText")
-            const msg = JSON.stringify({
-                "type": "message",
-                "content": input.value
-            })
-            ws.send(msg);
-            input.value = ''
-            e.preventDefault()
-        }
 
         const sendPaths = (svgStr) => {
             const msg = JSON.stringify({
@@ -387,7 +362,16 @@
             }
         });
         document.getElementById("send-prompt").addEventListener("submit", (e) => {
-            sendPrompt(e)
+            var input = document.getElementById("messageText")
+            if (input.value !== "") {
+
+                ws.send(JSON.stringify({
+                    "type": "message",
+                    "content": input.value
+                }));
+            }
+            input.value = ''
+            e.preventDefault();
         })
         document.getElementById("begin").addEventListener("click", () => {
             document.getElementById("sliding-overlay").style.bottom = "100%";
@@ -402,8 +386,18 @@
             modal.style.display = "none";
         });
         document.getElementById("confirm-modal").addEventListener("click", () => {
-            paper.project.clear()
+            topLayer.clear()
             modal.style.display = "none";
+        });
+        document.getElementById("switch-side").addEventListener("click", () => {
+            if (buttonControlLeft) {
+                console.log(window.innerWidth)
+                buttonPanel.style.left = `${window.innerWidth - buttonPanel.offsetWidth}px`;
+            } else {
+                buttonPanel.style.left = 0;
+            }
+            buttonControlLeft = !buttonControlLeft;
+
         });
         document.getElementById("undo").addEventListener("click", () => {
             const lastEvent = undoStack.pop();
