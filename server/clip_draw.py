@@ -23,6 +23,8 @@ class Clip_Draw_Optimiser:
         self.nouns_features = noun_features
         self.use_neg_prompts = False
         self.normalize_clip = True
+        # 
+        self.iteration = 0
         # Canvas parameters
         self.num_paths = 32
         self.max_width = 40
@@ -41,7 +43,7 @@ class Clip_Draw_Optimiser:
             'y0': 0.5,
             'y1': 1.0
         }
-        self.update_frequency = 5
+        self.update_frequency = 1
         self.is_stopping = False
         self.is_active = False
         self.nouns = get_noun_data()
@@ -138,27 +140,18 @@ class Clip_Draw_Optimiser:
 
         # refactor
         self.time_str = datetime.datetime.today().strftime("%Y_%m_%d_%H_%M_%S")
-
-    def run_drawer_iterations(self):
-        self.iteration = 0
-        while self.is_active:
-            self.run_iteration(self.iteration)
-            # Return some data
-            self.iteration += 1
         
-    def run_iteration(self, iteration):
+    def run_iteration(self):
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") #REFACTORRRRRR
-        self.iteration = iteration
-        logging.info(iteration)
-
-        if iteration > self.num_iter:
+        if self.iteration > self.num_iter:
             return -1
+        logging.info(self.iteration)
         self.points_optim.zero_grad()
         self.width_optim.zero_grad()
         self.color_optim.zero_grad()
         scene_args = pydiffvg.RenderFunction.serialize_scene(\
             self.canvas_w, self.canvas_h, self.shapes, self.shape_groups)
-        self.img = self.render(self.canvas_w, self.canvas_h, 2, 2, iteration, None, *scene_args)
+        self.img = self.render(self.canvas_w, self.canvas_h, 2, 2, self.iteration, None, *scene_args)
         self.img = self.img[:, :, 3:4] * self.img[:, :, :3] + torch.ones(self.img.shape[0], self.img.shape[1], 3, device = pydiffvg.get_device()) * (1 - self.img[:, :, 3:4])
         if self.w_img >0:
             self.l_img = torch.norm((self.img-self.img0.to(device))*self.mask).view(1)
@@ -209,7 +202,7 @@ class Clip_Draw_Optimiser:
 
         self.loss = loss.item()
         # This is just to check out the progress
-        if iteration % self.update_frequency == 0:
+        if self.iteration % self.update_frequency == 0:
             logging.info(f"render loss: {loss.item()}")
             logging.info(f"l_points: {l_points.item()}")
             logging.info(f"l_colors: {l_colors.item()}")
@@ -217,7 +210,7 @@ class Clip_Draw_Optimiser:
             logging.info(f"self.l_img: {self.l_img.item()}")
             # for l in l_style:
             #     print('l_style: ', l.item())
-            logging.info(f"Iteration: {iteration}")
+            logging.info(f"Iteration: {self.iteration}")
             with torch.no_grad():
                 pydiffvg.imwrite(self.img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+self.time_str+'.png', gamma=1)
                 if self.nouns_features != []:
@@ -229,7 +222,8 @@ class Clip_Draw_Optimiser:
                     for value, index in zip(values, indices):
                         logging.info(f"{self.nouns[index]:>16s}: {100 * value.item():.2f}%")
                 pydiffvg.save_svg('results/latest_rendered_paths.svg', self.canvas_w, self.canvas_h, self.shapes, self.shape_groups)
-        return self.shapes
+        self.iteration += 1
+        return  self.iteration
             # at this point the whole thing should return to the top with new path data
 
     def clip_has_stopped(self):

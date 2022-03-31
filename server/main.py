@@ -1,3 +1,4 @@
+from importlib.resources import contents
 from fastapi import FastAPI, Request, WebSocket, BackgroundTasks
 # WebSocket
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,6 +9,11 @@ from class_interface import Clip_Class
 from plot_util import plot_cosines, plot_zero_shot_images, plot_image
 import json
 import aiofiles
+import asyncio
+
+import threading
+
+
 # check environment var
 # add filename='logs.log'
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG, format=f'APP LOGGING: %(levelname)s %(name)s %(threadName)s : %(message)s')
@@ -122,19 +128,50 @@ async def get_latest_paths():
 # @app.websocket("/ws")
 # async def websocket_endpoint(websocket: WebSocket):
 #     await websocket.accept()
+#     json_data = await websocket.receive_json()
+#     async def read_from_socket(websocket: WebSocket):
+#         nonlocal json_data
+#         async for data in websocket.iter_json():
+#             logging.info(data)
+#             json_data = data
+#             if data["status"] == "activate":
+#                 websocket.send_text(f"Message text was: hello")
+
+#     asyncio.create_task(read_from_socket(websocket))
 #     while True:
-#         data = await websocket.receive_text()
-#         data = json.loads(data)
-#         # Right the paths to file
-        # if data["type"] == "paths":
-        #     svg_string = data["content"]
-        #     clip_class.clip_draw_optimiser.svg_string = svg_string
-        #     # can also triggure clip draw from here
-#         await websocket.send_text(f"Message text was: hello")
+#         logging.info(f"Pushing update: {json_data}")
+#         await asyncio.sleep(1)  # simulate a slow call to the weather service
+
+def read_from_socket():
+    with open("results/latest_rendered_paths.svg") as f:
+        return f.read()
+
+@app.websocket("/ws")
+async def read_webscoket(websocket: WebSocket):
+    await websocket.accept()
+    data = await websocket.receive_text()
+    logging.info(data)
+    svg_string = ""
+            
+    # asyncio.create_task(read_from_socket(websocket))
+    while True:
+        current_iteration = 0
+        if clip_class.clip_draw_optimiser.is_active:
+            current_iteration = clip_class.clip_draw_optimiser.run_iteration()
+            if current_iteration % 1 == 0:
+                svg_string = read_from_socket()
+                logging.info(f"Sending svg: {svg_string}")
+            await websocket.send_text(svg_string)
+        # await asyncio.sleep(.5)
 
 
-def start_clip_draw_background():
-    clip_class.clip_draw_optimiser.run_drawer_iterations()
+# def start_clip_draw_background():
+#     clip_class.clip_draw_optimiser.run_drawer_iterations()
+
+# class BackgroundTasks(threading.Thread):
+#     def run(self,*args,**kwargs):
+#         clip_class.clip_draw_optimiser.run_drawer_iterations()
+
 
 @app.post("/update_prompt")
 async def update_prompt(request: Request, background_tasks: BackgroundTasks):
@@ -150,7 +187,7 @@ async def update_prompt(request: Request, background_tasks: BackgroundTasks):
         logging.error("Failed to start clip draw")
     logging.info("Clip drawer initialised")
     # put in new thread in stead so it can be killed when the end point is hit.
-    background_tasks.add_task(start_clip_draw_background)
+    # background_tasks.add_task(start_clip_draw_background)
     return {
         "data" : request_data
     }
