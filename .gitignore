@@ -1,5 +1,6 @@
 server/local_images
 server/__pycache__
 server/env
+server/results
 
 reactcanvas/node_modules
