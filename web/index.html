@@ -49,11 +49,20 @@
         </div>
     </div>
 
-    <div id="slider-controls">
-        <div id="color-picker"></div>
-        <div id="width-input">
-            <label>Width</label>
-            <input type="range" id="width-slider" value="20" min="1" max="40">
+    <div id="art-controls">
+        <div id="pen-controls">
+            <div id="color-picker"></div>
+            <div id="width-input">
+                <label>Width</label>
+                <input type="range" id="width-slider" value="20" min="1" max="40">
+            </div>
+        </div>
+
+        <div id="select-controls">
+            <div id="scale-input">
+                <label>Scale</label>
+                <input type="range" id="scale-slider" value="50" min="1" max="100">
+            </div>
         </div>
     </div>
 
@@ -72,10 +81,8 @@
     <script type="text/javascript">
         // TO DO REFACTOR TOOLS.
         const ws = new WebSocket('ws://localhost:8000/ws');
-
-        const targetHeight = 224;
-
         // DOES THE "FRAME" NEED TO BE MOVED?
+        const targetHeight = 224;
         const canvasFrame = Math.max(window.innerWidth, window.innerHeight)
         const scaleFactor = targetHeight / canvasFrame; //take larger square so full sketch always captured
         paper.install(window);
@@ -84,7 +91,10 @@
         const canvas = document.getElementById('canvas');
         const controlPanel = document.getElementById("control-panel");
         const buttonPanel = document.getElementById("button-panel");
-        const artisticControls = document.getElementById("slider-controls");
+
+        const penControls = document.getElementById("pen-controls");
+        const selectControls = document.getElementById("select-controls");
+
         const message = document.getElementById('message');
         const startCollab = document.getElementById('draw');
 
@@ -275,11 +285,17 @@
         document.querySelectorAll(".pen-mode").forEach(elem => {
             elem.addEventListener("click", () => {
                 penMode = elem.id;
+                // REFACTOR Into a switch
                 if (penMode === "erase") {
                     console.log(paper.tools)
                     paper.tools[1].activate()
                 }
-                if (penMode === "pen" || penMode === "select") {
+                if (penMode === "pen") {
+                    penControls.style.display = "block";
+                    paper.tools[0].activate()
+                }
+                if (penMode === "select") {
+                    selectControls.style.display = "block";
                     paper.tools[0].activate()
                 }
                 if (penMode === "lasso") {
@@ -293,79 +309,34 @@
                     });
                 }
                 if (penMode !== "pen") {
-                    artisticControls.style.display = "none";
-                } else {
-                    artisticControls.style.display = "flex";
+                    penControls.style.display = "none";
+                }
+                if (penMode !== "select") {
+                    selectControls.style.display = "none";
                 }
                 console.log(penMode)
             });
         });
 
 
-        const deletePath = () => {
-            selected = getSelectedPaths();
-            if (selected.length > 0) {
-                pathList = selected.map(path => path.exportJSON()); //dont use paper ref
-                console.log(pathList)
-                undoStack.push({
-                    type: 'delete-event',
-                    data: pathList
-                });
-                selected.map(path => path.remove())
+
+        ws.onmessage = function(event) {
+            // ws.send({
+            //     "status": "hello world!"
+            // });
+            // console.log("Sent to ", ws)
+            if (collabDrawing) {
+                if (lastRender) {
+                    lastRender.remove();
+                }
+                let loadedSvg = topLayer.importSVG(event.data)
+                loadedSvg.position.x = window.innerWidth / 2;
+                loadedSvg.position.y = window.innerHeight / 2
+                loadedSvg.scale(1 / scaleFactor) // invert for reading back
+                lastRender = loadedSvg;
+                console.log(loadedSvg)
             }
-            event.preventDefault();
-        }
-
-        const undo = () => {
-            // pop off last path and push it onto undo stack.
-            // if redo just pop off undo stack.
-        }
-
-        // Color picker
-        const picker = new Picker({
-            parent: document.getElementById("color-picker"),
-            popup: false,
-            alpha: true,
-            defaultColor: '#0cf',
-            editor: false,
-            editorFormat: 'hex' // or 'rgb', 'hsl'
-        });
-        picker.setColor("#402f95");
-        picker.onChange = (color) => {
-            strokeColor = color.rgbaString;
         };
-        document.getElementById("width-slider").oninput = function() {
-            strokeWidth = parseInt(this.value, 10);
-        }
-
-
-        // const ws = new WebSocket('ws://localhost:8000/ws');
-        // ws.onmessage = function(event) {
-        //     console.log(event)
-        // const message = document.getElementById('message');
-        // const {
-        //     type,
-        //     content
-        // } = JSON.parse(event.data);
-        // if (type === "message") {
-        //     message.innerHTML = content
-        // }
-        // parse stroke information
-        // if (type === "paths") {
-        //     console.log(content);
-        // }
-        // };
-
-        document.body.addEventListener('keydown', function(event) { //delete with key
-            if (event.keyCode == 8) {
-                deletePath();
-                event.preventDefault();
-            }
-            if (event.keyCode == 46) {
-                deletePath();
-                event.preventDefault();
-            }
-        });
 
         async function getPathData() {
             return fetch(localHost + "/" + 'get_latest_paths')
@@ -404,17 +375,39 @@
             })
         }
 
+        const deletePath = () => {
+            selected = getSelectedPaths();
+            if (selected.length > 0) {
+                pathList = selected.map(path => path.exportJSON()); //dont use paper ref
+                console.log(pathList)
+                undoStack.push({
+                    type: 'delete-event',
+                    data: pathList
+                });
+                selected.map(path => path.remove())
+            }
+            event.preventDefault();
+        }
+
+        document.body.addEventListener('keydown', function(event) { //delete with key
+            if (event.keyCode == 8) {
+                deletePath();
+                event.preventDefault();
+            }
+            if (event.keyCode == 46) {
+                deletePath();
+                event.preventDefault();
+            }
+        });
         document.getElementById("send-prompt").addEventListener("submit", (e) => {
             e.preventDefault();
             var input = document.getElementById("messageText");
             if (!collabDrawing) {
                 if (input.value !== "") {
-                    // startCollab.setAttribute("", "confirm-cancel");
                     startCollab.innerHTML = "STOP";
                     collabDrawing = true;
                 }
             } else {
-                // startCollab.removeAttribute("confirm-cancel")
                 startCollab.innerHTML = "DRAW";
                 collabDrawing = false;
             }
@@ -436,30 +429,10 @@
                         // pathRenderer();
                         // setInterval(pathRenderer, 2000)
 
-                        // now start collecting the paths:
-
                     });
                 input.value = ''
             };
         });
-
-        ws.onmessage = function(event) {
-            // ws.send({
-            //     "status": "hello world!"
-            // });
-            // console.log("Sent to ", ws)
-            if (collabDrawing) {
-                if (lastRender) {
-                    lastRender.remove();
-                }
-                let loadedSvg = topLayer.importSVG(event.data)
-                loadedSvg.position.x = window.innerWidth / 2;
-                loadedSvg.position.y = window.innerHeight / 2
-                loadedSvg.scale(1 / scaleFactor) // invert for reading back
-                lastRender = loadedSvg;
-            }
-        };
-
         document.getElementById("begin").addEventListener("click", () => {
             document.getElementById("sliding-overlay").style.bottom = "100%";
         });
@@ -547,6 +520,27 @@
                 }
             }
         });
+        document.getElementById("width-slider").oninput = function() {
+            strokeWidth = parseInt(this.value, 10);
+        };
+        document.getElementById("scale-slider").oninput = function() {
+            let newScale = parseInt(this.value, 10);
+            let selected = getSelectedPaths();
+            selected.scale(newScale);
+        };
+        // Color picker
+        const picker = new Picker({
+            parent: document.getElementById("color-picker"),
+            popup: false,
+            alpha: true,
+            defaultColor: '#0cf',
+            editor: false,
+            editorFormat: 'hex' // or 'rgb', 'hsl'
+        });
+        picker.setColor("#402f95");
+        picker.onChange = (color) => {
+            strokeColor = color.rgbaString;
+        };
     </script>
 </body>
 

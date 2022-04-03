@@ -141,7 +141,7 @@ button[right-button] {
     justify-content: center;
 }
 
-#slider-controls {
+#art-controls {
     position: absolute;
     top: 0;
     right: 0;
@@ -154,8 +154,16 @@ button[right-button] {
     box-shadow: 0 5px 10px rgba(129, 129, 129, 0.19), 0 3px 3px rgba(146, 146, 146, 0.23);
 }
 
-#slider-controls * {
+input {
+    width: 250px;
+}
+
+#art-controls * {
     margin: 5px 0;
+}
+
+#select-controls {
+    display: none;
 }
 
 #control-panel * {

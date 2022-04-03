@@ -154,6 +154,8 @@ async def read_webscoket(websocket: WebSocket):
     svg_string = ""
             
     # asyncio.create_task(read_from_socket(websocket))
+    # split into an async task
+    # handle return to websocket
     while True:
         current_iteration = 0
         if clip_class.clip_draw_optimiser.is_active:
