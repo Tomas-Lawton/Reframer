@@ -156,14 +156,23 @@ async def read_webscoket(websocket: WebSocket):
     # asyncio.create_task(read_from_socket(websocket))
     # split into an async task
     # handle return to websocket
+
+    # 
+
+    # make the actual optim loop async so we can still recieve the websocket. Then set the is_active to false. 
+    current_iteration = 0
     while True:
-        current_iteration = 0
-        if clip_class.clip_draw_optimiser.is_active:
+        # if not clip_class.clip_draw_optimiser.is_active:
+        if current_iteration > 10:
+            break
+        else:
             current_iteration = clip_class.clip_draw_optimiser.run_iteration()
             if current_iteration % draw_step == 0:
                 svg_string = read_from_socket()
                 logging.info(f"Sending svg: {svg_string}")
             await websocket.send_text(svg_string)
+        logging.info(f"Optimisation {current_iteration} complete")
+    logging.info("Done")
         # await asyncio.sleep(.5)
 
 
