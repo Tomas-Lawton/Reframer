@@ -1,18 +1,14 @@
 from importlib.resources import contents
 from fastapi import FastAPI, Request, WebSocket, BackgroundTasks
-# WebSocket
+import asyncio
+import threading
 from fastapi.middleware.cors import CORSMiddleware
 import skimage
 import numpy as np
 import logging
 from class_interface import Clip_Class
 from plot_util import plot_cosines, plot_zero_shot_images, plot_image
-import json
 import aiofiles
-import asyncio
-
-import threading
-
 
 # check environment var
 # add filename='logs.log'
@@ -125,55 +121,62 @@ async def get_latest_paths():
     #             "loss": loss
     #     })
 
-# @app.websocket("/ws")
-# async def websocket_endpoint(websocket: WebSocket):
-#     await websocket.accept()
-#     json_data = await websocket.receive_json()
-#     async def read_from_socket(websocket: WebSocket):
-#         nonlocal json_data
-#         async for data in websocket.iter_json():
-#             logging.info(data)
-#             json_data = data
-#             if data["status"] == "activate":
-#                 websocket.send_text(f"Message text was: hello")
-
-#     asyncio.create_task(read_from_socket(websocket))
-#     while True:
-#         logging.info(f"Pushing update: {json_data}")
-#         await asyncio.sleep(1)  # simulate a slow call to the weather service
-
-def read_from_socket():
+def read_svg_file():
     with open("results/latest_rendered_paths.svg") as f:
         return f.read()
 
+# @app.websocket("/ws")
+# async def read_webscoket(websocket: WebSocket) -> None:
+#     await websocket.accept()
+#     data = await websocket.receive_text()
+#     svg_string = ""
+#     draw_step = 1
+#     # asyncio.create_task(read_from_socket(websocket))
+#     # split into an async task
+#     # handle return to websocket
+
+#     # make the actual optim loop async so we can still recieve the websocket. Then set the is_active to false. 
+#     current_iteration = 0
+#     while True:
+#         # if not clip_class.clip_draw_optimiser.is_active:
+#         if current_iteration > 10:
+#             break
+#         else:
+#             current_iteration = clip_class.clip_draw_optimiser.run_iteration()
+#             if current_iteration % draw_step == 0:
+#                 svg_string = read_svg_file()
+#                 # logging.info(f"Sending svg: {svg_string}")
+#             await websocket.send_text(svg_string)
+#         logging.info(f"Optimisation {current_iteration} complete")
+#         logging.info(data)
+#     logging.info("Done")
+#         # await asyncio.sleep(.5)
+
+
+
+stop_threads = False
+
 @app.websocket("/ws")
-async def read_webscoket(websocket: WebSocket):
+async def read_websocket(websocket: WebSocket) -> None:
     await websocket.accept()
-    data = await websocket.receive_text()
-    logging.info(data)
-    svg_string = ""
-    draw_step = 1
-    # asyncio.create_task(read_from_socket(websocket))
-    # split into an async task
-    # handle return to websocket
-
-    # 
-
-    # make the actual optim loop async so we can still recieve the websocket. Then set the is_active to false. 
-    current_iteration = 0
     while True:
-        # if not clip_class.clip_draw_optimiser.is_active:
-        if current_iteration > 10:
-            break
-        else:
-            current_iteration = clip_class.clip_draw_optimiser.run_iteration()
-            if current_iteration % draw_step == 0:
-                svg_string = read_from_socket()
-                logging.info(f"Sending svg: {svg_string}")
+        data = await websocket.receive_text()
+        is_running = True
+        
+        async def send_data_iteration(i = 0) -> int:
+            i = clip_class.clip_draw_optimiser.run_iteration()
+            svg_string = read_svg_file()
             await websocket.send_text(svg_string)
-        logging.info(f"Optimisation {current_iteration} complete")
-    logging.info("Done")
-        # await asyncio.sleep(.5)
+            logging.info(f"Optimisation {i} complete")    
+            return i
+
+        if data == "status":
+            await send_data_iteration()
+        
+        if data == "stop":
+            is_running = False
+            print("Stopping process")
+
 
 
 # def start_clip_draw_background():

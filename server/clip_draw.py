@@ -210,7 +210,6 @@ class Clip_Draw_Optimiser:
             logging.info(f"self.l_img: {self.l_img.item()}")
             # for l in l_style:
             #     print('l_style: ', l.item())
-            logging.info(f"Iteration: {self.iteration}")
             with torch.no_grad():
                 pydiffvg.imwrite(self.img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+self.time_str+'.png', gamma=1)
                 if self.nouns_features != []:

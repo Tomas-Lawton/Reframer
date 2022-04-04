@@ -48,7 +48,6 @@ def get_noun_data():
 def get_drawing_paths(path_to_svg_file, use_user_paths):
     path_list = []
     paths, attributes = svg2paths(path_to_svg_file)
-    logging.info("Getting the paths")
     for att in attributes:
         # defaults
         color = [0, 0, 0, 1]
@@ -108,7 +107,6 @@ def get_drawing_paths(path_to_svg_file, use_user_paths):
             path = [x0]+points_array
             path = points_array
         
-        print(f"path\n {path}")
         path = torch.tensor(path)
         color = torch.tensor(color)
         stroke_width = torch.tensor(stroke_width)
@@ -117,8 +115,6 @@ def get_drawing_paths(path_to_svg_file, use_user_paths):
             path[k,:] += v0
             if k%3 == 0:
                 v0 = path[k,:]
-
-        logging.info(f"\nCreating path: \nColor:  {color}\nWidth: {stroke_width}\nSegments: {num_segments}\n")
         path_list.append(DrawingPath(path, color, stroke_width, num_segments))
     logging.info(f"Returning list of paths: \n {path_list}")    
     return path_list
