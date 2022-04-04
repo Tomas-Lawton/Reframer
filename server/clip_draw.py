@@ -222,7 +222,7 @@ class Clip_Draw_Optimiser:
                         logging.info(f"{self.nouns[index]:>16s}: {100 * value.item():.2f}%")
                 pydiffvg.save_svg('results/latest_rendered_paths.svg', self.canvas_w, self.canvas_h, self.shapes, self.shape_groups)
         self.iteration += 1
-        return self.iteration
+        return self.iteration, loss.item()
             # at this point the whole thing should return to the top with new path data
 
     def clip_has_stopped(self):
