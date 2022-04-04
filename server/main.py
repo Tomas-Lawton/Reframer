@@ -113,10 +113,6 @@ async def get_latest_paths():
         "iterations": iteration,
         "loss": loss
     }
-
-def read_svg_file():
-    with open("results/latest_rendered_paths.svg") as f:
-        return f.read()
 class Interface():
     def __init__(self, websocket):
         self.socket = websocket
@@ -124,11 +120,11 @@ class Interface():
         logging.info("Interface connected")
 
     @staticmethod
-    def get_step_data():
+    async def get_step_data():
         i, loss = clip_class.clip_draw_optimiser.run_iteration()
-        svg = read_svg_file()
-        logging.info(f"Optimisation {i} complete")    
-        return i, svg, loss
+        async with aiofiles.open("results/latest_rendered_paths.svg", "r") as f:
+            svg = await f.read()  # async read
+            return i, svg, loss
     
     @staticmethod
     async def update(data):
@@ -152,7 +148,7 @@ class Interface():
                 "iterations": i,
                 "loss": loss
             }) 
-            logging.info("Iteration complete.")
+            logging.info(f"Optimisation {i} complete")    
             await asyncio.sleep(0.01)
         return -1
         
