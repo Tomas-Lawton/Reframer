@@ -153,26 +153,33 @@ def read_svg_file():
 #         # await asyncio.sleep(.5)
 
 
-
-stop_threads = False
-
 @app.websocket("/ws")
 async def read_websocket(websocket: WebSocket) -> None:
     await websocket.accept()
     while True:
         data = await websocket.receive_text()
-        is_running = True
         
-        async def send_data_iteration(i = 0) -> int:
+        def get_step_data():
             i = clip_class.clip_draw_optimiser.run_iteration()
-            svg_string = read_svg_file()
-            await websocket.send_text(svg_string)
+            svg = read_svg_file()
             logging.info(f"Optimisation {i} complete")    
-            return i
+            return svg
+
+        async def run_continuous_iterations():
+            while True:
+                svg_string = get_step_data()
+                await websocket.send_text(svg_string) 
 
         if data == "status":
-            await send_data_iteration()
-        
+            # Single iteration blocks the event loop for only a moment
+            # svg_string = get_step_data()
+            # await websocket.send_text(svg_string)
+            
+            # Constant iteration blocks the event loop completely
+            await run_continuous_iterations()
+
+        # If event loop is blocked, this code cannot be excecuted because
+        # the thread is occupied. 
         if data == "stop":
             is_running = False
             print("Stopping process")

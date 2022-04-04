@@ -171,11 +171,6 @@
         }
         tool.onMouseUp = function(event) {
             // collabDrawing = true
-            ws.send({
-                "status": "hello world!"
-            });
-            console.log("Sent to ", ws)
-
             if (penMode === "pen") {
                 myPath.simplify()
                     // sendPaths();
@@ -321,10 +316,6 @@
 
 
         ws.onmessage = function(event) {
-            // ws.send({
-            //     "status": "hello world!"
-            // });
-            // console.log("Sent to ", ws)
             if (collabDrawing) {
                 if (lastRender) {
                     lastRender.remove();
@@ -406,10 +397,12 @@
                 if (input.value !== "") {
                     startCollab.innerHTML = "STOP";
                     collabDrawing = true;
+                    ws.send("status");
                 }
             } else {
                 startCollab.innerHTML = "DRAW";
                 collabDrawing = false;
+                ws.send("stop");
             }
             if (input.value !== "") {
                 pathData = project.exportSVG({
