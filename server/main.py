@@ -9,6 +9,7 @@ import logging
 from class_interface import Clip_Class
 from plot_util import plot_cosines, plot_zero_shot_images, plot_image
 import aiofiles
+from fastapi.concurrency import run_in_threadpool
 
 # check environment var
 # add filename='logs.log'
@@ -165,10 +166,11 @@ async def read_websocket(websocket: WebSocket) -> None:
             logging.info(f"Optimisation {i} complete")    
             return svg
 
-        async def run_continuous_iterations():
+        # async
+        def run_continuous_iterations():
             while True:
                 svg_string = get_step_data()
-                await websocket.send_text(svg_string) 
+                websocket.send_text(svg_string) 
 
         if data["status"] == "update":
             prompt = data["data"]["prompt"]
@@ -181,11 +183,11 @@ async def read_websocket(websocket: WebSocket) -> None:
             except:
                 logging.error("Failed to start clip draw")
             logging.info("Clip drawer initialised")
-
         
         if data["status"] == "start":
-            svg_string = get_step_data()
-            await websocket.send_text(svg_string)
+            # svg_string = get_step_data()
+            # await websocket.send_text(svg_string)
+            await run_in_threadpool(run_continuous_iterations)
             # await run_continuous_iterations()
 
         if data["status"] == "stop":
