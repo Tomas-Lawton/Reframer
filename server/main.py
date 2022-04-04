@@ -157,8 +157,8 @@ def read_svg_file():
 async def read_websocket(websocket: WebSocket) -> None:
     await websocket.accept()
     while True:
-        data = await websocket.receive_text()
-        
+        data = await websocket.receive_json()
+
         def get_step_data():
             i = clip_class.clip_draw_optimiser.run_iteration()
             svg = read_svg_file()
@@ -170,46 +170,45 @@ async def read_websocket(websocket: WebSocket) -> None:
                 svg_string = get_step_data()
                 await websocket.send_text(svg_string) 
 
-        if data == "status":
-            # Single iteration blocks the event loop for only a moment
-            # svg_string = get_step_data()
-            # await websocket.send_text(svg_string)
-            
-            # Constant iteration blocks the event loop completely
-            await run_continuous_iterations()
+        if data["status"] == "update":
+            prompt = data["data"]["prompt"]
+            svg_string = data["data"]["svg"]
+            async with aiofiles.open('data/interface_paths.svg', 'w') as f:
+                await f.write(svg_string)  # async read
+            logging.info(f"Setting clip prompt: {prompt}")        
+            try:
+                clip_class.start_clip_draw([prompt], False) # optional args
+            except:
+                logging.error("Failed to start clip draw")
+            logging.info("Clip drawer initialised")
 
-        # If event loop is blocked, this code cannot be excecuted because
-        # the thread is occupied. 
-        if data == "stop":
+        
+        if data["status"] == "start":
+            svg_string = get_step_data()
+            await websocket.send_text(svg_string)
+            # await run_continuous_iterations()
+
+        if data["status"] == "stop":
             is_running = False
             print("Stopping process")
 
 
-
-# def start_clip_draw_background():
-#     clip_class.clip_draw_optimiser.run_drawer_iterations()
-
-# class BackgroundTasks(threading.Thread):
-#     def run(self,*args,**kwargs):
-#         clip_class.clip_draw_optimiser.run_drawer_iterations()
-
-
-@app.post("/update_prompt")
-async def update_prompt(request: Request, background_tasks: BackgroundTasks):
-    request_data = await request.json()
-    prompt = request_data["prompt"]
-    svg_string = request_data["svg"]
-    async with aiofiles.open('data/interface_paths.svg', 'w') as f:
-        await f.write(svg_string)  # async read
-    logging.info(f"Setting clip prompt: {prompt}")        
-    try:
-        clip_class.start_clip_draw([prompt], False) # optional args
-    except:
-        logging.error("Failed to start clip draw")
-    logging.info("Clip drawer initialised")
-    # put in new thread in stead so it can be killed when the end point is hit.
-    # background_tasks.add_task(start_clip_draw_background)
-    return {
-        "data" : request_data
-    }
+# @app.post("/update_prompt")
+# async def update_prompt(request: Request, background_tasks: BackgroundTasks):
+#     request_data = await request.json()
+#     prompt = request_data["prompt"]
+#     svg_string = request_data["svg"]
+#     async with aiofiles.open('data/interface_paths.svg', 'w') as f:
+#         await f.write(svg_string)  # async read
+#     logging.info(f"Setting clip prompt: {prompt}")        
+#     try:
+#         clip_class.start_clip_draw([prompt], False) # optional args
+#     except:
+#         logging.error("Failed to start clip draw")
+#     logging.info("Clip drawer initialised")
+#     # put in new thread in stead so it can be killed when the end point is hit.
+#     # background_tasks.add_task(start_clip_draw_background)
+#     return {
+#         "data" : request_data
+#     }
 

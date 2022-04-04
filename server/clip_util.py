@@ -77,7 +77,6 @@ def get_drawing_paths(path_to_svg_file, use_user_paths):
                         opacity = float(x[15:])
                 if len(x) >= 8:
                     if x[:7] == 'stroke:':
-                        print('got stroke')
                         color_code = str(x[7:])
         rgb = ImageColor.getrgb(color_code)
         for i, val in enumerate(rgb):
@@ -88,7 +87,7 @@ def get_drawing_paths(path_to_svg_file, use_user_paths):
         path = []
         # dynamically set canvas size for session. ??
         if not use_user_paths:
-            print(att['d'].split('c'))
+            # print(att['d'].split('c'))
             [x_a, x_b] = att['d'].split('c')
             x0 = [float(x) for x in x_a[2:].split(',')]
             points = [xx.split(',') for xx in x_b[1:].split(' ')]
