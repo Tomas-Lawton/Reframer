@@ -55,6 +55,9 @@ class Clip_Draw_Optimiser:
         logging.info("Drawer ready")
         Clip_Draw_Optimiser.__instance == self 
         return 
+    
+    def set_scale(self, scale):
+        self.scale_factor = scale
 
     def set_text_features(self, text_features, neg_text_features = []):
         self.text_features = text_features
@@ -73,10 +76,15 @@ class Clip_Draw_Optimiser:
         logging.info('Parsing SVG paths')
 
         path_list = []
-        if use_user_paths:
-            path_list = get_drawing_paths('data/interface_paths.svg', use_user_paths)
-        else:
-            path_list = get_drawing_paths('data/drawing_flower_vase.svg', use_user_paths)
+        try:
+            if use_user_paths:
+                path_list = get_drawing_paths('data/interface_paths.svg', use_user_paths, self.scale_factor)
+            else:
+                path_list = get_drawing_paths('data/drawing_flower_vase.svg', use_user_paths)
+        except:
+            logging.error("SVG Parsing failed")
+
+        logging.info('Transforms')
 
         # Configure image Augmentation Transformation
         if self.normalize_clip:
@@ -91,7 +99,7 @@ class Clip_Draw_Optimiser:
 
         logging.info('Rendering img')
         self.shapes, self.shape_groups = render_save_img(path_list, self.canvas_w, self.canvas_h)
-
+        print('a')
         self.shapes_rnd, self.shape_groups_rnd = build_random_curves(
             self.num_paths,
             self.canvas_w,
@@ -101,9 +109,12 @@ class Clip_Draw_Optimiser:
             self.drawing_area['y0'],
             self.drawing_area['y1'],
             )
+        print('b')
+
         self.shapes += self.shapes_rnd
         self.shape_groups = add_shape_groups(self.shape_groups, self.shape_groups_rnd)
         self.points_vars0, self.stroke_width_vars0, self.color_vars0, self.img0 = load_vars()
+        print('c')
 
         self.points_vars = []
         self.stroke_width_vars = []

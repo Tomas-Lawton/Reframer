@@ -45,9 +45,12 @@ def get_noun_data():
     return ["a drawing of a " + x for x in nouns]
     # return ["a drawing of a " + x for x in nouns[0::100]]
 
-def get_drawing_paths(path_to_svg_file, use_user_paths):
+def get_drawing_paths(path_to_svg_file, use_user_paths, scale=None):
     path_list = []
     paths, attributes = svg2paths(path_to_svg_file)
+
+    logging.info(f"Atributes:\n{attributes}")
+
     for att in attributes:
         # defaults
         color = [0, 0, 0, 1]
@@ -65,7 +68,7 @@ def get_drawing_paths(path_to_svg_file, use_user_paths):
                     stroke_width = float(att['stroke-width'])
             except:
                 logging.error("Couldn't parse sketch")
-        if not use_user_paths:
+        else:
             style = att['style'].split(';')
             for x in style:
                 # logging.info(x) # view available styles
@@ -78,21 +81,14 @@ def get_drawing_paths(path_to_svg_file, use_user_paths):
                 if len(x) >= 8:
                     if x[:7] == 'stroke:':
                         color_code = str(x[7:])
+        
         rgb = ImageColor.getrgb(color_code)
         for i, val in enumerate(rgb):
             color[i] = float(val/256)
         color[3] = opacity
-
         num_segments = len(att['d'].split(','))//3
+        
         path = []
-        # dynamically set canvas size for session. ??
-        if not use_user_paths:
-            # print(att['d'].split('c'))
-            [x_a, x_b] = att['d'].split('c')
-            x0 = [float(x) for x in x_a[2:].split(',')]
-            points = [xx.split(',') for xx in x_b[1:].split(' ')]
-            points = [[float(x), float(y)] for [x,y] in points] 
-            path = [x0]+points
         if use_user_paths:
             spaced_data = att['d'].split('c')
             x0 = spaced_data[0][2:].split(',') # only thing different is M instead of m
@@ -102,14 +98,25 @@ def get_drawing_paths(path_to_svg_file, use_user_paths):
                 for i in range(3):
                     point_list.append(curve[i])
             tuple_array = [tuple.split(',') for tuple in point_list] # split each curve by path spaces, then comma for points
-            points_array = [[float(x), float(y)] for [x,y] in tuple_array] 
+            points_array = [[round(float(x)* scale, 5), round(float(y) * scale, 5)] for [x,y] in tuple_array] 
+            start_x = round(float(x0[0]) * scale, 5)
+            start_y = round(float(x0[1]) * scale, 5)
+            x0 = [start_x, start_y]
             path = [x0]+points_array
-            path = points_array
+        else:
+            # print(att['d'].split('c'))
+            [x_a, x_b] = att['d'].split('c')
+            x0 = [float(x) for x in x_a[2:].split(',')]
+            points = [xx.split(',') for xx in x_b[1:].split(' ')]
+            points = [[float(x), float(y)] for [x,y] in points] 
+            path = [x0]+points
         
-        path = torch.tensor(path)
+        print("path")
+        print(path)
         color = torch.tensor(color)
         stroke_width = torch.tensor(stroke_width)
         v0 = torch.tensor([0,0])
+        path = torch.tensor(path)
         for k in range(path.size(0)):
             path[k,:] += v0
             if k%3 == 0:

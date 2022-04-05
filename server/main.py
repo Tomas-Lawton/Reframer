@@ -1,15 +1,13 @@
 from importlib.resources import contents
 from fastapi import FastAPI, Request, WebSocket, BackgroundTasks
 import asyncio
-import threading
 from fastapi.middleware.cors import CORSMiddleware
 import skimage
 import numpy as np
 import logging
 from class_interface import Clip_Class
 from plot_util import plot_cosines, plot_zero_shot_images, plot_image
-import aiofiles
-from fastapi.concurrency import run_in_threadpool
+from interface_handler import Interface
 
 # check environment var
 # add filename='logs.log'
@@ -95,88 +93,23 @@ def activate_clip_draw():
     clip_class.start_clip_draw(prompts, False, neg_prompts);
     return {"Hello": "World"}
 
-@app.get("/get_latest_paths")
-async def get_latest_paths():
-    svg_string = ""
-    with open("results/latest_rendered_paths.svg") as f:
-        svg_string = f.read()
-        logging.info(svg_string)
-
-    iteration = 0
-    if (hasattr(clip_class.clip_draw_optimiser, 'iteration')):
-        iteration = clip_class.clip_draw_optimiser.iteration
-    loss = 1
-    if (hasattr(clip_class.clip_draw_optimiser, 'loss')):
-        loss = clip_class.clip_draw_optimiser.loss
-    return {
-        "svg": svg_string,
-        "iterations": iteration,
-        "loss": loss
-    }
-class Interface():
-    def __init__(self, websocket):
-        self.socket = websocket
-        self.is_running = False
-        logging.info("Interface connected")
-
-    @staticmethod
-    async def get_step_data():
-        i, loss = clip_class.clip_draw_optimiser.run_iteration()
-        async with aiofiles.open("results/latest_rendered_paths.svg", "r") as f:
-            svg = await f.read()  # async read
-            return i, svg, loss
-    
-    @staticmethod
-    async def update(data):
-        prompt = data["data"]["prompt"]
-        svg_string = data["data"]["svg"]
-        async with aiofiles.open('data/interface_paths.svg', 'w') as f:
-            await f.write(svg_string)  # async read
-        logging.info(f"Setting clip prompt: {prompt}")        
-        try:
-            clip_class.start_clip_draw([prompt], False) # optional args
-        except:
-            logging.error("Failed to start clip draw")
-        logging.info("Drawer updated")
-    
-    async def run(self):
-        while self.is_running:
-            logging.info("Running iteration...")
-            i, svg, loss = self.get_step_data()
-            await self.socket.send_json({
-                "svg": svg,
-                "iterations": i,
-                "loss": loss
-            }) 
-            logging.info(f"Optimisation {i} complete")    
-            await asyncio.sleep(0.01)
-        return -1
-        
-    async def stop(self):
-        self.is_running = False
-        logging.info("Stopping process")
-
 async def read_and_send_to_client(data, canvas):
     if data["status"] == "start":
-        logging.info("Updating...")
         await canvas.update(data)
-        logging.info("Starting collab...")
         if not canvas.is_running:
             canvas.is_running = True
         await canvas.run()
     if data["status"] == "stop":
-        logging.info("Stopping...")
         await canvas.stop()
 
 @app.websocket("/ws")
-async def read_webscoket(websocket: WebSocket):
+async def ws_endpoint(websocket: WebSocket):
     await websocket.accept()
     queue = asyncio.queues.Queue()
-    canvas = Interface(websocket)
+    canvas = Interface(websocket, clip_class)
 
     async def read_from_socket(websocket: WebSocket):
         async for data in websocket.iter_json():
-            print(f"putting {data} in the queue")
             queue.put_nowait(data)
 
     async def get_data_and_send():
@@ -185,7 +118,6 @@ async def read_webscoket(websocket: WebSocket):
         while True:
             data = await queue.get()
             if not fetch_task.done():
-                print(f'Cancelling last ongoing task.')
                 fetch_task.cancel()
             fetch_task = asyncio.create_task(read_and_send_to_client(data, canvas))
 

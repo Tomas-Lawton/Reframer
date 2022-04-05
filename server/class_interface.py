@@ -139,39 +139,9 @@ class Clip_Class:
         """Use old classes to guide image"""
         self.clip_draw_optimiser.activate(use_user_paths)
 
-
-# CLIP Setup step -------------------
+# TO DO
+# It is possible to chain results by feeding the output(s) of one encoder to the other or by looping.
 # MAKE SURE CLIP IS SET TO ZERO SHOT
-
-
-
-
-
-
-
-
-
-
-    # def gan_image_from_prompt(self):
-    #     return
-
-    # def bezier_image_from_prompt(self):
-    #     return
-
-    # def create_text_classifier(self, mode):
-    #     return
-
-
-
-
-
-
-
-
-
-
-#It is possible to chain results by feeding the output(s) of one encoder to the other or by looping.
-
 class Image_Classifier:
     """Returns an image that best matches a prompt / Classifies image from prompt"""
     def __init__(self, mode):
