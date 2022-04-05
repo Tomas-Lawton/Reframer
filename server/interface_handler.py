@@ -9,6 +9,10 @@ class Interface():
         self.clip_class = clip_instance
         logging.info("Interface connected")
 
+    async def clear(self):
+        # reset to model defaults
+        return
+
     async def get_step_data(self):
         i, loss = self.clip_class.clip_draw_optimiser.run_iteration()
         async with aiofiles.open("results/latest_rendered_paths.svg", "r") as f:
@@ -31,6 +35,7 @@ class Interface():
     async def run(self):
         logging.info("Starting collab...")
         while self.is_running:
+            # check iteration greater than maximum and loss value
             logging.info("Running iteration...")
             i, svg, loss = await self.get_step_data()
             await self.socket.send_json({
@@ -40,7 +45,6 @@ class Interface():
             }) 
             logging.info(f"Optimisation {i} complete")    
             await asyncio.sleep(0.01)
-        return -1
         
     async def stop(self):
         logging.info("Stopping...")

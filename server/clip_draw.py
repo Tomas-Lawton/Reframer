@@ -99,7 +99,6 @@ class Clip_Draw_Optimiser:
 
         logging.info('Rendering img')
         self.shapes, self.shape_groups = render_save_img(path_list, self.canvas_w, self.canvas_h)
-        print('a')
         self.shapes_rnd, self.shape_groups_rnd = build_random_curves(
             self.num_paths,
             self.canvas_w,
@@ -109,12 +108,10 @@ class Clip_Draw_Optimiser:
             self.drawing_area['y0'],
             self.drawing_area['y1'],
             )
-        print('b')
 
         self.shapes += self.shapes_rnd
         self.shape_groups = add_shape_groups(self.shape_groups, self.shape_groups_rnd)
         self.points_vars0, self.stroke_width_vars0, self.color_vars0, self.img0 = load_vars()
-        print('c')
 
         self.points_vars = []
         self.stroke_width_vars = []
@@ -143,11 +140,9 @@ class Clip_Draw_Optimiser:
             ).to(device)
 
         logging.info('Setting optimisers')
-        # Optimizers
         self.points_optim = torch.optim.Adam(self.points_vars, lr=0.5)
         self.width_optim = torch.optim.Adam(self.stroke_width_vars, lr=0.1)
         self.color_optim = torch.optim.Adam(self.color_vars, lr=0.01)
-        logging.info('Optimisers set')
 
         # refactor
         self.time_str = datetime.datetime.today().strftime("%Y_%m_%d_%H_%M_%S")
@@ -157,6 +152,7 @@ class Clip_Draw_Optimiser:
         if self.iteration > self.num_iter:
             return -1
         logging.info(self.iteration)
+
         self.points_optim.zero_grad()
         self.width_optim.zero_grad()
         self.color_optim.zero_grad()

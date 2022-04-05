@@ -12,7 +12,8 @@ def render_save_img(path_list, canvas_height, canvas_width):
     for dpath in path_list:
         num_control_points = torch.zeros(dpath.num_segments, dtype = torch.int32) + 2
         points = torch.zeros_like(dpath.path)
-        stroke_width = dpath.width*100
+        # stroke_width = dpath.width*100
+        stroke_width = dpath.width
         points[:, 0] = canvas_width*dpath.path[:,0]
         points[:, 1] = canvas_height*dpath.path[:,1]
         path = pydiffvg.Path(num_control_points = num_control_points,
