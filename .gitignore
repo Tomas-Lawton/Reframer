@@ -1,6 +1,9 @@
-server/local_images
 server/__pycache__
 server/env
 server/results
+server/plot
+server/tmp
+server/logs.log
+server/.DS_Store
 
 reactcanvas/node_modules
