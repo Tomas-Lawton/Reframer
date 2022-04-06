@@ -47,20 +47,72 @@ def get_noun_data():
     return ["a drawing of a " + x for x in nouns]
     # return ["a drawing of a " + x for x in nouns[0::100]]
 
-def get_drawing_paths(path_to_svg_file, use_user_paths, scale=None):
-    path_list = []
+def get_color(code, opacity):
+    color = [0, 0, 0, 1]    
+    rgb = ImageColor.getrgb(code)
+    for i, val in enumerate(rgb):
+        color[i] = float(val/256)
+    color[3] = opacity
+    return color
+
+def data_to_tensor(color, stroke_width, path, num_segments):
+    color = torch.tensor(color)
+    stroke_width = torch.tensor(stroke_width)
+    v0 = torch.tensor([0,0])
+    path = torch.tensor(path)
+    for k in range(path.size(0)):
+        path[k,:] += v0
+        if k%3 == 0:
+            v0 = path[k,:]
+    return DrawingPath(path, color, stroke_width, num_segments)
+
+def parse_local_svg(path_to_svg_file):
     paths, attributes = svg2paths(path_to_svg_file) #paths only
+    path_list = []
+    for att in attributes:
+        stroke_width = 15
+        color_code = '#000000'
+        opacity = 1
+        style = att['style'].split(';')
+        for x in style:
+            if len(x) >= 13:
+                if x[:13] == 'stroke-width:':
+                    stroke_width = float(x[13:])
+            if len(x) >= 15:
+                if x[:15] == 'stroke-opacity:':
+                    opacity = float(x[15:])
+            if len(x) >= 8:
+                if x[:7] == 'stroke:':
+                    color_code = str(x[7:])
+        
+        color = get_color(color_code, opacity)
+        num_segments = len(att['d'].split(','))//3
+        
+        path = []
+        [x_a, x_b] = att['d'].split('c')
+        x0 = [float(x) for x in x_a[2:].split(',')]
+        points = [xx.split(',') for xx in x_b[1:].split(' ')]
+        points = [[float(x), float(y)] for [x,y] in points] 
+        path = [x0]+points
+        
+        path_list.append(data_to_tensor(color, stroke_width, path, num_segments))
+    
+    logging.info(f"Returning list of paths: \n {path_list}")    
+    return path_list
+
+def parse_svg(path_to_svg_file):
+    paths, attributes = svg2paths(path_to_svg_file) #paths only
+    path_list = []
+
     parsed_svg = SVG.parse(path_to_svg_file) #access <g> tag for non-path styles
     elements_list = list(parsed_svg.elements())
-    parent_svg = {}
     path_group = {}
-
-    # logging.info(f"Atributes:\n{attributes}")
+    parent_svg = {}
+    sketch_scalers = None
     for element in elements_list:
-        # logging.info("NEW ELEMENT ___________________")
-        # logging.info(element.values)
         try:
-            if element.values['visibility'] == 'hidden':
+            if element.values['tag'] == 'g':
+                path_group = element.values
                 continue
         except (KeyError, AttributeError):
             pass
@@ -70,90 +122,58 @@ def get_drawing_paths(path_to_svg_file, use_user_paths, scale=None):
                 continue
         except (KeyError, AttributeError):
             pass
-        try:
-            if element.values['tag'] == 'g':
-                path_group = element.values
-                continue
-        except (KeyError, AttributeError):
-            pass
+
+    targetHeight = 224;
+    width = int(parent_svg['attributes']['width'])
+    height = int(parent_svg['attributes']['height'])
+    frame_size = max(width, height)   # for first point can actually scale both x and y because this will cause no shearing on single point
+    # frame_size = height
+    resizeScaleFactor = targetHeight / frame_size
+    normaliseScaleFactor = 1 / frame_size
 
     for att in attributes:
         # defaults could refactor now local file not needed
-        color = [0, 0, 0, 1]
         stroke_width = 15
         color_code = '#000000'
         opacity = 1
-        # parse values
-        if use_user_paths:
-            try:
-                if 'stroke' in att:
-                    color_code = str(att['stroke'])
-                else:
-                    color_code = str(path_group['attributes']['stroke'])
-                if 'stroke-width' in att:
-                    stroke_width = float(att['stroke-width'])
-                else:
-                    stroke_width = float(path_group['attributes']['stroke-width'])
-                if 'stroke-opacity' in att:
-                    opacity = float(att['stroke-opacity']) 
-                    # if not opacity, just use "1" since not in group attrib
-            except:
-                logging.error("Couldn't parse sketch")
-        else:
-            style = att['style'].split(';')
-            for x in style:
-                # logging.info(x) # view available styles
-                if len(x) >= 13:
-                    if x[:13] == 'stroke-width:':
-                        stroke_width = float(x[13:])
-                if len(x) >= 15:
-                    if x[:15] == 'stroke-opacity:':
-                        opacity = float(x[15:])
-                if len(x) >= 8:
-                    if x[:7] == 'stroke:':
-                        color_code = str(x[7:])
-        
-        rgb = ImageColor.getrgb(color_code)
-        for i, val in enumerate(rgb):
-            color[i] = float(val/256)
-        color[3] = opacity
+        try:
+            if 'stroke' in att:
+                color_code = str(att['stroke'])
+            else:
+                color_code = str(path_group['attributes']['stroke'])
+            if 'stroke-width' in att:
+                stroke_width = float(att['stroke-width']) * resizeScaleFactor
+            else:
+                stroke_width = float(path_group['attributes']['stroke-width']) * resizeScaleFactor
+            if 'stroke-opacity' in att:
+                opacity = float(att['stroke-opacity']) 
+                # if not opacity, just use "1" since not in group attrib
+        except:
+            logging.error("Couldn't parse sketch")
+
+        color = get_color(color_code, opacity)
         num_segments = len(att['d'].split(','))//3
         
         path = []
-        if use_user_paths:
-            spaced_data = att['d'].split('c')
-            x0 = spaced_data[0][2:].split(',') # only thing different is M instead of m
-            curve_list = [spaced_data.split(' ') for spaced_data in spaced_data[1:]] # exclude move to
-            point_list = []
-            for curve in curve_list:
-                for i in range(3):
-                    point_list.append(curve[i])
-            tuple_array = [tuple.split(',') for tuple in point_list] # split each curve by path spaces, then comma for points
-            points_array = [[round(float(x)* scale, 5), round(float(y) * scale, 5)] for [x,y] in tuple_array] 
-            start_x = round(float(x0[0]) * scale, 5)
-            start_y = round(float(x0[1]) * scale, 5)
-            x0 = [start_x, start_y]
-            path = [x0]+points_array
-        else:
-            # print(att['d'].split('c'))
-            [x_a, x_b] = att['d'].split('c')
-            x0 = [float(x) for x in x_a[2:].split(',')]
-            points = [xx.split(',') for xx in x_b[1:].split(' ')]
-            points = [[float(x), float(y)] for [x,y] in points] 
-            path = [x0]+points
-        
-        color = torch.tensor(color)
-        stroke_width = torch.tensor(stroke_width)
-        v0 = torch.tensor([0,0])
-        path = torch.tensor(path)
-        for k in range(path.size(0)):
-            path[k,:] += v0
-            if k%3 == 0:
-                v0 = path[k,:]
-        path_list.append(DrawingPath(path, color, stroke_width, num_segments))
-    logging.info(f"Returning list of paths: \n {path_list}")    
-    return path_list
+        spaced_data = att['d'].split('c')
+        x0 = spaced_data[0][1:].split(',') # only thing different is M instead of m
+        curve_list = [spaced_data.split(' ') for spaced_data in spaced_data[1:]] # exclude move to
+        point_list = []
+        for curve in curve_list:
+            for i in range(3):
+                point_list.append(curve[i])
+        tuple_array = [tuple.split(',') for tuple in point_list] # split each curve by path spaces, then comma for points
+        points_array = [[round(float(x)* normaliseScaleFactor, 5), round(float(y) * normaliseScaleFactor, 5)] for [x,y] in tuple_array] 
+        start_x = round(float(x0[0]) / width, 5)
+        start_y = round(float(x0[1]) / height, 5)
+        x0 = [start_x, start_y]
 
+        path = [x0]+points_array
+        path_list.append(data_to_tensor(color, stroke_width, path, num_segments))
+
+    logging.info(f"Returning list of paths: \n {path_list}")    
+    
+    return path_list, width, height, resizeScaleFactor, normaliseScaleFactor
 
 def save_data(time_str, draw_class):
     with open('results/'+time_str+'.txt', 'w') as f:
@@ -166,7 +186,6 @@ def save_data(time_str, draw_class):
         f.write('w_img: '+str(draw_class.w_img)+'\n')
         f.close()
 
-
 def area_mask(width, height, x0=0, x1=1, y0=0, y1=1):
     j0 = round(x0*width)
     j1 = round(x1*width)
@@ -175,4 +194,3 @@ def area_mask(width, height, x0=0, x1=1, y0=0, y1=1):
     mask = torch.ones((height, width,3))
     mask[i0:i1, j0:j1, :] = torch.zeros((i1-i0, j1-j0, 3))
     return mask
-

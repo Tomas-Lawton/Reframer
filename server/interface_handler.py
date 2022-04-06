@@ -23,12 +23,10 @@ class Interface():
         logging.info("Updating...")
         prompt = data["data"]["prompt"]
         svg_string = data["data"]["svg"]
-        scale_factor = data["data"]["scale"]
         async with aiofiles.open('data/interface_paths.svg', 'w') as f:
             await f.write(svg_string)
         try:
-            self.clip_class.clip_draw_optimiser.set_scale(scale_factor)
-            self.clip_class.start_clip_draw([prompt], True) # use canvas svg?
+            self.clip_class.start_clip_draw([prompt]) # use canvas svg?
         except:
             logging.error("Failed to start clip draw")
     

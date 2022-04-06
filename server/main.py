@@ -90,7 +90,7 @@ def classify_text_from_image(prompt: str):
 def activate_clip_draw():
     prompts = ['A drawing of a red chair.']
     neg_prompts = ['A badly drawn sketch.', 'Many ugly, messy drawings.']
-    clip_class.start_clip_draw(prompts, False, neg_prompts);
+    clip_class.start_clip_draw(prompts, neg_prompts);
     return {"Hello": "World"}
 
 async def read_and_send_to_client(data, canvas):

@@ -4,9 +4,10 @@ import torchvision.transforms as transforms
 import datetime
 import numpy as np
 # make a util directory???
-from clip_util import get_noun_data, get_drawing_paths, area_mask, save_data
-from render_design import add_shape_groups, load_vars, render_save_img, build_random_curves
+from clip_util import *
+from render_design import *
 import logging
+import pickle
 
 class Clip_Draw_Optimiser:
     __instance = None
@@ -23,13 +24,14 @@ class Clip_Draw_Optimiser:
         self.nouns_features = noun_features
         self.use_neg_prompts = False
         self.normalize_clip = True
+        self.use_user_paths = True
         # 
         self.iteration = 0
         # Canvas parameters
         self.num_paths = 32
         self.max_width = 40
-        self.canvas_h = 224
-        self.canvas_w = 224
+        self.render_canvas_h = 224
+        self.render_canvas_w = 224
         # Algorithm parameters
         self.num_iter = 1001
         self.w_points = 0.01
@@ -56,9 +58,6 @@ class Clip_Draw_Optimiser:
         Clip_Draw_Optimiser.__instance == self 
         return 
     
-    def set_scale(self, scale):
-        self.scale_factor = scale
-
     def set_text_features(self, text_features, neg_text_features = []):
         self.text_features = text_features
         self.neg_text_features = neg_text_features
@@ -70,75 +69,87 @@ class Clip_Draw_Optimiser:
         self.is_stopping = True
 
     # HOW TO ABORT WITH NEW PROMPT?
-    def activate(self, use_user_paths):
+    def activate(self):
         self.is_active = True
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         logging.info('Parsing SVG paths')
 
         path_list = []
         try:
-            if use_user_paths:
-                path_list = get_drawing_paths('data/interface_paths.svg', use_user_paths, self.scale_factor)
+            if self.use_user_paths:
+                path_list, width, height, resizeScaleFactor, normaliseScaleFactor = parse_svg('data/interface_paths.svg')
+                # self.frame_size = frame_size
+                self.user_canvas_w = width
+                self.user_canvas_h = height
+                self.resizeScaleFactor = resizeScaleFactor
+                self.normaliseScaleFactor =normaliseScaleFactor
             else:
-                path_list = get_drawing_paths('data/drawing_flower_vase.svg', use_user_paths)
+                path_list = parse_local_svg('data/drawing_flower_vase.svg')
         except:
             logging.error("SVG Parsing failed")
 
-        logging.info('Transforms')
-
-        # Configure image Augmentation Transformation
+        logging.info('Transforming')
         if self.normalize_clip:
             self.augment_trans = transforms.Compose([
             transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
-            transforms.RandomResizedCrop(self.canvas_w, scale=(0.7,0.9)),
+            transforms.RandomResizedCrop(self.render_canvas_w, scale=(0.7,0.9)),
             transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))]) 
         else: 
             self.augment_trans = transforms.Compose([
             transforms.RandomPerspective(fill=1, p=1, distortion_scale=0.5),
-            transforms.RandomResizedCrop(self.canvas_w, scale=(0.7,0.9))])
+            transforms.RandomResizedCrop(self.render_canvas_w, scale=(0.7,0.9))])
 
-        logging.info('Rendering img')
-        # ONLY PATHS
-        self.shapes, self.shape_groups = render_save_img(path_list, self.canvas_w, self.canvas_h)
-        print('test')
-        self.shapes_rnd, self.shape_groups_rnd = build_random_curves(
+        logging.info('Setting up og curves')
+
+        shapes, shape_groups = render_save_img(path_list, self.render_canvas_w, self.render_canvas_h)
+        shapes_rnd, shape_groups_rnd = build_random_curves(
             self.num_paths,
-            self.canvas_w,
-            self.canvas_h,
+            self.render_canvas_w,
+            self.render_canvas_h,
             self.drawing_area['x0'],
             self.drawing_area['x1'],
             self.drawing_area['y0'],
             self.drawing_area['y1'],
             )
-        print('test 2')
-        self.shapes += self.shapes_rnd
-        self.shape_groups = add_shape_groups(self.shape_groups, self.shape_groups_rnd)
-        print('made it')
+
+        # Combine
+        self.shapes = shapes + shapes_rnd
+        self.shape_groups = add_shape_groups(shape_groups, shape_groups_rnd)
+
+        points_vars, stroke_width_vars, color_vars = initialise_gradients(self.shapes, self.shape_groups)
+        self.points_vars = points_vars
+        self.stroke_width_vars = stroke_width_vars
+        self.color_vars = color_vars
+
+        user_scene_args = pydiffvg.RenderFunction.serialize_scene(
+            self.render_canvas_w, self.render_canvas_h, shapes, shape_groups)
+        render = pydiffvg.RenderFunction.apply
+# TEST ---------
+        testing_args = pydiffvg.RenderFunction.serialize_scene(\
+            self.render_canvas_w, self.render_canvas_h, shapes, shape_groups)
+        testing_img = render(self.render_canvas_w, self.render_canvas_h, 2, 2, self.iteration, None, *testing_args)
+        pydiffvg.save_svg('results/first_rendered_paths.svg', self.render_canvas_w, self.render_canvas_h, shapes, shape_groups)
+# TEST ---------
+        user_points_vars, user_stroke_width_vars, user_color_vars = initialise_gradients(shapes, shape_groups)
+        user_img = render(self.render_canvas_w, self.render_canvas_h, 2, 2, 0, None, *user_scene_args)
+        user_img = user_img[:, :, 3:4] * user_img[:, :, :3] + torch.ones(user_img.shape[0], user_img.shape[1], 3, device = pydiffvg.get_device()) * (1 - user_img[:, :, 3:4])
+        with open('tmp/img0.pkl', 'wb+') as f:
+            pickle.dump(user_img, f)
+        with open('tmp/points_vars.pkl', 'wb+') as f:
+            pickle.dump(user_points_vars, f)
+        with open('tmp/stroke_width_vars.pkl', 'wb+') as f:
+            pickle.dump(user_stroke_width_vars, f)
+        with open('tmp/color_vars.pkl', 'wb+') as f:
+            pickle.dump(user_color_vars, f)
+        
         self.points_vars0, self.stroke_width_vars0, self.color_vars0, self.img0 = load_vars()
-        print('made it 2')
-
-        # PATHS + Random curves
-        self.points_vars = []
-        self.stroke_width_vars = []
-        self.color_vars = []
-        for path in self.shapes:
-            print('made it')
-            path.points.requires_grad = True
-            self.points_vars.append(path.points)
-            path.stroke_width.requires_grad = True
-            self.stroke_width_vars.append(path.stroke_width)
-        for group in self.shape_groups:
-            group.stroke_color.requires_grad = True
-            self.color_vars.append(group.stroke_color)
-
-        logging.info('Setting up differentiable renderer')
         scene_args = pydiffvg.RenderFunction.serialize_scene(\
-            self.canvas_w, self.canvas_h, self.shapes, self.shape_groups)
+            self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups)
         self.render = pydiffvg.RenderFunction.apply
 
         self.mask = area_mask(
-            self.canvas_w,
-            self.canvas_h,
+            self.render_canvas_w,
+            self.render_canvas_h,
             self.drawing_area['x0'],
             self.drawing_area['x1'],
             self.drawing_area['y0'],
@@ -149,8 +160,6 @@ class Clip_Draw_Optimiser:
         self.points_optim = torch.optim.Adam(self.points_vars, lr=0.5)
         self.width_optim = torch.optim.Adam(self.stroke_width_vars, lr=0.1)
         self.color_optim = torch.optim.Adam(self.color_vars, lr=0.01)
-
-        # refactor
         self.time_str = datetime.datetime.today().strftime("%Y_%m_%d_%H_%M_%S")
         
     def run_iteration(self):
@@ -163,8 +172,8 @@ class Clip_Draw_Optimiser:
         self.width_optim.zero_grad()
         self.color_optim.zero_grad()
         scene_args = pydiffvg.RenderFunction.serialize_scene(\
-            self.canvas_w, self.canvas_h, self.shapes, self.shape_groups)
-        self.img = self.render(self.canvas_w, self.canvas_h, 2, 2, self.iteration, None, *scene_args)
+            self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups)
+        self.img = self.render(self.render_canvas_w, self.render_canvas_h, 2, 2, self.iteration, None, *scene_args)
         self.img = self.img[:, :, 3:4] * self.img[:, :, :3] + torch.ones(self.img.shape[0], self.img.shape[1], 3, device = pydiffvg.get_device()) * (1 - self.img[:, :, 3:4])
         if self.w_img >0:
             self.l_img = torch.norm((self.img-self.img0.to(device))*self.mask).view(1)
@@ -233,10 +242,16 @@ class Clip_Draw_Optimiser:
                     logging.info("\nTop predictions:\n")
                     for value, index in zip(values, indices):
                         logging.info(f"{self.nouns[index]:>16s}: {100 * value.item():.2f}%")
-                pydiffvg.save_svg('results/latest_rendered_paths.svg', self.canvas_w, self.canvas_h, self.shapes, self.shape_groups)
+                
+                # check if userdrawn paths or use default
+                if self.use_user_paths:
+                    render_shapes, render_shape_groups = reposition_pen_moves(self.shapes, self.shape_groups, self.user_canvas_w, self.user_canvas_h)
+                    pydiffvg.save_svg('results/latest_rendered_paths.svg', self.render_canvas_w, self.render_canvas_h, render_shapes, render_shape_groups) # this will be blown up in the canvas for correct path changes
+                else:
+                    pydiffvg.save_svg('results/latest_rendered_paths.svg', self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups)
+
         self.iteration += 1
         return self.iteration, loss.item()
-            # at this point the whole thing should return to the top with new path data
 
     def clip_has_stopped(self):
         logging.info("Stopping clip drawer")
@@ -246,8 +261,3 @@ class Clip_Draw_Optimiser:
         self.is_stopping = False
         logging.info("Drawer ready for restart")
         return
-
-
-
-           # def use_svg_from_file(self, path_input):
-    #     return
