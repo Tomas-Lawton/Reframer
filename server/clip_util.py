@@ -1,9 +1,11 @@
+from email import parser
 import numpy as np
 import torch
 import clip
 
 import torch
-from svgpathtools import svg2paths # add to package
+from svgpathtools import svg2paths
+from svgelements import *
 from PIL import ImageColor
 
 import logging
@@ -47,12 +49,36 @@ def get_noun_data():
 
 def get_drawing_paths(path_to_svg_file, use_user_paths, scale=None):
     path_list = []
-    paths, attributes = svg2paths(path_to_svg_file)
+    paths, attributes = svg2paths(path_to_svg_file) #paths only
+    parsed_svg = SVG.parse(path_to_svg_file) #access <g> tag for non-path styles
+    elements_list = list(parsed_svg.elements())
+    parent_svg = {}
+    path_group = {}
 
-    logging.info(f"Atributes:\n{attributes}")
+    # logging.info(f"Atributes:\n{attributes}")
+    for element in elements_list:
+        # logging.info("NEW ELEMENT ___________________")
+        # logging.info(element.values)
+        try:
+            if element.values['visibility'] == 'hidden':
+                continue
+        except (KeyError, AttributeError):
+            pass
+        try:
+            if element.values['tag'] == 'svg':
+                parent_svg = element.values
+                continue
+        except (KeyError, AttributeError):
+            pass
+        try:
+            if element.values['tag'] == 'g':
+                path_group = element.values
+                continue
+        except (KeyError, AttributeError):
+            pass
 
     for att in attributes:
-        # defaults
+        # defaults could refactor now local file not needed
         color = [0, 0, 0, 1]
         stroke_width = 15
         color_code = '#000000'
@@ -62,10 +88,15 @@ def get_drawing_paths(path_to_svg_file, use_user_paths, scale=None):
             try:
                 if 'stroke' in att:
                     color_code = str(att['stroke'])
-                if 'stroke-opacity' in att:
-                    opacity = float(att['stroke-opacity'])
+                else:
+                    color_code = str(path_group['attributes']['stroke'])
                 if 'stroke-width' in att:
                     stroke_width = float(att['stroke-width'])
+                else:
+                    stroke_width = float(path_group['attributes']['stroke-width'])
+                if 'stroke-opacity' in att:
+                    opacity = float(att['stroke-opacity']) 
+                    # if not opacity, just use "1" since not in group attrib
             except:
                 logging.error("Couldn't parse sketch")
         else:
@@ -111,8 +142,6 @@ def get_drawing_paths(path_to_svg_file, use_user_paths, scale=None):
             points = [[float(x), float(y)] for [x,y] in points] 
             path = [x0]+points
         
-        print("path")
-        print(path)
         color = torch.tensor(color)
         stroke_width = torch.tensor(stroke_width)
         v0 = torch.tensor([0,0])

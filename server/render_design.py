@@ -7,8 +7,7 @@ def render_save_img(path_list, canvas_height, canvas_width):
     # Initialize Curves
     shapes = []
     shape_groups = []
-    # First the ones from my drawing
-    print('1')
+
     for dpath in path_list:
         num_control_points = torch.zeros(dpath.num_segments, dtype = torch.int32) + 2
         points = torch.zeros_like(dpath.path)
@@ -23,36 +22,26 @@ def render_save_img(path_list, canvas_height, canvas_width):
         path_group = pydiffvg.ShapeGroup(shape_ids = torch.tensor(
             [len(shapes) - 1]), fill_color = None, stroke_color = dpath.color)
         shape_groups.append(path_group)
-    print('2')
 
     scene_args = pydiffvg.RenderFunction.serialize_scene(
         canvas_width, canvas_height, shapes, shape_groups
     )
     render = pydiffvg.RenderFunction.apply
     img = render(canvas_width, canvas_height, 2, 2, 0, None, *scene_args)
-    print('3')
 
     points_vars = []
     stroke_width_vars = []
     color_vars = []
     for path in shapes:
         path.points.requires_grad = True
-        print('failed')
         points_vars.append(path.points)
-        print('here')
-        print(path.stroke_width)
-        print(path.stroke_width.requires_grad)
         path.stroke_width.requires_grad = True
-        print('failed2')
         stroke_width_vars.append(path.stroke_width)
-    print('3.5')
     for group in shape_groups:
         group.stroke_color.requires_grad = True
         color_vars.append(group.stroke_color)
-    print('4')
 
     img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(img.shape[0], img.shape[1], 3, device = pydiffvg.get_device()) * (1 - img[:, :, 3:4])
-    print('5')
 
     with open('tmp/img0.pkl', 'wb') as f:
         pickle.dump(img, f)

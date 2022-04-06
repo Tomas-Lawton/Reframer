@@ -16,3 +16,4 @@ svgpathtools
 setuptools
 aiofiles==0.6.0
 diffvg==0.0.1
+svgelements
