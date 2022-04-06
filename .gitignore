@@ -1,8 +1,8 @@
 server/__pycache__
-server/env
-server/results
-server/plot
-server/tmp
+server/env/
+server/results/
+server/plot/
+server/tmp/
 server/logs.log
 server/.DS_Store
 

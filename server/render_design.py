@@ -42,14 +42,14 @@ def render_save_img(path_list, canvas_height, canvas_width):
         color_vars.append(group.stroke_color)
 
     img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(img.shape[0], img.shape[1], 3, device = pydiffvg.get_device()) * (1 - img[:, :, 3:4])
-
-    with open('tmp/img0.pkl', 'wb') as f:
+    
+    with open('tmp/img0.pkl', 'wb+') as f:
         pickle.dump(img, f)
-    with open('tmp/points_vars.pkl', 'wb') as f:
+    with open('tmp/points_vars.pkl', 'wb+') as f:
         pickle.dump(points_vars, f)
-    with open('tmp/stroke_width_vars.pkl', 'wb') as f:
+    with open('tmp/stroke_width_vars.pkl', 'wb+') as f:
         pickle.dump(stroke_width_vars, f)
-    with open('tmp/color_vars.pkl', 'wb') as f:
+    with open('tmp/color_vars.pkl', 'wb+') as f:
         pickle.dump(color_vars, f)
 
     return shapes, shape_groups

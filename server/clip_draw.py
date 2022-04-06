@@ -98,7 +98,9 @@ class Clip_Draw_Optimiser:
             transforms.RandomResizedCrop(self.canvas_w, scale=(0.7,0.9))])
 
         logging.info('Rendering img')
+        # ONLY PATHS
         self.shapes, self.shape_groups = render_save_img(path_list, self.canvas_w, self.canvas_h)
+        print('test')
         self.shapes_rnd, self.shape_groups_rnd = build_random_curves(
             self.num_paths,
             self.canvas_w,
@@ -108,15 +110,19 @@ class Clip_Draw_Optimiser:
             self.drawing_area['y0'],
             self.drawing_area['y1'],
             )
-
+        print('test 2')
         self.shapes += self.shapes_rnd
         self.shape_groups = add_shape_groups(self.shape_groups, self.shape_groups_rnd)
+        print('made it')
         self.points_vars0, self.stroke_width_vars0, self.color_vars0, self.img0 = load_vars()
+        print('made it 2')
 
+        # PATHS + Random curves
         self.points_vars = []
         self.stroke_width_vars = []
         self.color_vars = []
         for path in self.shapes:
+            print('made it')
             path.points.requires_grad = True
             self.points_vars.append(path.points)
             path.stroke_width.requires_grad = True
