@@ -1,4 +1,4 @@
-# Run Fastapi application
+# Run Fastapi Application
 
 ```
 cd server/
@@ -16,4 +16,4 @@ source activate.sh
 
 # Run canvas
 
-Run the frontend canvas using a local server (Can use VS Code Live Server extension). Ensure it's in a seperate window so file overwrites don't cause a window restart.
+Run the frontend canvas using a local server (Can use VS Code Live Server extension). Ensure it's in a seperate code window so file overwrites don't cause a restart.

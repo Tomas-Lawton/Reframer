@@ -250,7 +250,7 @@ ws.onmessage = function(event) {
         let loadedSvg = topLayer.importSVG(svg);
         for (const child of loadedSvg.children) {
             child.children.forEach((path) => {
-                path.simplify();
+                // path.simplify();
                 path.smooth();
             });
         }

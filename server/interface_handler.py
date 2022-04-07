@@ -28,18 +28,18 @@ class Interface():
     
     async def run(self):
         logging.info("Starting collab...")
-        while self.is_running:
+        # while self.is_running:
             # check iteration greater than maximum and loss value
-            logging.info("Running iteration...")
-            i, svg, loss = await self.get_step_data()
-            await self.socket.send_json({
-                "svg": svg,
-                "iterations": i,
-                "loss": loss
-            }) 
-            logging.info(f"Optimisation {i} complete")    
-            await asyncio.sleep(0.01)
-        
+        logging.info("Running iteration...")
+        i, svg, loss = await self.get_step_data()
+        await self.socket.send_json({
+            "svg": svg,
+            "iterations": i,
+            "loss": loss
+        }) 
+        logging.info(f"Optimisation {i} complete")    
+        # await asyncio.sleep(0.01) don't use since using executer now
+    
     async def stop(self):
         logging.info("Stopping...")
         self.is_running = False

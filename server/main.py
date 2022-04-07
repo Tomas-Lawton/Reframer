@@ -1,5 +1,4 @@
-from importlib.resources import contents
-from fastapi import FastAPI, Request, WebSocket, BackgroundTasks
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import asyncio
 from fastapi.middleware.cors import CORSMiddleware
 import skimage
@@ -8,6 +7,7 @@ import logging
 from class_interface import Clip_Class
 from plot_util import plot_cosines, plot_zero_shot_images, plot_image
 from interface_handler import Interface
+import asyncio
 
 # check environment var
 # add filename='logs.log'
@@ -103,22 +103,51 @@ async def read_and_send_to_client(data, canvas):
         await canvas.stop()
 
 @app.websocket("/ws")
-async def ws_endpoint(websocket: WebSocket):
+async def websocket_endpoint(websocket: WebSocket):
+    canvas_interface = Interface(websocket, clip_class)
     await websocket.accept()
-    queue = asyncio.queues.Queue()
-    canvas = Interface(websocket, clip_class)
-
-    async def read_from_socket(websocket: WebSocket):
-        async for data in websocket.iter_json():
-            queue.put_nowait(data)
-
-    async def get_data_and_send():
-        data = await queue.get()
-        fetch_task = asyncio.create_task(read_and_send_to_client(data, canvas))
+    
+    try:
         while True:
-            data = await queue.get()
-            if not fetch_task.done():
-                fetch_task.cancel()
-            fetch_task = asyncio.create_task(read_and_send_to_client(data, canvas))
+            data = await websocket.receive_json()
 
-    await asyncio.gather(read_from_socket(websocket), get_data_and_send())
+            async def run_continuous_iterations():
+                while canvas_interface.is_running:
+                    await canvas_interface.run()
+
+            if data["status"] == "start":
+                await canvas_interface.update(data)
+                if not canvas_interface.is_running:
+                    canvas_interface.is_running = True
+                loop = asyncio.get_running_loop()
+                loop.run_in_executor(None, lambda: asyncio.run(run_continuous_iterations()))
+            
+            if data["status"] == "stop":
+                await canvas_interface.stop()
+
+                
+    except WebSocketDisconnect:
+        await canvas_interface.stop()
+        logging.info("Client disconnected")  
+
+
+# @app.websocket("/ws")
+# async def ws_endpoint(websocket: WebSocket):
+#     await websocket.accept()
+#     queue = asyncio.queues.Queue()
+#     canvas = Interface(websocket, clip_class)
+
+#     async def read_from_socket(websocket: WebSocket):
+#         async for data in websocket.iter_json():
+#             queue.put_nowait(data)
+
+#     async def get_data_and_send():
+#         data = await queue.get()
+#         fetch_task = asyncio.create_task(read_and_send_to_client(data, canvas))
+#         while True:
+#             data = await queue.get()
+#             if not fetch_task.done():
+#                 fetch_task.cancel()
+#             fetch_task = asyncio.create_task(read_and_send_to_client(data, canvas))
+
+#     await asyncio.gather(read_from_socket(websocket), get_data_and_send())
