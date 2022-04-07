@@ -1,9 +1,5 @@
 const ws = new WebSocket("ws://localhost:8000/ws");
-// DOES THE "FRAME" NEED TO BE MOVED?
-const targetHeight = 224;
-const canvasFrame = Math.max(window.innerWidth, window.innerHeight);
-const scaleRender = targetHeight / canvasFrame; //take larger square so full sketch always captured
-const scaleFactor = 1 / canvasFrame; //normalise svg points to -1, 1
+const localHost = "http://localhost:8000";
 
 const modal = document.getElementById("modal");
 const canvas = document.getElementById("canvas");
@@ -13,8 +9,6 @@ const penControls = document.getElementById("pen-controls");
 const selectControls = document.getElementById("select-controls");
 const message = document.getElementById("message");
 const startCollab = document.getElementById("draw");
-
-const localHost = "http://localhost:8000";
 
 // Default draw settings
 let buttonControlLeft = true;
@@ -104,11 +98,6 @@ penTool.onMouseUp = function(event) {
         });
     }
     console.log(project.exportSVG());
-
-    // let loadedSvg = topLayer.importSVG(svgTest);
-    // loadedSvg.position.x = canvas.width / 2;
-    // loadedSvg.position.y = canvas.height / 2;
-    // loadedSvg.scale(1 / scaleRender); // invert for reading back
 };
 
 eraseTool.onMouseDown = function(event) {
@@ -204,23 +193,26 @@ eraseTool.onMouseUp = function(event) {
 document.querySelectorAll(".pen-mode").forEach((elem) => {
     elem.addEventListener("click", () => {
         penMode = elem.id;
-        // REFACTOR Into a switch
-        if (penMode === "erase") {
-            console.log(paper.tools);
-            paper.tools[1].activate();
+
+        switch (penMode) {
+            case "erase":
+                paper.tools[1].activate();
+                break;
+            case "pen":
+                penControls.style.display = "block";
+                paper.tools[0].activate();
+                break;
+            case "select":
+                selectControls.style.display = "block";
+                paper.tools[0].activate();
+                break;
+            case "lasso":
+                paper.tools[0].activate();
+                // Not sure what it does yet?
+                break;
         }
-        if (penMode === "pen") {
-            penControls.style.display = "block";
-            paper.tools[0].activate();
-        }
-        if (penMode === "select") {
-            selectControls.style.display = "block";
-            paper.tools[0].activate();
-        }
-        if (penMode === "lasso") {
-            paper.tools[0].activate();
-            // Not sure what it does yet?
-        }
+
+        // Not-pen mode
         if (penMode !== "select") {
             topLayer.getItems().forEach((path) => {
                 console.log(path);
@@ -255,11 +247,7 @@ ws.onmessage = function(event) {
             });
         }
 
-        // loadedSvg.position.x = canvas.width / 2;
-        // loadedSvg.position.y = canvas.height / 2;
-        // loadedSvg.scale(1 / scaleRender); // invert for reading back
         lastRender = loadedSvg;
-        // topLayer.smooth();
         console.log(`Draw iteration: ${iterations} \nLoss value: ${loss}`);
     }
 };
@@ -306,7 +294,6 @@ document.getElementById("send-prompt").addEventListener("submit", (e) => {
                 data: {
                     prompt: input.value,
                     svg: pathData,
-                    scale: scaleFactor,
                 },
             })
         );
@@ -349,7 +336,7 @@ document.getElementById("switch-side").addEventListener("click", () => {
     buttonControlLeft = !buttonControlLeft;
 });
 document.getElementById("undo").addEventListener("click", () => {
-    if (redoStack.length > 0) {
+    if (undoStack.length > 0) {
         const lastEvent = undoStack.pop();
         if (lastEvent.type === "draw-event") {
             let thisPath; //json from redo, otherwise path

@@ -73,7 +73,8 @@ def rescale_constants(shapes, groups, scale_ratio):
     shape_groups_copy = copy.deepcopy(groups)
     for path in shapes_copy:
         path.points = torch.div(path.points, scale_ratio)
-        path.stroke_width /= (scale_ratio * 2)
+        path.stroke_width /= (scale_ratio * 0.5)
+        # path.stroke_width /= (scale_ratio)
 
     return shapes_copy, shape_groups_copy
 

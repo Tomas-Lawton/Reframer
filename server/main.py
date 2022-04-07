@@ -93,15 +93,6 @@ def activate_clip_draw():
     clip_class.start_clip_draw(prompts, neg_prompts);
     return {"Hello": "World"}
 
-async def read_and_send_to_client(data, canvas):
-    if data["status"] == "start":
-        await canvas.update(data)
-        if not canvas.is_running:
-            canvas.is_running = True
-        await canvas.run()
-    if data["status"] == "stop":
-        await canvas.stop()
-
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     canvas_interface = Interface(websocket, clip_class)
@@ -111,7 +102,7 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data = await websocket.receive_json()
 
-            async def run_continuous_iterations():
+            async def loop_optimisation():
                 while canvas_interface.is_running:
                     await canvas_interface.run()
 
@@ -120,16 +111,24 @@ async def websocket_endpoint(websocket: WebSocket):
                 if not canvas_interface.is_running:
                     canvas_interface.is_running = True
                 loop = asyncio.get_running_loop()
-                loop.run_in_executor(None, lambda: asyncio.run(run_continuous_iterations()))
+                loop.run_in_executor(None, lambda: asyncio.run(loop_optimisation()))
             
             if data["status"] == "stop":
                 await canvas_interface.stop()
-
                 
     except WebSocketDisconnect:
         await canvas_interface.stop()
         logging.info("Client disconnected")  
 
+
+# async def read_and_send_to_client(data, canvas):
+#     if data["status"] == "start":
+#         await canvas.update(data)
+#         if not canvas.is_running:
+#             canvas.is_running = True
+#         await canvas.run()
+#     if data["status"] == "stop":
+#         await canvas.stop()
 
 # @app.websocket("/ws")
 # async def ws_endpoint(websocket: WebSocket):

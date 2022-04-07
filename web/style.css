@@ -273,6 +273,6 @@ input {
 canvas[resize] {
     /* height: 100vh;
     width: 100vw; */
-    height: 1000px;
-    width: 1000px;
+    height: 100vh;
+    width: 100vh;
 }

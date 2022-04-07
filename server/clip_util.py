@@ -123,12 +123,15 @@ def parse_svg(path_to_svg_file):
         except (KeyError, AttributeError):
             pass
 
-    targetHeight = 224;
     width = int(parent_svg['attributes']['width'])
     height = int(parent_svg['attributes']['height'])
     frame_size = max(width, height)
-    resizeScaleFactor = targetHeight / frame_size
+    reframe_size = min(width, height)
+
     normaliseScaleFactor = 1 / frame_size
+    # normaliseScaleFactor = 2 / frame_size
+    # resizeScaleFactor = 224 / reframe_size #must use smaller so the square fits the larger rect. Also has to center
+    resizeScaleFactor = 224 / frame_size
 
     for att in attributes:
         # defaults could refactor now local file not needed
@@ -141,9 +144,9 @@ def parse_svg(path_to_svg_file):
             else:
                 color_code = str(path_group['attributes']['stroke'])
             if 'stroke-width' in att:
-                stroke_width = float(att['stroke-width']) * resizeScaleFactor
+                stroke_width = float(att['stroke-width']) * normaliseScaleFactor
             else:
-                stroke_width = float(path_group['attributes']['stroke-width']) * resizeScaleFactor
+                stroke_width = float(path_group['attributes']['stroke-width']) * normaliseScaleFactor
             if 'stroke-opacity' in att:
                 opacity = float(att['stroke-opacity']) 
                 # if not opacity, just use "1" since not in group attrib
