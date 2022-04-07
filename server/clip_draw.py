@@ -131,12 +131,7 @@ class Clip_Draw_Optimiser:
         user_scene_args = pydiffvg.RenderFunction.serialize_scene(
             self.render_canvas_w, self.render_canvas_h, shapes, shape_groups)
         render = pydiffvg.RenderFunction.apply
-# TEST ---------
-        testing_args = pydiffvg.RenderFunction.serialize_scene(\
-            self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups)
-        testing_img = render(self.render_canvas_w, self.render_canvas_h, 2, 2, self.iteration, None, *testing_args)
-        pydiffvg.save_svg('results/first_rendered_paths.svg', self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups)
-# TEST ---------
+
         user_points_vars, user_stroke_width_vars, user_color_vars = initialise_gradients(shapes, shape_groups)
         user_img = render(self.render_canvas_w, self.render_canvas_h, 2, 2, 0, None, *user_scene_args)
         user_img = user_img[:, :, 3:4] * user_img[:, :, :3] + torch.ones(user_img.shape[0], user_img.shape[1], 3, device = pydiffvg.get_device()) * (1 - user_img[:, :, 3:4])
