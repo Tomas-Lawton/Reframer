@@ -16,4 +16,4 @@ source activate.sh
 
 # Run canvas
 
-Run the frontend canvas using a local server (VS code has an extension for this). Ensure, it's in a seperate window so file overwrites in the same root directory don't cause a crash.
+Run the frontend canvas using a local server (Can use VS Code Live Server extension). Ensure it's in a seperate window so file overwrites don't cause a window restart.
