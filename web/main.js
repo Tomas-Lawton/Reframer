@@ -248,10 +248,18 @@ ws.onmessage = function(event) {
         }
         const { svg, iterations, loss } = JSON.parse(event.data);
         let loadedSvg = topLayer.importSVG(svg);
-        loadedSvg.position.x = canvas.width / 2;
+        for (const child of loadedSvg.children) {
+            child.children.forEach((path) => {
+                path.simplify();
+                path.smooth();
+            });
+        }
+
+        // loadedSvg.position.x = canvas.width / 2;
         // loadedSvg.position.y = canvas.height / 2;
         // loadedSvg.scale(1 / scaleRender); // invert for reading back
         lastRender = loadedSvg;
+        // topLayer.smooth();
         console.log(`Draw iteration: ${iterations} \nLoss value: ${loss}`);
     }
 };

@@ -231,7 +231,7 @@ class Clip_Draw_Optimiser:
             # for l in l_style:
             #     print('l_style: ', l.item())
             with torch.no_grad():
-                pydiffvg.imwrite(self.img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+self.time_str+'.png', gamma=1)
+                # pydiffvg.imwrite(self.img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+self.time_str+'.png', gamma=1)
                 if self.nouns_features != []:
                     im_norm = image_features / image_features.norm(dim=-1, keepdim=True)
                     noun_norm = self.nouns_features / self.nouns_features.norm(dim=-1, keepdim=True)
@@ -250,6 +250,6 @@ class Clip_Draw_Optimiser:
         return self.iteration, loss.item()
 
     def stop_drawing(self):
-        pydiffvg.imwrite(self.img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+self.time_str+'.png', gamma=1)
-        save_data(self.time_str, self)
+        # pydiffvg.imwrite(self.img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+self.time_str+'.png', gamma=1)
+        # save_data(self.time_str, self)
         self.is_active = False
