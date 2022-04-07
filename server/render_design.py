@@ -2,6 +2,7 @@ import pydiffvg
 import torch
 import pickle
 import random
+import copy
 
 def initialise_gradients(shapes, shape_groups):
     points_vars = []
@@ -68,14 +69,13 @@ def build_random_curves(num_paths, render_canvas_width, render_canvas_height, x0
 
 def rescale_constants(shapes, groups, scale_ratio):
     """Scale up points since they are absolute positioned."""    
-    # s = shapes.detach().clone()
-    for path in shapes:
-        print('before')
+    shapes_copy = copy.deepcopy(shapes)
+    shape_groups_copy = copy.deepcopy(groups)
+    for path in shapes_copy:
         print(path.points)
-        print('after')
         path.points = torch.div(path.points, scale_ratio)
 
-    return shapes, groups
+    return shapes_copy, shape_groups_copy
 
 def load_vars():
     with open('tmp/points_vars.pkl', 'rb') as f:

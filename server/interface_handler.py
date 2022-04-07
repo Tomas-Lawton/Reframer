@@ -11,7 +11,7 @@ class Interface():
 
     async def get_step_data(self):
         i, loss = self.clip_class.clip_draw_optimiser.run_iteration()
-        async with aiofiles.open("results/latest_rendered_paths.svg", "r") as f:
+        async with aiofiles.open("results/output.svg", "r") as f:
             svg = await f.read()
             return i, svg, loss
     

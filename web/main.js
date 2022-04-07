@@ -23,7 +23,13 @@ let strokeColor = "#402f95";
 let strokeWidth = 20;
 let penMode = "pen";
 let collabDrawing = false;
-let myPath, currentSelectedPath, lastRender, erasePath, tmpGroup, mask;
+let myPath,
+    currentSelectedPath,
+    lastRender,
+    erasePath,
+    tmpGroup,
+    mask,
+    firstLoad;
 undoStack = [];
 redoStack = [];
 
@@ -236,12 +242,14 @@ ws.onmessage = function(event) {
         if (lastRender) {
             lastRender.remove();
         }
+        if (firstLoad) {
+            topLayer.clear();
+            firstLoad = false;
+        }
         const { svg, iterations, loss } = JSON.parse(event.data);
         let loadedSvg = topLayer.importSVG(svg);
-
         loadedSvg.position.x = canvas.width / 2;
-        loadedSvg.position.y = canvas.height / 2;
-
+        // loadedSvg.position.y = canvas.height / 2;
         // loadedSvg.scale(1 / scaleRender); // invert for reading back
         lastRender = loadedSvg;
         console.log(`Draw iteration: ${iterations} \nLoss value: ${loss}`);
@@ -283,6 +291,7 @@ document.getElementById("send-prompt").addEventListener("submit", (e) => {
     // input.value = "";
     if (!collabDrawing) {
         // start drawing
+        firstLoad = true; //so canvas reset
         ws.send(
             JSON.stringify({
                 status: "start",

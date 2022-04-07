@@ -240,11 +240,10 @@ class Clip_Draw_Optimiser:
                     for value, index in zip(values, indices):
                         logging.info(f"{self.nouns[index]:>16s}: {100 * value.item():.2f}%")
                 
+                pydiffvg.save_svg('results/latest_rendered_paths.svg', self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups)
                 if self.use_user_paths:
-                    render_shapes, render_shape_groups = rescale_constants(list(self.shapes), self.shape_groups, self.resizeScaleFactor)
-                    pydiffvg.save_svg('results/latest_rendered_paths.svg', self.user_canvas_w, self.user_canvas_h, render_shapes, render_shape_groups) # this will be blown up in the canvas for correct path changes
-                # else:
-                # pydiffvg.save_svg('results/latest_rendered_paths.svg', self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups)
+                    render_shapes, render_shape_groups = rescale_constants(self.shapes, self.shape_groups, self.resizeScaleFactor)
+                    pydiffvg.save_svg('results/output.svg', self.user_canvas_w, self.user_canvas_h, render_shapes, render_shape_groups)
 
         self.iteration += 1
         return self.iteration, loss.item()
