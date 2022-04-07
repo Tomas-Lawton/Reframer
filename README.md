@@ -1,7 +1,5 @@
 # Run Fastapi application
 
-Run server with
-
 ```
 cd server/
 ```
