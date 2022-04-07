@@ -126,8 +126,7 @@ def parse_svg(path_to_svg_file):
     targetHeight = 224;
     width = int(parent_svg['attributes']['width'])
     height = int(parent_svg['attributes']['height'])
-    frame_size = max(width, height)   # for first point can actually scale both x and y because this will cause no shearing on single point
-    # frame_size = height
+    frame_size = max(width, height)
     resizeScaleFactor = targetHeight / frame_size
     normaliseScaleFactor = 1 / frame_size
 
@@ -173,7 +172,7 @@ def parse_svg(path_to_svg_file):
 
     logging.info(f"Returning list of paths: \n {path_list}")    
     
-    return path_list, width, height, resizeScaleFactor, normaliseScaleFactor
+    return path_list, width, height, resizeScaleFactor
 
 def save_data(time_str, draw_class):
     with open('results/'+time_str+'.txt', 'w') as f:

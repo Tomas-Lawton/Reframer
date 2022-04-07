@@ -75,12 +75,11 @@ class Clip_Draw_Optimiser:
         path_list = []
         try:
             if self.use_user_paths:
-                path_list, width, height, resizeScaleFactor, normaliseScaleFactor = parse_svg('data/interface_paths.svg')
+                path_list, width, height, resizeScaleFactor = parse_svg('data/interface_paths.svg')
                 # self.frame_size = frame_size
                 self.user_canvas_w = width
                 self.user_canvas_h = height
                 self.resizeScaleFactor = resizeScaleFactor
-                self.normaliseScaleFactor =normaliseScaleFactor
             else:
                 path_list = parse_local_svg('data/drawing_flower_vase.svg')
         except:
@@ -242,7 +241,7 @@ class Clip_Draw_Optimiser:
                         logging.info(f"{self.nouns[index]:>16s}: {100 * value.item():.2f}%")
                 
                 if self.use_user_paths:
-                    render_shapes, render_shape_groups = rescale_constants(self.shapes, self.shape_groups, self.user_canvas_w, self.user_canvas_h)
+                    render_shapes, render_shape_groups = rescale_constants(list(self.shapes), self.shape_groups, self.resizeScaleFactor)
                     pydiffvg.save_svg('results/latest_rendered_paths.svg', self.user_canvas_w, self.user_canvas_h, render_shapes, render_shape_groups) # this will be blown up in the canvas for correct path changes
                 # else:
                 # pydiffvg.save_svg('results/latest_rendered_paths.svg', self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups)

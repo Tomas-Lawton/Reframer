@@ -70,13 +70,10 @@ def rescale_constants(shapes, groups, scale_ratio):
     """Scale up points since they are absolute positioned."""    
     # s = shapes.detach().clone()
     for path in shapes:
-        print("--------------------")
+        print('before')
         print(path.points)
-        for point in path.points:
-            print(point)
-            # point[0][0] *= width_ratio
-            # point[0][1] *= height_ratio
-        path.stroke_width *= scale_ratio
+        print('after')
+        path.points = torch.div(path.points, scale_ratio)
 
     return shapes, groups
 
