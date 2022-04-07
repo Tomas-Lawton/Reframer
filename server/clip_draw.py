@@ -41,7 +41,7 @@ class Clip_Draw_Optimiser:
         self.drawing_area = {
             'x0': 0.0,
             'x1': 1.0,
-            'y0': 0.5,
+            'y0': 0.0,
             'y1': 1.0
         }
         self.update_frequency = 1
@@ -99,6 +99,16 @@ class Clip_Draw_Optimiser:
         logging.info('Setting up og curves')
 
         shapes, shape_groups = render_save_img(path_list, self.render_canvas_w, self.render_canvas_h)
+        
+        self.mask = area_mask(
+            self.render_canvas_w,
+            self.render_canvas_h,
+            self.drawing_area['x0'],
+            self.drawing_area['x1'],
+            self.drawing_area['y0'],
+            self.drawing_area['y1'],
+            ).to(device)
+
         shapes_rnd, shape_groups_rnd = build_random_curves(
             self.num_paths,
             self.render_canvas_w,
@@ -123,9 +133,9 @@ class Clip_Draw_Optimiser:
         render = pydiffvg.RenderFunction.apply
 # TEST ---------
         testing_args = pydiffvg.RenderFunction.serialize_scene(\
-            self.render_canvas_w, self.render_canvas_h, shapes, shape_groups)
+            self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups)
         testing_img = render(self.render_canvas_w, self.render_canvas_h, 2, 2, self.iteration, None, *testing_args)
-        pydiffvg.save_svg('results/first_rendered_paths.svg', self.render_canvas_w, self.render_canvas_h, shapes, shape_groups)
+        pydiffvg.save_svg('results/first_rendered_paths.svg', self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups)
 # TEST ---------
         user_points_vars, user_stroke_width_vars, user_color_vars = initialise_gradients(shapes, shape_groups)
         user_img = render(self.render_canvas_w, self.render_canvas_h, 2, 2, 0, None, *user_scene_args)
@@ -143,15 +153,6 @@ class Clip_Draw_Optimiser:
         scene_args = pydiffvg.RenderFunction.serialize_scene(\
             self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups)
         self.render = pydiffvg.RenderFunction.apply
-
-        self.mask = area_mask(
-            self.render_canvas_w,
-            self.render_canvas_h,
-            self.drawing_area['x0'],
-            self.drawing_area['x1'],
-            self.drawing_area['y0'],
-            self.drawing_area['y1'],
-            ).to(device)
 
         logging.info('Setting optimisers')
         self.points_optim = torch.optim.Adam(self.points_vars, lr=0.5)
