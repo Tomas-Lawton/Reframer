@@ -66,20 +66,17 @@ def build_random_curves(num_paths, render_canvas_width, render_canvas_height, x0
         shape_groups.append(path_group)
     return shapes, shape_groups
 
-def reposition_pen_moves(shapes, groups, target_width, target_height):
-    """Scale up "M" points in every path by the resize ratio since they 
-    are absolute positioned. This is a single point so scaling width 
-    and hight won't shear the image"""
-
-    height_ratio = target_height / 224
-    width_ratio = target_width / 224
-    print('scaleing')
-    print(shapes)
-    print('test')
-    print(groups)
-
+def rescale_constants(shapes, groups, scale_ratio):
+    """Scale up points since they are absolute positioned."""    
+    # s = shapes.detach().clone()
     for path in shapes:
+        print("--------------------")
         print(path.points)
+        for point in path.points:
+            print(point)
+            # point[0][0] *= width_ratio
+            # point[0][1] *= height_ratio
+        path.stroke_width *= scale_ratio
 
     return shapes, groups
 

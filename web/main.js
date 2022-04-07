@@ -98,6 +98,11 @@ penTool.onMouseUp = function(event) {
         });
     }
     console.log(project.exportSVG());
+
+    // let loadedSvg = topLayer.importSVG(svgTest);
+    // loadedSvg.position.x = canvas.width / 2;
+    // loadedSvg.position.y = canvas.height / 2;
+    // loadedSvg.scale(1 / scaleRender); // invert for reading back
 };
 
 eraseTool.onMouseDown = function(event) {
@@ -233,11 +238,13 @@ ws.onmessage = function(event) {
         }
         const { svg, iterations, loss } = JSON.parse(event.data);
         let loadedSvg = topLayer.importSVG(svg);
-        loadedSvg.position.x = window.innerWidth / 2;
-        loadedSvg.position.y = window.innerHeight / 2;
-        loadedSvg.scale(1 / scaleRender); // invert for reading back
+
+        loadedSvg.position.x = canvas.width / 2;
+        loadedSvg.position.y = canvas.height / 2;
+
+        // loadedSvg.scale(1 / scaleRender); // invert for reading back
         lastRender = loadedSvg;
-        console.log(`Draw iteration: ${i} \nLoss value: ${loss}`);
+        console.log(`Draw iteration: ${iterations} \nLoss value: ${loss}`);
     }
 };
 
@@ -269,26 +276,24 @@ document.body.addEventListener("keydown", function(event) {
 document.getElementById("send-prompt").addEventListener("submit", (e) => {
     e.preventDefault();
     var input = document.getElementById("messageText");
-    if (input.value !== "") {
-        pathData = project.exportSVG({
-            asString: true,
-        });
-        message.innerHTML = input.value;
-        input.value = "";
-        if (!collabDrawing) {
-            // start drawing
-            ws.send(
-                JSON.stringify({
-                    status: "start",
-                    data: {
-                        prompt: input.value,
-                        svg: pathData,
-                        scale: scaleFactor,
-                    },
-                })
-            );
-            startCollab.innerHTML = "STOP";
-        }
+    pathData = project.exportSVG({
+        asString: true,
+    });
+    message.innerHTML = input.value;
+    // input.value = "";
+    if (!collabDrawing) {
+        // start drawing
+        ws.send(
+            JSON.stringify({
+                status: "start",
+                data: {
+                    prompt: input.value,
+                    svg: pathData,
+                    scale: scaleFactor,
+                },
+            })
+        );
+        startCollab.innerHTML = "STOP";
     }
     if (collabDrawing) {
         // stop drawing

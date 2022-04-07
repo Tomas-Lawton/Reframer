@@ -9,10 +9,6 @@ class Interface():
         self.clip_class = clip_instance
         logging.info("Interface connected")
 
-    async def clear(self):
-        # reset to model defaults
-        return
-
     async def get_step_data(self):
         i, loss = self.clip_class.clip_draw_optimiser.run_iteration()
         async with aiofiles.open("results/latest_rendered_paths.svg", "r") as f:
@@ -47,3 +43,6 @@ class Interface():
     async def stop(self):
         logging.info("Stopping...")
         self.is_running = False
+
+        # if self.clip_draw_optimiser.is_active:
+        #     self.clip_draw_optimiser.stop_drawing()

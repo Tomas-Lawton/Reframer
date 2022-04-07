@@ -117,23 +117,19 @@ class Clip_Class:
 
     def start_clip_draw(self, prompts, neg_prompts = []):
         """Check if it's running and if it is, wait for it to stop before starting again."""
-        if self.clip_draw_optimiser.is_active:
-            self.clip_draw_optimiser.stop_clip_draw()
-        if not self.clip_draw_optimiser.is_active and not self.clip_draw_optimiser.is_stopping:
-            logging.info("Starting clip drawer")
-            try:
-                prompt_features = self.encode_text_classes(prompts)
-                neg_prompt_features = self.encode_text_classes(neg_prompts)
-            except:
-                logging.error("Failed to get encoded prompt features")
-            try:
-                self.clip_draw_optimiser.set_text_features(prompt_features, neg_prompt_features)
-            except:
-                logging.error("Failed to encode text features in clip")
-            try:
-                return self.clip_draw_optimiser.activate()
-            except:
-                logging.error("Failed to activate clip draw")
+        self.clip_draw_optimiser.reset()
+        
+        logging.info("Starting clip drawer")
+        prompt_features = self.encode_text_classes(prompts)
+        neg_prompt_features = self.encode_text_classes(neg_prompts)
+        try:
+            self.clip_draw_optimiser.set_text_features(prompt_features, neg_prompt_features)
+        except:
+            logging.error("Failed to encode text features in clip")
+        try:
+            return self.clip_draw_optimiser.activate()
+        except:
+            logging.error("Failed to activate clip draw")
 
     def restart_last_drawer(self):
         """Use old classes to guide image"""

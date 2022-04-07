@@ -13,20 +13,19 @@ class Clip_Draw_Optimiser:
     __instance = None
     def __init__(self, model, noun_features):
         """These inputs are defaults and can have methods for setting them after the inital start up"""
-        if Clip_Draw_Optimiser.__instance != None:  # Should this all be refactored to not be a "class instance" since it is only used once?
+        
+        if Clip_Draw_Optimiser.__instance != None:  # Should be refactored since only used once?
             raise Exception("Clip is already instantiated.")
-        # Set up parent
+        
+        # Set up
         self.model = model
-        # Partial sketch
-        # Array set as arrays
-        self.text_features = []
-        self.neg_text_features = []
         self.nouns_features = noun_features
+        self.nouns = get_noun_data()
+        self.is_initialised = False
+        self.use_user_paths = True
+        self.is_active = False
         self.use_neg_prompts = False
         self.normalize_clip = True
-        self.use_user_paths = True
-        # 
-        self.iteration = 0
         # Canvas parameters
         self.num_paths = 32
         self.max_width = 40
@@ -46,17 +45,20 @@ class Clip_Draw_Optimiser:
             'y1': 1.0
         }
         self.update_frequency = 1
-        self.is_stopping = False
-        self.is_active = False
-        self.nouns = get_noun_data()
         # Configure rasterisor
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         pydiffvg.set_print_timing(False)
         pydiffvg.set_use_gpu(torch.cuda.is_available())
         pydiffvg.set_device(device)
         logging.info("Drawer ready")
+
         Clip_Draw_Optimiser.__instance == self 
         return 
+
+    def reset(self):
+        self.text_features = []
+        self.neg_text_features = []
+        self.iteration = 0
     
     def set_text_features(self, text_features, neg_text_features = []):
         self.text_features = text_features
@@ -64,12 +66,8 @@ class Clip_Draw_Optimiser:
         logging.info("Updated CLIP prompt features")
         return
 
-    def stop_clip_draw(self):
-        logging.info("Stopping Clip draw")
-        self.is_stopping = True
-
     # HOW TO ABORT WITH NEW PROMPT?
-    def activate(self):
+    def activate(self):        
         self.is_active = True
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         logging.info('Parsing SVG paths')
@@ -243,21 +241,16 @@ class Clip_Draw_Optimiser:
                     for value, index in zip(values, indices):
                         logging.info(f"{self.nouns[index]:>16s}: {100 * value.item():.2f}%")
                 
-                # check if userdrawn paths or use default
                 if self.use_user_paths:
-                    render_shapes, render_shape_groups = reposition_pen_moves(self.shapes, self.shape_groups, self.user_canvas_w, self.user_canvas_h)
-                    pydiffvg.save_svg('results/latest_rendered_paths.svg', self.render_canvas_w, self.render_canvas_h, render_shapes, render_shape_groups) # this will be blown up in the canvas for correct path changes
-                else:
-                    pydiffvg.save_svg('results/latest_rendered_paths.svg', self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups)
+                    render_shapes, render_shape_groups = rescale_constants(self.shapes, self.shape_groups, self.user_canvas_w, self.user_canvas_h)
+                    pydiffvg.save_svg('results/latest_rendered_paths.svg', self.user_canvas_w, self.user_canvas_h, render_shapes, render_shape_groups) # this will be blown up in the canvas for correct path changes
+                # else:
+                # pydiffvg.save_svg('results/latest_rendered_paths.svg', self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups)
 
         self.iteration += 1
         return self.iteration, loss.item()
 
-    def clip_has_stopped(self):
-        logging.info("Stopping clip drawer")
+    def stop_drawing(self):
         pydiffvg.imwrite(self.img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+self.time_str+'.png', gamma=1)
         save_data(self.time_str, self)
         self.is_active = False
-        self.is_stopping = False
-        logging.info("Drawer ready for restart")
-        return
