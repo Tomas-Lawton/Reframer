@@ -1,22 +1,30 @@
 const ws = new WebSocket("ws://localhost:8000/ws");
 const localHost = "http://localhost:8000";
 
-const modal = document.getElementById("modal");
 const canvas = document.getElementById("canvas");
+const canvas1 = document.getElementById("canvas1");
+const canvas2 = document.getElementById("canvas2");
+const canvas3 = document.getElementById("canvas3");
+const prompt = document.getElementById("messageText");
+const modal = document.getElementById("modal");
 const controlPanel = document.getElementById("control-panel");
 const buttonPanel = document.getElementById("button-panel");
+const artControls = document.getElementById("art-controls");
 const penControls = document.getElementById("pen-controls");
 const selectControls = document.getElementById("select-controls");
 const message = document.getElementById("message");
 const startCollab = document.getElementById("draw");
 
 // Default draw settings
-let buttonControlLeft = true;
 let backgroundColor = "#FCFCFC";
+// let backgroundColor = "red";
+
 let strokeColor = "#402f95";
 let strokeWidth = 20;
 let penMode = "pen";
 let collabDrawing = false;
+let buttonControlLeft = true;
+let showLastPaths = true;
 let myPath,
     currentSelectedPath,
     lastRender,
@@ -29,11 +37,27 @@ redoStack = [];
 
 // Setup
 paper.install(window);
-paper.setup(canvas);
+const scope = new PaperScope();
+const scope1 = new PaperScope();
+const scope2 = new PaperScope();
+const scope3 = new PaperScope();
+
+scope.setup(canvas);
+scope1.setup(canvas1);
+scope2.setup(canvas2);
+scope3.setup(canvas3);
+canvas.style.background = backgroundColor;
+// canvas1.style.background = backgroundColor;
+// canvas2.style.background = backgroundColor;
+// canvas3.style.background = backgroundColor;
+scope.activate();
+// scope1.activate();
+// scope2.activate();
+// scope3.activate();
+
 const topLayer = new Layer(); //for drawing + erase mask
 const penTool = new Tool(); //refactor to single tool?
 const eraseTool = new Tool();
-canvas.style.background = backgroundColor;
 
 function getSelectedPaths() {
     return topLayer.getItems().filter((path) => path.selected);
@@ -97,7 +121,7 @@ penTool.onMouseUp = function(event) {
             data: myPath,
         });
     }
-    console.log(project.exportSVG());
+    console.log(paper.project.exportSVG());
 };
 
 eraseTool.onMouseDown = function(event) {
@@ -189,21 +213,39 @@ eraseTool.onMouseUp = function(event) {
     }
 };
 
+const toggleArtControls = () => {
+    if (!artControls.style.display || artControls.style.display === "none") {
+        artControls.style.display = "block";
+    } else {
+        artControls.style.display = "none";
+    }
+};
+
 // Drawing Controls
 document.querySelectorAll(".pen-mode").forEach((elem) => {
-    elem.addEventListener("click", () => {
+    elem.addEventListener("click", (e) => {
         penMode = elem.id;
-
         switch (penMode) {
             case "erase":
                 paper.tools[1].activate();
                 break;
             case "pen":
-                penControls.style.display = "block";
+                toggleArtControls();
+                if (buttonControlLeft) {
+                    let x = e.clientX + 30 + "px";
+                    let y = e.clientY - 300 + "px";
+                    artControls.style.top = y;
+                    artControls.style.left = x;
+                } else {
+                    let x = e.clientX - 30 - artControls.offsetWidth + "px";
+                    let y = e.clientY - 300 + "px";
+                    artControls.style.top = y;
+                    artControls.style.left = x;
+                }
                 paper.tools[0].activate();
                 break;
             case "select":
-                selectControls.style.display = "block";
+                toggleArtControls();
                 paper.tools[0].activate();
                 break;
             case "lasso":
@@ -219,19 +261,42 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
                 path.selected = false;
             });
         }
-        if (penMode !== "pen") {
-            penControls.style.display = "none";
-        }
-        if (penMode !== "select") {
-            selectControls.style.display = "none";
+        if (penMode !== "pen" && penMode !== "select") {
+            artControls.style.display = "none";
         }
         console.log(penMode);
     });
 });
 
+let history = {};
+history["main-canvas"] = [];
+let updateHistory = (sketch) => {
+    history["main-canvas"].push(sketch);
+    // decrease opacity of all elements by same amount
+    for (const oldSketch of history["main-canvas"]) {
+        oldSketch.getItems().forEach((item) => {
+            item.opacity *= 0.6;
+        });
+    }
+    // if len greater, get and delete first element
+    if (history["main-canvas"].length > 5) {
+        firstHistory = history["main-canvas"][0];
+        firstHistory.remove();
+    }
+};
+
+const setVisibilityHistory = () => {
+    for (const oldSketch of history["main-canvas"]) {
+        oldSketch.getItems().forEach((item) => {
+            item.visible = !item.visible;
+        });
+    }
+};
+
 ws.onmessage = function(event) {
     if (collabDrawing) {
         if (lastRender) {
+            // updateHistory(lastRender);
             lastRender.remove();
         }
         if (firstLoad) {
@@ -246,8 +311,11 @@ ws.onmessage = function(event) {
                 path.smooth();
             });
         }
-
+        // if (!showLastPaths) {
+        //     lastRender = loadedSvg;
+        // }
         lastRender = loadedSvg;
+
         console.log(`Draw iteration: ${iterations} \nLoss value: ${loss}`);
     }
 };
@@ -266,24 +334,41 @@ const deletePath = () => {
     event.preventDefault();
 };
 
-document.body.addEventListener("keydown", function(event) {
-    //delete with key
-    if (event.keyCode == 8) {
-        deletePath();
-        event.preventDefault();
+const switchControls = () => {
+    if (buttonControlLeft) {
+        console.log(window.innerWidth);
+        buttonPanel.style.left = `${window.innerWidth - buttonPanel.offsetWidth}px`;
+    } else {
+        buttonPanel.style.left = 0;
     }
-    if (event.keyCode == 46) {
-        deletePath();
-        event.preventDefault();
+    buttonControlLeft = !buttonControlLeft;
+};
+
+document.body.addEventListener("keydown", function(event) {
+    if (document.activeElement !== prompt) {
+        var handled = false;
+        if (event.key == "Delete") {
+            deletePath();
+            handled = true;
+        }
+        if (event.key == "Backspace") {
+            deletePath();
+            handled = true;
+        }
+        if (handled) {
+            // Suppress "double action" if event handled
+            event.preventDefault();
+        }
     }
 });
+
 document.getElementById("send-prompt").addEventListener("submit", (e) => {
     e.preventDefault();
-    var input = document.getElementById("messageText");
-    pathData = project.exportSVG({
+    var input = prompt;
+    pathData = paper.project.exportSVG({
         asString: true,
     });
-    message.innerHTML = input.value;
+    // message.innerHTML = input.value;
     // input.value = "";
     if (!collabDrawing) {
         // start drawing
@@ -327,13 +412,7 @@ document.getElementById("confirm-modal").addEventListener("click", () => {
     modal.style.display = "none";
 });
 document.getElementById("switch-side").addEventListener("click", () => {
-    if (buttonControlLeft) {
-        console.log(window.innerWidth);
-        buttonPanel.style.left = `${window.innerWidth - buttonPanel.offsetWidth}px`;
-    } else {
-        buttonPanel.style.left = 0;
-    }
-    buttonControlLeft = !buttonControlLeft;
+    switchControls();
 });
 document.getElementById("undo").addEventListener("click", () => {
     if (undoStack.length > 0) {
@@ -414,6 +493,10 @@ document.getElementById("save").addEventListener("click", () => {
         }
     });
 });
+document.getElementById("time").addEventListener("click", () => {
+    showLastPaths = !showLastPaths;
+    setVisibilityHistory();
+});
 document.getElementById("width-slider").oninput = function() {
     strokeWidth = this.value;
 };
@@ -446,3 +529,5 @@ picker.setColor("#402f95");
 picker.onChange = (color) => {
     strokeColor = color.rgbaString;
 };
+
+// switchControls();
