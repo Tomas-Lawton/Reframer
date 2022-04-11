@@ -280,6 +280,7 @@ input {
 
 #button-panel .fa-solid:hover {
     background-color: #59cdff;
+    color: white;
 }
 
 #button-panel .fa-solid .active {

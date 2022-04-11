@@ -12,18 +12,19 @@
     <script type="text/javascript" src="https://cdn.rawgit.com/paperjs/paper.js/6feff32254b6ba077d1e56d0ecf3f40be5ca594a/dist/paper-full.js"></script>
     <script type="text/javascript" src="offset.js"></script>
 
-    <script src="main.js" type="text/javascript" defer></script>
+    <script src="setup.js" type="text/javascript" defer></script>
+    <script src="logic.js" type="text/javascript" defer></script>
+    <script src="interface.js" type="text/javascript" defer></script>
 </head>
 
 <body>
     <div id="modal">
         <div id="simple-modal">
             <div id="modal-status">
-                <h2 id="modal-title">Clearing Canvas</h2>
+                <h2 id="modal-title"></h2>
                 <i id="modal-cross" class="fa-solid fa-xmark"></i>
             </div>
-            <!-- <p>Are you sure you want to delete your drawing? :(</p> -->
-            <p id="modal-message">Are you sure you want to delete your drawing? :(</p>
+            <p id="modal-message"></p>
             <div id="action">
                 <button id="cancel-modal">Cancel</button>
                 <button id="confirm-modal" confirm-cancel right-button>Confirm</button>
