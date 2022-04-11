@@ -22,10 +22,12 @@ let backgroundColor = "#FCFCFC";
 let strokeColor = "#402f95";
 let strokeWidth = 20;
 let penMode = "pen";
-let collabDrawing = false;
+let clipDrawing = false;
 let buttonControlLeft = true;
 let showLastPaths = true;
 let myPath,
+    regionPath,
+    drawRegion,
     currentSelectedPath,
     lastRender,
     erasePath,
@@ -55,73 +57,98 @@ scope.activate();
 // scope2.activate();
 // scope3.activate();
 
-const topLayer = new Layer(); //for drawing + erase mask
+const userLayer = new Layer(); //for drawing + erase mask
+// const clipLayer = new Layer();
 const penTool = new Tool(); //refactor to single tool?
 const eraseTool = new Tool();
 
 function getSelectedPaths() {
-    return topLayer.getItems().filter((path) => path.selected);
+    return userLayer.getItems().filter((path) => path.selected);
 }
 
 penTool.onMouseDown = function(event) {
-    if (penMode === "select") {
-        path = null;
-        var hitResult = paper.project.hitTest(event.point, {
-            segments: true,
-            stroke: true,
-            // tolerance: 5
-        });
-        if (!hitResult) {
-            topLayer.getItems().forEach((path) => {
-                console.log(path);
-                path.selected = false;
+    switch (penMode) {
+        case "select":
+            path = null;
+            var hitResult = paper.project.hitTest(event.point, {
+                segments: true,
+                stroke: true,
+                // tolerance: 5
             });
-            return;
-        }
-        if (hitResult) {
-            path = hitResult.item;
-            path.selected = true; //fix so that this happens with no drag but with drag it won't toggle !path.selected
-        }
-    }
-    if (penMode === "pen") {
-        myPath = new Path({
-            strokeColor: strokeColor,
-            strokeWidth: strokeWidth,
-            strokeCap: "round",
-            strokeJoin: "round",
-        });
-        myPath.add(event.point);
-        myPath.add({
-            ...event.point,
-            x: event.point.x + 0.001, //this is ok because path gets simplified
-        }); //in case no drag means no line segment
+            if (!hitResult) {
+                userLayer.getItems().forEach((path) => {
+                    console.log(path);
+                    path.selected = false;
+                });
+                return;
+            }
+            if (hitResult) {
+                path = hitResult.item;
+                path.selected = true; //fix so that this happens with no drag but with drag it won't toggle !path.selected
+            }
+            break;
+        case "pen":
+            myPath = new Path({
+                strokeColor: strokeColor,
+                strokeWidth: strokeWidth,
+                strokeCap: "round",
+                strokeJoin: "round",
+            });
+            myPath.add(event.point);
+            myPath.add({
+                ...event.point,
+                x: event.point.x + 0.001, //this is ok because path gets simplified
+            }); //in case no drag means no line segment
+            break;
+        case "lasso":
+            drawRegion = new Rectangle(event.point);
+            break;
     }
 };
 penTool.onMouseDrag = function(event) {
-    if (penMode === "pen") {
-        myPath.add(event.point);
-        myPath.smooth();
-    }
-    if (penMode === "select") {
-        const selectedPaths = getSelectedPaths(); // all selected
-        console.log(selectedPaths);
-        selectedPaths.forEach((path) => {
-            path.position.x += event.delta.x;
-            path.position.y += event.delta.y;
-        });
+    switch (penMode) {
+        case "pen":
+            myPath.add(event.point);
+            myPath.smooth();
+            break;
+        case "select":
+            const selectedPaths = getSelectedPaths(); // all selected
+            console.log(selectedPaths);
+            selectedPaths.forEach((path) => {
+                path.position.x += event.delta.x;
+                path.position.y += event.delta.y;
+            });
+            break;
+        case "lasso":
+            // console.log(regionPath.bounds);
+            drawRegion.width += event.delta.x;
+            drawRegion.height += event.delta.y;
+            if (regionPath !== undefined) regionPath.remove(); // redraw
+            regionPath = new Path.Rectangle(drawRegion);
+            regionPath.set({
+                fillColor: "#e9e9ff",
+                opacity: 0.4,
+                selected: true,
+            });
+            // Start draw
+            break;
     }
 };
 penTool.onMouseUp = function(event) {
-    // collabDrawing = true
-    if (penMode === "pen") {
-        myPath.simplify();
-        // sendPaths();
-        undoStack.push({
-            type: "draw-event",
-            data: myPath,
-        });
+    switch (penMode) {
+        case "pen":
+            myPath.simplify();
+            // sendPaths();
+            undoStack.push({
+                type: "draw-event",
+                data: myPath,
+            });
+            break;
+        case "lasso":
+            startDrawing(true);
+            clipDrawing = true;
+            break;
     }
-    console.log(paper.project.exportSVG());
 };
 
 eraseTool.onMouseDown = function(event) {
@@ -132,7 +159,7 @@ eraseTool.onMouseDown = function(event) {
         strokeColor: backgroundColor,
     });
     tmpGroup = new Group({
-        children: topLayer.removeChildren(),
+        children: userLayer.removeChildren(),
         blendMode: "source-out",
         insert: false,
     });
@@ -208,7 +235,7 @@ eraseTool.onMouseUp = function(event) {
         });
         erasePath.remove(); // done w/ this now
 
-        topLayer.addChildren(tmpGroup.removeChildren());
+        userLayer.addChildren(tmpGroup.removeChildren());
         mask.remove();
     }
 };
@@ -250,19 +277,25 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
                 break;
             case "lasso":
                 paper.tools[0].activate();
-                // Not sure what it does yet?
+                // clipLayer.activate();
                 break;
         }
 
         // Not-pen mode
         if (penMode !== "select") {
-            topLayer.getItems().forEach((path) => {
+            userLayer.getItems().forEach((path) => {
                 console.log(path);
                 path.selected = false;
             });
         }
         if (penMode !== "pen" && penMode !== "select") {
             artControls.style.display = "none";
+        }
+        if (penMode !== "lasso" && penMode !== "select") {
+            drawRegion = undefined;
+        }
+        if (penMode !== "lasso") {
+            userLayer.activate();
         }
         console.log(penMode);
     });
@@ -294,44 +327,46 @@ const setVisibilityHistory = () => {
 };
 
 ws.onmessage = function(event) {
-    if (collabDrawing) {
+    if (clipDrawing) {
         if (lastRender) {
             // updateHistory(lastRender);
             lastRender.remove();
         }
         if (firstLoad) {
-            topLayer.clear();
+            userLayer.clear();
             firstLoad = false;
         }
         const { svg, iterations, loss } = JSON.parse(event.data);
-        let loadedSvg = topLayer.importSVG(svg);
+        let loadedSvg = userLayer.importSVG(svg);
         for (const child of loadedSvg.children) {
             child.children.forEach((path) => {
                 // path.simplify();
                 path.smooth();
             });
         }
-        // if (!showLastPaths) {
-        //     lastRender = loadedSvg;
-        // }
-        lastRender = loadedSvg;
+        if (!showLastPaths) {
+            lastRender = loadedSvg;
+        }
+        // lastRender = loadedSvg;
 
         console.log(`Draw iteration: ${iterations} \nLoss value: ${loss}`);
     }
 };
 
-const deletePath = () => {
-    selected = getSelectedPaths();
-    if (selected.length > 0) {
-        pathList = selected.map((path) => path.exportJSON()); //dont use paper ref
-        console.log(pathList);
-        undoStack.push({
-            type: "delete-event",
-            data: pathList,
-        });
-        selected.map((path) => path.remove());
+const deletePath = (event) => {
+    if (event.key == "Delete" || event.key == "Backspace") {
+        deletePath();
+        selected = getSelectedPaths();
+        if (selected.length > 0) {
+            pathList = selected.map((path) => path.exportJSON()); //dont use paper ref
+            console.log(pathList);
+            undoStack.push({
+                type: "delete-event",
+                data: pathList,
+            });
+            selected.map((path) => path.remove());
+        }
     }
-    event.preventDefault();
 };
 
 const switchControls = () => {
@@ -344,48 +379,46 @@ const switchControls = () => {
     buttonControlLeft = !buttonControlLeft;
 };
 
+const startDrawing = (hasRegion = false) => {
+    // userLayer.activate();
+    firstLoad = true; //reset canvas
+    const request = {
+        status: "start",
+        data: {
+            prompt: prompt.value,
+            svg: paper.project.exportSVG({
+                asString: true,
+            }),
+            region: {
+                activate: hasRegion,
+                x1: drawRegion ? drawRegion.x : 0,
+                y1: drawRegion ? canvas.height - drawRegion.y : 0,
+                x2: drawRegion ? drawRegion.x + drawRegion.width : canvas.width,
+                y2: drawRegion ?
+                    canvas.height - drawRegion.y - drawRegion.height // use non-web y coords
+                    :
+                    canvas.height, // same as width
+            },
+        },
+    };
+    console.log(request);
+    ws.send(JSON.stringify(request));
+    startCollab.innerHTML = "STOP";
+};
+
 document.body.addEventListener("keydown", function(event) {
     if (document.activeElement !== prompt) {
-        var handled = false;
-        if (event.key == "Delete") {
-            deletePath();
-            handled = true;
-        }
-        if (event.key == "Backspace") {
-            deletePath();
-            handled = true;
-        }
-        if (handled) {
-            // Suppress "double action" if event handled
-            event.preventDefault();
-        }
+        deletePath(event);
+        event.preventDefault();
     }
 });
 
 document.getElementById("send-prompt").addEventListener("submit", (e) => {
     e.preventDefault();
-    var input = prompt;
-    pathData = paper.project.exportSVG({
-        asString: true,
-    });
-    // message.innerHTML = input.value;
-    // input.value = "";
-    if (!collabDrawing) {
-        // start drawing
-        firstLoad = true; //so canvas reset
-        ws.send(
-            JSON.stringify({
-                status: "start",
-                data: {
-                    prompt: input.value,
-                    svg: pathData,
-                },
-            })
-        );
-        startCollab.innerHTML = "STOP";
+    if (!clipDrawing) {
+        startDrawing(false);
     }
-    if (collabDrawing) {
-        // stop drawing
+    if (clipDrawing) {
         ws.send(
             JSON.stringify({
                 status: "stop",
@@ -393,7 +426,7 @@ document.getElementById("send-prompt").addEventListener("submit", (e) => {
         );
         startCollab.innerHTML = "DRAW";
     }
-    collabDrawing = !collabDrawing;
+    clipDrawing = !clipDrawing;
 });
 document.getElementById("begin").addEventListener("click", () => {
     document.getElementById("sliding-overlay").style.bottom = "100%";
@@ -408,7 +441,7 @@ document.getElementById("modal-cross").addEventListener("click", () => {
     modal.style.display = "none";
 });
 document.getElementById("confirm-modal").addEventListener("click", () => {
-    topLayer.clear();
+    userLayer.clear();
     modal.style.display = "none";
 });
 document.getElementById("switch-side").addEventListener("click", () => {
@@ -459,9 +492,9 @@ document.getElementById("redo").addEventListener("click", () => {
         }
         if (lastEvent.type === "delete-event") {
             let pathList = [];
-            lastEvent.data.map((deletePath) => {
-                let pathCopy = deletePath.exportJSON();
-                deletePath.remove();
+            lastEvent.data.map((path) => {
+                let pathCopy = path.exportJSON();
+                path.remove();
                 pathList.push(pathCopy);
             });
             undoStack.push({

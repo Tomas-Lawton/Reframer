@@ -1,3 +1,4 @@
+from importlib.resources import path
 import torch
 import pydiffvg
 import torchvision.transforms as transforms
@@ -66,24 +67,39 @@ class Clip_Draw_Optimiser:
         logging.info("Updated CLIP prompt features")
         return
 
-    # HOW TO ABORT WITH NEW PROMPT?
-    def activate(self):        
-        self.is_active = True
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        logging.info('Parsing SVG paths')
-
+    def parse_svg(self, region):
         path_list = []
         try:
             if self.use_user_paths:
-                path_list, width, height, resizeScaleFactor = parse_svg('data/interface_paths.svg')
-                # self.frame_size = frame_size
+                paths, width, height, resizeScaleFactor, normaliseScaleFactor = parse_svg('data/interface_paths.svg', region['activate'])                
+                path_list = paths
                 self.user_canvas_w = width
                 self.user_canvas_h = height
                 self.resizeScaleFactor = resizeScaleFactor
+
+                leftX = min(float(region['x1']) * normaliseScaleFactor, float(region['x2']) * normaliseScaleFactor)
+                rightX = max(float(region['x1']) * normaliseScaleFactor, float(region['x2']) * normaliseScaleFactor)
+                bottomY = min(float(region['y1']) * normaliseScaleFactor, float(region['y2']) * normaliseScaleFactor)
+                topY = max (float(region['y1']) * normaliseScaleFactor, float(region['y2']) * normaliseScaleFactor)
+                
+                if region['activate']:
+                    self.drawing_area = {
+                        'x0': leftX,
+                        'x1': rightX,
+                        'y0': bottomY,
+                        'y1': topY
+                    }
+                    print(self.drawing_area)
             else:
                 path_list = parse_local_svg('data/drawing_flower_vase.svg')
         except:
             logging.error("SVG Parsing failed")
+        self.path_list = path_list
+
+    def activate(self):        
+        self.is_active = True
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        logging.info('Parsing SVG paths')
 
         logging.info('Transforming')
         if self.normalize_clip:
@@ -98,7 +114,7 @@ class Clip_Draw_Optimiser:
 
         logging.info('Setting up og curves')
 
-        shapes, shape_groups = render_save_img(path_list, self.render_canvas_w, self.render_canvas_h)
+        shapes, shape_groups = render_save_img(self.path_list, self.render_canvas_w, self.render_canvas_h)
         
         self.mask = area_mask(
             self.render_canvas_w,

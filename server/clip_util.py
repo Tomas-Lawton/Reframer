@@ -100,15 +100,14 @@ def parse_local_svg(path_to_svg_file):
     logging.info(f"Returning list of paths: \n {path_list}")    
     return path_list
 
-def parse_svg(path_to_svg_file):
+def parse_svg(path_to_svg_file, skip_box_select = False):
     paths, attributes = svg2paths(path_to_svg_file) #paths only
     path_list = []
-
     parsed_svg = SVG.parse(path_to_svg_file) #access <g> tag for non-path styles
     elements_list = list(parsed_svg.elements())
     path_group = {}
     parent_svg = {}
-    sketch_scalers = None
+
     for element in elements_list:
         try:
             if element.values['tag'] == 'g':
@@ -125,16 +124,19 @@ def parse_svg(path_to_svg_file):
 
     width = int(parent_svg['attributes']['width'])
     height = int(parent_svg['attributes']['height'])
+
     frame_size = max(width, height)
     reframe_size = min(width, height)
 
     normaliseScaleFactor = 1 / frame_size
-    # normaliseScaleFactor = 2 / frame_size
-    # resizeScaleFactor = 224 / reframe_size #must use smaller so the square fits the larger rect. Also has to center
     resizeScaleFactor = 224 / frame_size
 
+    count = 0
+    num_paths = len(attributes)
     for att in attributes:
-        # defaults could refactor now local file not needed
+        if skip_box_select and count == num_paths - 1: 
+            continue
+        # could refactor now local file is seperate function
         stroke_width = 15
         color_code = '#000000'
         opacity = 1
@@ -156,26 +158,29 @@ def parse_svg(path_to_svg_file):
         color = get_color(color_code, opacity)
         num_segments = len(att['d'].split(','))//3
         
-        path = []
-        spaced_data = att['d'].split('c')
-        x0 = spaced_data[0][1:].split(',') # only thing different is M instead of m
-        curve_list = [spaced_data.split(' ') for spaced_data in spaced_data[1:]] # exclude move to
-        point_list = []
-        for curve in curve_list:
-            for i in range(3):
-                point_list.append(curve[i])
-        tuple_array = [tuple.split(',') for tuple in point_list] # split each curve by path spaces, then comma for points
-        points_array = [[round(float(x)* normaliseScaleFactor, 5), round(float(y) * normaliseScaleFactor, 5)] for [x,y] in tuple_array] 
-        start_x = round(float(x0[0]) / width, 5)
-        start_y = round(float(x0[1]) / height, 5)
-        x0 = [start_x, start_y]
-
-        path = [x0]+points_array
-        path_list.append(data_to_tensor(color, stroke_width, path, num_segments))
+        try:
+            path = []
+            spaced_data = att['d'].split('c')
+            x0 = spaced_data[0][1:].split(',') # only thing different is M instead of m
+            curve_list = [spaced_data.split(' ') for spaced_data in spaced_data[1:]] # exclude move to
+            point_list = []
+            for curve in curve_list:
+                for i in range(3):
+                    point_list.append(curve[i])
+            tuple_array = [tuple.split(',') for tuple in point_list] # split each curve by path spaces, then comma for points
+            points_array = [[round(float(x) * normaliseScaleFactor, 5), round(float(y) * normaliseScaleFactor, 5)] for [x,y] in tuple_array] 
+            start_x = round(float(x0[0]) / width, 5)
+            start_y = round(float(x0[1]) / height, 5)
+            x0 = [start_x, start_y]
+            path = [x0]+points_array
+            path_list.append(data_to_tensor(color, stroke_width, path, num_segments))
+        except:
+            logging.error("Unexpected paths from canvas")
+        count += 1
 
     logging.info(f"Returning list of paths: \n {path_list}")    
     
-    return path_list, width, height, resizeScaleFactor
+    return path_list, width, height, resizeScaleFactor, normaliseScaleFactor
 
 def save_data(time_str, draw_class):
     with open('results/'+time_str+'.txt', 'w') as f:

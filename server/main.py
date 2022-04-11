@@ -86,18 +86,10 @@ def classify_text_from_image(prompt: str):
     plot_image(top_image)
     return {"Hello": "{prompt}"}
 
-@app.get("/activate_clip_draw/")
-def activate_clip_draw():
-    prompts = ['A drawing of a red chair.']
-    neg_prompts = ['A badly drawn sketch.', 'Many ugly, messy drawings.']
-    clip_class.start_clip_draw(prompts, neg_prompts);
-    return {"Hello": "World"}
-
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     canvas_interface = Interface(websocket, clip_class)
     await websocket.accept()
-    
     try:
         while True:
             data = await websocket.receive_json()

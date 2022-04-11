@@ -115,7 +115,7 @@ class Clip_Class:
             noun_features = self.encode_text_classes(nouns)
         self.clip_draw_optimiser = Clip_Draw_Optimiser(self.model, noun_features)
 
-    def start_clip_draw(self, prompts, neg_prompts = []):
+    def start_clip_draw(self, prompts, region, neg_prompts = []):
         """Check if it's running and if it is, wait for it to stop before starting again."""
         self.clip_draw_optimiser.reset()
         
@@ -126,6 +126,10 @@ class Clip_Class:
             self.clip_draw_optimiser.set_text_features(prompt_features, neg_prompt_features)
         except:
             logging.error("Failed to encode text features in clip")
+        try:
+            self.clip_draw_optimiser.parse_svg(region)
+        except: 
+            logging.error("Couldn't parse data from sketch")
         try:
             return self.clip_draw_optimiser.activate()
         except:
