@@ -109,14 +109,12 @@ class Clip_Draw_Optimiser:
             self.drawing_area['y1'],
             ).to(device)
 
-        shapes_rnd, shape_groups_rnd = build_random_curves(
+        shapes_rnd, shape_groups_rnd = treebranch_initialization(
+            path_list,
             self.num_paths,
             self.render_canvas_w,
             self.render_canvas_h,
-            self.drawing_area['x0'],
-            self.drawing_area['x1'],
-            self.drawing_area['y0'],
-            self.drawing_area['y1'],
+            self.drawing_area
             )
 
         # Combine
