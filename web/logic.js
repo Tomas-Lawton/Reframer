@@ -81,7 +81,7 @@ penTool.onMouseUp = function(event) {
             });
             break;
         case "lasso":
-            startDrawing(true);
+            startDrawing(prompt.value === lastPrompt ? "redraw" : "draw", true);
             clipDrawing = true;
             break;
     }
@@ -262,12 +262,12 @@ const switchControls = () => {
     buttonControlLeft = !buttonControlLeft;
 };
 
-const startDrawing = (hasRegion = false) => {
+const startDrawing = (status, hasRegion = false) => {
     // userLayer.activate();
     firstLoad = true; //reset canvas
     let canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
     const request = {
-        status: "start",
+        status: status,
         data: {
             prompt: prompt.value,
             svg: paper.project.exportSVG({
@@ -285,6 +285,7 @@ const startDrawing = (hasRegion = false) => {
             },
         },
     };
+    lastPrompt = prompt.value;
     console.log(request);
     ws.send(JSON.stringify(request));
     startCollab.innerHTML = "STOP";
@@ -304,6 +305,15 @@ const deletePath = (event) => {
             selected.map((path) => path.remove());
         }
     }
+};
+
+const stopClip = () => {
+    ws.send(
+        JSON.stringify({
+            status: "stop",
+        })
+    );
+    startCollab.innerHTML = "REDRAW";
 };
 
 // switchControls();
