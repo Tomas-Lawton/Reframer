@@ -14,13 +14,12 @@ const penControls = document.getElementById("pen-controls");
 const selectControls = document.getElementById("select-controls");
 const message = document.getElementById("message");
 const startCollab = document.getElementById("draw");
+const palette = document.getElementById("palette");
 
 // Default draw settings
-let backgroundColor = "#FCFCFC";
-// let backgroundColor = "red";
-
-let strokeColor = "#402f95";
-let strokeWidth = 20;
+let strokeColor = "#181818";
+let strokeWidth = 12;
+let opacity = 0.99; //ink feel
 let penMode = "pen";
 let clipDrawing = false;
 let buttonControlLeft = true;
@@ -48,10 +47,7 @@ scope.setup(canvas);
 scope1.setup(canvas1);
 scope2.setup(canvas2);
 scope3.setup(canvas3);
-canvas.style.background = backgroundColor;
-// canvas1.style.background = backgroundColor;
-// canvas2.style.background = backgroundColor;
-// canvas3.style.background = backgroundColor;
+
 scope.activate();
 // scope1.activate();
 // scope2.activate();
@@ -73,6 +69,7 @@ penTool.onMouseDown = function(event) {
             var hitResult = paper.project.hitTest(event.point, {
                 segments: true,
                 stroke: true,
+                fill: true,
                 // tolerance: 5
             });
             if (!hitResult) {
@@ -91,6 +88,7 @@ penTool.onMouseDown = function(event) {
             myPath = new Path({
                 strokeColor: strokeColor,
                 strokeWidth: strokeWidth,
+                opacity: opacity,
                 strokeCap: "round",
                 strokeJoin: "round",
             });
@@ -241,6 +239,24 @@ eraseTool.onMouseUp = function(event) {
 };
 
 const toggleArtControls = () => {
+    // if (buttonControlLeft) {
+    //     let x = winodow.clientX + 30 + "px";
+    //     let y = winodow.clientY - 300 + "px";
+    //     artControls.style.top = y;
+    //     artControls.style.left = x;
+    // } else {
+    //     let x = winodow.clientX - 30 - artControls.offsetWidth + "px";
+    //     let y = winodow.clientY - 300 + "px";
+    //     artControls.style.top = y;
+    //     artControls.style.left = x;
+    // }
+
+    let rect = palette.getBoundingClientRect();
+    // artControls.style.right = `${window.innerWidth - rect.x}px`;
+    // artControls.style.top = `${rect.y + (rect.bottom - rect.top) / 2}px`;
+    artControls.style.right = `10px`;
+    artControls.style.top = `${rect.bottom + rect.y}px`;
+
     if (!artControls.style.display || artControls.style.display === "none") {
         artControls.style.display = "block";
     } else {
@@ -248,36 +264,70 @@ const toggleArtControls = () => {
     }
 };
 
+const noPrompt = () =>
+    prompt.value === "" ||
+    prompt.value === undefined ||
+    prompt.value === prompt.getAttribute("placeholder");
+
+// document.getElementById("delete").addEventListener("click", () => {
+//     modal.style.display = "block";
+// });
+// document.getElementById("cancel-modal").addEventListener("click", () => {
+//     modal.style.display = "none";
+// });
+// document.getElementById("modal-cross").addEventListener("click", () => {
+//     modal.style.display = "none";
+// });
+// document.getElementById("confirm-modal").addEventListener("click", () => {
+//     userLayer.clear();
+//     modal.style.display = "none";
+// });
+
+// let defaultClear = () => {
+//     userLayer.clear();
+//     modal.style.display = "none";
+// };
+
+const openModal = (data) => {
+    let cancel = () => (modal.style.display = "none");
+    let confirm = () => (modal.style.display = "none");
+    if (data.hasOwnProperty("cancelAction")) cancel = cancelAction();
+    if (data.hasOwnProperty("confirmAction")) confirm = confirmAction();
+    let close = () => cancel();
+
+    document.getElementById("modal-title").innerHTML = data.title;
+    document.getElementById("modal-message").innerHTML = data.message;
+
+    document.getElementById("cancel-modal").onclick = () => cancel();
+    document.getElementById("modal-cross").onclick = () => close();
+    document.getElementById("confirm-modal").onclick = () => confirm();
+    modal.style.display = "block";
+};
+
 // Drawing Controls
 document.querySelectorAll(".pen-mode").forEach((elem) => {
     elem.addEventListener("click", (e) => {
+        let lastPenMode = penMode;
         penMode = elem.id;
         switch (penMode) {
             case "erase":
                 paper.tools[1].activate();
                 break;
             case "pen":
-                toggleArtControls();
-                if (buttonControlLeft) {
-                    let x = e.clientX + 30 + "px";
-                    let y = e.clientY - 300 + "px";
-                    artControls.style.top = y;
-                    artControls.style.left = x;
-                } else {
-                    let x = e.clientX - 30 - artControls.offsetWidth + "px";
-                    let y = e.clientY - 300 + "px";
-                    artControls.style.top = y;
-                    artControls.style.left = x;
-                }
                 paper.tools[0].activate();
                 break;
             case "select":
-                toggleArtControls();
                 paper.tools[0].activate();
                 break;
             case "lasso":
                 paper.tools[0].activate();
-                // clipLayer.activate();
+                if (noPrompt()) {
+                    penMode = lastPenMode;
+                    openModal({
+                        title: "Add a prompt first!",
+                        message: "You need a prompt to generate sketches with the region tool.",
+                    });
+                }
                 break;
         }
 
@@ -288,14 +338,15 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
                 path.selected = false;
             });
         }
-        if (penMode !== "pen" && penMode !== "select") {
-            artControls.style.display = "none";
-        }
+        // if (penMode !== "pen" && penMode !== "select") {
+        //     artControls.style.display = "none";
+        // }
         if (penMode !== "lasso" && penMode !== "select") {
             drawRegion = undefined;
+            if (regionPath) regionPath.remove();
         }
         if (penMode !== "lasso") {
-            userLayer.activate();
+            // userLayer.activate();
         }
         console.log(penMode);
     });
@@ -353,22 +404,6 @@ ws.onmessage = function(event) {
     }
 };
 
-const deletePath = (event) => {
-    if (event.key == "Delete" || event.key == "Backspace") {
-        deletePath();
-        selected = getSelectedPaths();
-        if (selected.length > 0) {
-            pathList = selected.map((path) => path.exportJSON()); //dont use paper ref
-            console.log(pathList);
-            undoStack.push({
-                type: "delete-event",
-                data: pathList,
-            });
-            selected.map((path) => path.remove());
-        }
-    }
-};
-
 const switchControls = () => {
     if (buttonControlLeft) {
         console.log(window.innerWidth);
@@ -406,15 +441,29 @@ const startDrawing = (hasRegion = false) => {
     startCollab.innerHTML = "STOP";
 };
 
+const deletePath = (event) => {
+    if (event.key == "Delete" || event.key == "Backspace") {
+        deletePath();
+        selected = getSelectedPaths();
+        if (selected.length > 0) {
+            pathList = selected.map((path) => path.exportJSON()); //dont use paper ref
+            console.log(pathList);
+            undoStack.push({
+                type: "delete-event",
+                data: pathList,
+            });
+            selected.map((path) => path.remove());
+        }
+    }
+};
+
 document.body.addEventListener("keydown", function(event) {
     if (document.activeElement !== prompt) {
-        deletePath(event);
-        event.preventDefault();
+        deletePath(event.key);
     }
 });
 
-document.getElementById("send-prompt").addEventListener("submit", (e) => {
-    e.preventDefault();
+document.getElementById("draw").addEventListener("click", (e) => {
     if (!clipDrawing) {
         startDrawing(false);
     }
@@ -431,22 +480,9 @@ document.getElementById("send-prompt").addEventListener("submit", (e) => {
 document.getElementById("begin").addEventListener("click", () => {
     document.getElementById("sliding-overlay").style.bottom = "100%";
 });
-document.getElementById("delete").addEventListener("click", () => {
-    modal.style.display = "block";
-});
-document.getElementById("cancel-modal").addEventListener("click", () => {
-    modal.style.display = "none";
-});
-document.getElementById("modal-cross").addEventListener("click", () => {
-    modal.style.display = "none";
-});
-document.getElementById("confirm-modal").addEventListener("click", () => {
-    userLayer.clear();
-    modal.style.display = "none";
-});
-document.getElementById("switch-side").addEventListener("click", () => {
-    switchControls();
-});
+// document.getElementById("switch-side").addEventListener("click", () => {
+//     switchControls();
+// });
 document.getElementById("undo").addEventListener("click", () => {
     if (undoStack.length > 0) {
         const lastEvent = undoStack.pop();
@@ -526,30 +562,33 @@ document.getElementById("save").addEventListener("click", () => {
         }
     });
 });
-document.getElementById("time").addEventListener("click", () => {
-    showLastPaths = !showLastPaths;
-    setVisibilityHistory();
-});
+// document.getElementById("time").addEventListener("click", () => {
+//     showLastPaths = !showLastPaths;
+//     setVisibilityHistory();
+// });
 document.getElementById("width-slider").oninput = function() {
     strokeWidth = this.value;
 };
-document.getElementById("scale-slider").oninput = function() {
-    let newScale = this.value / 10;
-    let selected = getSelectedPaths();
-    for (child of selected) {
-        child.applyMatrix = false;
-        child.scaling = newScale;
-    }
-};
-document.getElementById("rotate-slider").oninput = function() {
-    let angle = this.value;
-    console.log(angle);
-    let selected = getSelectedPaths();
-    for (child of selected) {
-        // implement all of these methods for selecting shapes
-        // http://sketch.paperjs.org/#V/0.12.7/S/nVdtb9s2EP4rrArUEqqoibcMqL1gQNpuK9BhRZJtH+J8oCXKVkOTBknnZUH++46vImUl2WYggXk83tvz3JF+yBjekGyWnV8TVa+zMqt5o9c3WKB1p37fqo4ziU7Qw4ItlCSrDWFKzpASO1IakRL8mkSCtqM0WipOicCsBpXjBXucg4y1O1Zru6gR+PZXcpfflqguESvACYKPcQ4+GblFX7FaV2dktaNYfOX0fsVZbuS8Yyo/OjwsEfwrSvRDiW7ROzQt5tbIupKEklqR5gOnXIC5iYJA5BYLSGHitOz/GnZr9OoE7VhD2o6RBv0EghlaZK/Je/K+bReZO8B0XENVZlQhE3y/EyroritdXX0gCHR1fDx1kDZY4WrdrdYU/pTL/BfBd9vclUQHue5oA7HP0OUGX5NTDhHIfA2p6+UHLhgR/fqiU5TA6qoMBixUxvsMTV7jKZ627aTfv+lkt6QAVIupJFb8WCSFEkTtBENrED4mSMYh8BJJD6WmjhyWS0K5juc91qsk4yLaqa1J2L8MYSJeLU3uleLbL6RV5fjWma7l2N6SAys3T520u+aw3b1y8bhYqpaLT7he5z733G6UqCtQj9YYiWuF2QpQibSMYeAjAUicnXRTdn8DIrIXBkT0Z1XhpvmgiQFQzweQObBWo2A5+nAPlFN+PlrhhbNQr8jnvhNLQuADgwb3np5stsmS4vp6EsHvW8E0+wW5U3EwoZWgclHRag7VZGo23qXctGSkbpvir65R6xk6HFRQeVJYiCAankrSSqu9ItgR9FmRTV9pCFDCUKwoX+WL7NxoIK2yyEoXn/fPwwwD13qkBnk6MSrXui9oLUXHVhf8ZwElyvcRqynB4tw5zH24W8G/gSREoiMdaQKu+f+QwBBl+QeTz+X5Qk5mHg3Z7ePC4P+GfMH3RMTV8mcGpOQ3wPw7EhFf82ypRQbdQQx+5l4eXYXvzr85c3l4VW257Izxk73JlKgePalqhk2iOx3X7SdXov3dc9re+H4hXHfGhVDPFmF69R/6IvWHm287qYZDp2tz500qrADqE7hGITSg6SKL2bQXU5KvX3iKIALYo+eOh5QAPxt4lENEypgv3rpLzcx3cncEB/0zZgoPEdCKqa81jPMSha99HMXcW3IvqxJtYfjOrUw717M4YrPBiHPq5uIFfM2tES2tNh372EEp4bkFGkeH/Q5nv/GdJB/5rS5Z6FpyA06L5HEH21vrlO0o1RaUewyeEbmjZt+1HsguiFTWCqDQ6QT6V6MJTHUtyl+F04VxZQZEOm2M7kLZSWoWj/Z03nt+86YPo1L3W0cYfRFYuljLLvxetYOhE5tEL9t0xQCzaGh3dCACkVwGfRl7u07mNCAnW7ENb7q2028KfWkJTm0OvbekNyAqweGraQ5nqqf6s8cIvCLiY6liaAAj8n1MOSN5PKAH1mtMySmW2kOEPzpIrfhpYIIdvx2CzaLHKKL+PjoTDfgkkMvr+uKNXQz9KykhhWfdWNH8GAqwhptca/uT6TX3mXUKfboxxCmHUIT0HvfbUuDVeFuOFatMp8WeC10Uz0Kg915yKSUKzx57EcZUiNgR8cCMK41+inwld0v4gVWrPMG+qChhK0Dy3Rh53ObAuqJ/Ev1KTC/TJx1sAM5uS+9zY7YYGFuKxFh0Kf5PgzB4T32Z9BDuX8o27rcoMVe6CAbiYu5t9tajzrG2T4e1T67RnoduDMBgeRH3MEGiwWZ+afmbfLR9k4ICbrak7syBowHFUpmX+rBg/HZUfzuiawqpkzdnKrs88D7tOjoCGVuVH9Fh/F4I1TT5kvzg++MYxv0XwvDAQP/fI4CM8Mn6h8eN7zqjFV4zb31LNYQq7GbMUy71JMnKbCkIvja1lNns8urxHw==
-    }
-};
+// document.getElementById("scale-slider").oninput = function() {
+//     let newScale = this.value / 10;
+//     let selected = getSelectedPaths();
+//     for (child of selected) {
+//         child.applyMatrix = false;
+//         child.scaling = newScale;
+//     }
+// };
+// document.getElementById("rotate-slider").oninput = function() {
+//     let angle = this.value;
+//     console.log(angle);
+//     let selected = getSelectedPaths();
+//     for (child of selected) {
+//         // implement all of these methods for selecting shapes
+//         // http://sketch.paperjs.org/#V/0.12.7/S/nVdtb9s2EP4rrArUEqqoibcMqL1gQNpuK9BhRZJtH+J8oCXKVkOTBknnZUH++46vImUl2WYggXk83tvz3JF+yBjekGyWnV8TVa+zMqt5o9c3WKB1p37fqo4ziU7Qw4ItlCSrDWFKzpASO1IakRL8mkSCtqM0WipOicCsBpXjBXucg4y1O1Zru6gR+PZXcpfflqguESvACYKPcQ4+GblFX7FaV2dktaNYfOX0fsVZbuS8Yyo/OjwsEfwrSvRDiW7ROzQt5tbIupKEklqR5gOnXIC5iYJA5BYLSGHitOz/GnZr9OoE7VhD2o6RBv0EghlaZK/Je/K+bReZO8B0XENVZlQhE3y/EyroritdXX0gCHR1fDx1kDZY4WrdrdYU/pTL/BfBd9vclUQHue5oA7HP0OUGX5NTDhHIfA2p6+UHLhgR/fqiU5TA6qoMBixUxvsMTV7jKZ627aTfv+lkt6QAVIupJFb8WCSFEkTtBENrED4mSMYh8BJJD6WmjhyWS0K5juc91qsk4yLaqa1J2L8MYSJeLU3uleLbL6RV5fjWma7l2N6SAys3T520u+aw3b1y8bhYqpaLT7he5z733G6UqCtQj9YYiWuF2QpQibSMYeAjAUicnXRTdn8DIrIXBkT0Z1XhpvmgiQFQzweQObBWo2A5+nAPlFN+PlrhhbNQr8jnvhNLQuADgwb3np5stsmS4vp6EsHvW8E0+wW5U3EwoZWgclHRag7VZGo23qXctGSkbpvir65R6xk6HFRQeVJYiCAankrSSqu9ItgR9FmRTV9pCFDCUKwoX+WL7NxoIK2yyEoXn/fPwwwD13qkBnk6MSrXui9oLUXHVhf8ZwElyvcRqynB4tw5zH24W8G/gSREoiMdaQKu+f+QwBBl+QeTz+X5Qk5mHg3Z7ePC4P+GfMH3RMTV8mcGpOQ3wPw7EhFf82ypRQbdQQx+5l4eXYXvzr85c3l4VW257Izxk73JlKgePalqhk2iOx3X7SdXov3dc9re+H4hXHfGhVDPFmF69R/6IvWHm287qYZDp2tz500qrADqE7hGITSg6SKL2bQXU5KvX3iKIALYo+eOh5QAPxt4lENEypgv3rpLzcx3cncEB/0zZgoPEdCKqa81jPMSha99HMXcW3IvqxJtYfjOrUw717M4YrPBiHPq5uIFfM2tES2tNh372EEp4bkFGkeH/Q5nv/GdJB/5rS5Z6FpyA06L5HEH21vrlO0o1RaUewyeEbmjZt+1HsguiFTWCqDQ6QT6V6MJTHUtyl+F04VxZQZEOm2M7kLZSWoWj/Z03nt+86YPo1L3W0cYfRFYuljLLvxetYOhE5tEL9t0xQCzaGh3dCACkVwGfRl7u07mNCAnW7ENb7q2028KfWkJTm0OvbekNyAqweGraQ5nqqf6s8cIvCLiY6liaAAj8n1MOSN5PKAH1mtMySmW2kOEPzpIrfhpYIIdvx2CzaLHKKL+PjoTDfgkkMvr+uKNXQz9KykhhWfdWNH8GAqwhptca/uT6TX3mXUKfboxxCmHUIT0HvfbUuDVeFuOFatMp8WeC10Uz0Kg915yKSUKzx57EcZUiNgR8cCMK41+inwld0v4gVWrPMG+qChhK0Dy3Rh53ObAuqJ/Ev1KTC/TJx1sAM5uS+9zY7YYGFuKxFh0Kf5PgzB4T32Z9BDuX8o27rcoMVe6CAbiYu5t9tajzrG2T4e1T67RnoduDMBgeRH3MEGiwWZ+afmbfLR9k4ICbrak7syBowHFUpmX+rBg/HZUfzuiawqpkzdnKrs88D7tOjoCGVuVH9Fh/F4I1TT5kvzg++MYxv0XwvDAQP/fI4CM8Mn6h8eN7zqjFV4zb31LNYQq7GbMUy71JMnKbCkIvja1lNns8urxHw==
+//     }
+// };
+palette.addEventListener("click", () => {
+    toggleArtControls();
+});
 const picker = new Picker({
     parent: document.getElementById("color-picker"),
     popup: false,
@@ -558,7 +597,7 @@ const picker = new Picker({
     editor: false,
     editorFormat: "hex", // or 'rgb', 'hsl'
 });
-picker.setColor("#402f95");
+picker.setColor(strokeColor);
 picker.onChange = (color) => {
     strokeColor = color.rgbaString;
 };

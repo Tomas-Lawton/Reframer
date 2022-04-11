@@ -89,7 +89,6 @@ class Clip_Draw_Optimiser:
                         'y0': bottomY,
                         'y1': topY
                     }
-                    print(self.drawing_area)
             else:
                 path_list = parse_local_svg('data/drawing_flower_vase.svg')
         except:
