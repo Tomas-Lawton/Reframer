@@ -158,4 +158,3 @@ class Clip_Class:
         prompt_features = self.encode_text_classes(prompts)
         neg_prompt_features = self.encode_text_classes(neg_prompts)
         self.clip_draw_optimiser.set_text_features(prompt_features, neg_prompt_features)
-        return self.clip_draw_optimiser.activate()
