@@ -12,22 +12,28 @@
     <script type="text/javascript" src="https://cdn.rawgit.com/paperjs/paper.js/6feff32254b6ba077d1e56d0ecf3f40be5ca594a/dist/paper-full.js"></script>
     <script type="text/javascript" src="offset.js"></script>
 
-    <script src="main.js" type="text/javascript" defer></script>
+    <script src="setup.js" type="text/javascript" defer></script>
+    <script src="logic.js" type="text/javascript" defer></script>
+    <script src="interface.js" type="text/javascript" defer></script>
 </head>
 
 <body>
     <div id="modal">
         <div id="simple-modal">
             <div id="modal-status">
-                <h2 id="modal-status">Clearing Canvas</h2>
+                <h2 id="modal-title"></h2>
                 <i id="modal-cross" class="fa-solid fa-xmark"></i>
             </div>
-            <p>Are you sure you want to delete your drawing? :(</p>
+            <p id="modal-message"></p>
             <div id="action">
                 <button id="cancel-modal">Cancel</button>
                 <button id="confirm-modal" confirm-cancel right-button>Confirm</button>
             </div>
         </div>
+    </div>
+
+    <div id="art-dot">
+        <i class="fa-solid fa-palette fa-fw" id="palette"></i>
     </div>
 
     <div id="sliding-overlay">
@@ -39,13 +45,17 @@
 
     <div id="clip-wrap">
         <div id="control-panel">
-            <!-- <h2 id="message">Lets draw a...</h2> -->
-            <form id="send-prompt">
-                <input type="text" id="messageText" />
-                <button id="draw" right-button confirm-action>DRAW</button>
-                <button id="draw" right-button>Continue</button>
-            </form>
-            <input type="range" id="time-slider" value="20" min="1" max="40">
+            <div id="send-prompt">
+                <input type="text" id="messageText" placeholder="What are we drawing?" />
+                <div id="control-actions">
+                    <button id="draw">DRAW</button>
+                    <button id="continue">Continue</button>
+                    <button id="region-select" confirm-action>
+                        <i class="fa-solid fa-square fa-fw pen-mode" id="lasso"></i>
+                    </button>
+                </div>
+            </div>
+            <input type="range" id="time-slider" value="40" min="1" max="40">
         </div>
     </div>
 
@@ -53,27 +63,26 @@
         <div id="color-picker"></div>
         <div id="width-input">
             <label>Width</label>
-            <input type="range" id="width-slider" value="20" min="1" max="40">
+            <input type="range" id="width-slider" value="12" min="1" max="40">
         </div>
-        <div id="scale-input">
+        <!-- <div id="scale-input">
             <label>Scale</label>
             <input type="range" id="scale-slider" value="15" min="1" max="30">
         </div>
         <div id="rotate-input">
             <label>Rotate</label>
             <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
-        </div>
+        </div> -->
     </div>
 
     <div id="button-panel">
         <i class="fa-solid fa-pen fa-fw pen-mode" id="pen"></i>
         <i class="fa-solid fa-arrow-pointer fa-fw pen-mode" id="select"></i>
-        <i class="fa-solid fa-square fa-fw pen-mode" id="lasso"></i>
         <i class="fa-solid fa-eraser fa-fw pen-mode" id="erase"></i>
         <i class="fa-solid fa-clock-rotate-left fa-fw" id="undo"></i>
         <i class="fa-solid fa-rotate-right fa-fw" id="redo"></i>
-        <i class="fa-solid fa-robot fa-fw" id="time"></i>
-        <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i>
+        <!-- <i class="fa-solid fa-robot fa-fw" id="time"></i> -->
+        <!-- <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i> -->
         <i class="fa-solid fa-save fa-fw" id="save"></i>
         <i class="fa-solid fa-trash fa-fw" id="delete"></i>
     </div>
@@ -83,7 +92,7 @@
         <div id="contain-canvas">
             <canvas id="canvas" resize></canvas>
         </div>
-        <div id="multiple-canvas">
+        <!-- <div id="multiple-canvas">
             <div class="mini-canvas">
                 <div>
                     <canvas id="canvas1"></canvas>
@@ -99,8 +108,7 @@
                     <canvas id="canvas3"></canvas>
                 </div>
             </div>
-        </div>
-
+        </div> -->
 </body>
 
 </html>

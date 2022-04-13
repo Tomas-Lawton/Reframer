@@ -137,73 +137,24 @@ class Clip_Class:
             noun_features = self.encode_text_classes(nouns)
         self.clip_draw_optimiser = Clip_Draw_Optimiser(self.model, noun_features)
 
-    def start_clip_draw(self, prompts, region, neg_prompts=[]):
-        """Check if it's running and if it is, wait for it to stop before starting again."""
+    def setup_draw(self, prompts, region, neg_prompts=[]):
+        """Use current paths with the given (possibly different) prompt to generate options"""
         self.clip_draw_optimiser.reset()
-
         logging.info("Starting clip drawer")
         prompt_features = self.encode_text_classes(prompts)
         neg_prompt_features = self.encode_text_classes(neg_prompts)
-        try:
-            self.clip_draw_optimiser.set_text_features(
-                prompt_features, neg_prompt_features
-            )
-        except:
-            logging.error("Failed to encode text features in clip")
-        try:
-            self.clip_draw_optimiser.parse_svg(region)
-        except:
-            logging.error("Couldn't parse data from sketch")
-        try:
-            return self.clip_draw_optimiser.activate()
-        except:
-            logging.error("Failed to activate clip draw")
+        self.clip_draw_optimiser.set_text_features(prompt_features, neg_prompt_features)
+        self.clip_draw_optimiser.parse_svg(region)
+        return self.clip_draw_optimiser.activate()
 
-    def restart_last_drawer(self):
-        """Use old classes to guide image"""
-        self.clip_draw_optimiser.activate()
+    def setup_redraw(self):
+        """Use original paths with origional prompt to try new options from same settings"""
+        logging.info("Starting redraw")
+        return self.clip_draw_optimiser.activate()
 
-
-# TO DO
-# It is possible to chain results by feeding the output(s) of one encoder to the other or by looping.
-# MAKE SURE CLIP IS SET TO ZERO SHOT
-class Image_Classifier:
-    """Returns an image that best matches a prompt / Classifies image from prompt"""
-
-    def __init__(self, mode):
-        self.image_mode = mode  # use argument to determine how image is created
-        return
-
-    def get_image_name_from_directory(self):
-        return
-
-    def get_similar_classes_from_image(self):
-        return
-
-    def get_similar_images_image(self):
-        return
-
-    def use_unprocessed_images(self):
-        return
-
-    def use_gan_image(self):
-        return
-
-    def use_bezier_curves(self):
-        return
-
-
-class Text_Classifier:
-    """Returns the class(s) (+ full prompt?) that best matches an input image / Classifies text from image"""
-
-    def __init__(self):
-        return
-
-    def get_class_from_input_image(self):
-        return
-
-    def get_similar_classes_from_image(self):
-        return
-
-    def get_similar_images_image(self):
-        return
+    def setup_continue(self, prompts, neg_prompts=[]):
+        """Use origional paths with origional prompt to try new options from same settings"""
+        logging.info("Continuing with new prompt(s)")
+        prompt_features = self.encode_text_classes(prompts)
+        neg_prompt_features = self.encode_text_classes(neg_prompts)
+        self.clip_draw_optimiser.set_text_features(prompt_features, neg_prompt_features)

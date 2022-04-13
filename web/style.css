@@ -2,6 +2,9 @@
 * {
     margin: 0;
     font-family: "Poppins", sans-serif;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0) !important;
+    -webkit-focus-ring-color: rgba(255, 255, 255, 0) !important;
+    outline: none !important;
 }
 
 button {
@@ -20,11 +23,18 @@ body {
 
 canvas {
     display: block;
+    background-color: #fcfcfc;
+    /* background-color: #00e21a; */
 }
 
+
+/* 
 canvas[resize] {
-    /* height: 100vh;
-    width: 100vw; */
+    height: 100vh;
+    width: 100vh;
+} */
+
+canvas[resize] {
     height: 100vh;
     width: 100vh;
 }
@@ -44,7 +54,6 @@ canvas[resize] {
 }
 
 .mini-canvas div canvas {
-    background-color: #ea81ff73;
     outline: 1px solid rgb(197, 197, 197);
     position: absolute;
     top: 0;
@@ -146,7 +155,7 @@ button[confirm-action] {
 }
 
 button[confirm-action]:hover {
-    background-color: #3caeff;
+    background-color: #3cff69;
 }
 
 button[right-button] {
@@ -154,16 +163,19 @@ button[right-button] {
 }
 
 #control-panel {
-    height: 55px;
+    height: 25px;
     width: 550px;
-    padding: 30px 130px 40px 130px;
+    margin-bottom: 10px;
+    /* padding: 5px 130px 300px 130px; */
     background-color: #ffffff;
     clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
+    padding: 10px 100px 45px 100px;
 }
 
-#message {
+
+/* #message {
     text-align: center;
-}
+} */
 
 #clip-wrap {
     filter: drop-shadow(0 5px 10px rgba(129, 129, 129, 0.19)) drop-shadow(0 3px 3px rgba(146, 146, 146, 0.23));
@@ -182,13 +194,21 @@ button[right-button] {
 #art-controls {
     position: absolute;
     z-index: 10;
-    background-color: rgba(255, 255, 255, 0.716);
+    /* background-color: rgba(255, 255, 255, 0.716); */
+    background-color: rgb(255, 255, 255);
+    border-radius: 0.5em;
     display: flex;
     flex-direction: column;
     justify-content: center;
     padding: 30px;
-    box-shadow: 0 5px 10px rgba(129, 129, 129, 0.19), 0 3px 3px rgba(146, 146, 146, 0.23);
+    box-shadow: 0 5px 10px rgba(198, 198, 198, 0.19), 0 3px 3px rgba(201, 201, 201, 0.23);
     display: none;
+}
+
+#drawregion-container {
+    /* height: 100%; */
+    width: 30px;
+    height: 30px;
 }
 
 input {
@@ -213,13 +233,11 @@ input {
 
 #button-panel {
     position: absolute;
-    /* left: 0; */
     z-index: 10;
     background-color: rgba(255, 255, 255, 0.881);
     display: flex;
     flex-direction: column-reverse;
     padding: 5px;
-    /* top: 0; */
     top: 50%;
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
@@ -233,10 +251,23 @@ input {
 
 #send-prompt {
     display: flex;
+    margin-bottom: 0;
+}
+
+#control-actions {
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+#control-actions button {
+    margin-left: 10px;
 }
 
 #send-prompt input {
     width: 100%;
+    border-radius: 5px;
+    padding: 10px 10px 7px 10px;
 }
 
 #button-panel .fa-solid {
@@ -249,6 +280,7 @@ input {
 
 #button-panel .fa-solid:hover {
     background-color: #59cdff;
+    color: white;
 }
 
 #button-panel .fa-solid .active {
@@ -261,6 +293,44 @@ input {
 
 #button-panel #delete:hover {
     background-color: #f86433;
+}
+
+#art-dot {
+    height: 54px;
+    width: 54px;
+    border-radius: 50%;
+    display: inline-block;
+    background-color: #59cdff;
+    position: absolute;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    padding: 5px;
+    margin: 7px;
+    box-shadow: 0 5px 10px rgba(129, 129, 129, 0.19), 0 3px 3px rgba(146, 146, 146, 0.23);
+}
+
+#palette {
+    color: white;
+    margin-top: 5px;
+    margin-left: 3px;
+    border-radius: 0.2em;
+    padding: 0.4em;
+    font-size: 1.5em;
+    transition: 0.5s;
+}
+
+.layout_default.picker_wrapper {
+    padding: 0;
+    font-size: 1em;
+}
+
+.picker_wrapper {
+    box-shadow: none;
+}
+
+.picker_slider .picker_selector {
+    border-radius: 50px;
 }
 
 
