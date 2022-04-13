@@ -1,8 +1,10 @@
 import matplotlib
-matplotlib.use('agg') # non interactive with fast api
+
+matplotlib.use('agg')  # non interactive with fast api
 
 from matplotlib import pyplot as plt
 import numpy as np
+
 
 def plot_image(image):
     plt.figure(figsize=(20, 14))
@@ -10,7 +12,8 @@ def plot_image(image):
     plt.title("High cosine similarity image", size=20)
     plt.savefig('plot/text_classify.png')
 
-def plot_cosines(clip_model): # change to just model
+
+def plot_cosines(clip_model):  # change to just model
     similarity = clip_model.similarity
     images = clip_model.unprocessed_images
     classes = clip_model.classes
@@ -36,6 +39,7 @@ def plot_cosines(clip_model): # change to just model
 
     plt.title("Cosine similarity between text and image features", size=20)
     plt.savefig('plot/my_plot.png')
+
 
 def plot_zero_shot_images(clip_model):
     top_probs, top_labels = clip_model.similarity.cpu().topk(5, dim=-1)
