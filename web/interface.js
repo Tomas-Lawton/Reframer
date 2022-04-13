@@ -181,10 +181,9 @@ document.getElementById("save").addEventListener("click", () => {
         }
     });
 });
-// document.getElementById("time").addEventListener("click", () => {
-//     showLastPaths = !showLastPaths;
-//     setVisibilityHistory();
-// });
+document.getElementById("time").addEventListener("click", () => {
+    showTraces = !showTraces;
+});
 document.getElementById("width-slider").oninput = function() {
     strokeWidth = this.value;
 };
@@ -206,12 +205,22 @@ document.getElementById("width-slider").oninput = function() {
 //     }
 // };
 
+setTraces.oninput = function() {
+    // rerender the traces
+    userLayer.clear();
+    showTraceHistoryFrom(timeKeeper.value);
+};
+
 timeKeeper.oninput = function() {
-    if (this.value === 0) return; // 0 is pre-generated state
+    if (this.value === 0) return; // 0 is pre-generation state
     historyIndex = this.value;
     userLayer.clear();
-    let svg = historyHolder[historyIndex].svg;
-    parseFromSvg(svg);
+    if (showTraces) {
+        showTraceHistoryFrom(historyIndex);
+    } else {
+        let svg = historyHolder[historyIndex].svg;
+        parseFromSvg(svg);
+    }
 };
 
 prompt.addEventListener("input", (e) => {

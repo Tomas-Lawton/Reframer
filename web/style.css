@@ -366,3 +366,11 @@ input {
     margin-bottom: 20px;
     pointer-events: auto;
 } */
+
+#rolling-loss {
+    position: absolute;
+    left: 8px;
+    z-index: 10;
+    bottom: 8px;
+    color: #707070;
+}

@@ -51,7 +51,7 @@ class Interface:
         async with aiofiles.open("results/output.svg", "r") as f:
             svg = await f.read()
         result = {"status": "draw", "svg": svg, "iterations": i, "loss": loss}
-        self.last_result = result # won't get to client unless continued
+        self.last_result = result  # won't get to client unless continued
         await self.socket.send_json(result)
         logging.info(f"Optimisation {i} complete")
 
@@ -59,7 +59,6 @@ class Interface:
         logging.info("Stopping...")
         self.is_running = False
         await self.socket.send_json({"status": "stop"})
-
 
         # if self.clip_draw_optimiser.is_active:
         #     self.clip_draw_optimiser.stop_drawing()

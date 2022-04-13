@@ -53,6 +53,12 @@
                     <button id="region-select" confirm-action>
                         <i class="fa-solid fa-square fa-fw pen-mode" id="lasso"></i>
                     </button>
+                    <button confirm-action>
+                        <i class="fa-solid fa-grip-lines fa-fw" id="time"></i>
+                    </button>
+                    <div>
+                        <input id="num-traces" type="number" min="1" value="1">
+                    </div>
                 </div>
             </div>
             <input type="range" id="time-slider" value="0" min="0" max="0">
@@ -81,7 +87,6 @@
         <i class="fa-solid fa-eraser fa-fw pen-mode" id="erase"></i>
         <i class="fa-solid fa-clock-rotate-left fa-fw" id="undo"></i>
         <i class="fa-solid fa-rotate-right fa-fw" id="redo"></i>
-        <!-- <i class="fa-solid fa-robot fa-fw" id="time"></i> -->
         <!-- <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i> -->
         <i class="fa-solid fa-save fa-fw" id="save"></i>
         <i class="fa-solid fa-trash fa-fw" id="delete"></i>
@@ -109,6 +114,8 @@
                 </div>
             </div>
         </div> -->
+
+        <p id="rolling-loss"></p>
 </body>
 
 </html>

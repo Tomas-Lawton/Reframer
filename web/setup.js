@@ -17,6 +17,8 @@ const drawButton = document.getElementById("draw");
 const continueButton = document.getElementById("continue");
 const palette = document.getElementById("palette");
 const timeKeeper = document.getElementById("time-slider");
+const lossText = document.getElementById("rolling-loss");
+const setTraces = document.getElementById("num-traces");
 
 // Default draw settings
 let strokeColor = "#181818";
@@ -25,7 +27,7 @@ let opacity = 0.99; //ink feel
 let penMode = "pen";
 let clipDrawing = false;
 let buttonControlLeft = true;
-let showLastPaths = true;
+let showTraces = true;
 let step = 1;
 let myPath,
     regionPath,
@@ -37,7 +39,8 @@ let myPath,
     tmpGroup,
     mask,
     isFirstIteration,
-    lastLoss;
+    lastRollingLoss,
+    traces;
 let undoStack = [];
 let redoStack = [];
 let historyHolder = [];

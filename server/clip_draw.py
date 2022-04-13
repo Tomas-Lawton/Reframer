@@ -143,10 +143,13 @@ class Clip_Draw_Optimiser:
             )
 
         shapes, shape_groups = render_save_img(
-            self.path_list, self.render_canvas_w, self.render_canvas_h)
-        
+            self.path_list, self.render_canvas_w, self.render_canvas_h
+        )
+
         # breaks when no user paths
-        initialise_user_gradients(self.render_canvas_w, self.render_canvas_h, shapes, shape_groups)
+        initialise_user_gradients(
+            self.render_canvas_w, self.render_canvas_h, shapes, shape_groups
+        )
         (
             self.points_vars0,
             self.stroke_width_vars0,
@@ -175,10 +178,12 @@ class Clip_Draw_Optimiser:
         self.shapes = shapes + shapes_rnd
         self.shape_groups = add_shape_groups(shape_groups, shape_groups_rnd)
 
-        self.points_vars, self.stroke_width_vars, self.color_vars = initialise_gradients(
-            self.shapes, self.shape_groups
-        )
-        
+        (
+            self.points_vars,
+            self.stroke_width_vars,
+            self.color_vars,
+        ) = initialise_gradients(self.shapes, self.shape_groups)
+
         scene_args = pydiffvg.RenderFunction.serialize_scene(
             self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups
         )

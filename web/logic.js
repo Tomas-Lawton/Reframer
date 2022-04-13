@@ -327,34 +327,45 @@ const parseFromSvg = (svg) => {
     return paperObject;
 };
 
-const drawingComplete = () => {};
-
-const getLastFiveGens = (latestElem = historyHolder.length) => {};
+const getHistoryBatch = (maxSize, startIdx) => {
+    let len = historyHolder.length;
+    if (len <= 1) return null;
+    let lossList = [];
+    let batchSize = Math.min(maxSize, startIdx); // not first item
+    for (let i = 0; i < batchSize; i++) {
+        lossList.push(historyHolder[startIdx - i]);
+    }
+    return lossList;
+};
 
 // update because loss varies a lot??
 const calcRollingLoss = () => {
-    let len = historyHolder.length;
-    if (len === 1) return;
-
-    let lossList = [];
-    let batchSize = Math.min(len, 5) - 1;
-    for (let i = 0; i < batchSize; i++) {
-        lossList.push(historyHolder[len - i - 1]);
-    }
-    const sum = lossList.reduce(
-        (partialSum, historyItem) => partialSum + historyItem.loss,
-        0
-    );
-    const avg = sum / lossList.length;
-    console.log(avg);
-
-    if (lastLoss !== undefined) {
-        if (Math.abs(lastLoss - avg) < 0.0005) {
-            console.log("stopping");
-            stopClip();
+    const items = getHistoryBatch(setTraces.value, historyHolder.length - 1);
+    console.log(items);
+    if (items) {
+        const sum = items.reduce(
+            (partialSum, historyItem) => partialSum + historyItem.loss,
+            0
+        );
+        const newRollingLoss = sum / items.length;
+        lossText.innerHTML = `Rolling loss: ${newRollingLoss}`;
+        if (lastRollingLoss !== undefined) {
+            if (Math.abs(lastRollingLoss - newRollingLoss) < 0.0005) {
+                lossText.innerHTML = `Converged at: ${newRollingLoss}`;
+                stopClip();
+            }
         }
+        lastRollingLoss = newRollingLoss;
     }
-    lastLoss = avg;
+};
+
+const showTraceHistoryFrom = (fromIndex) => {
+    const items = getHistoryBatch(setTraces.value, fromIndex);
+    let refList = [];
+    for (let pastGen of items) {
+        refList.push(parseFromSvg(pastGen.svg));
+    }
+    traces = refList;
 };
 
 ws.onmessage = function(event) {
@@ -368,33 +379,36 @@ ws.onmessage = function(event) {
         }
 
         if (result.status === "draw") {
-            if (lastRender) {
-                //remove ref
-                lastRender.remove();
-            }
             if (isFirstIteration) {
-                //remove user drawn lines
                 userLayer.clear();
                 isFirstIteration = false;
+            } else {
+                // Delete ref to last gen and old traces
+                if (lastRender) {
+                    lastRender.remove();
+                }
+                if (traces) {
+                    for (const trace of traces) {
+                        trace.remove();
+                    }
+                }
             }
-
             historyHolder.push(result);
-            step += 1; //avoid disconnect iteration
+            step += 1; //avoid disconnected iteration after stopping
             timeKeeper.style.width = "100%";
             timeKeeper.setAttribute("max", String(step));
             timeKeeper.value = String(step);
+            setTraces.setAttribute("max", String(step));
 
-            let loadedSvg = parseFromSvg(result.svg);
-            if (loadedSvg) {
-                lastRender = loadedSvg;
+            // draw and save current
+            lastRender = parseFromSvg(result.svg);
+            // draw and save traces
+            if (showTraces) {
+                setTraces.value = String(step);
+                showTraceHistoryFrom(historyHolder.length - 1);
             }
 
             calcRollingLoss();
-            // if iterations
-
-            // if (!showLastPaths) {
-            //     lastRender = loadedSvg;
-            // }
             console.log(
                 `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`
             );
