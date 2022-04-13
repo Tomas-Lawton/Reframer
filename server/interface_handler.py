@@ -9,7 +9,7 @@ class Interface:
         self.is_running = False
         self.clip_class = clip_instance
         logging.info("Interface connected")
-    
+
     # draw
     async def draw_update(self, data):
         logging.info("Updating...")
@@ -44,13 +44,9 @@ class Interface:
         i, loss = self.clip_class.clip_draw_optimiser.run_iteration()
         async with aiofiles.open("results/output.svg", "r") as f:
             svg = await f.read()
-        await self.socket.send_json({
-            "svg": svg,
-            "iterations": i,
-            "loss": loss
-        }) 
-        logging.info(f"Optimisation {i} complete")    
-    
+        await self.socket.send_json({"svg": svg, "iterations": i, "loss": loss})
+        logging.info(f"Optimisation {i} complete")
+
     async def stop(self):
         logging.info("Stopping...")
         self.is_running = False

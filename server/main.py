@@ -112,7 +112,7 @@ async def websocket_endpoint(websocket: WebSocket):
             data = await websocket.receive_json()
 
             def run_loop():
-                canvas_interface.is_running = True #for loop to continue
+                canvas_interface.is_running = True  # for loop to continue
                 loop = asyncio.get_running_loop()
                 loop.run_in_executor(None, lambda: asyncio.run(loop_optimisation()))
 
@@ -120,7 +120,6 @@ async def websocket_endpoint(websocket: WebSocket):
                 while canvas_interface.is_running:
                     await canvas_interface.run()
 
-<<<<<<< HEAD
             # refactor to sinlge update.
             if data["status"] == "draw":
                 await canvas_interface.draw_update(data)
@@ -133,16 +132,7 @@ async def websocket_endpoint(websocket: WebSocket):
             if data["status"] == "continue":
                 await canvas_interface.continue_update(data)
                 run_loop()
-            
-=======
-            if data["status"] == "start":
-                await canvas_interface.update(data)
-                if not canvas_interface.is_running:
-                    canvas_interface.is_running = True
-                loop = asyncio.get_running_loop()
-                loop.run_in_executor(None, lambda: asyncio.run(loop_optimisation()))
 
->>>>>>> master
             if data["status"] == "stop":
                 await canvas_interface.stop()
 
