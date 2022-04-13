@@ -103,6 +103,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 while canvas_interface.is_running:
                     await canvas_interface.run()
 
+            # refactor to sinlge update.
             if data["status"] == "draw":
                 await canvas_interface.draw_update(data)
                 run_loop()

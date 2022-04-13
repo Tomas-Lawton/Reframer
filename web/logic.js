@@ -336,10 +336,10 @@ ws.onmessage = function(event) {
                 path.smooth();
             });
         }
-        if (!showLastPaths) {
-            lastRender = loadedSvg;
-        }
-        // lastRender = loadedSvg;
+        // if (!showLastPaths) {
+        //     lastRender = loadedSvg;
+        // }
+        lastRender = loadedSvg;
 
         console.log(`Draw iteration: ${iterations} \nLoss value: ${loss}`);
     }
