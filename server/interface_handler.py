@@ -2,7 +2,8 @@ import logging
 import aiofiles
 import asyncio
 
-class Interface():
+
+class Interface:
     def __init__(self, websocket, clip_instance):
         self.socket = websocket
         self.is_running = False
@@ -36,7 +37,7 @@ class Interface():
             self.clip_class.setup_continue(prompt)
         except:
             logging.error("Failed to start clip draw")
-    
+
     async def run(self):
         logging.info("Running iteration...")
         svg = ''

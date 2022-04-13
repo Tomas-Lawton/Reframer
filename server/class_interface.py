@@ -7,13 +7,19 @@ from clip_util import load_model_defaults, run_preprocess, get_noun_data
 from clip_draw import Clip_Draw_Optimiser
 
 import logging
+
+
 class Clip_Class:
     """Init clip, then configure the classifier type, then set the required img/class/prompt parameters"""
+
     __instance = None
+
     def __init__(self):
-        if Clip_Class.__instance != None:  # Should this all be refactored to not be a "class instance" since it is only used once?
+        if (
+            Clip_Class.__instance != None
+        ):  # Should this all be refactored to not be a "class instance" since it is only used once?
             raise Exception("Clip is already instantiated.")
-        
+
         device, model, preprocess = load_model_defaults()
         self.device = device
         self.model = model
@@ -21,7 +27,7 @@ class Clip_Class:
 
         run_preprocess(preprocess)
         logging.info("Model ready")
-        Clip_Class.__instance == self 
+        Clip_Class.__instance == self
 
     def set_image_descriptions(self, description_map):
         """Ensure every description has an image whose name matches the description list"""
@@ -35,7 +41,7 @@ class Clip_Class:
         self.unprocessed_images = unprocessed_images
 
     def set_processed_images(self, processed_images):
-        self.images_rgb = processed_images # as tensors
+        self.images_rgb = processed_images  # as tensors
 
     def prepare_single_image(self, image_path):
         """Zero shot always uses all classes"""
@@ -44,17 +50,23 @@ class Clip_Class:
         self.set_unprocessed_images([image])
         self.set_processed_images([self.preprocess(image)])
 
-    def prepare_images(self, image_dir_path, use_descriptions=True, use_all_classes=False):
+    def prepare_images(
+        self, image_dir_path, use_descriptions=True, use_all_classes=False
+    ):
         """Defaults to data-set classification mode and only using classes corresponding to a single image
         Zero_shot is activated by not using descriptions. use_all_classes should be set to true for zero_shot but not text classification where class is fixed."""
         unprocessed_images = []
         rgb_images = []
         classes = []
-        for filename in [filename for filename in os.listdir(image_dir_path) if filename.endswith(".png") or filename.endswith(".jpg")]:
+        for filename in [
+            filename
+            for filename in os.listdir(image_dir_path)
+            if filename.endswith(".png") or filename.endswith(".jpg")
+        ]:
             if use_descriptions and not use_all_classes:
                 name = os.path.splitext(filename)[0]
                 if name not in self.descriptions:
-                    continue #skip by starting for loop iteration
+                    continue  # skip by starting for loop iteration
                 classes.append(self.descriptions[name])
             image = Image.open(os.path.join(image_dir_path, filename)).convert("RGB")
             unprocessed_images.append(image)
@@ -65,7 +77,7 @@ class Clip_Class:
         # todo: refactor
         if use_descriptions:
             if use_all_classes:
-                self.set_clip_classes(list(self.descriptions.values())) 
+                self.set_clip_classes(list(self.descriptions.values()))
             else:
                 self.set_clip_classes(classes)
         else:
@@ -75,37 +87,47 @@ class Clip_Class:
     def encode_image_tensors(self, img_tensor):
         image_input = torch.tensor(img_tensor)
         with torch.no_grad():
-            image_features = self.model.encode_image(image_input).float().cpu() #normalise add to device
+            image_features = (
+                self.model.encode_image(image_input).float().cpu()
+            )  # normalise add to device
             return image_features / image_features.norm(dim=-1, keepdim=True)
 
     def encode_text_classes(self, token_list):
-            tokens = []
-            if token_list != []:
-                try:
-                    tokens = clip.tokenize(token_list)
-                except:
-                    logging.error(f"Failed to tokenize: {token_list}")
-            if tokens == []:
-                return tokens
+        tokens = []
+        if token_list != []:
+            try:
+                tokens = clip.tokenize(token_list)
+            except:
+                logging.error(f"Failed to tokenize: {token_list}")
+        if tokens == []:
+            return tokens
 
-            with torch.no_grad():
-                text_features = self.model.encode_text(tokens).float().cpu() #normalise
-                return text_features / text_features.norm(dim=-1, keepdim=True)
+        with torch.no_grad():
+            text_features = self.model.encode_text(tokens).float().cpu()  # normalise
+            return text_features / text_features.norm(dim=-1, keepdim=True)
 
-    def calc_cosine_similarities_for_text(self, text_features, image_features, apply_scaleing=False):
+    def calc_cosine_similarities_for_text(
+        self, text_features, image_features, apply_scaleing=False
+    ):
         """Calculates the cosines for caption with every image (square of cosines)"""
         if apply_scaleing:
-            self.similarity = (100.0 *  image_features @ text_features.T).softmax(dim=-1)
+            self.similarity = (100.0 * image_features @ text_features.T).softmax(dim=-1)
         else:
-            self.similarity = image_features.cpu().numpy() @ text_features.cpu().numpy().T
+            self.similarity = (
+                image_features.cpu().numpy() @ text_features.cpu().numpy().T
+            )
 
     # how to refactor this? !!!UBIU!BGIOUBG:POUBG
-    def calc_cosine_similarities_for_image(self, text_features, image_features, apply_scaleing=False): # how to do this without flipping???
+    def calc_cosine_similarities_for_image(
+        self, text_features, image_features, apply_scaleing=False
+    ):  # how to do this without flipping???
         """Calculates the cosines for every image with every caption (square of cosines)"""
         if apply_scaleing:
-            self.similarity = (100.0 *  text_features @ image_features.T).softmax(dim=-1)
+            self.similarity = (100.0 * text_features @ image_features.T).softmax(dim=-1)
         else:
-            self.similarity = text_features.cpu().numpy() @ image_features.cpu().numpy().T
+            self.similarity = (
+                text_features.cpu().numpy() @ image_features.cpu().numpy().T
+            )
 
     def create_clip_draw(self, encode_nouns):
         noun_features = []

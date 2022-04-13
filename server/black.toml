@@ -1,0 +1,4 @@
+[tool.black]
+skip-string-normalization = true
+target-version = ['py38']
+exclude = 'config.py'
