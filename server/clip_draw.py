@@ -142,11 +142,17 @@ class Clip_Draw_Optimiser:
                 ]
             )
 
-        logging.info('Setting up og curves')
-
         shapes, shape_groups = render_save_img(
-            self.path_list, self.render_canvas_w, self.render_canvas_h
-        )
+            self.path_list, self.render_canvas_w, self.render_canvas_h)
+        
+        # breaks when no user paths
+        initialise_user_gradients(self.render_canvas_w, self.render_canvas_h, shapes, shape_groups)
+        (
+            self.points_vars0,
+            self.stroke_width_vars0,
+            self.color_vars0,
+            self.img0,
+        ) = load_vars()
 
         self.mask = area_mask(
             self.render_canvas_w,
@@ -169,44 +175,10 @@ class Clip_Draw_Optimiser:
         self.shapes = shapes + shapes_rnd
         self.shape_groups = add_shape_groups(shape_groups, shape_groups_rnd)
 
-        points_vars, stroke_width_vars, color_vars = initialise_gradients(
+        self.points_vars, self.stroke_width_vars, self.color_vars = initialise_gradients(
             self.shapes, self.shape_groups
         )
-        self.points_vars = points_vars
-        self.stroke_width_vars = stroke_width_vars
-        self.color_vars = color_vars
-
-        user_scene_args = pydiffvg.RenderFunction.serialize_scene(
-            self.render_canvas_w, self.render_canvas_h, shapes, shape_groups
-        )
-        render = pydiffvg.RenderFunction.apply
-
-        (
-            user_points_vars,
-            user_stroke_width_vars,
-            user_color_vars,
-        ) = initialise_gradients(shapes, shape_groups)
-        user_img = render(
-            self.render_canvas_w, self.render_canvas_h, 2, 2, 0, None, *user_scene_args
-        )
-        user_img = user_img[:, :, 3:4] * user_img[:, :, :3] + torch.ones(
-            user_img.shape[0], user_img.shape[1], 3, device=pydiffvg.get_device()
-        ) * (1 - user_img[:, :, 3:4])
-        with open('tmp/img0.pkl', 'wb+') as f:
-            pickle.dump(user_img, f)
-        with open('tmp/points_vars.pkl', 'wb+') as f:
-            pickle.dump(user_points_vars, f)
-        with open('tmp/stroke_width_vars.pkl', 'wb+') as f:
-            pickle.dump(user_stroke_width_vars, f)
-        with open('tmp/color_vars.pkl', 'wb+') as f:
-            pickle.dump(user_color_vars, f)
-
-        (
-            self.points_vars0,
-            self.stroke_width_vars0,
-            self.color_vars0,
-            self.img0,
-        ) = load_vars()
+        
         scene_args = pydiffvg.RenderFunction.serialize_scene(
             self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups
         )

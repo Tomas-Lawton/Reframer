@@ -46,17 +46,17 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
     });
 });
 
-const clearCanvas = () => {
-    userLayer.clear();
-    // prompt.value = "";
-    modal.style.display = "none";
-};
-
 document.getElementById("delete").addEventListener("click", () =>
     openModal({
         title: "Clearing Canvas",
         message: "Are you sure you want to delete your drawing? :(",
-        confirmAction: () => clearCanvas(),
+        confirmAction: () => {
+            lastPrompt = null; //clear for draw (not redraw)
+            drawButton.innerHTML = "Draw";
+            userLayer.clear();
+            // prompt.value = "";
+            modal.style.display = "none";
+        },
     })
 );
 // document.getElementById("cancel-modal").addEventListener("click", () => {
@@ -78,7 +78,9 @@ document.body.addEventListener("keydown", function(event) {
 
 document.getElementById("draw").addEventListener("click", (e) => {
     if (!clipDrawing) {
+        resetHistory(); //reset since not continuing
         startDrawing(prompt.value === lastPrompt ? "redraw" : "draw", false);
+        drawButton.innerHTML = "Stop";
     } else {
         stopClip();
     }
@@ -87,6 +89,7 @@ document.getElementById("draw").addEventListener("click", (e) => {
 document.getElementById("continue").addEventListener("click", (e) => {
     if (!clipDrawing) {
         startDrawing("continue", false);
+        continueButton.innerHTML = "Stop";
     } else {
         stopClip();
     }
@@ -203,11 +206,19 @@ document.getElementById("width-slider").oninput = function() {
 //     }
 // };
 
+timeKeeper.oninput = function() {
+    if (this.value === 0) return; // 0 is pre-generated state
+    historyIndex = this.value;
+    userLayer.clear();
+    let svg = historyHolder[historyIndex].svg;
+    parseFromSvg(svg);
+};
+
 prompt.addEventListener("input", (e) => {
     if (prompt.value === lastPrompt) {
-        startCollab.innerHTML = "REDRAW";
+        drawButton.innerHTML = "Redraw";
     } else {
-        startCollab.innerHTML = "DRAW";
+        drawButton.innerHTML = "Draw";
     }
 });
 

@@ -2,6 +2,7 @@ const getSelectedPaths = () =>
     userLayer.getItems().filter((path) => path.selected);
 
 penTool.onMouseDown = function(event) {
+    // refactor for multitouch
     switch (penMode) {
         case "select":
             path = null;
@@ -9,7 +10,6 @@ penTool.onMouseDown = function(event) {
                 segments: true,
                 stroke: true,
                 fill: true,
-                // tolerance: 5
             });
             if (!hitResult) {
                 userLayer.getItems().forEach((path) => {
@@ -34,8 +34,8 @@ penTool.onMouseDown = function(event) {
             myPath.add(event.point);
             myPath.add({
                 ...event.point,
-                x: event.point.x + 0.001, //this is ok because path gets simplified
-            }); //in case no drag means no line segment
+                x: event.point.x + 0.001,
+            }); //make a segment on touch down (one point)
             break;
         case "lasso":
             drawRegion = new Rectangle(event.point);
@@ -81,6 +81,7 @@ penTool.onMouseUp = function(event) {
             });
             break;
         case "lasso":
+            resetHistory(); //reset since not continuing
             startDrawing(prompt.value === lastPrompt ? "redraw" : "draw", true);
             clipDrawing = true;
             break;
@@ -177,21 +178,7 @@ eraseTool.onMouseUp = function(event) {
 };
 
 const toggleArtControls = () => {
-    // if (buttonControlLeft) {
-    //     let x = winodow.clientX + 30 + "px";
-    //     let y = winodow.clientY - 300 + "px";
-    //     artControls.style.top = y;
-    //     artControls.style.left = x;
-    // } else {
-    //     let x = winodow.clientX - 30 - artControls.offsetWidth + "px";
-    //     let y = winodow.clientY - 300 + "px";
-    //     artControls.style.top = y;
-    //     artControls.style.left = x;
-    // }
-
     let rect = palette.getBoundingClientRect();
-    // artControls.style.right = `${window.innerWidth - rect.x}px`;
-    // artControls.style.top = `${rect.y + (rect.bottom - rect.top) / 2}px`;
     artControls.style.right = `10px`;
     artControls.style.top = `${rect.bottom + rect.y}px`;
 
@@ -227,30 +214,32 @@ const openModal = (data) => {
     modal.style.display = "block";
 };
 
-let history = {};
-history["main-canvas"] = [];
-let updateHistory = (sketch) => {
-    history["main-canvas"].push(sketch);
-    // decrease opacity of all elements by same amount
-    for (const oldSketch of history["main-canvas"]) {
-        oldSketch.getItems().forEach((item) => {
-            item.opacity *= 0.6;
-        });
-    }
-    // if len greater, get and delete first element
-    if (history["main-canvas"].length > 5) {
-        firstHistory = history["main-canvas"][0];
-        firstHistory.remove();
-    }
-};
+// // historyHolder
 
-const setVisibilityHistory = () => {
-    for (const oldSketch of history["main-canvas"]) {
-        oldSketch.getItems().forEach((item) => {
-            item.visible = !item.visible;
-        });
-    }
-};
+// let history = {};
+// history["main-canvas"] = [];
+// let updateHistory = (sketch) => {
+//     history["main-canvas"].push(sketch);
+//     // decrease opacity of all elements by same amount
+//     for (const oldSketch of history["main-canvas"]) {
+//         oldSketch.getItems().forEach((item) => {
+//             item.opacity *= 0.6;
+//         });
+//     }
+//     // if len greater, get and delete first element
+//     if (history["main-canvas"].length > 5) {
+//         firstHistory = history["main-canvas"][0];
+//         firstHistory.remove();
+//     }
+// };
+
+// const setVisibilityHistory = () => {
+//     for (const oldSketch of history["main-canvas"]) {
+//         oldSketch.getItems().forEach((item) => {
+//             item.visible = !item.visible;
+//         });
+//     }
+// };
 
 const switchControls = () => {
     if (buttonControlLeft) {
@@ -264,7 +253,7 @@ const switchControls = () => {
 
 const startDrawing = (status, hasRegion = false) => {
     // userLayer.activate();
-    firstLoad = true; //reset canvas
+    isFirstIteration = true; //reset canvas
     let canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
     const request = {
         status: status,
@@ -288,11 +277,10 @@ const startDrawing = (status, hasRegion = false) => {
     lastPrompt = prompt.value;
     console.log(request);
     ws.send(JSON.stringify(request));
-    startCollab.innerHTML = "STOP";
 };
 
-const deletePath = (event) => {
-    if (event.key == "Delete" || event.key == "Backspace") {
+const deletePath = (key) => {
+    if (key == "Delete" || key == "Backspace") {
         deletePath();
         selected = getSelectedPaths();
         if (selected.length > 0) {
@@ -313,34 +301,103 @@ const stopClip = () => {
             status: "stop",
         })
     );
-    startCollab.innerHTML = "REDRAW";
+    drawButton.innerHTML = "Redraw";
+    continueButton.innerHTML = "Continue";
 };
 
 // switchControls();
 
+const resetHistory = () => {
+    step = 0; // reset since not continuing
+    historyHolder = [{ svg: "" }];
+    timeKeeper.style.width = "0";
+    timeKeeper.setAttribute("max", "0");
+    timeKeeper.value = "0";
+};
+
+const parseFromSvg = (svg) => {
+    if (svg === "") return null;
+    let paperObject = userLayer.importSVG(svg);
+    for (const child of paperObject.children) {
+        child.children.forEach((path) => {
+            // path.simplify();
+            path.smooth();
+        });
+    }
+    return paperObject;
+};
+
+const drawingComplete = () => {};
+
+const getLastFiveGens = (latestElem = historyHolder.length) => {};
+
+// update because loss varies a lot??
+const calcRollingLoss = () => {
+    let len = historyHolder.length;
+    if (len === 1) return;
+
+    let lossList = [];
+    let batchSize = Math.min(len, 5) - 1;
+    for (let i = 0; i < batchSize; i++) {
+        lossList.push(historyHolder[len - i - 1]);
+    }
+    const sum = lossList.reduce(
+        (partialSum, historyItem) => partialSum + historyItem.loss,
+        0
+    );
+    const avg = sum / lossList.length;
+    console.log(avg);
+
+    if (lastLoss !== undefined) {
+        if (Math.abs(lastLoss - avg) < 0.0005) {
+            console.log("stopping");
+            stopClip();
+        }
+    }
+    lastLoss = avg;
+};
+
 ws.onmessage = function(event) {
     if (clipDrawing) {
-        if (lastRender) {
-            // updateHistory(lastRender);
-            lastRender.remove();
-        }
-        if (firstLoad) {
-            userLayer.clear();
-            firstLoad = false;
-        }
-        const { svg, iterations, loss } = JSON.parse(event.data);
-        let loadedSvg = userLayer.importSVG(svg);
-        for (const child of loadedSvg.children) {
-            child.children.forEach((path) => {
-                // path.simplify();
-                path.smooth();
-            });
-        }
-        // if (!showLastPaths) {
-        //     lastRender = loadedSvg;
-        // }
-        lastRender = loadedSvg;
+        result = JSON.parse(event.data);
+        console.log(result);
 
-        console.log(`Draw iteration: ${iterations} \nLoss value: ${loss}`);
+        if (result.status === "stop") {
+            console.log("Stopped drawer");
+            clipDrawing = false;
+        }
+
+        if (result.status === "draw") {
+            if (lastRender) {
+                //remove ref
+                lastRender.remove();
+            }
+            if (isFirstIteration) {
+                //remove user drawn lines
+                userLayer.clear();
+                isFirstIteration = false;
+            }
+
+            historyHolder.push(result);
+            step += 1; //avoid disconnect iteration
+            timeKeeper.style.width = "100%";
+            timeKeeper.setAttribute("max", String(step));
+            timeKeeper.value = String(step);
+
+            let loadedSvg = parseFromSvg(result.svg);
+            if (loadedSvg) {
+                lastRender = loadedSvg;
+            }
+
+            calcRollingLoss();
+            // if iterations
+
+            // if (!showLastPaths) {
+            //     lastRender = loadedSvg;
+            // }
+            console.log(
+                `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`
+            );
+        }
     }
 };

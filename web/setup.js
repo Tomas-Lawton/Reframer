@@ -13,8 +13,10 @@ const artControls = document.getElementById("art-controls");
 const penControls = document.getElementById("pen-controls");
 const selectControls = document.getElementById("select-controls");
 const message = document.getElementById("message");
-const startCollab = document.getElementById("draw");
+const drawButton = document.getElementById("draw");
+const continueButton = document.getElementById("continue");
 const palette = document.getElementById("palette");
+const timeKeeper = document.getElementById("time-slider");
 
 // Default draw settings
 let strokeColor = "#181818";
@@ -24,6 +26,7 @@ let penMode = "pen";
 let clipDrawing = false;
 let buttonControlLeft = true;
 let showLastPaths = true;
+let step = 1;
 let myPath,
     regionPath,
     drawRegion,
@@ -33,9 +36,11 @@ let myPath,
     erasePath,
     tmpGroup,
     mask,
-    firstLoad;
-undoStack = [];
-redoStack = [];
+    isFirstIteration,
+    lastLoss;
+let undoStack = [];
+let redoStack = [];
+let historyHolder = [];
 
 // Setup
 paper.install(window);
@@ -58,3 +63,5 @@ const userLayer = new Layer(); //for drawing + erase mask
 // const clipLayer = new Layer();
 const penTool = new Tool(); //refactor to single tool?
 const eraseTool = new Tool();
+
+timeKeeper.style.width = "0";

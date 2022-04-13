@@ -126,7 +126,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 run_loop()
 
             if data["status"] == "redraw":
-                await canvas_interface.redraw_update(data)
+                await canvas_interface.redraw_update()
                 run_loop()
 
             if data["status"] == "continue":

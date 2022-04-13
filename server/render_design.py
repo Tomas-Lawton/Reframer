@@ -21,6 +21,8 @@ def initialise_gradients(shapes, shape_groups):
 
 
 def render_save_img(path_list, render_canvas_height, render_canvas_width):
+    if len(path_list) == 0:
+        return [], []
     # Initialize Curves
     shapes = []
     shape_groups = []
@@ -175,3 +177,32 @@ def add_shape_groups(a, b):
         group.shape_ids = torch.tensor([k])
         shape_groups.append(group)
     return shape_groups
+
+def initialise_user_gradients(render_canvas_w, render_canvas_h, shapes, shape_groups):
+    (
+        user_points_vars,
+        user_stroke_width_vars,
+        user_color_vars,
+    ) = initialise_gradients(shapes, shape_groups)
+
+    user_scene_args = pydiffvg.RenderFunction.serialize_scene(
+        render_canvas_w, render_canvas_h, shapes, shape_groups
+    )
+    render = pydiffvg.RenderFunction.apply
+    # breaks with no paths in sketch
+    user_img = render(
+        render_canvas_w, render_canvas_h, 2, 2, 0, None, *user_scene_args
+    )
+    print(user_img)
+    user_img = user_img[:, :, 3:4] * user_img[:, :, :3] + torch.ones(
+        user_img.shape[0], user_img.shape[1], 3, device=pydiffvg.get_device()
+    ) * (1 - user_img[:, :, 3:4])
+
+    with open('tmp/img0.pkl', 'wb+') as f:
+        pickle.dump(user_img, f)
+    with open('tmp/points_vars.pkl', 'wb+') as f:
+        pickle.dump(user_points_vars, f)
+    with open('tmp/stroke_width_vars.pkl', 'wb+') as f:
+        pickle.dump(user_stroke_width_vars, f)
+    with open('tmp/color_vars.pkl', 'wb+') as f:
+        pickle.dump(user_color_vars, f)
