@@ -5,16 +5,16 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
         penMode = elem.id;
         switch (penMode) {
             case "erase":
-                paper.tools[1].activate();
+                eraseTool.activate();
                 break;
             case "pen":
-                paper.tools[0].activate();
+                multiTool.activate();
                 break;
             case "select":
-                paper.tools[0].activate();
+                multiTool.activate();
                 break;
             case "lasso":
-                paper.tools[0].activate();
+                multiTool.activate();
                 if (noPrompt()) {
                     penMode = lastPenMode;
                     openModal({
@@ -28,10 +28,11 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
         // Not-pen mode
         if (penMode !== "select") {
             userLayer.getItems().forEach((path) => {
-                console.log(path);
+                // console.log(path);
                 path.selected = false;
             });
         }
+
         // if (penMode !== "pen" && penMode !== "select") {
         //     artControls.style.display = "none";
         // }
@@ -42,7 +43,7 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
         if (penMode !== "lasso") {
             // userLayer.activate();
         }
-        console.log(penMode);
+        // console.log(penMode);
     });
 });
 
@@ -59,16 +60,6 @@ document.getElementById("delete").addEventListener("click", () =>
         },
     })
 );
-// document.getElementById("cancel-modal").addEventListener("click", () => {
-//     modal.style.display = "none";
-// });
-// document.getElementById("modal-cross").addEventListener("click", () => {
-//     modal.style.display = "none";
-// });
-// document.getElementById("confirm-modal").addEventListener("click", () => {
-//     userLayer.clear();
-//     modal.style.display = "none";
-// });
 
 document.body.addEventListener("keydown", function(event) {
     if (document.activeElement !== prompt) {
@@ -164,15 +155,15 @@ document.getElementById("redo").addEventListener("click", () => {
 });
 document.getElementById("save").addEventListener("click", () => {
     view.element.toBlob((blob) => {
-        var url = window.URL || window.webkitURL;
+        let url = window.URL || window.webkitURL;
         link = url.createObjectURL(blob);
         window.open(link, "_blank");
 
-        var isIE = false || !!document.documentMode;
+        let isIE = false || !!document.documentMode;
         if (isIE) {
             window.navigator.msSaveBlob(blob, fileName);
         } else {
-            var a = document.createElement("a");
+            let a = document.createElement("a");
             a.setAttribute("download", "sketch.png");
             a.setAttribute("href", link);
             document.body.appendChild(a);

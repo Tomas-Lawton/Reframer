@@ -48,23 +48,24 @@ let historyHolder = [];
 // Setup
 paper.install(window);
 const scope = new PaperScope();
-const scope1 = new PaperScope();
-const scope2 = new PaperScope();
-const scope3 = new PaperScope();
+// const scope1 = new PaperScope();
+// const scope2 = new PaperScope();
+// const scope3 = new PaperScope();
 
 scope.setup(canvas);
-scope1.setup(canvas1);
-scope2.setup(canvas2);
-scope3.setup(canvas3);
+// scope1.setup(canvas1);
+// scope2.setup(canvas2);
+// scope3.setup(canvas3);
 
-scope.activate();
+// scope.activate();
 // scope1.activate();
 // scope2.activate();
 // scope3.activate();
 
 const userLayer = new Layer(); //for drawing + erase mask
-// const clipLayer = new Layer();
-const penTool = new Tool(); //refactor to single tool?
-const eraseTool = new Tool();
-
 timeKeeper.style.width = "0";
+
+const multiTool = new Tool();
+multiTool.minDistance = 5;
+const eraseTool = new Tool();
+eraseTool.minDistance = 10;
