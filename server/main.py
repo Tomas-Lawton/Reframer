@@ -139,34 +139,3 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         await canvas_interface.stop()
         logging.info("Client disconnected")
-
-
-# async def read_and_send_to_client(data, canvas):
-#     if data["status"] == "start":
-#         await canvas.update(data)
-#         if not canvas.is_running:
-#             canvas.is_running = True
-#         await canvas.run()
-#     if data["status"] == "stop":
-#         await canvas.stop()
-
-# @app.websocket("/ws")
-# async def ws_endpoint(websocket: WebSocket):
-#     await websocket.accept()
-#     queue = asyncio.queues.Queue()
-#     canvas = Interface(websocket, clip_class)
-
-#     async def read_from_socket(websocket: WebSocket):
-#         async for data in websocket.iter_json():
-#             queue.put_nowait(data)
-
-#     async def get_data_and_send():
-#         data = await queue.get()
-#         fetch_task = asyncio.create_task(read_and_send_to_client(data, canvas))
-#         while True:
-#             data = await queue.get()
-#             if not fetch_task.done():
-#                 fetch_task.cancel()
-#             fetch_task = asyncio.create_task(read_and_send_to_client(data, canvas))
-
-#     await asyncio.gather(read_from_socket(websocket), get_data_and_send())
