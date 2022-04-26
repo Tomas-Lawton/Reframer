@@ -178,9 +178,6 @@ document.getElementById("save").addEventListener("click", () => {
         }
     });
 });
-document.getElementById("time").addEventListener("click", () => {
-    showTraces = !showTraces;
-});
 document.getElementById("width-slider").oninput = function() {
     strokeWidth = this.value;
 };

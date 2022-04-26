@@ -41,25 +41,6 @@
         </div>
     </div>
 
-    <div id="clip-wrap">
-        <div id="control-panel">
-            <div id="send-prompt">
-                <input type="text" id="messageText" placeholder="What are we drawing?" />
-                <div id="control-actions">
-                    <button id="draw">Draw</button>
-                    <button id="continue">Continue</button>
-                    <button confirm-action>
-                        <i class="fa-solid fa-grip-lines fa-fw" id="time"></i>
-                    </button>
-                    <div>
-                        <input id="num-traces" type="number" min="1" value="1">
-                    </div>
-                </div>
-            </div>
-            <input type="range" id="time-slider" value="0" min="0" max="0">
-        </div>
-    </div>
-
     <div id="art-controls">
         <div id="color-picker"></div>
         <div id="width-input">
@@ -122,17 +103,36 @@
         </div>
 
         <div id="sketch-view">
-            <!-- <div id="canvas-ui"> -->
             <div id="contain-dot">
                 <div class="icon-outer-circle" id="palette">
                     <i class="colors fa-solid fa-palette fa-fw"></i>
                 </div>
             </div>
-            <!-- </div> -->
             <div id="contain-canvas">
                 <canvas id="canvas" resize></canvas>
             </div>
-            <!-- <div id="multiple-canvas">
+            <p id="rolling-loss"></p>
+        </div>
+    </div>
+
+    <!-- <div id="control-panel">
+            <div id="send-prompt">
+                <input type="text" id="messageText" placeholder="What are we drawing?" />
+                <div id="control-actions">
+                    <button id="draw">Draw</button>
+                    <button id="continue">Continue</button>
+                    <button confirm-action>
+                        <i class="fa-solid fa-grip-lines fa-fw" id="time"></i>
+                    </button>
+                    <div>
+                        <input id="num-traces" type="number" min="1" value="1">
+                    </div>
+                </div>
+            </div>
+            <input type="range" id="time-slider" value="0" min="0" max="0">
+        </div> -->
+
+    <!-- <div id="multiple-canvas">
             <div class="mini-canvas">
                 <div>
                     <canvas id="canvas1"></canvas>
@@ -149,9 +149,31 @@
                 </div>
             </div>
         </div> -->
-            <p id="rolling-loss"></p>
-        </div>
 
+    <div id="right-background">
+        <div id="describe-card">
+            <div id="describe-top">
+                <h1>Describe</h1>
+                <div id="describe-actions">
+                    <button id="draw">Draw</button>
+                    <button id="continue">Continue</button>
+                </div>
+            </div>
+            <div id="prompt-input">
+                <i class="fas fa-search"></i>
+                <input type="text" id="messageText" placeholder="A majestic rainbow unicorn..." />
+            </div>
+        </div>
+    </div>
+
+    <div id="artefact-controls">
+        <button confirm-action>
+            <i class="fa-solid fa-grip-lines fa-fw" id="time"></i>
+        </button>
+        <div>
+            <input id="num-traces" type="number" min="1" value="1">
+        </div>
+        <input type="range" id="time-slider" value="0" min="0" max="0">
     </div>
 </body>
 
