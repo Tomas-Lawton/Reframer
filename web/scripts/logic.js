@@ -165,6 +165,20 @@ const showTraceHistoryFrom = (fromIndex) => {
     traces = refList;
 };
 
+const moveSelecterTo = (elem) => {
+    console.log(elem.getBoundingClientRect());
+    selectDot.style.left = elem.getBoundingClientRect().x + "px";
+    selectDot.style.top = elem.getBoundingClientRect().y + "px";
+    let colorClass = elem.firstChild.nextElementSibling.classList[0];
+    selectDot.firstElementChild.firstElementChild.classList.remove(
+        "brush",
+        "select",
+        "erase",
+        "region"
+    );
+    selectDot.firstElementChild.firstElementChild.classList.add(colorClass);
+};
+
 ws.onmessage = function(event) {
     if (clipDrawing) {
         result = JSON.parse(event.data);

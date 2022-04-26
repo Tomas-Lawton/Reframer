@@ -87,7 +87,7 @@ multiTool.onMouseUp = function(event) {
 
 eraseTool.onMouseDown = function(event) {
     erasorPath = new Path({
-        strokeWidth: strokeWidth * userLayer.view.pixelRatio,
+        strokeWidth: strokeWidth * 2,
         strokeCap: "round",
         strokeJoin: "round",
         strokeColor: "white",
@@ -109,7 +109,7 @@ eraseTool.onMouseDrag = function(event) {
 
 eraseTool.onMouseUp = function(event) {
     erasorPath.simplify();
-    const eraseRadius = (strokeWidth * userLayer.view.pixelRatio) / 2;
+    const eraseRadius = (strokeWidth * 2) / 2;
     const outerPath = OffsetUtils.offsetPath(erasorPath, eraseRadius);
     const innerPath = OffsetUtils.offsetPath(erasorPath, -eraseRadius);
     erasorPath.remove();

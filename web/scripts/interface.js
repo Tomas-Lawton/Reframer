@@ -1,17 +1,21 @@
 // Drawing Controls
 document.querySelectorAll(".pen-mode").forEach((elem) => {
-    elem.addEventListener("click", (e) => {
+    elem.addEventListener("click", () => {
         let lastPenMode = penMode;
         penMode = elem.id;
+
         switch (penMode) {
             case "erase":
                 eraseTool.activate();
+                moveSelecterTo(elem);
                 break;
             case "pen":
                 multiTool.activate();
+                moveSelecterTo(elem);
                 break;
             case "select":
                 multiTool.activate();
+                moveSelecterTo(elem);
                 break;
             case "lasso":
                 multiTool.activate();
@@ -21,7 +25,9 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
                         title: "Add a prompt first!",
                         message: "You need a prompt to generate sketches with the region tool.",
                     });
+                    break;
                 }
+                moveSelecterTo(elem);
                 break;
         }
 
@@ -154,10 +160,10 @@ document.getElementById("redo").addEventListener("click", () => {
     }
 });
 document.getElementById("save").addEventListener("click", () => {
-    view.element.toBlob((blob) => {
+    userLayer.view.element.toBlob((blob) => {
         let url = window.URL || window.webkitURL;
-        link = url.createObjectURL(blob);
-        window.open(link, "_blank");
+        let link = url.createObjectURL(blob);
+        // window.open(link, "_blank");
 
         let isIE = false || !!document.documentMode;
         if (isIE) {
@@ -233,7 +239,10 @@ const picker = new Picker({
     editor: false,
     editorFormat: "hex", // or 'rgb', 'hsl'
 });
+
 picker.setColor(strokeColor);
 picker.onChange = (color) => {
     strokeColor = color.rgbaString;
 };
+
+moveSelecterTo(document.querySelectorAll(".pen-mode")[2]);

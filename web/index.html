@@ -34,10 +34,6 @@
         </div>
     </div>
 
-    <div id="art-dot">
-        <i class="fa-solid fa-palette fa-fw" id="palette"></i>
-    </div>
-
     <div id="sliding-overlay">
         <div id="hero-content">
             <h2>Welcome to Clip draw!</h2>
@@ -52,9 +48,6 @@
                 <div id="control-actions">
                     <button id="draw">Draw</button>
                     <button id="continue">Continue</button>
-                    <button id="region-select" confirm-action>
-                        <i class="fa-solid fa-square fa-fw pen-mode" id="lasso"></i>
-                    </button>
                     <button confirm-action>
                         <i class="fa-solid fa-grip-lines fa-fw" id="time"></i>
                     </button>
@@ -83,23 +76,63 @@
         </div> -->
     </div>
 
-    <div id="button-panel">
-        <i class="fa-solid fa-pen fa-fw pen-mode" id="pen"></i>
-        <i class="fa-solid fa-arrow-pointer fa-fw pen-mode" id="select"></i>
-        <i class="fa-solid fa-eraser fa-fw pen-mode" id="erase"></i>
-        <i class="fa-solid fa-clock-rotate-left fa-fw" id="undo"></i>
-        <i class="fa-solid fa-rotate-right fa-fw" id="redo"></i>
-        <!-- <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i> -->
-        <i class="fa-solid fa-save fa-fw" id="save"></i>
-        <i class="fa-solid fa-trash fa-fw" id="delete"></i>
+    <div id="contain-pen-dot">
+        <div id="penmode-outer-circle">
+            <div id="penmode-inner-circle"></div>
+        </div>
     </div>
 
-
-    <div id="sketch-view">
-        <div id="contain-canvas">
-            <canvas id="canvas" resize></canvas>
+    <div id="left-background">
+        <div id="button-panel">
+            <div id="top-buttons" class="button-container">
+                <div class="icon-outer-circle pen-mode" id="select">
+                    <i class="select fa-solid fa-arrow-pointer fa-fw"></i>
+                </div>
+                <div class="icon-outer-circle pen-mode" id="pen">
+                    <i class="brush fa-solid fa-paintbrush fa-fw"></i>
+                </div>
+                <div class="icon-outer-circle pen-mode" id="erase">
+                    <i class="erase fa-solid fa-eraser fa-fw"></i>
+                </div>
+                <div class="icon-outer-circle pen-mode" id="lasso">
+                    <i class="region fa-solid fa-object-group fa-fw"></i>
+                </div>
+                <div class="center">
+                    <hr id="divider">
+                </div>
+                <div class="icon-outer-circle" id="undo">
+                    <i class="undo fa-solid fa-rotate-left fa-fw"></i>
+                </div>
+                <div class="icon-outer-circle" id="redo">
+                    <i class="redo fa-solid fa-rotate-right fa-fw"></i>
+                </div>
+            </div>
+            <div id="bottom-buttons" class="button-container">
+                <div class="icon-outer-circle" id="settings">
+                    <i class="basic-grey fa-solid fa-cog fa-fw"></i>
+                </div>
+                <!-- <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i> -->
+                <div class="icon-outer-circle" id="save">
+                    <i class="save fa-solid fa-save fa-fw"></i>
+                </div>
+                <div class="icon-outer-circle" id="delete">
+                    <i class="trash fa-solid fa-trash fa-fw"></i>
+                </div>
+            </div>
         </div>
-        <!-- <div id="multiple-canvas">
+
+        <div id="sketch-view">
+            <!-- <div id="canvas-ui"> -->
+            <div id="contain-dot">
+                <div class="icon-outer-circle" id="palette">
+                    <i class="colors fa-solid fa-palette fa-fw"></i>
+                </div>
+            </div>
+            <!-- </div> -->
+            <div id="contain-canvas">
+                <canvas id="canvas" resize></canvas>
+            </div>
+            <!-- <div id="multiple-canvas">
             <div class="mini-canvas">
                 <div>
                     <canvas id="canvas1"></canvas>
@@ -116,8 +149,10 @@
                 </div>
             </div>
         </div> -->
+            <p id="rolling-loss"></p>
+        </div>
 
-        <p id="rolling-loss"></p>
+    </div>
 </body>
 
 </html>
