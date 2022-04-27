@@ -39,7 +39,7 @@ body {
 
 #contain-pen-dot {
     position: absolute;
-    z-index: 11;
+    z-index: 8;
 }
 
 #left-background {
@@ -260,20 +260,6 @@ button[right-button] {
     justify-content: center;
 } */
 
-#art-controls {
-    position: absolute;
-    z-index: 10;
-    /* background-color: rgba(255, 255, 255, 0.716); */
-    background-color: rgb(255, 255, 255);
-    border-radius: 0.5em;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 30px;
-    box-shadow: 0 5px 10px rgba(198, 198, 198, 0.19), 0 3px 3px rgba(201, 201, 201, 0.23);
-    display: none;
-}
-
 #drawregion-container {
     /* height: 100%; */
     width: 30px;
@@ -305,7 +291,7 @@ input {
 #button-panel {
     display: flex;
     border-radius: 0 4em 4em 0;
-    z-index: 8;
+    z-index: 4;
     flex-direction: column;
     justify-content: space-between;
     padding: 2em;
@@ -352,6 +338,7 @@ input {
 }
 
 #contain-dot {
+    z-index: 8;
     padding: 2em;
     right: 0;
     position: absolute;
@@ -453,7 +440,7 @@ input {
 #right-background {
     width: 100%;
     height: 100%;
-    margin: 0 3em;
+    margin: 0 7em;
 }
 
 #describe-card {
@@ -463,6 +450,7 @@ input {
     flex-direction: column;
     padding: 3em;
     margin-top: 2.5em;
+    box-shadow: 10px 9px 27px rgba(48, 48, 48, 0.12);
 }
 
 #describe-top {
@@ -474,7 +462,7 @@ input {
 
 #describe-top h1 {
     font-size: 1.5em;
-    font-weight: 300;
+    font-weight: 500;
 }
 
 #describe-actions {
@@ -492,9 +480,7 @@ input {
 }
 
 #prompt-input {
-    /* width: 100%; */
     border-radius: 3em;
-    /* border: none; */
     display: flex;
     padding: 1em 2em;
     align-items: center;
@@ -516,4 +502,132 @@ input {
 #artefact-controls {
     position: absolute;
     left: 50%;
+}
+
+#moodboard-header {
+    display: flex;
+    justify-content: space-between;
+    margin: 2em 0em;
+}
+
+#open-moodboard {
+    background: black;
+    color: white;
+    font-weight: bold;
+    padding: 0em 2em;
+    border-radius: 3em;
+}
+
+
+/* REMOVE? */
+
+#exemplar-grid {
+    /* display: inline-block; */
+    display: grid;
+    grid-template-columns: 50% 50%;
+    /* grid-row: auto auto; */
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+    /* height: 100%; */
+}
+
+.exemplar-card {
+    background: #ffffff;
+    border-radius: 1em;
+    filter: drop-shadow(10px 9px 27px rgba(48, 48, 48, 0.12));
+    padding: 1em;
+    position: relative;
+}
+
+.iteration-count {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 0.6em 1em 0 0;
+    color: #7b7b7b;
+}
+
+.card-image {
+    /* width: 240px;
+    height: 240px; */
+    /* width: 100%;
+    height: 100%; */
+    background: #12b700;
+}
+
+.card-info {
+    padding: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-info h3 {
+    color: #7b66ff;
+}
+
+.card-info p {
+    color: #7b7b7b;
+}
+
+.card-info i {
+    background: #ffffff;
+    box-shadow: 2px 3px 9px rgba(48, 48, 48, 0.17);
+    border-radius: 0.3em;
+    font-size: 2.4em;
+    padding: 0.1em;
+    color: #7b66ff;
+}
+
+#moodboard-header h2 {
+    color: black;
+    font-weight: 500;
+}
+
+#moodboard-heade p {
+    color: #5c5c5c;
+}
+
+.square {
+    width: 100%;
+}
+
+.square:after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+}
+
+#pen-styles {
+    display: flex;
+    width: 100%;
+    padding: 1em;
+}
+
+#art-panel {
+    position: absolute;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    display: none;
+    background: #f8f8f8;
+    box-shadow: 10px 9px 27px rgba(48, 48, 48, 0.12);
+    border-radius: 2em;
+    /* background-color: #0095ff; */
+    /* padding: 2em; */
+}
+
+#swatches {
+    display: flex;
+    justify-content: space-between;
+}
+
+.swatch {
+    width: 100%;
+}
+
+.swatch:after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
 }

@@ -1,15 +1,21 @@
 const ws = new WebSocket("ws://localhost:8000/ws");
 const localHost = "http://localhost:8000";
 
+// Sketch
 const canvas = document.getElementById("canvas");
+
+// Exemplars
 const canvas1 = document.getElementById("canvas1");
 const canvas2 = document.getElementById("canvas2");
 const canvas3 = document.getElementById("canvas3");
+const canvas4 = document.getElementById("canvas4");
+
+// Main UI
 const prompt = document.getElementById("messageText");
 const modal = document.getElementById("modal");
 const controlPanel = document.getElementById("control-panel");
 const buttonPanel = document.getElementById("button-panel");
-const artControls = document.getElementById("art-controls");
+const artControls = document.getElementById("art-panel");
 const penControls = document.getElementById("pen-controls");
 const selectControls = document.getElementById("select-controls");
 const message = document.getElementById("message");
@@ -41,7 +47,8 @@ let myPath,
     mask,
     isFirstIteration,
     lastRollingLoss,
-    traces;
+    traces,
+    boundingBox;
 let undoStack = [];
 let redoStack = [];
 let historyHolder = [];

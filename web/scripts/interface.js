@@ -37,6 +37,7 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
                 // console.log(path);
                 path.selected = false;
             });
+            boundingBox.remove();
         }
 
         // if (penMode !== "pen" && penMode !== "select") {
@@ -69,7 +70,9 @@ document.getElementById("delete").addEventListener("click", () =>
 
 document.body.addEventListener("keydown", function(event) {
     if (document.activeElement !== prompt) {
-        deletePath(event.key);
+        if (event.key == "Delete" || event.key == "Backspace") {
+            deletePath();
+        }
     }
 });
 
@@ -242,4 +245,4 @@ picker.onChange = (color) => {
     strokeColor = color.rgbaString;
 };
 
-moveSelecterTo(document.querySelectorAll(".pen-mode")[2]);
+moveSelecterTo(document.querySelectorAll(".pen-mode")[1]);

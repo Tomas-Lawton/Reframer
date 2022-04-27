@@ -3,8 +3,13 @@ const getSelectedPaths = () =>
 
 const toggleArtControls = () => {
     let rect = palette.getBoundingClientRect();
-    artControls.style.right = `10px`;
-    artControls.style.top = `${rect.bottom + rect.y}px`;
+    console.log(rect);
+    // artControls.style.right = `10px`;
+
+    console.log(canvas.width);
+    artControls.style.right = `${rect.width / 2}px`;
+
+    artControls.style.top = `${rect.bottom - rect.height / 2}px`;
 
     if (!artControls.style.display || artControls.style.display === "none") {
         artControls.style.display = "block";
@@ -76,19 +81,19 @@ const startDrawing = (status, hasRegion = false) => {
     ws.send(JSON.stringify(request));
 };
 
-const deletePath = (key) => {
-    if (key == "Delete" || key == "Backspace") {
-        deletePath();
-        selected = getSelectedPaths();
-        if (selected.length > 0) {
-            pathList = selected.map((path) => path.exportJSON()); //dont use paper ref
-            console.log(pathList);
-            undoStack.push({
-                type: "delete-event",
-                data: pathList,
-            });
-            selected.map((path) => path.remove());
-        }
+const deletePath = () => {
+    selected = getSelectedPaths();
+    if (selected.length > 0) {
+        pathList = selected.map((path) => path.exportJSON()); //dont use paper ref
+        console.log(pathList);
+        undoStack.push({
+            type: "delete-event",
+            data: pathList,
+        });
+        selected.map((path) => path.remove());
+    }
+    if (boundingBox) {
+        boundingBox.remove();
     }
 };
 

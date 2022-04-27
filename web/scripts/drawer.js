@@ -1,3 +1,5 @@
+// If not a path and not in bounds
+
 multiTool.onMouseDown = function(event) {
     // refactor for multitouch
     switch (penMode) {
@@ -7,17 +9,43 @@ multiTool.onMouseDown = function(event) {
                 segments: true,
                 stroke: true,
                 fill: true,
+                tolerance: 10,
             });
-            if (!hitResult) {
+
+            let isInBounds = true;
+            if (boundingBox) {
+                console.log(event);
+                console.log(boundingBox);
+                isInBounds =
+                    event.point.x > boundingBox.bounds.left &&
+                    event.point.x < boundingBox.bounds.right &&
+                    event.point.y > boundingBox.bounds.top &&
+                    event.point.y < boundingBox.bounds.bottom;
+            }
+            if (!hitResult && !isInBounds) {
                 userLayer.getItems().forEach((path) => {
                     console.log(path);
                     path.selected = false;
                 });
-                return;
+                if (boundingBox) {
+                    boundingBox.remove();
+                }
             }
             if (hitResult) {
+                if (boundingBox) {
+                    boundingBox.remove();
+                }
+
                 path = hitResult.item;
                 path.selected = true; //fix so that this happens with no drag but with drag it won't toggle !path.selected
+
+                let items = getSelectedPaths();
+                let bbox = items.reduce((bbox, item) => {
+                    return !bbox ? item.bounds : bbox.unite(item.bounds);
+                }, null);
+                // Add stroke width so no overflow over bounds?
+                boundingBox = new Path.Rectangle(bbox);
+                boundingBox.strokeColor = "black";
             }
             break;
         case "pen":
@@ -47,11 +75,12 @@ multiTool.onMouseDrag = function(event) {
             break;
         case "select":
             const selectedPaths = getSelectedPaths(); // all selected
-            console.log(selectedPaths);
             selectedPaths.forEach((path) => {
                 path.position.x += event.delta.x;
                 path.position.y += event.delta.y;
             });
+            boundingBox.position.x += event.delta.x;
+            boundingBox.position.y += event.delta.y;
             break;
         case "lasso":
             drawRegion.width += event.delta.x;

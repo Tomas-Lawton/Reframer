@@ -41,22 +41,6 @@
         </div>
     </div>
 
-    <div id="art-controls">
-        <div id="color-picker"></div>
-        <div id="width-input">
-            <label>Width</label>
-            <input type="range" id="width-slider" value="12" min="1" max="40">
-        </div>
-        <!-- <div id="scale-input">
-            <label>Scale</label>
-            <input type="range" id="scale-slider" value="15" min="1" max="30">
-        </div>
-        <div id="rotate-input">
-            <label>Rotate</label>
-            <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
-        </div> -->
-    </div>
-
     <div id="contain-pen-dot">
         <div id="penmode-outer-circle">
             <div id="penmode-inner-circle"></div>
@@ -103,6 +87,32 @@
         </div>
 
         <div id="sketch-view">
+
+            <div id="art-panel">
+                <!-- <div id="color-picker"></div> -->
+
+                <div id="swatches"></div>
+                <div id="pen-styles">
+                    <div id="custom-picker"></div>
+                    <input type="range" id="alpha-slider" value="12" min="1" max="40">
+                    <input type="range" id="width-slider" value="12" min="1" max="40">
+                    <div id="stroke-size">
+                        <div id="circle-bound">
+                            <div id="stroke-size"></div>
+                        </div>
+                        <div id="selected-color"></div>
+                    </div>
+                </div>
+                <!-- <div id="scale-input">
+                    <label>Scale</label>
+                    <input type="range" id="scale-slider" value="15" min="1" max="30">
+                </div>
+                <div id="rotate-input">
+                    <label>Rotate</label>
+                    <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
+                </div> -->
+            </div>
+
             <div id="contain-dot">
                 <div class="icon-outer-circle" id="palette">
                     <i class="colors fa-solid fa-palette fa-fw"></i>
@@ -161,9 +171,82 @@
             </div>
             <div id="prompt-input">
                 <i class="fas fa-search"></i>
-                <input type="text" id="messageText" placeholder="A majestic rainbow unicorn..." />
+                <input type="text" id="messageText" placeholder="Sketch of a majestic rainbow unicorn..." />
             </div>
         </div>
+
+
+        <div id="moodboard-header">
+            <div>
+                <h2>Add to Moodboard...</h2>
+                <p>Exemplars can improve AI sketches.</p>
+            </div>
+            <button id="open-moodboard">
+                Expand
+                <i class="fas fa-image"></i>
+            </button>
+        </div>
+
+        <!-- Grid -->
+        <div id="exemplar-grid">
+            <div class="exemplar-card">
+                <p class="iteration-count">0</p>
+                <div class="card-image square">
+                    <!-- <canvas id="canvas1" class="square-content"></canvas> -->
+                </div>
+                <div class="card-info">
+                    <div>
+                        <h3>Exemplar 1</h3>
+                        <p>Loss: 0</p>
+                    </div>
+                    <i class="fa-solid fa-plus fa-fw"></i>
+                </div>
+            </div>
+
+            <div class="exemplar-card">
+                <p class="iteration-count">0</p>
+                <div class="card-image square">
+                    <!-- <canvas id="canvas2" class="square-content"></canvas> -->
+                </div>
+                <div class="card-info">
+                    <div>
+                        <h3>Exemplar 1</h3>
+                        <p>Loss: 0</p>
+                    </div>
+                    <i class="fa-solid fa-plus fa-fw"></i>
+                </div>
+            </div>
+
+            <div class="exemplar-card">
+                <p class="iteration-count">0</p>
+                <div class="card-image square">
+                    <!-- <canvas id="canvas3" class="square-content"></canvas> -->
+                </div>
+                <div class="card-info">
+                    <div>
+                        <h3>Exemplar 1</h3>
+                        <p>Loss: 0</p>
+                    </div>
+                    <i class="fa-solid fa-plus fa-fw"></i>
+                </div>
+            </div>
+
+            <div class="exemplar-card">
+                <p class="iteration-count">0</p>
+                <div class="card-image square">
+                    <!-- <canvas id="canvas4" class="square-content"></canvas> -->
+                </div>
+                <div class="card-info">
+                    <div>
+                        <h3>Exemplar 1</h3>
+                        <p>Loss: 0</p>
+                    </div>
+                    <i class="fa-solid fa-plus fa-fw"></i>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 
     <div id="artefact-controls">
