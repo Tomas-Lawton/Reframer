@@ -155,12 +155,30 @@ const resetHistory = () => {
 const parseFromSvg = (svg) => {
     if (svg === "") return null;
     let paperObject = userLayer.importSVG(svg);
-    for (const child of paperObject.children) {
-        child.children.forEach((path) => {
-            // path.simplify();
-            path.smooth();
-        });
+    const numPaths = paperObject.children[0].children.length;
+    console.log(numPaths, " Paths");
+
+    for (const returnedIndex in paperObject.children[0].children) {
+        const child = paperObject.children[0].children[returnedIndex];
+        child.smooth();
+        // AI Stroke Effects
+        if (returnedIndex >= numPaths - 32) {
+            console.log("AI Path: ", child);
+            child.opacity = 0.4;
+            // const pathEffect = child.clone({ insert: false });
+            // // pathEffect.position.y += 100;
+            // // pathEffect.strokeColor = "#FFFF00";
+            // pathEffect.opacity = 0.8;
+            // pathEffect.strokeWidth = strokeWidth * 2;
+            // userLayer.addChild(pathEffect);
+            // try opacity
+        }
+
+        // Add all to main canvas by adding to user layer as children.
+        // Works but makes it harder to clear the canvas. So maybe just do this on draw stop!!
+        // userLayer.addChild(child);
     }
+
     return paperObject;
 };
 
@@ -253,10 +271,12 @@ ws.onmessage = function(event) {
             // draw and save current
             lastRender = parseFromSvg(result.svg);
             // draw and save traces
-            if (showTraces) {
-                // setTraces.value = String(step);
-                showTraceHistoryFrom(historyHolder.length - 1);
-            }
+
+            // To do change this so it is just max num traces
+            // if (showTraces) {
+            //     // setTraces.value = String(step);
+            //     showTraceHistoryFrom(historyHolder.length - 1);
+            // }
 
             calcRollingLoss();
             console.log(
