@@ -118,7 +118,7 @@ rotateHandler.addEventListener("click", (e) => {
 //     }
 // });
 
-document.getElementById("draw").addEventListener("click", (e) => {
+drawButton.addEventListener("click", (e) => {
     if (!clipDrawing) {
         resetHistory(); //reset since not continuing
         startDrawing(prompt.value === lastPrompt ? "redraw" : "draw", false);
@@ -128,7 +128,7 @@ document.getElementById("draw").addEventListener("click", (e) => {
     }
     clipDrawing = !clipDrawing;
 });
-document.getElementById("continue").addEventListener("click", (e) => {
+continueButton.addEventListener("click", (e) => {
     if (!clipDrawing) {
         startDrawing("continue", false);
         continueButton.innerHTML = "Stop";
@@ -136,6 +136,9 @@ document.getElementById("continue").addEventListener("click", (e) => {
         stopClip();
     }
     clipDrawing = !clipDrawing;
+});
+generateButton.addEventListener("click", (e) => {
+    startDrawing("sketch_exemplars", false);
 });
 
 document.getElementById("begin").addEventListener("click", () => {
@@ -244,11 +247,11 @@ document.getElementById("width-slider").oninput = function() {
 //     }
 // };
 
-setTraces.oninput = function() {
-    // rerender the traces
-    userLayer.clear();
-    showTraceHistoryFrom(timeKeeper.value);
-};
+// setTraces.oninput = function() {
+//     // rerender the traces
+//     userLayer.clear();
+//     showTraceHistoryFrom(timeKeeper.value);
+// };
 
 timeKeeper.oninput = function() {
     if (this.value === 0) return; // 0 is pre-generation state

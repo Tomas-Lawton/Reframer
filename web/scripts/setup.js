@@ -19,13 +19,15 @@ const artControls = document.getElementById("art-panel");
 const penControls = document.getElementById("pen-controls");
 const selectControls = document.getElementById("select-controls");
 const message = document.getElementById("message");
-const drawButton = document.getElementById("draw");
-const continueButton = document.getElementById("continue");
 const palette = document.getElementById("palette");
 const timeKeeper = document.getElementById("time-slider");
 const lossText = document.getElementById("rolling-loss");
 const setTraces = document.getElementById("num-traces");
 const selectDot = document.getElementById("contain-pen-dot");
+
+const drawButton = document.getElementById("draw");
+const continueButton = document.getElementById("continue");
+const generateButton = document.getElementById("generate");
 
 // Select UI
 const deleteHandler = document.getElementById("delete-handler");

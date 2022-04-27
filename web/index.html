@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/vanilla-picker@2"></script>
     <script type="text/javascript" src="https://unpkg.com/paper@0.11.5/dist/paper-full.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.3/dat.gui.min.js"></script>
     <script type="text/javascript" src="scripts/offset.js"></script>
 
     <script type="text/javascript" src="scripts/setup.js" defer></script>
@@ -100,17 +99,28 @@
 
             <div id="art-panel">
                 <!-- <div id="color-picker"></div> -->
-
-                <div id="swatches"></div>
+                <h2>Art Panel</h2>
+                <div id="swatches">
+                    <div class="red swatch"></div>
+                    <div class="yellow swatch"></div>
+                    <div class="green swatch"></div>
+                    <div class="blue swatch"></div>
+                    <div class="pink swatch"></div>
+                    <div class="purple swatch"></div>
+                    <div class="off-black swatch"></div>
+                    <div class="white swatch"></div>
+                </div>
                 <div id="pen-styles">
                     <div id="custom-picker"></div>
-                    <input type="range" id="alpha-slider" value="12" min="1" max="40">
-                    <input type="range" id="width-slider" value="12" min="1" max="40">
-                    <div id="stroke-size">
-                        <div id="circle-bound">
-                            <div id="stroke-size"></div>
+                    <div id="fine-control">
+                        <input type="range" id="alpha-slider" class="art-slider" value="12" min="1" max="40">
+                        <input type="range" id="width-slider" class="art-slider" value="12" min="1" max="40">
+                        <div id="art-control-final">
+                            <div id="stroke-dot">
+                                <div></div>
+                            </div>
+                            <div class="off-black"></div>
                         </div>
-                        <div id="selected-color"></div>
                     </div>
                 </div>
                 <!-- <div id="scale-input">
@@ -131,58 +141,27 @@
             <div id="contain-canvas">
                 <canvas id="canvas" resize></canvas>
             </div>
-            <p id="rolling-loss"></p>
+            <p id="rolling-loss"> <input id="num-traces" type="number" min="1" value="1">
+            </p>
         </div>
     </div>
-
-    <!-- <div id="control-panel">
-            <div id="send-prompt">
-                <input type="text" id="messageText" placeholder="What are we drawing?" />
-                <div id="control-actions">
-                    <button id="draw">Draw</button>
-                    <button id="continue">Continue</button>
-                    <button confirm-action>
-                        <i class="fa-solid fa-grip-lines fa-fw" id="time"></i>
-                    </button>
-                    <div>
-                        <input id="num-traces" type="number" min="1" value="1">
-                    </div>
-                </div>
-            </div>
-            <input type="range" id="time-slider" value="0" min="0" max="0">
-        </div> -->
-
-    <!-- <div id="multiple-canvas">
-            <div class="mini-canvas">
-                <div>
-                    <canvas id="canvas1"></canvas>
-                </div>
-            </div>
-            <div class="mini-canvas">
-                <div>
-                    <canvas id="canvas2"></canvas>
-                </div>
-            </div>
-            <div class="mini-canvas">
-                <div>
-                    <canvas id="canvas3"></canvas>
-                </div>
-            </div>
-        </div> -->
 
     <div id="right-background">
         <div id="describe-card">
             <div id="describe-top">
                 <h1>Describe</h1>
                 <div id="describe-actions">
+                    <!-- Change to icons -->
                     <button id="draw">Draw</button>
                     <button id="continue">Continue</button>
+                    <button id="generate">Gen</button>
                 </div>
             </div>
             <div id="prompt-input">
                 <i class="fas fa-search"></i>
                 <input type="text" id="messageText" placeholder="Sketch of a majestic rainbow unicorn..." />
             </div>
+            <input type="range" id="time-slider" value="0" min="0" max="0">
         </div>
 
 
@@ -255,15 +234,6 @@
                 </div>
             </div>
         </div>
-
-
-    </div>
-
-    <div id="artefact-controls">
-        <div>
-            <input id="num-traces" type="number" min="1" value="1">
-        </div>
-        <input type="range" id="time-slider" value="0" min="0" max="0">
     </div>
 </body>
 

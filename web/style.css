@@ -215,6 +215,12 @@ button[right-button] {
     background: #ededed;
 }
 
+.black {}
+
+.white {
+    background: #ffffff;
+}
+
 
 /* Button colors */
 
@@ -256,6 +262,30 @@ button[right-button] {
 
 
 /* Swatch colors */
+
+.red {
+    background: #ff6c6c;
+}
+
+.yellow {
+    background: #ffdf6c;
+}
+
+.green {
+    background: #6cff8d;
+}
+
+.blue {
+    background: #6c9eff;
+}
+
+.pink {
+    background: #ea6cff;
+}
+
+.purple {
+    background: #a091ff;
+}
 
 
 /* #clip-wrap {
@@ -611,7 +641,6 @@ input {
 
 #pen-styles {
     display: flex;
-    width: 100%;
     padding: 1em;
 }
 
@@ -623,18 +652,82 @@ input {
     display: none;
     background: #f8f8f8;
     box-shadow: 10px 9px 27px rgba(48, 48, 48, 0.12);
-    border-radius: 2em;
+    border-radius: 1em;
     /* background-color: #0095ff; */
     /* padding: 2em; */
 }
 
+
+/* #art-panel:first-child {
+    display: flex;
+    width: 100%;
+} */
+
+#art-panel h2 {
+    color: #363636;
+    font-weight: 300;
+    text-align: center;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 1.2em;
+}
+
 #swatches {
     display: flex;
+    width: 100%;
     justify-content: space-between;
+    background: #ededed;
+    padding: 0.6em 0;
+    width: 100%;
+    margin-top: 1em;
 }
 
 .swatch {
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 0.4em;
+}
+
+.swatch:first-child {
+    margin-left: 0.6em;
+}
+
+.swatch:last-child {
+    margin-right: 0.6em;
+}
+
+#fine-control {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#art-control-final {
+    width: 100%;
+    height: 70px;
+}
+
+#stroke-dot {
+    border-radius: 50%;
+    background: #ededed;
+    width: 50px;
+    height: 50px;
+    position: relative;
+}
+
+#stroke-dot div {
+    position: absolute;
+    border-radius: 50%;
+    background: #363636;
+    height: 20px;
+    width: 20px;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+}
+
+#art-control-final:last-child {
+    height: 20px;
 }
 
 .swatch:after {

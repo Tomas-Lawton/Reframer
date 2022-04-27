@@ -13,10 +13,11 @@ import pickle
 import asyncio
 import aiofiles
 class Clip_Draw_Optimiser:
-    def __init__(self, model, websocket):
+    def __init__(self, model, websocket, exemplar_count = None):
         """These inputs are defaults and can have methods for setting them after the inital start up"""
 
         self.clip_interface = model
+        self.exemplar_count = exemplar_count
         # self.nouns_features = noun_features
         self.socket = websocket
         self.is_running = False
@@ -373,10 +374,14 @@ class Clip_Draw_Optimiser:
         i, loss = self.run_iteration()
         async with aiofiles.open("results/output.svg", "r") as f:
             svg = await f.read()
-        result = {"status": "draw", "svg": svg, "iterations": i, "loss": loss}
-        self.last_result = result  # won't get to client unless continued
+        status = "draw"
+        if (isinstance(self.exemplar_count, int)):
+            status = self.exemplar_count
+        result = {"status": status, "svg": svg, "iterations": i, "loss": loss}
         await self.socket.send_json(result)
         logging.info(f"Optimisation {i} complete")
+        
+        self.last_result = result  # won't go to client unless continued is used
 
     async def stop(self):
         logging.info("Stopping...")
