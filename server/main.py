@@ -1,23 +1,24 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import asyncio
 from fastapi.middleware.cors import CORSMiddleware
-import skimage
-import numpy as np
 import logging
 from class_interface import Clip_Class
-# from plot_util import plot_cosines, plot_zero_shot_images, plot_image
+
 from interface_handler import Interface
 import asyncio
 
-# check environment var
-# add filename='logs.log'
+# import skimage
+# import numpy as np
+# from plot_util import plot_cosines, plot_zero_shot_images, plot_image
+
+# TO DO add environment var to set log mode
 logging.basicConfig(
     encoding='utf-8',
     level=logging.DEBUG,
     format=f'APP LOGGING: %(levelname)s %(name)s %(threadName)s : %(message)s',
 )
 
-app = FastAPI(title="Clip Draw Backend")
+app = FastAPI(title="Clip Algorithm API")
 origins = [
     "http://localhost",
     "http://localhost:8080",
@@ -106,6 +107,7 @@ clip_class.create_clip_draw(False)  # encode nouns or nah
 async def websocket_endpoint(websocket: WebSocket):
     canvas_interface = Interface(websocket, clip_class)
     await websocket.accept()
+    logging.info("Websocket Client Connected")
     try:
         while True:
             data = await websocket.receive_json()
@@ -119,7 +121,6 @@ async def websocket_endpoint(websocket: WebSocket):
                 while canvas_interface.is_running:
                     await canvas_interface.run()
 
-            # refactor to sinlge update.
             if data["status"] == "draw":
                 await canvas_interface.draw_update(data)
                 run_loop()

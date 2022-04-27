@@ -81,6 +81,41 @@ const startDrawing = (status, hasRegion = false) => {
     ws.send(JSON.stringify(request));
 };
 
+// dragging moves select elements + ui
+const hideSelectUI = () => {
+    // remove rect
+    if (boundingBox) {
+        boundingBox.remove();
+        boundingBox = null;
+    }
+    // hide ui
+    deleteHandler.style.display = "none";
+    rotateHandler.style.display = "none";
+};
+
+const updateSelectUI = () => {
+    if (boundingBox) {
+        rotateHandler.style.display = "block";
+        deleteHandler.style.display = "block";
+
+        rotateHandler.style.left = boundingBox.bounds.bottomCenter.x + "px";
+        rotateHandler.style.top =
+            boundingBox.bounds.bottomCenter.y +
+            rotateHandler.getBoundingClientRect().height / 2 +
+            "px";
+
+        deleteHandler.style.left =
+            boundingBox.bounds.topRight.x -
+            deleteHandler.getBoundingClientRect().width / 2 +
+            "px";
+        deleteHandler.style.bottom =
+            1080 -
+            boundingBox.bounds.topRight.y -
+            deleteHandler.getBoundingClientRect().height / 2 +
+            "px";
+    }
+};
+
 const deletePath = () => {
     selected = getSelectedPaths();
     if (selected.length > 0) {
@@ -93,7 +128,7 @@ const deletePath = () => {
         selected.map((path) => path.remove());
     }
     if (boundingBox) {
-        boundingBox.remove();
+        hideSelectUI();
     }
 };
 
@@ -171,7 +206,6 @@ const showTraceHistoryFrom = (fromIndex) => {
 };
 
 const moveSelecterTo = (elem) => {
-    console.log(elem.getBoundingClientRect());
     selectDot.style.left = elem.getBoundingClientRect().x + "px";
     selectDot.style.top = elem.getBoundingClientRect().y + "px";
     let colorClass = elem.firstChild.nextElementSibling.classList[0];
@@ -230,10 +264,4 @@ ws.onmessage = function(event) {
             );
         }
     }
-};
-
-// drag should also reposition the ui elements
-const hideSelectBoundUI = () => {
-    // remove rect
-    // hide ui
 };

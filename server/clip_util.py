@@ -2,15 +2,11 @@ from email import parser
 import numpy as np
 import torch
 import clip
-
 import torch
 from svgpathtools import svg2paths
 from svgelements import *
 from PIL import ImageColor
-
 import logging
-
-
 class DrawingPath:
     def __init__(self, path, color, width, num_segments):
         self.path = path

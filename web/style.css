@@ -631,3 +631,23 @@ input {
     display: block;
     padding-bottom: 100%;
 }
+
+.select-ui {
+    z-index: 9;
+    display: none;
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+
+.select-ui div {
+    border-radius: 50%;
+    background-color: #ffffff;
+}
+
+.select-ui i {
+    box-shadow: 2px 3px 9px rgba(48, 48, 48, 0.17);
+    border-radius: 50%;
+    font-size: 1em;
+    padding: 0.1em;
+    color: #363636;
+}

@@ -8,7 +8,7 @@ from clip_draw import Clip_Draw_Optimiser
 
 import logging
 
-
+# TO DO Reorganise around the drawer code
 class Clip_Class:
     """Init clip, then configure the classifier type, then set the required img/class/prompt parameters"""
 

@@ -37,7 +37,7 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
                 // console.log(path);
                 path.selected = false;
             });
-            boundingBox.remove();
+            hideSelectUI();
         }
 
         // if (penMode !== "pen" && penMode !== "select") {
@@ -75,6 +75,48 @@ document.body.addEventListener("keydown", function(event) {
         }
     }
 });
+
+deleteHandler.addEventListener("click", (e) => {
+    deletePath();
+});
+rotateHandler.addEventListener("click", (e) => {
+    boundingBox.data.state === "rotating";
+});
+
+// let isRotating = false;
+// rotateHandler.addEventListener("mousedown", (e) => {
+//     x = e.offsetX;
+//     y = e.offsetY;
+//     isRotating = true;
+//     console.log("down");
+// });
+
+// const map = (value, x1, y1, x2, y2) =>
+//     ((value - x1) * (y2 - x2)) / (y1 - x1) + x2;
+
+// rotateHandler.addEventListener("mousemove", (e) => {
+//     if (isRotating === true) {
+//         let degree = map(e.clientX, 0, 1080, 0, 720);
+//         console.log(degree);
+//         let selectedPaths = getSelectedPaths(); // all selected
+//         // add the bounds to slected paths ????
+//         let boundedSelection = new Group({ children: selectedPaths });
+
+//         boundedSelection.rotate(degree);
+//         // boundingBox.rotate(degree);
+
+//         //     // to ungroup iterate items and put into user layer. then remove the empty group
+//     }
+// });
+
+// rotateHandler.addEventListener("mouseup", (e) => {
+//     if (isRotating === true) {
+//         //   drawLine(context, x, y, e.offsetX, e.offsetY);
+//         x = 0;
+//         y = 0;
+//         isRotating = false;
+//     }
+// });
 
 document.getElementById("draw").addEventListener("click", (e) => {
     if (!clipDrawing) {

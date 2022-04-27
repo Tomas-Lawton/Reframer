@@ -27,6 +27,10 @@ const lossText = document.getElementById("rolling-loss");
 const setTraces = document.getElementById("num-traces");
 const selectDot = document.getElementById("contain-pen-dot");
 
+// Select UI
+const deleteHandler = document.getElementById("delete-handler");
+const rotateHandler = document.getElementById("rotate-handler");
+
 // Default draw settings
 let strokeColor = "#181818";
 let strokeWidth = 12;

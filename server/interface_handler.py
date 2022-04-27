@@ -59,6 +59,3 @@ class Interface:
         logging.info("Stopping...")
         self.is_running = False
         await self.socket.send_json({"status": "stop"})
-
-        # if self.clip_draw_optimiser.is_active:
-        #     self.clip_draw_optimiser.stop_drawing()

@@ -12,6 +12,7 @@ multiTool.onMouseDown = function(event) {
                 tolerance: 10,
             });
 
+            // TO change to simple hit test
             let isInBounds = true;
             if (boundingBox) {
                 console.log(event);
@@ -22,18 +23,21 @@ multiTool.onMouseDown = function(event) {
                     event.point.y > boundingBox.bounds.top &&
                     event.point.y < boundingBox.bounds.bottom;
             }
+
             if (!hitResult && !isInBounds) {
+                // outside bound + no path
                 userLayer.getItems().forEach((path) => {
                     console.log(path);
                     path.selected = false;
                 });
                 if (boundingBox) {
-                    boundingBox.remove();
+                    hideSelectUI();
                 }
             }
             if (hitResult) {
+                // got path
                 if (boundingBox) {
-                    boundingBox.remove();
+                    hideSelectUI();
                 }
 
                 path = hitResult.item;
@@ -46,6 +50,31 @@ multiTool.onMouseDown = function(event) {
                 // Add stroke width so no overflow over bounds?
                 boundingBox = new Path.Rectangle(bbox);
                 boundingBox.strokeColor = "black";
+                boundingBox.data.state = "moving";
+                updateSelectUI();
+            }
+            if (boundingBox) {
+                if (
+                    boundingBox.hitTest(event.point, {
+                        segments: true,
+                        tolerance: 3,
+                    })
+                ) {
+                    // got rectangle segment
+                    // find which segment point was hit
+                    var i;
+                    for (i = 0; i < boundingBox.segments.length; i++) {
+                        var p = boundingBox.segments[i].point;
+                        if (p.isClose(event.point, 3)) {
+                            break;
+                        }
+                    }
+                    var opposite = (i + 2) % 4;
+                    boundingBox.data.from = boundingBox.segments[opposite].point;
+                    boundingBox.data.to = boundingBox.segments[i].point;
+                    boundingBox.data.state = "resizing";
+                    boundingBox.data.corner = boundingBox.segments[i].point;
+                }
             }
             break;
         case "pen":
@@ -67,6 +96,7 @@ multiTool.onMouseDown = function(event) {
             break;
     }
 };
+
 multiTool.onMouseDrag = function(event) {
     switch (penMode) {
         case "pen":
@@ -74,13 +104,47 @@ multiTool.onMouseDrag = function(event) {
             myPath.smooth();
             break;
         case "select":
-            const selectedPaths = getSelectedPaths(); // all selected
-            selectedPaths.forEach((path) => {
-                path.position.x += event.delta.x;
-                path.position.y += event.delta.y;
-            });
-            boundingBox.position.x += event.delta.x;
-            boundingBox.position.y += event.delta.y;
+            if (boundingBox) {
+                if (boundingBox.data.state === "moving") {
+                    const selectedPaths = getSelectedPaths(); // all selected
+                    selectedPaths.forEach((path) => {
+                        path.position.x += event.delta.x;
+                        path.position.y += event.delta.y;
+                    });
+                    boundingBox.position.x += event.delta.x;
+                    boundingBox.position.y += event.delta.y;
+
+                    updateSelectUI();
+                } else if (boundingBox.data.state === "resizing") {
+                    // Enforce 1:1 rect only
+                    boundingBox.bounds = new Rectangle(
+                        boundingBox.data.from,
+                        event.point
+                    );
+                    boundingBox.strokeColor = "black";
+                    boundingBox.data.state = "resizing";
+
+                    const selectedPaths = getSelectedPaths(); // all selected
+                    let boundedSelection = new Group({ children: selectedPaths });
+                    boundedSelection.scale(
+                        event.delta.length / 5.5,
+                        boundingBox.data.from
+                    );
+                    // UNGROUP
+
+                    updateSelectUI();
+                } else if (boundingBox.data.state === "rotating") {
+                    // rotate by difference of angles, relative to center, of
+                    // the last two points.
+                    var center = boundingBox.center;
+                    var baseVec = center - e.lastPoint;
+                    var nowVec = center - e.point;
+                    var angle = nowVec.angle - baseVec.angle;
+                    boundingBox.rotate(angle);
+                    // adjustRect(rect);
+                    updateSelectUI();
+                }
+            }
             break;
         case "lasso":
             drawRegion.width += event.delta.x;
