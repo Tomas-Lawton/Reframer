@@ -129,32 +129,10 @@ class Clip_Class:
                 text_features.cpu().numpy() @ image_features.cpu().numpy().T
             )
 
-    def create_clip_draw(self, encode_nouns):
-        noun_features = []
-        if encode_nouns:
-            logging.info("Encoding nouns")
-            nouns = get_noun_data()
-            noun_features = self.encode_text_classes(nouns)
-        self.clip_draw_optimiser = Clip_Draw_Optimiser(self.model, noun_features)
-
-    def setup_draw(self, prompts, region, neg_prompts=[]):
-        """Use current paths with the given (possibly different) prompt to generate options"""
-        self.clip_draw_optimiser.reset()
-        logging.info("Starting clip drawer")
-        prompt_features = self.encode_text_classes(prompts)
-        neg_prompt_features = self.encode_text_classes(neg_prompts)
-        self.clip_draw_optimiser.set_text_features(prompt_features, neg_prompt_features)
-        self.clip_draw_optimiser.parse_svg(region)
-        return self.clip_draw_optimiser.activate()
-
-    def setup_redraw(self):
-        """Use original paths with origional prompt to try new options from same settings"""
-        logging.info("Starting redraw")
-        return self.clip_draw_optimiser.activate()
-
-    def setup_continue(self, prompts, neg_prompts=[]):
-        """Use origional paths with origional prompt to try new options from same settings"""
-        logging.info("Continuing with new prompt(s)")
-        prompt_features = self.encode_text_classes(prompts)
-        neg_prompt_features = self.encode_text_classes(neg_prompts)
-        self.clip_draw_optimiser.set_text_features(prompt_features, neg_prompt_features)
+    # def create_clip_draw(self, encode_nouns):
+    #     noun_features = []
+    #     if encode_nouns:
+    #         logging.info("Encoding nouns")
+    #         nouns = get_noun_data()
+    #         noun_features = self.encode_text_classes(nouns)
+    #     self.clip_draw_optimiser = Clip_Draw_Optimiser(self.model, noun_features)

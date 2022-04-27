@@ -1,15 +1,8 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-import asyncio
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 from class_interface import Clip_Class
-
-from interface_handler import Interface
-import asyncio
-
-# import skimage
-# import numpy as np
-# from plot_util import plot_cosines, plot_zero_shot_images, plot_image
+from clip_draw import Clip_Draw_Optimiser
 
 # TO DO add environment var to set log mode
 logging.basicConfig(
@@ -35,107 +28,52 @@ app.add_middleware(
 )
 
 clip_class = Clip_Class()
-clip_class.create_clip_draw(False)  # encode nouns or nah
-
-# @app.get("/classify_dataset")
-# def classify_dataset():
-#     """Requires at least one image for each class so an image is classifed"""
-#     clip_class.set_image_descriptions(
-#         {
-#             "cat": "a facial photo of a tabby cat",
-#             "astronaut": "a portrait of an astronaut with the American flag",
-#             "rocket": "a rocket standing on a launchpad",
-#             # "page": "a page of text about segmentation",
-#             # "motorcycle_right": "a red motorcycle standing in a garage",
-#             # "camera": "a person looking at a camera on a tripod",
-#             # "horse": "a black-and-white silhouette of a horse",
-#             # "coffee": "a cup of coffee on a saucer"
-#         }
-#     )
-#     clip_class.prepare_images("data/local_images", True, False)  # or skimage.data_dir
-#     image_features = clip_class.encode_image_tensors(np.stack(clip_class.images_rgb))
-#     text_features = clip_class.encode_text_classes(
-#         ["This is " + desc for desc in clip_class.classes]
-#     )
-#     clip_class.calc_cosine_similarities_for_text(text_features, image_features, False)
-#     plot_cosines(clip_class)
-#     return {"Hello": "World"}
-
-
-# @app.get("/classify_zero_shot_dataset")
-# def classify_zero_shot_dataset():
-#     """Classify as many images as you like. Optionally set the number of classes, or a list of nouns???"""
-#     clip_class.prepare_images("data/local_images", False, True)  # or skimage.data_dir
-#     image_features = clip_class.encode_image_tensors(np.stack(clip_class.images_rgb))
-#     text_features = clip_class.encode_text_classes(
-#         ["This is " + desc for desc in clip_class.classes]
-#     )
-#     clip_class.calc_cosine_similarities_for_text(text_features, image_features, True)
-#     plot_zero_shot_images(clip_class)
-#     return {"Hello": "World"}
-
-
-# @app.get("/classify_zero_shot_image")
-# def read_item(target: str = "cat"):
-#     image_path = f"data/local_images/single_images/{target}.jpg"
-#     clip_class.prepare_single_image(image_path)  # or skimage.data_dir
-#     image_features = clip_class.encode_image_tensors(np.stack(clip_class.images_rgb))
-#     text_features = clip_class.encode_text_classes(
-#         ["This is " + desc for desc in clip_class.classes]
-#     )
-#     clip_class.calc_cosine_similarities_for_text(text_features, image_features, True)
-#     plot_zero_shot_images(clip_class)
-#     return {"Hello": target}
-
-
-# @app.get("/classify_text/directory/{prompt}")
-# def classify_text_from_image(prompt: str):
-#     prompt = prompt.replace('-', ' ')
-#     clip_class.prepare_images(skimage.data_dir, False, False)  # or skimage.data_dir
-#     text_features = clip_class.encode_text_classes([prompt])
-#     image_features = clip_class.encode_image_tensors(np.stack(clip_class.images_rgb))
-#     clip_class.calc_cosine_similarities_for_image(text_features, image_features, True)
-
-#     image_values = clip_class.similarity[0].tolist()
-#     top_index = np.argsort(image_values)[-1:][0]
-#     top_image = clip_class.unprocessed_images[top_index]
-#     plot_image(top_image)
-#     return {"Hello": "{prompt}"}
-
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    canvas_interface = Interface(websocket, clip_class)
+    artefact_drawer = Clip_Draw_Optimiser(clip_class, websocket)
+
+    # exemplar_drawers = []
+    # for i in range (4):
+    #     exemplar_drawers.append(Clip_Draw_Optimiser(clip_class, websocket))
+
+
     await websocket.accept()
     logging.info("Websocket Client Connected")
     try:
         while True:
             data = await websocket.receive_json()
 
-            def run_loop():
-                canvas_interface.is_running = True  # for loop to continue
-                loop = asyncio.get_running_loop()
-                loop.run_in_executor(None, lambda: asyncio.run(loop_optimisation()))
-
-            async def loop_optimisation():
-                while canvas_interface.is_running:
-                    await canvas_interface.run()
-
             if data["status"] == "draw":
-                await canvas_interface.draw_update(data)
-                run_loop()
+                try:
+                    await artefact_drawer.draw_update(data)
+                except:
+                    logging.error("Failed to update drawer")
+                artefact_drawer.run_loop()
 
             if data["status"] == "redraw":
-                await canvas_interface.redraw_update()
-                run_loop()
+                try:
+                    await artefact_drawer.redraw_update()
+                except:
+                    logging.error("Failed to update drawer")
+                artefact_drawer.run_loop()
 
             if data["status"] == "continue":
-                await canvas_interface.continue_update(data)
-                run_loop()
+                try:
+                    await artefact_drawer.continue_update(data)
+                except:
+                    logging.error("Failed to update drawer")
+                artefact_drawer.run_loop()
 
             if data["status"] == "stop":
-                await canvas_interface.stop()
+                await artefact_drawer.stop()
+            
+            if data["status"] == "generate_exemplars":
+                # Exemplar_Interface
+                # for drawer in exemplar_drawers:
+                    # print()
+                print()
 
     except WebSocketDisconnect:
-        await canvas_interface.stop()
+        await artefact_drawer.stop()
         logging.info("Client disconnected")

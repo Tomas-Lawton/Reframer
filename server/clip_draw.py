@@ -10,26 +10,19 @@ from clip_util import *
 from render_design import *
 import logging
 import pickle
-
-
+import asyncio
+import aiofiles
 class Clip_Draw_Optimiser:
-    __instance = None
-
-    def __init__(self, model, noun_features):
+    def __init__(self, model, websocket):
         """These inputs are defaults and can have methods for setting them after the inital start up"""
 
-        if (
-            Clip_Draw_Optimiser.__instance != None
-        ):  # Should be refactored since only used once?
-            raise Exception("Clip is already instantiated.")
-
-        # Set up
-        self.model = model
-        self.nouns_features = noun_features
+        self.clip_interface = model
+        # self.nouns_features = noun_features
+        self.socket = websocket
+        self.is_running = False
         self.nouns = get_noun_data()
         self.is_initialised = False
         self.use_user_paths = True
-        self.is_active = False
         self.use_neg_prompts = False
         self.normalize_clip = True
         # Canvas parameters
@@ -45,15 +38,13 @@ class Clip_Draw_Optimiser:
         self.w_img = 0.01
         self.w_full_img = 0.001
         self.drawing_area = {'x0': 0.0, 'x1': 1.0, 'y0': 0.0, 'y1': 1.0}
+        self.iteration = 0
         self.update_frequency = 1
         # Configure rasterisor
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         pydiffvg.set_print_timing(False)
         pydiffvg.set_use_gpu(torch.cuda.is_available())
         pydiffvg.set_device(device)
-        logging.info("Drawer ready")
-
-        Clip_Draw_Optimiser.__instance == self
         return
 
     def reset(self):
@@ -207,6 +198,7 @@ class Clip_Draw_Optimiser:
         self.points_optim.zero_grad()
         self.width_optim.zero_grad()
         self.color_optim.zero_grad()
+
         scene_args = pydiffvg.RenderFunction.serialize_scene(
             self.render_canvas_w, self.render_canvas_h, self.shapes, self.shape_groups
         )
@@ -240,7 +232,7 @@ class Clip_Draw_Optimiser:
         for n in range(NUM_AUGS):
             self.img_augs.append(self.augment_trans(self.img))
         im_batch = torch.cat(self.img_augs)
-        image_features = self.model.encode_image(im_batch)
+        image_features = self.clip_interface.model.encode_image(im_batch)
         for n in range(NUM_AUGS):
             loss -= torch.cosine_similarity(
                 self.text_features, image_features[n : n + 1], dim=1
@@ -292,18 +284,19 @@ class Clip_Draw_Optimiser:
             #     print('l_style: ', l.item())
             with torch.no_grad():
                 # pydiffvg.imwrite(self.img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+self.time_str+'.png', gamma=1)
-                if self.nouns_features != []:
-                    im_norm = image_features / image_features.norm(dim=-1, keepdim=True)
-                    noun_norm = self.nouns_features / self.nouns_features.norm(
-                        dim=-1, keepdim=True
-                    )
-                    similarity = (100.0 * im_norm @ noun_norm.T).softmax(dim=-1)
-                    values, indices = similarity[0].topk(5)
-                    logging.info("\nTop predictions:\n")
-                    for value, index in zip(values, indices):
-                        logging.info(
-                            f"{self.nouns[index]:>16s}: {100 * value.item():.2f}%"
-                        )
+
+                # if self.nouns_features != []:
+                #     im_norm = image_features / image_features.norm(dim=-1, keepdim=True)
+                #     noun_norm = self.nouns_features / self.nouns_features.norm(
+                #         dim=-1, keepdim=True
+                #     )
+                #     similarity = (100.0 * im_norm @ noun_norm.T).softmax(dim=-1)
+                #     values, indices = similarity[0].topk(5)
+                #     logging.info("\nTop predictions:\n")
+                #     for value, index in zip(values, indices):
+                #         logging.info(
+                #             f"{self.nouns[index]:>16s}: {100 * value.item():.2f}%"
+                #         )
 
                 pydiffvg.save_svg(
                     'results/latest_rendered_paths.svg',
@@ -326,8 +319,75 @@ class Clip_Draw_Optimiser:
 
         self.iteration += 1
         return self.iteration, loss.item()
+    
+    # RUN STUFF
+    async def draw_update(self, data):
+        """Use current paths with the given (possibly different) prompt to generate options"""
+        logging.info("Updating...")
+        prompt = data["data"]["prompt"]
+        neg_prompt = []
+        svg_string = data["data"]["svg"]
+        region = data["data"]["region"]
+        self.clip_interface.positive = prompt
+        async with aiofiles.open('data/interface_paths.svg', 'w') as f:
+            await f.write(svg_string)
+        try:
+            self.reset()
+            logging.info("Starting clip drawer")
+            prompt_features = self.clip_interface.encode_text_classes([prompt])
+            neg_prompt_features = self.clip_interface.encode_text_classes(neg_prompt)
+            self.set_text_features(prompt_features, neg_prompt_features)
+            self.parse_svg(region)
+            logging.info("Got features")
+            return self.activate()
+        except:
+            logging.error("Failed to encode features in clip")
 
-    def stop_drawing(self):
-        # pydiffvg.imwrite(self.img.cpu().permute(0, 2, 3, 1).squeeze(0), 'results/'+self.time_str+'.png', gamma=1)
-        # save_data(self.time_str, self)
-        self.is_active = False
+    async def redraw_update(self):
+        """Use original paths with origional prompt to try new options from same settings"""
+        logging.info("Starting redraw")
+        return self.activate()
+
+    async def continue_update(self, data):
+        """Use origional paths with origional prompt to try new options from same settings"""
+        logging.info("Continuing...")
+        prompt = data["data"]["prompt"]
+        neg_prompt = []
+        # if same as last prompt, retrieve last iteration
+        if prompt == self.clip_interface.positive:
+            await self.socket.send_json(self.last_result)
+        else:
+            self.clip_interface.positive = prompt
+        try:
+            prompt_features = self.clip_interface.encode_text_classes([prompt])
+            neg_prompt_features = self.clip_interface.encode_text_classes(neg_prompt)
+            self.set_text_features(prompt_features, neg_prompt_features)
+            logging.info("Got features")
+        except:
+            logging.error("Failed to encode features in clip")
+
+    async def run(self):
+        # Refactor so that the code is a thin layer of the looper
+        logging.info("Running iteration...")
+        svg = ''
+        i, loss = self.run_iteration()
+        async with aiofiles.open("results/output.svg", "r") as f:
+            svg = await f.read()
+        result = {"status": "draw", "svg": svg, "iterations": i, "loss": loss}
+        self.last_result = result  # won't get to client unless continued
+        await self.socket.send_json(result)
+        logging.info(f"Optimisation {i} complete")
+
+    async def stop(self):
+        logging.info("Stopping...")
+        self.is_running = False
+        await self.socket.send_json({"status": "stop"})
+
+    def run_loop(self):
+        self.is_running = True  # for loop to continue
+        loop = asyncio.get_running_loop()
+        loop.run_in_executor(None, lambda: asyncio.run(self.loop_optimisation()))
+
+    async def loop_optimisation(self):
+        while self.is_running:
+            await self.run()
