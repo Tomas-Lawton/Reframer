@@ -166,6 +166,7 @@ class Clip_Draw_Optimiser:
             self.drawing_area['y1'],
         ).to(device)
 
+        logging.info("Initialising Shapes")
         shapes_rnd, shape_groups_rnd = treebranch_initialization(
             self.path_list,
             self.num_paths,
