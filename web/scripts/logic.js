@@ -231,3 +231,9 @@ ws.onmessage = function(event) {
         }
     }
 };
+
+// drag should also reposition the ui elements
+const hideSelectBoundUI = () => {
+    // remove rect
+    // hide ui
+};
