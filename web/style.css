@@ -28,8 +28,6 @@ button {
 
 html,
 body {
-    /* width: 100%; */
-    height: 100%;
     display: flex;
     background: #fbfbfb;
 }
@@ -446,7 +444,10 @@ button[right-button] {
 #right-background {
     width: 100%;
     height: 100%;
-    margin: 0 7em;
+    margin: 0;
+    padding: 0 4em;
+    display: flex;
+    flex-direction: column;
 }
 
 #describe-card {
@@ -525,16 +526,24 @@ button[right-button] {
 }
 
 
-/* REMOVE? */
+/* 
+.grid-verticle {
+    height: 100%;
+} */
 
 #exemplar-grid {
-    /* display: inline-block; */
-    display: grid;
-    grid-template-columns: 50% 50%;
-    /* grid-row: auto auto; */
-    grid-column-gap: 20px;
-    grid-row-gap: 20px;
-    /* height: 100%; */
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 2.5em;
+    /* justify-content: space-between; */
+    justify-content: space-around;
+    height: 100%;
+}
+
+#exemplar-grid div {
+    display: flex;
+    justify-content: space-around;
 }
 
 .exemplar-card {
@@ -543,6 +552,9 @@ button[right-button] {
     filter: drop-shadow(10px 9px 27px rgba(48, 48, 48, 0.12));
     padding: 1em;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 38%;
 }
 
 .iteration-count {
@@ -554,10 +566,14 @@ button[right-button] {
 }
 
 .card-info {
-    padding: 1em;
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.card-info div {
+    display: flex;
+    flex-direction: column;
 }
 
 .card-info h3 {
@@ -586,10 +602,11 @@ button[right-button] {
     color: #5c5c5c;
 }
 
-.square:after {
-    content: "";
-    display: none;
+.square {
+    height: 0;
+    width: 100%;
     padding-bottom: 100%;
+    background-color: red;
 }
 
 #pen-styles {

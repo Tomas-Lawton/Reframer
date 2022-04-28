@@ -61,13 +61,17 @@ let redoStack = [];
 let historyHolder = [];
 
 // Adjust square canvases
-exemplarSize = document.querySelector(".square").getBoundingClientRect().width;
-console.log(exemplarSize);
-exemplars.forEach((exemplar) => {
-    exemplar.style.width = exemplarSize + "px";
-    exemplar.style.height = exemplarSize + "px";
-    console.log(exemplar);
-});
+setTimeout(() => {
+    exemplarSize = document
+        .querySelector(".square")
+        .getBoundingClientRect().width;
+    console.log(exemplarSize);
+    exemplars.forEach((exemplar) => {
+        exemplar.style.width = exemplarSize + "px";
+        exemplar.style.height = exemplarSize + "px";
+        console.log(exemplar);
+    });
+}, 500);
 
 // Setup
 paper.install(window);
@@ -77,14 +81,6 @@ const scope = new PaperScope();
 scope.setup(canvas);
 
 // For exemplars
-// const scope1 = new PaperScope();
-// const scope2 = new PaperScope();
-// const scope3 = new PaperScope();
-// const scope4 = new PaperScope();
-// scope1.setup(canvas1);
-// scope2.setup(canvas2);
-// scope3.setup(canvas3);
-// scope4.setup(canvas3);
 const exemplarScope = new PaperScope();
 exemplarScope.setup(canvas1);
 exemplarScope.setup(canvas2);
@@ -93,10 +89,6 @@ exemplarScope.setup(canvas4);
 console.log(exemplarScope);
 
 scope.activate();
-// scope1.activate();
-// scope2.activate();
-// scope3.activate();
-// scope4.activate();
 
 const userLayer = new Layer(); //for drawing + erase mask
 timeKeeper.style.width = "0";
