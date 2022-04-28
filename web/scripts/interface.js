@@ -39,7 +39,12 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
             });
             hideSelectUI();
         }
-
+        if (penMode !== "pen" && penMode !== "erase") {
+            palette.style.display = "none";
+            artControls.style.display = "none";
+        } else {
+            palette.style.display = "block";
+        }
         // if (penMode !== "pen" && penMode !== "select") {
         //     artControls.style.display = "none";
         // }
@@ -229,6 +234,14 @@ document.getElementById("save").addEventListener("click", () => {
 document.getElementById("width-slider").oninput = function() {
     strokeWidth = this.value;
 };
+document.getElementById("settings").addEventListener("click", () => {
+    openModal({
+        title: "Settings",
+        message: "Change how artefacts and exemplars are shown.",
+        ui: document.getElementById("settings-ui"),
+    });
+});
+
 // document.getElementById("scale-slider").oninput = function() {
 //     let newScale = this.value / 10;
 //     let selected = getSelectedPaths();
@@ -288,6 +301,7 @@ const picker = new Picker({
 picker.setColor(strokeColor);
 picker.onChange = (color) => {
     strokeColor = color.rgbaString;
+    document.getElementById("pen-color").style.background = strokeColor;
 };
 
 moveSelecterTo(document.querySelectorAll(".pen-mode")[1]);

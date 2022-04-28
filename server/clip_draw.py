@@ -105,6 +105,13 @@ class Clip_Draw_Optimiser:
             logging.error("SVG Parsing failed")
         self.path_list = path_list
 
+
+    # def activate(self):
+    #     self.is_active = True
+    #     self.initialize_shapes()
+    #     self.initialize_variables()
+    #     self.initialize_optimizer()
+
     def activate(self):
         self.is_active = True
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -246,7 +253,6 @@ class Clip_Draw_Optimiser:
                     * 0.3
                 )
 
-        # B\'ezier losses
         l_points = 0
         l_widths = 0
         l_colors = 0

@@ -6,9 +6,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
-    <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/vanilla-picker@2"></script>
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
     <script type="text/javascript" src="https://unpkg.com/paper@0.11.5/dist/paper-full.js"></script>
     <script type="text/javascript" src="scripts/offset.js"></script>
 
@@ -26,6 +27,7 @@
                 <i id="modal-cross" class="fa-solid fa-xmark"></i>
             </div>
             <p id="modal-message"></p>
+            <div id="modalContent"></div>
             <div id="action">
                 <button id="cancel-modal">Cancel</button>
                 <button id="confirm-modal" confirm-cancel right-button>Confirm</button>
@@ -38,6 +40,11 @@
             <h2>Welcome to Clip draw!</h2>
             <button id="begin">BEGIN</button>
         </div>
+    </div>
+
+    <div id="settings-ui">
+        <label>Maximum number of traces</label>
+        <input id="num-traces" type="number" min="1" value="1">
     </div>
 
     <div id="contain-pen-dot">
@@ -98,7 +105,6 @@
             </div>
 
             <div id="art-panel">
-                <!-- <div id="color-picker"></div> -->
                 <h2>Art Panel</h2>
                 <div id="swatches">
                     <div class="red swatch"></div>
@@ -111,17 +117,19 @@
                     <div class="white swatch"></div>
                 </div>
                 <div id="pen-styles">
-                    <div id="custom-picker"></div>
+                    <!-- <div id="custom-picker"></div> -->
+                    <div id="color-picker"></div>
                     <div id="fine-control">
-                        <input type="range" id="alpha-slider" class="art-slider" value="12" min="1" max="40">
-                        <input type="range" id="width-slider" class="art-slider" value="12" min="1" max="40">
+                        <input type="range" id="width-slider" value="12" min="1" max="40">
                         <div id="art-control-final">
                             <div id="stroke-dot">
                                 <div></div>
                             </div>
-                            <div class="off-black"></div>
+                            <div id="pen-color" class="off-black"></div>
                         </div>
                     </div>
+                    <input type="range" id="time-slider" value="0" min="0" max="0">
+
                 </div>
                 <!-- <div id="scale-input">
                     <label>Scale</label>
@@ -135,14 +143,13 @@
 
             <div id="contain-dot">
                 <div class="icon-outer-circle" id="palette">
-                    <i class="colors fa-solid fa-palette fa-fw"></i>
+                    <i class="palette fa-solid fa-palette fa-fw"></i>
                 </div>
             </div>
             <div id="contain-canvas">
                 <canvas id="canvas" resize></canvas>
             </div>
-            <p id="rolling-loss"> <input id="num-traces" type="number" min="1" value="1">
-            </p>
+            <p id="rolling-loss"></p>
         </div>
     </div>
 
@@ -161,7 +168,6 @@
                 <i class="fas fa-search"></i>
                 <input type="text" id="messageText" placeholder="Sketch of a majestic rainbow unicorn..." />
             </div>
-            <input type="range" id="time-slider" value="0" min="0" max="0">
         </div>
 
 

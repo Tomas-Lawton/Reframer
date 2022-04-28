@@ -24,6 +24,18 @@ const noPrompt = () =>
     prompt.value === prompt.getAttribute("placeholder");
 
 const openModal = (data) => {
+    if (data.hasOwnProperty("ui")) {
+        modalContent.innerHTML = null;
+        data.ui.style.display = "flex";
+        modalContent.appendChild(data.ui);
+    } else {
+        if (modalContent.firstChild) {
+            modalContent.firstChild.style.display = "none";
+            document.body.appendChild(modalContent.firstChild); //store on body
+        }
+        modalContent.innerHTML = null;
+    }
+
     let cancel = () =>
         data.hasOwnProperty("cancelAction") ?
         data.cancelAction() :

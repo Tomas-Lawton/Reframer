@@ -36,7 +36,7 @@ const rotateHandler = document.getElementById("rotate-handler");
 // Default draw settings
 let strokeColor = "#181818";
 let strokeWidth = 12;
-let opacity = 0.99; //ink feel
+let opacity = 0.8; //ink feel
 let penMode = "pen";
 let clipDrawing = false;
 let buttonControlLeft = true;
