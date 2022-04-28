@@ -76,7 +76,7 @@ def data_to_tensor(color, stroke_width, path, num_segments):
 
 
 def parse_local_svg(path_to_svg_file):
-    paths, attributes = svg2paths(path_to_svg_file)  # paths only
+    paths, attributes = svg2paths(path_to_svg_file)
     path_list = []
     for att in attributes:
         stroke_width = 15
@@ -111,7 +111,7 @@ def parse_local_svg(path_to_svg_file):
 
 
 def parse_svg(path_to_svg_file, skip_box_select=False):
-    paths, attributes = svg2paths(path_to_svg_file)  # paths only
+    paths, attributes = svg2paths(path_to_svg_file)
     path_list = []
     parsed_svg = SVG.parse(path_to_svg_file)  # access <g> tag for non-path styles
     elements_list = list(parsed_svg.elements())
