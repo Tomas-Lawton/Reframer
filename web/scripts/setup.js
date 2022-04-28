@@ -32,6 +32,7 @@ const generateButton = document.getElementById("generate");
 // Select UI
 const deleteHandler = document.getElementById("delete-handler");
 const rotateHandler = document.getElementById("rotate-handler");
+const initialiseHandler = document.getElementById("initialise-handler");
 
 // Default draw settings
 let strokeColor = "#181818";
@@ -62,16 +63,13 @@ let historyHolder = [];
 
 // Adjust square canvases
 setTimeout(() => {
-    exemplarSize = document
-        .querySelector(".square")
-        .getBoundingClientRect().width;
-    console.log(exemplarSize);
+    let squares = document.querySelectorAll(".square");
+    exemplarSize = squares[0].getBoundingClientRect().width;
     exemplars.forEach((exemplar) => {
         exemplar.style.width = exemplarSize + "px";
         exemplar.style.height = exemplarSize + "px";
-        console.log(exemplar);
     });
-}, 500);
+}, 100);
 
 // Setup
 paper.install(window);
@@ -86,7 +84,6 @@ exemplarScope.setup(canvas1);
 exemplarScope.setup(canvas2);
 exemplarScope.setup(canvas3);
 exemplarScope.setup(canvas4);
-console.log(exemplarScope);
 
 scope.activate();
 

@@ -47,7 +47,8 @@ multiTool.onMouseDown = function(event) {
                 }, null);
                 // Add stroke width so no overflow over bounds?
                 boundingBox = new Path.Rectangle(bbox);
-                boundingBox.strokeColor = "black";
+                boundingBox.strokeColor = "#D2D2D2";
+                boundingBox.strokeWidth = 2;
                 boundingBox.data.state = "moving";
                 updateSelectUI();
             }
@@ -119,7 +120,8 @@ multiTool.onMouseDrag = function(event) {
                         boundingBox.data.from,
                         event.point
                     );
-                    boundingBox.strokeColor = "black";
+                    boundingBox.strokeColor = "#D2D2D2";
+                    boundingBox.strokeWidth = 2;
                     boundingBox.data.state = "resizing";
 
                     const selectedPaths = getSelectedPaths(); // all selected

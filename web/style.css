@@ -514,7 +514,7 @@ button[right-button] {
 #moodboard-header {
     display: flex;
     justify-content: space-between;
-    margin: 2em 0em;
+    margin: 2em 0em 0em 0em;
 }
 
 #open-moodboard {
@@ -629,6 +629,14 @@ button[right-button] {
     display: none;
     position: absolute;
     transform: translate(-50%, -50%);
+}
+
+.no-transform {
+    transform: none;
+    transform: translate(0%, -50%);
+    margin: 1em 1em 1em 0;
+    font-weight: 500;
+    color: #a091ff;
 }
 
 .select-ui div {

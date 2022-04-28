@@ -65,7 +65,7 @@ const switchControls = () => {
     buttonControlLeft = !buttonControlLeft;
 };
 
-const startDrawing = (status, hasRegion = false) => {
+const startDrawing = (status, hasRegion = false, setSVG = null) => {
     // userLayer.activate();
     isFirstIteration = true; //reset canvas
     let canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
@@ -73,9 +73,11 @@ const startDrawing = (status, hasRegion = false) => {
         status: status,
         data: {
             prompt: prompt.value,
-            svg: paper.project.exportSVG({
-                asString: true,
-            }),
+            svg: setSVG ?
+                setSVG :
+                paper.project.exportSVG({
+                    asString: true,
+                }),
             frame_size: status === "sketch_exemplars" ? exemplarSize : "None",
             region: {
                 activate: hasRegion,
@@ -104,12 +106,14 @@ const hideSelectUI = () => {
     // hide ui
     deleteHandler.style.display = "none";
     rotateHandler.style.display = "none";
+    initialiseHandler.style.display = "none";
 };
 
 const updateSelectUI = () => {
     if (boundingBox) {
         rotateHandler.style.display = "block";
         deleteHandler.style.display = "block";
+        initialiseHandler.style.display = "block";
 
         rotateHandler.style.left = boundingBox.bounds.bottomCenter.x + "px";
         rotateHandler.style.top =
@@ -125,6 +129,16 @@ const updateSelectUI = () => {
             1080 -
             boundingBox.bounds.topRight.y -
             deleteHandler.getBoundingClientRect().height / 2 +
+            "px";
+
+        initialiseHandler.style.left =
+            boundingBox.bounds.topLeft.x +
+            // initialiseHandler.getBoundingClientRect().width / 2
+            "px";
+        initialiseHandler.style.bottom =
+            1080 -
+            boundingBox.bounds.topRight.y -
+            initialiseHandler.getBoundingClientRect().height / 2 +
             "px";
     }
 };
@@ -299,16 +313,17 @@ ws.onmessage = function(event) {
     }
     var matches = result.status.match(/\d+/g);
     if (matches != null) {
-        //exemplar
-        let exemplar_canvas = exemplarScope.projects[result.status];
-        exemplar_canvas.activate();
-        exemplar_canvas.clear();
         let svg = result.svg;
         if (svg === "") return null;
-        exemplar_canvas.importSVG(result.svg);
-
+        let exemplar_canvas = exemplarScope.projects[parseInt(result.status)];
+        // console.log(exemplar_canvas);
+        // exemplarScope.activate();
+        // new Point(100, 100);
+        exemplar_canvas.activate();
+        // exemplar_canvas.clear();
+        exemplar_canvas.importSVG(svg);
         document.querySelectorAll(".card-info div p")[
             parseInt(result.status)
-        ].innerHTML = `Loss: ${result.loss}`;
+        ].innerHTML = `Loss: ${result.loss.toPrecision(5)}`;
     }
 };
