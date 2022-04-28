@@ -54,43 +54,36 @@ let undoStack = [];
 let redoStack = [];
 let historyHolder = [];
 
-// Adjust square canvases
-setTimeout(() => {
-    let squares = document.querySelectorAll(".square");
-    exemplarSize = squares[0].getBoundingClientRect().width;
-    exemplars.forEach((exemplar) => {
-        exemplar.style.width = exemplarSize + "px";
-        exemplar.style.height = exemplarSize + "px";
-    });
-}, 100);
-
 // Setup
 paper.install(window);
 
-// For sketching
-const scope = new PaperScope();
-scope.setup(canvas);
-
-// For exemplars
-
+// Exemplars
 const canvas1 = document.getElementById("canvas1");
 const canvas2 = document.getElementById("canvas2");
 const canvas3 = document.getElementById("canvas3");
 const canvas4 = document.getElementById("canvas4");
 const exemplars = [canvas1, canvas2, canvas3, canvas4];
 
+exemplarSize = document.querySelector(".square").getBoundingClientRect().width;
+console.log(exemplarSize);
+exemplars.forEach((exemplar) => {
+    exemplar.style.width = exemplarSize + "px";
+    exemplar.style.height = exemplarSize + "px";
+});
+
 const exemplarScope = new PaperScope();
 exemplarScope.setup(canvas1);
 exemplarScope.setup(canvas2);
 exemplarScope.setup(canvas3);
 exemplarScope.setup(canvas4);
-console.log(exemplarScope);
 
+// For sketching
+const scope = new PaperScope();
+scope.setup(canvas);
 scope.activate();
 
 const userLayer = new Layer(); //for drawing + erase mask
 timeKeeper.style.width = "0";
-
 const multiTool = new Tool();
 multiTool.minDistance = 5;
 const eraseTool = new Tool();
