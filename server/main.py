@@ -63,17 +63,16 @@ async def websocket_endpoint(websocket: WebSocket):
 
             if data["status"] == "stop":
                 await artefact_drawer.stop()
+                for drawer in exemplar_drawers:
+                    await drawer.stop()
             
             if data["status"] == "sketch_exemplars":
                 for drawer in exemplar_drawers:
+                    drawer.frame_size = data["data"]['frame_size']
                     # Use info from other drawer? Or should grab directly from UI???
                     # For now just use same data as drawing.
                     await drawer.draw_update(data)
                     drawer.run_loop()
-                
-            if data["status"] == "stop_exemplars":
-                for drawer in exemplar_drawers:
-                    await drawer.stop()
 
     except WebSocketDisconnect:
         await artefact_drawer.stop()

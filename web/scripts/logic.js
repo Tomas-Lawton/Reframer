@@ -76,6 +76,7 @@ const startDrawing = (status, hasRegion = false) => {
             svg: paper.project.exportSVG({
                 asString: true,
             }),
+            frame_size: status === "sketch_exemplars" ? exemplarSize : "None",
             region: {
                 activate: hasRegion,
                 x1: drawRegion ? drawRegion.x : 0,
@@ -175,7 +176,7 @@ const parseFromSvg = (svg) => {
         child.smooth();
         // AI Stroke Effects
         if (returnedIndex >= numPaths - 32) {
-            console.log("AI Path: ", child);
+            // console.log("AI Path: ", child);
             child.opacity = 0.4;
             // const pathEffect = child.clone({ insert: false });
             // // pathEffect.position.y += 100;
@@ -190,7 +191,6 @@ const parseFromSvg = (svg) => {
         // Works but makes it harder to clear the canvas. So maybe just do this on draw stop!!
         // userLayer.addChild(child);
     }
-
     return paperObject;
 };
 
@@ -249,51 +249,66 @@ const moveSelecterTo = (elem) => {
 };
 
 ws.onmessage = function(event) {
-    if (clipDrawing) {
-        result = JSON.parse(event.data);
-        console.log(result);
+    result = JSON.parse(event.data);
+    console.log(result);
+    // if (clipDrawing)
 
-        if (result.status === "stop") {
-            console.log("Stopped drawer");
-            clipDrawing = false;
-        }
+    if (result.status === "stop") {
+        console.log("Stopped drawer");
+        clipDrawing = false;
+        // stop exemplars also?
+    }
 
-        if (result.status === "draw") {
-            if (isFirstIteration) {
-                userLayer.clear();
-                isFirstIteration = false;
-            } else {
-                // Delete ref to last gen and old traces
-                if (lastRender) {
-                    lastRender.remove();
-                }
-                if (traces) {
-                    for (const trace of traces) {
-                        trace.remove();
-                    }
+    if (result.status === "draw") {
+        //sketch
+        if (isFirstIteration) {
+            userLayer.clear();
+            isFirstIteration = false;
+        } else {
+            // Delete ref to last gen and old traces
+            if (lastRender) {
+                lastRender.remove();
+            }
+            if (traces) {
+                for (const trace of traces) {
+                    trace.remove();
                 }
             }
-            historyHolder.push(result);
-            step += 1; //avoid disconnected iteration after stopping
-            timeKeeper.style.width = "100%";
-            timeKeeper.setAttribute("max", String(step));
-            timeKeeper.value = String(step);
-            setTraces.setAttribute("max", String(step));
-
-            // draw and save current
-            lastRender = parseFromSvg(result.svg);
-            // draw and save traces
-
-            // To do change this so it is just max num traces
-            // if (showTraces) {
-            //     // setTraces.value = String(step);
-            //     showTraceHistoryFrom(historyHolder.length - 1);
-            // }
-
-            calcRollingLoss();
-            console.log(
-                `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`
-            );
         }
+        historyHolder.push(result);
+        step += 1; //avoid disconnected iteration after stopping
+        timeKeeper.style.width = "100%";
+        timeKeeper.setAttribute("max", String(step));
+        timeKeeper.value = String(step);
+        setTraces.setAttribute("max", String(step));
+
+        // draw and save current
+        lastRender = parseFromSvg(result.svg);
+        // draw and save traces
+
+        // To do change this so it is just max num traces
+        // if (showTraces) {
+        //     // setTraces.value = String(step);
+        //     showTraceHistoryFrom(historyHolder.length - 1);
+        // }
+
+        calcRollingLoss();
+        console.log(
+            `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`
+        );
+    }
+    var matches = result.status.match(/\d+/g);
+    if (matches != null) {
+        //exemplar
+        let exemplar_canvas = exemplarScope.projects[result.status];
+        exemplar_canvas.activate();
+        exemplar_canvas.clear();
+        let svg = result.svg;
+        if (svg === "") return null;
+        exemplar_canvas.importSVG(result.svg);
+
+        document.querySelectorAll(".card-info div p")[
+            parseInt(result.status)
+        ].innerHTML = `Loss: ${result.loss}`;
     }
 };

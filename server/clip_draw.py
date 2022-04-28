@@ -52,6 +52,7 @@ class Clip_Draw_Optimiser:
         self.iteration = 0
         self.num_augs = 4
         self.update_frequency = 1
+        self.frame_size = None
         # Configure rasterisor
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         pydiffvg.set_print_timing(False)
@@ -244,6 +245,8 @@ class Clip_Draw_Optimiser:
 
         # Update sketch
         if self.use_user_paths:
+            if self.frame_size is not None:
+                self.resizeScaleFactor = 224 / self.frame_size
             render_shapes, render_shape_groups = rescale_constants(
                 self.shapes, self.shape_groups, self.resizeScaleFactor
             )

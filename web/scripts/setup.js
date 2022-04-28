@@ -9,6 +9,7 @@ const canvas1 = document.getElementById("canvas1");
 const canvas2 = document.getElementById("canvas2");
 const canvas3 = document.getElementById("canvas3");
 const canvas4 = document.getElementById("canvas4");
+const exemplars = [canvas1, canvas2, canvas3, canvas4];
 
 // Main UI
 const prompt = document.getElementById("messageText");
@@ -24,7 +25,6 @@ const timeKeeper = document.getElementById("time-slider");
 const lossText = document.getElementById("rolling-loss");
 const setTraces = document.getElementById("num-traces");
 const selectDot = document.getElementById("contain-pen-dot");
-
 const drawButton = document.getElementById("draw");
 const continueButton = document.getElementById("continue");
 const generateButton = document.getElementById("generate");
@@ -54,27 +54,49 @@ let myPath,
     isFirstIteration,
     lastRollingLoss,
     traces,
-    boundingBox;
+    boundingBox,
+    exemplarSize;
 let undoStack = [];
 let redoStack = [];
 let historyHolder = [];
 
+// Adjust square canvases
+exemplarSize = document.querySelector(".square").getBoundingClientRect().width;
+console.log(exemplarSize);
+exemplars.forEach((exemplar) => {
+    exemplar.style.width = exemplarSize + "px";
+    exemplar.style.height = exemplarSize + "px";
+    console.log(exemplar);
+});
+
 // Setup
 paper.install(window);
+
+// For sketching
 const scope = new PaperScope();
+scope.setup(canvas);
+
+// For exemplars
 // const scope1 = new PaperScope();
 // const scope2 = new PaperScope();
 // const scope3 = new PaperScope();
-
-scope.setup(canvas);
+// const scope4 = new PaperScope();
 // scope1.setup(canvas1);
 // scope2.setup(canvas2);
 // scope3.setup(canvas3);
+// scope4.setup(canvas3);
+const exemplarScope = new PaperScope();
+exemplarScope.setup(canvas1);
+exemplarScope.setup(canvas2);
+exemplarScope.setup(canvas3);
+exemplarScope.setup(canvas4);
+console.log(exemplarScope);
 
-// scope.activate();
+scope.activate();
 // scope1.activate();
 // scope2.activate();
 // scope3.activate();
+// scope4.activate();
 
 const userLayer = new Layer(); //for drawing + erase mask
 timeKeeper.style.width = "0";

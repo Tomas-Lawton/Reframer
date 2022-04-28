@@ -1,5 +1,3 @@
-// If not a path and not in bounds
-
 multiTool.onMouseDown = function(event) {
     // refactor for multitouch
     switch (penMode) {

@@ -553,14 +553,6 @@ button[right-button] {
     color: #7b7b7b;
 }
 
-.card-image {
-    /* width: 240px;
-    height: 240px; */
-    /* width: 100%;
-    height: 100%; */
-    background: #12b700;
-}
-
 .card-info {
     padding: 1em;
     display: flex;
@@ -594,13 +586,9 @@ button[right-button] {
     color: #5c5c5c;
 }
 
-.square {
-    width: 100%;
-}
-
 .square:after {
     content: "";
-    display: block;
+    display: none;
     padding-bottom: 100%;
 }
 
