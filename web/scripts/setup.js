@@ -4,13 +4,6 @@ const localHost = "http://localhost:8000";
 // Sketch
 const canvas = document.getElementById("canvas");
 
-// Exemplars
-const canvas1 = document.getElementById("canvas1");
-const canvas2 = document.getElementById("canvas2");
-const canvas3 = document.getElementById("canvas3");
-const canvas4 = document.getElementById("canvas4");
-const exemplars = [canvas1, canvas2, canvas3, canvas4];
-
 // Main UI
 const prompt = document.getElementById("messageText");
 const modal = document.getElementById("modal");
@@ -79,11 +72,19 @@ const scope = new PaperScope();
 scope.setup(canvas);
 
 // For exemplars
+
+const canvas1 = document.getElementById("canvas1");
+const canvas2 = document.getElementById("canvas2");
+const canvas3 = document.getElementById("canvas3");
+const canvas4 = document.getElementById("canvas4");
+const exemplars = [canvas1, canvas2, canvas3, canvas4];
+
 const exemplarScope = new PaperScope();
 exemplarScope.setup(canvas1);
 exemplarScope.setup(canvas2);
 exemplarScope.setup(canvas3);
 exemplarScope.setup(canvas4);
+console.log(exemplarScope);
 
 scope.activate();
 

@@ -313,15 +313,13 @@ ws.onmessage = function(event) {
     }
     var matches = result.status.match(/\d+/g);
     if (matches != null) {
+        let exemplar_canvas = exemplarScope.projects[parseInt(result.status)];
+        exemplar_canvas.activate();
+        exemplar_canvas.clear();
         let svg = result.svg;
         if (svg === "") return null;
-        let exemplar_canvas = exemplarScope.projects[parseInt(result.status)];
-        // console.log(exemplar_canvas);
-        // exemplarScope.activate();
-        // new Point(100, 100);
-        exemplar_canvas.activate();
-        // exemplar_canvas.clear();
-        exemplar_canvas.importSVG(svg);
+        exemplar_canvas.importSVG(result.svg);
+
         document.querySelectorAll(".card-info div p")[
             parseInt(result.status)
         ].innerHTML = `Loss: ${result.loss.toPrecision(5)}`;
