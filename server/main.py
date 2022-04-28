@@ -68,7 +68,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 for drawer in exemplar_drawers:
                     # Use info from other drawer? Or should grab directly from UI???
                     # For now just use same data as drawing.
-                    drawer.draw_update(data)
+                    await drawer.draw_update(data)
                     drawer.run_loop()
                 
             if data["status"] == "stop_exemplars":

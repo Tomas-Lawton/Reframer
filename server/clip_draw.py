@@ -156,10 +156,8 @@ class Clip_Draw_Optimiser:
         return img
 
     def run_epoch(self):
-        if self.iteration > self.num_iter:
-            return -1
-        logging.info(self.iteration)
         t = self.iteration
+        logging.info(f"Starting run {t} in drawer {str(self.exemplar_count)}")
 
         self.points_optim.zero_grad()
         self.width_optim.zero_grad()
@@ -250,13 +248,13 @@ class Clip_Draw_Optimiser:
                 self.shapes, self.shape_groups, self.resizeScaleFactor
             )
             pydiffvg.save_svg(
-                'results/img.png',
+                f"results/img-{str(self.exemplar_count)}.png",
                 224,
                 224,
                 self.shapes, self.shape_groups,
             )
             pydiffvg.save_svg(
-                'results/output.svg',
+                f"results/output-{str(self.exemplar_count)}.svg",
                 self.user_canvas_w,
                 self.user_canvas_h,
                 render_shapes,
@@ -316,14 +314,15 @@ class Clip_Draw_Optimiser:
         logging.info("Running iteration...")
         svg = ''
         i, loss = self.run_epoch()
-        async with aiofiles.open("results/output.svg", "r") as f:
+        async with aiofiles.open(f"results/output-{str(self.exemplar_count)}.svg", "r") as f:
             svg = await f.read()
         status = "draw"
         if (isinstance(self.exemplar_count, int)):
-            status = self.exemplar_count
+            logging.info(f"Sending exemplar {self.exemplar_count}")
+            status = str(self.exemplar_count)
         result = {"status": status, "svg": svg, "iterations": i, "loss": loss}
         await self.socket.send_json(result)
-        logging.info(f"Optimisation {i} complete")
+        logging.info(f"Completed run {i} in drawer {str(self.exemplar_count)}")
         
         self.last_result = result  # won't go to client unless continued is used
 
