@@ -66,15 +66,13 @@ const switchControls = () => {
 };
 
 const startDrawing = (status, hasRegion = false, setSVG = null) => {
-    // userLayer.activate();
     isFirstIteration = true; //reset canvas
     let canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
     const request = {
         status: status,
         data: {
             prompt: prompt.value,
-            svg: setSVG ?
-                setSVG :
+            svg: setSVG ||
                 paper.project.exportSVG({
                     asString: true,
                 }),
@@ -122,8 +120,8 @@ const updateSelectUI = () => {
             "px";
 
         deleteHandler.style.left =
-            boundingBox.bounds.topRight.x -
-            deleteHandler.getBoundingClientRect().width / 2 +
+            boundingBox.bounds.topRight.x +
+            // deleteHandler.getBoundingClientRect().width / 2 +
             "px";
         deleteHandler.style.bottom =
             1080 -
@@ -181,18 +179,20 @@ const resetHistory = () => {
 
 const parseFromSvg = (svg) => {
     if (svg === "") return null;
+    userLayer.clear();
     let paperObject = userLayer.importSVG(svg);
     const numPaths = paperObject.children[0].children.length;
-    console.log(numPaths, " Paths");
-
     for (const returnedIndex in paperObject.children[0].children) {
         const child = paperObject.children[0].children[returnedIndex];
         child.smooth();
         // AI Stroke Effects
-        if (returnedIndex >= numPaths - 32) {
+        if (returnedIndex >= numPaths - 50) {
             // console.log("AI Path: ", child);
-            child.opacity = 0.4;
+            child.opacity = 0.5;
+
             // const pathEffect = child.clone({ insert: false });
+            // userLayer.addChild(pathEffect);
+
             // // pathEffect.position.y += 100;
             // // pathEffect.strokeColor = "#FFFF00";
             // pathEffect.opacity = 0.8;
@@ -201,10 +201,15 @@ const parseFromSvg = (svg) => {
             // try opacity
         }
 
+        const pathEffect = child.clone({ insert: false });
+        userLayer.addChild(pathEffect);
+
         // Add all to main canvas by adding to user layer as children.
         // Works but makes it harder to clear the canvas. So maybe just do this on draw stop!!
         // userLayer.addChild(child);
     }
+    paperObject.remove();
+    console.log(userLayer);
     return paperObject;
 };
 
@@ -230,12 +235,12 @@ const calcRollingLoss = () => {
         );
         const newRollingLoss = sum / items.length;
         lossText.innerHTML = `Rolling loss: ${newRollingLoss}`;
-        if (lastRollingLoss !== undefined) {
-            if (Math.abs(lastRollingLoss - newRollingLoss) < 0.0001) {
-                lossText.innerHTML = `Converged at: ${newRollingLoss}`;
-                stopClip();
-            }
-        }
+        // if (lastRollingLoss !== undefined) {
+        //     if (Math.abs(lastRollingLoss - newRollingLoss) < 0.0001) {
+        //         lossText.innerHTML = `Converged at: ${newRollingLoss}`;
+        //         stopClip();
+        //     }
+        // }
         lastRollingLoss = newRollingLoss;
     }
 };

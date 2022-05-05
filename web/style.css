@@ -30,6 +30,25 @@ html,
 body {
     display: flex;
     background: #fbfbfb;
+    height: 100%;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+}
+
+#left-background {
+    width: fit-content;
+    display: flex;
+    background: #ffffff;
+    box-shadow: 10px 9px 27px rgba(48, 48, 48, 0.04);
+}
+
+#right-background {
+    width: 100%;
+    /* height: 100%; */
+    margin: 0;
+    padding: 0 2em;
+    display: flex;
+    flex-direction: column;
 }
 
 #penmode-inner-circle {
@@ -49,12 +68,6 @@ body {
 #contain-pen-dot {
     position: absolute;
     z-index: 8;
-}
-
-#left-background {
-    display: flex;
-    background: #ffffff;
-    box-shadow: 10px 9px 27px rgba(48, 48, 48, 0.04);
 }
 
 canvas {
@@ -285,6 +298,10 @@ button[right-button] {
     background: #a091ff;
 }
 
+#initialise-handler i {
+    color: #a091ff;
+}
+
 
 /* #clip-wrap {
     filter: drop-shadow(0 5px 10px rgba(129, 129, 129, 0.19)) drop-shadow(0 3px 3px rgba(146, 146, 146, 0.23));
@@ -355,11 +372,22 @@ button[right-button] {
 }
 
 #contain-dot {
+    align-items: center;
     z-index: 8;
-    padding: 2em;
+    width: 100%;
     right: 0;
     position: absolute;
     display: flex;
+    justify-content: space-between;
+}
+
+#time-slider {
+    margin-left: 2em;
+    margin-right: 0;
+}
+
+#palette {
+    margin: 2em;
 }
 
 #contain-dot .fa-solid {
@@ -433,21 +461,19 @@ button[right-button] {
     pointer-events: auto;
 } */
 
+
+/* #time-slider {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+} */
+
 #rolling-loss {
     position: absolute;
     left: 8px;
     z-index: 10;
     bottom: 8px;
     color: #707070;
-}
-
-#right-background {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0 4em;
-    display: flex;
-    flex-direction: column;
 }
 
 #describe-card {
@@ -465,15 +491,31 @@ button[right-button] {
     justify-content: space-between;
     font-weight: lighter;
     color: white;
+    align-items: center;
+    margin: 1em 0;
 }
 
 #describe-top h1 {
-    font-size: 1.5em;
+    font-size: 1.2em;
     font-weight: 500;
 }
 
 #describe-actions {
     display: flex;
+    justify-content: space-between;
+    justify-content: flex-end;
+}
+
+#describe-actions div {
+    margin: 0 0.1em;
+    box-shadow: none;
+}
+
+#describe-actions i {
+    padding: 0.2em;
+    font-size: 1.2;
+    color: #363636;
+    /* color: #7b66ff; */
 }
 
 #control-actions {
@@ -853,3 +895,124 @@ input[type="range"]::-moz-range-thumb {
 #settings-ui {
     display: none;
 }
+
+
+/* Mobile Stuff */
+
+#mobile-art-controls {
+    display: none;
+}
+
+#left-background p {
+    display: none;
+}
+
+@media screen and (max-width: 600px) {
+    #button-panel {
+        flex-direction: row;
+    }
+    .button-container {
+        flex-direction: row;
+    }
+    #button-panel {
+        display: block;
+        width: auto;
+        margin-bottom: 3em;
+        border-radius: 0;
+    }
+    #button-panel div {
+        justify-content: space-between;
+    }
+    .icon-outer-circle {
+        height: fit-content;
+    }
+    #button-panel .fa-solid {
+        font-size: 0.8em;
+    }
+    #button-panel .center {
+        display: none;
+    }
+    #left-background {
+        flex-direction: column;
+        width: fit-content;
+    }
+    .icon-outer-circle {
+        padding: 0.3em;
+    }
+    #right-background {
+        display: none;
+    }
+    #penmode-inner-circle {
+        width: 0.5em;
+        height: 0.5em;
+    }
+    #penmode-outer-circle {
+        padding: 0.2em;
+    }
+    body {
+        flex-direction: column;
+        width: auto;
+    }
+    canvas[resize] {
+        height: 100vw;
+        width: 100vw;
+    }
+    .layout_default.picker_wrapper {
+        background: #f8f8f8 !important;
+        width: 100% !important;
+    }
+    #simple-modal {
+        width: fit-content;
+    }
+    #mobile-art-controls {
+        display: flex;
+    }
+    #art-panel {
+        width: 80%;
+    }
+    #time-slider {
+        display: none;
+    }
+}
+
+#button-panel .fa-solid {
+    font-size: 0.8em;
+}
+
+.icon-outer-circle {
+    padding: 0.3em;
+}
+
+@media screen and (min-height: 50em) {
+    /* body {
+        display: flex;
+        flex-direction: column-reverse;
+    } */
+    #describe-top {
+        display: block;
+    }
+    #describe-card {
+        padding: 2em;
+    }
+    #describe-actions {
+        justify-content: flex-start;
+    }
+    #describe-card {
+        padding: 2em;
+    }
+}
+
+
+/* @media screen and (min-height: 55em) {
+    body {
+        display: block;
+    }
+    #right-background {
+        display: block;
+            flex-direction: column-reverse;
+    }
+    #left-background {
+        width: auto;
+        justify-content: space-between;
+    }
+} */

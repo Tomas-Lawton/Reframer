@@ -39,12 +39,12 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
             });
             hideSelectUI();
         }
-        if (penMode !== "pen" && penMode !== "erase") {
-            palette.style.display = "none";
-            artControls.style.display = "none";
-        } else {
-            palette.style.display = "block";
-        }
+        // if (penMode !== "pen" && penMode !== "erase") {
+        //     palette.style.display = "none";
+        //     artControls.style.display = "none";
+        // } else {
+        //     palette.style.display = "block";
+        // }
         // if (penMode !== "pen" && penMode !== "select") {
         //     artControls.style.display = "none";
         // }

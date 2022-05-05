@@ -37,7 +37,7 @@ class Clip_Draw_Optimiser:
         self.use_neg_prompts = False
         self.normalize_clip = True
         # Canvas parameters
-        self.num_paths = 32
+        self.num_paths = 50
         self.max_width = 40
         self.canvas_h = 224
         self.canvas_w = 224

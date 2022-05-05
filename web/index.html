@@ -20,6 +20,8 @@
 </head>
 
 <body>
+    <!-- UI -->
+
     <div id="modal">
         <div id="simple-modal">
             <div id="modal-status">
@@ -52,6 +54,111 @@
             <div id="penmode-inner-circle"></div>
         </div>
     </div>
+
+    <!-- TARGET -->
+
+    <div id="right-background">
+        <div id="describe-card">
+            <div id="describe-top">
+                <h1>Describe</h1>
+                <div id="describe-actions">
+                    <!-- Change to icons -->
+
+                    <div class="icon-outer-circle" id="draw">
+                        <i class="fa-solid fa-brain fa-fw"></i>
+                    </div>
+                    <div class="icon-outer-circle" id="continue">
+                        <i class="fa-solid fa-arrow-right fa-fw"></i>
+                    </div>
+                    <div class="icon-outer-circle" id="generate">
+                        <i class="fa-solid fa-border-all fa-fw"></i>
+                    </div>
+                    <div class="icon-outer-circle">
+                        <i class="fa-solid fa-stop fa-fw"></i>
+                    </div>
+
+                </div>
+            </div>
+            <div id="prompt-input">
+                <i class="fas fa-search"></i>
+                <input type="text" id="messageText" placeholder="Sketch of a majestic rainbow unicorn..." />
+            </div>
+        </div>
+
+
+        <div id="moodboard-header">
+            <div>
+                <h2>Add to Moodboard...</h2>
+                <p>Exemplars can improve AI sketches.</p>
+            </div>
+            <button id="open-moodboard">
+                Expand
+                <i class="fas fa-image"></i>
+            </button>
+        </div>
+
+        <!-- Grid -->
+
+        <div id="exemplar-grid">
+            <div class="exemplar-grid-verticle">
+                <div class="exemplar-card">
+                    <div class="square">
+                        <canvas id="canvas1" class="exemplar"></canvas>
+                    </div>
+                    <div class="card-info">
+                        <div>
+                            <h3>Exemplar 1</h3>
+                            <p>Loss: 0</p>
+                        </div>
+                        <i class="fa-solid fa-plus fa-fw"></i>
+                    </div>
+                </div>
+
+                <div class="exemplar-card">
+                    <div class="square">
+                        <canvas id="canvas2" class="exemplar"></canvas>
+                    </div>
+                    <div class="card-info">
+                        <div>
+                            <h3>Exemplar 2</h3>
+                            <p>Loss: 0</p>
+                        </div>
+                        <i class="fa-solid fa-plus fa-fw"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-verticle">
+                <div class="exemplar-card">
+                    <div class="square">
+                        <canvas id="canvas3" class="exemplar"></canvas>
+                    </div>
+                    <div class="card-info">
+                        <div>
+                            <h3>Exemplar 3</h3>
+                            <p>Loss: 0</p>
+                        </div>
+                        <i class="fa-solid fa-plus fa-fw"></i>
+                    </div>
+                </div>
+
+                <div class="exemplar-card">
+                    <div class="square">
+                        <canvas id="canvas4" class="exemplar"></canvas>
+                    </div>
+                    <div class="card-info">
+                        <div>
+                            <h3>Exemplar 4</h3>
+                            <p>Loss: 0</p>
+                        </div>
+                        <i class="fa-solid fa-plus fa-fw"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SKETCH -->
 
     <div id="left-background">
         <div id="button-panel">
@@ -90,9 +197,18 @@
                     <i class="trash fa-solid fa-trash fa-fw"></i>
                 </div>
             </div>
+            <p>At least 600px width for AI controls.</p>
         </div>
 
         <div id="sketch-view">
+
+            <div id="contain-dot">
+                <input type="range" id="time-slider" value="0" min="0" max="0">
+                <div class="icon-outer-circle" id="palette">
+                    <i class="palette fa-solid fa-palette fa-fw"></i>
+                </div>
+            </div>
+
             <div id="delete-handler" class="select-ui">
                 <div class="icon-outer-circle">
                     <i class="basic-grey fa-solid fa-trash fa-fw"></i>
@@ -103,10 +219,11 @@
                     <i class="basic-grey fa-solid fa-rotate fa-fw"></i>
                 </div>
             </div>
-            <div id="initialise-handler" class="no-transform select-ui">
-                Initialise Selection
+            <div id="initialise-handler" class="select-ui">
+                <div class="icon-outer-circle">
+                    <i class="basic-grey fa-solid fa-brain fa-fw"></i>
+                </div>
             </div>
-
 
             <div id="art-panel">
                 <h2>Art Panel</h2>
@@ -121,7 +238,6 @@
                     <div class="white swatch"></div>
                 </div>
                 <div id="pen-styles">
-                    <!-- <div id="custom-picker"></div> -->
                     <div id="color-picker"></div>
                     <div id="fine-control">
                         <input type="range" id="width-slider" value="12" min="1" max="40">
@@ -132,24 +248,9 @@
                             <div id="pen-color" class="off-black"></div>
                         </div>
                     </div>
-                    <input type="range" id="time-slider" value="0" min="0" max="0">
-
-                </div>
-                <!-- <div id="scale-input">
-                    <label>Scale</label>
-                    <input type="range" id="scale-slider" value="15" min="1" max="30">
-                </div>
-                <div id="rotate-input">
-                    <label>Rotate</label>
-                    <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
-                </div> -->
-            </div>
-
-            <div id="contain-dot">
-                <div class="icon-outer-circle" id="palette">
-                    <i class="palette fa-solid fa-palette fa-fw"></i>
                 </div>
             </div>
+
             <div id="contain-canvas">
                 <canvas id="canvas" resize></canvas>
             </div>
@@ -157,97 +258,8 @@
         </div>
     </div>
 
-    <div id="right-background">
-        <div id="describe-card">
-            <div id="describe-top">
-                <h1>Describe</h1>
-                <div id="describe-actions">
-                    <!-- Change to icons -->
-                    <button id="draw">Draw</button>
-                    <button id="continue">Continue</button>
-                    <button id="generate">Gen</button>
-                </div>
-            </div>
-            <div id="prompt-input">
-                <i class="fas fa-search"></i>
-                <input type="text" id="messageText" placeholder="Sketch of a majestic rainbow unicorn..." />
-            </div>
-        </div>
+    <div id="mobile-art-controls"></div>
 
-
-        <div id="moodboard-header">
-            <div>
-                <h2>Add to Moodboard...</h2>
-                <p>Exemplars can improve AI sketches.</p>
-            </div>
-            <button id="open-moodboard">
-                Expand
-                <i class="fas fa-image"></i>
-            </button>
-        </div>
-
-        <div id="exemplar-grid">
-            <div class="exemplar-grid-verticle">
-                <div class="exemplar-card">
-                    <!-- <p class="iteration-count">0</p> -->
-                    <div class="square">
-                        <canvas id="canvas1" class="exemplar"></canvas>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                            <h3>Exemplar 1</h3>
-                            <p>Loss: 0</p>
-                        </div>
-                        <i class="fa-solid fa-plus fa-fw"></i>
-                    </div>
-                </div>
-
-                <div class="exemplar-card">
-                    <!-- <p class="iteration-count">0</p> -->
-                    <div class="square">
-                        <canvas id="canvas2" class="exemplar"></canvas>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                            <h3>Exemplar 2</h3>
-                            <p>Loss: 0</p>
-                        </div>
-                        <i class="fa-solid fa-plus fa-fw"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid-verticle">
-                <div class="exemplar-card">
-                    <!-- <p class="iteration-count">0</p> -->
-                    <div class="square">
-                        <canvas id="canvas3" class="exemplar"></canvas>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                            <h3>Exemplar 3</h3>
-                            <p>Loss: 0</p>
-                        </div>
-                        <i class="fa-solid fa-plus fa-fw"></i>
-                    </div>
-                </div>
-
-                <div class="exemplar-card">
-                    <!-- <p class="iteration-count">0</p> -->
-                    <div class="square">
-                        <canvas id="canvas4" class="exemplar"></canvas>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                            <h3>Exemplar 4</h3>
-                            <p>Loss: 0</p>
-                        </div>
-                        <i class="fa-solid fa-plus fa-fw"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 
 </html>

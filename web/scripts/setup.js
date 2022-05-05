@@ -50,6 +50,7 @@ let myPath,
     traces,
     boundingBox,
     exemplarSize;
+
 let undoStack = [];
 let redoStack = [];
 let historyHolder = [];
@@ -64,12 +65,20 @@ const canvas3 = document.getElementById("canvas3");
 const canvas4 = document.getElementById("canvas4");
 const exemplars = [canvas1, canvas2, canvas3, canvas4];
 
+console.log(document.querySelector(".square").getBoundingClientRect());
 exemplarSize = document.querySelector(".square").getBoundingClientRect().width;
 console.log(exemplarSize);
 exemplars.forEach((exemplar) => {
     exemplar.style.width = exemplarSize + "px";
     exemplar.style.height = exemplarSize + "px";
 });
+
+if (window.innerWidth <= 600) {
+    document.getElementById("mobile-art-controls").appendChild(artControls);
+    document
+        .getElementById("mobile-art-controls")
+        .appendChild(document.getElementById("contain-dot"));
+}
 
 const exemplarScope = new PaperScope();
 exemplarScope.setup(canvas1);
@@ -88,3 +97,46 @@ const multiTool = new Tool();
 multiTool.minDistance = 5;
 const eraseTool = new Tool();
 eraseTool.minDistance = 10;
+
+// class UndoStack {
+//     constructor() {
+//         this.undoStack = [];
+//         this.redoStack = [];
+//         this.historyHolder = [];
+//     }
+// }
+
+// class SketchHandler {
+//     constructor() {
+//         this.prompt;
+//         this.svg;
+
+//         // let strokeColor = "#181818";
+//         // let strokeWidth = 12;
+//         // let opacity = 0.8; //ink feel
+//         // let penMode = "pen";
+//         // let clipDrawing = false;
+//         // let buttonControlLeft = true;
+//         // let showTraces = true;
+
+//         // Update these
+//         this.drawRegion = null;
+//         this.currentSelectedPath = null;
+//         this.lastRender = null;
+//         this.lastPrompt = null;
+//         this.erasePath = null;
+//         this.tmpGroup = null;
+//         this.mask = null;
+//         this.isFirstIteration = null;
+//         this.lastRollingLoss = null;
+//         this.traces = null;
+//         this.boundingBox = null;
+//     }
+//     send() {}
+//     draw() {}
+//     redraw() {}
+//     showExemplars() {}
+//     stop() {}
+// }
+
+// mainSketch = new SketchHandler();
