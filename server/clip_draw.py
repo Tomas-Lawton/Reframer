@@ -245,8 +245,9 @@ class Clip_Draw_Optimiser:
 
         # Update sketch
         if self.use_user_paths:
-            if self.frame_size is not None:
+            if self.exemplar_count is not None:
                 self.resizeScaleFactor = 224 / self.frame_size
+
             render_shapes, render_shape_groups = rescale_constants(
                 self.shapes, self.shape_groups, self.resizeScaleFactor
             )

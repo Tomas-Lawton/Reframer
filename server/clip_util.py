@@ -134,10 +134,7 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
 
     width = int(parent_svg['attributes']['width'])
     height = int(parent_svg['attributes']['height'])
-
     frame_size = max(width, height)
-    reframe_size = min(width, height)
-
     normaliseScaleFactor = 1 / frame_size
     resizeScaleFactor = 224 / frame_size
 
@@ -202,7 +199,7 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
         count += 1
 
     logging.info(f"Returning list of paths: \n {path_list}")
-
+    print(resizeScaleFactor)
     return path_list, width, height, resizeScaleFactor, normaliseScaleFactor
 
 

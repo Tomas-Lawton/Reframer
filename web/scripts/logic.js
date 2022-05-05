@@ -1,3 +1,106 @@
+class SimpleStack {
+    constructor() {
+        this.undoStack = [];
+        this.redoStack = [];
+        this.historyHolder = [];
+    }
+}
+
+class SketchHandler {
+    // Maintains a logical state for sending over WS
+    constructor() {
+        // Sketching Data
+        this.prompt = null;
+        this.svg = null;
+        this.frameSize = canvas.getBoundingClientRect().width;
+
+        // Defaults
+        this.strokeColor = "#181818";
+        this.strokeWidth = 12;
+        this.opacity = 0.75;
+        this.penMode = "pen";
+        this.clipDrawing = false;
+        this.maximumTraces = 1; // todo change
+
+        // TODO Refactor
+        this.buttonControlLeft = true;
+        this.showTraces = true;
+
+        // User Initialised
+        this.drawRegion = null;
+        this.lastRender = null;
+        this.lastPrompt = null;
+        this.isFirstIteration = null;
+        this.lastRollingLoss = null;
+        this.traces = null;
+        this.boundingBox = null;
+
+        // Undo/redo stack
+        this.stack = new SimpleStack();
+    }
+    updateDrawer({ status, svg, hasRegion, frameSize, prompt }) {
+        mainSketch.isFirstIteration = true; //reset canvas
+        const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
+        mainSketch.lastPrompt = prompt;
+        const res = {
+            status: status,
+            data: {
+                prompt: prompt,
+                svg: svg,
+                frame_size: frameSize,
+                region: {
+                    activate: hasRegion,
+                    x1: mainSketch.drawRegion ? mainSketch.drawRegion.x : 0,
+                    y1: mainSketch.drawRegion ?
+                        canvasBounds.height - mainSketch.drawRegion.y :
+                        0,
+                    x2: mainSketch.drawRegion ?
+                        mainSketch.drawRegion.x + mainSketch.drawRegion.width :
+                        canvasBounds.width,
+                    y2: mainSketch.drawRegion ?
+                        canvasBounds.height -
+                        mainSketch.drawRegion.y -
+                        mainSketch.drawRegion.height // use non-web y coords
+                        :
+                        canvasBounds.height, // same as width
+                },
+            },
+        };
+        ws.send(JSON.stringify(res));
+        console.log(res);
+    }
+    draw(withRegion = false) {
+        this.updateDrawer({
+            status: "draw",
+            svg: this.svg,
+            hasRegion: withRegion,
+            frameSize: this.frameSize,
+            prompt: this.prompt,
+        });
+    }
+    redraw(withRegion = false) {
+        this.updateDrawer({
+            status: "redraw",
+            hasRegion: withRegion,
+            frameSize: this.frameSize,
+        });
+    }
+    generate() {
+        this.updateDrawer({
+            status: "sketch_exemplars",
+            svg: this.svg,
+            hasRegion: false,
+            frameSize: exemplarSize,
+            prompt: this.prompt,
+        });
+    }
+    stop() {
+        this.updateDrawer({ status: "stop" });
+    }
+}
+
+mainSketch = new SketchHandler();
+
 const getSelectedPaths = () =>
     userLayer.getItems().filter((path) => path.selected);
 
@@ -56,50 +159,21 @@ const openModal = (data) => {
 };
 
 const switchControls = () => {
-    if (buttonControlLeft) {
+    if (mainSketch.buttonControlLeft) {
         console.log(window.innerWidth);
         buttonPanel.style.left = `${window.innerWidth - buttonPanel.offsetWidth}px`;
     } else {
         buttonPanel.style.left = 0;
     }
-    buttonControlLeft = !buttonControlLeft;
-};
-
-const startDrawing = (status, hasRegion = false, setSVG = null) => {
-    isFirstIteration = true; //reset canvas
-    let canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
-    const request = {
-        status: status,
-        data: {
-            prompt: prompt.value,
-            svg: setSVG ||
-                paper.project.exportSVG({
-                    asString: true,
-                }),
-            frame_size: status === "sketch_exemplars" ? exemplarSize : "None",
-            region: {
-                activate: hasRegion,
-                x1: drawRegion ? drawRegion.x : 0,
-                y1: drawRegion ? canvasBounds.height - drawRegion.y : 0,
-                x2: drawRegion ? drawRegion.x + drawRegion.width : canvasBounds.width,
-                y2: drawRegion ?
-                    canvasBounds.height - drawRegion.y - drawRegion.height // use non-web y coords
-                    :
-                    canvasBounds.height, // same as width
-            },
-        },
-    };
-    lastPrompt = prompt.value;
-    console.log(request);
-    ws.send(JSON.stringify(request));
+    mainSketch.buttonControlLeft = !mainSketch.buttonControlLeft;
 };
 
 // dragging moves select elements + ui
 const hideSelectUI = () => {
     // remove rect
-    if (boundingBox) {
-        boundingBox.remove();
-        boundingBox = null;
+    if (mainSketch.boundingBox) {
+        mainSketch.boundingBox.remove();
+        mainSketch.boundingBox = null;
     }
     // hide ui
     deleteHandler.style.display = "none";
@@ -108,34 +182,35 @@ const hideSelectUI = () => {
 };
 
 const updateSelectUI = () => {
-    if (boundingBox) {
+    if (mainSketch.boundingBox) {
         rotateHandler.style.display = "block";
         deleteHandler.style.display = "block";
         initialiseHandler.style.display = "block";
 
-        rotateHandler.style.left = boundingBox.bounds.bottomCenter.x + "px";
+        rotateHandler.style.left =
+            mainSketch.boundingBox.bounds.bottomCenter.x + "px";
         rotateHandler.style.top =
-            boundingBox.bounds.bottomCenter.y +
+            mainSketch.boundingBox.bounds.bottomCenter.y +
             rotateHandler.getBoundingClientRect().height / 2 +
             "px";
 
         deleteHandler.style.left =
-            boundingBox.bounds.topRight.x +
+            mainSketch.boundingBox.bounds.topRight.x +
             // deleteHandler.getBoundingClientRect().width / 2 +
             "px";
         deleteHandler.style.bottom =
-            1080 -
-            boundingBox.bounds.topRight.y -
+            mainSketch.frameSize -
+            mainSketch.boundingBox.bounds.topRight.y -
             deleteHandler.getBoundingClientRect().height / 2 +
             "px";
 
         initialiseHandler.style.left =
-            boundingBox.bounds.topLeft.x +
+            mainSketch.boundingBox.bounds.topLeft.x +
             // initialiseHandler.getBoundingClientRect().width / 2
             "px";
         initialiseHandler.style.bottom =
-            1080 -
-            boundingBox.bounds.topRight.y -
+            mainSketch.frameSize -
+            mainSketch.boundingBox.bounds.topRight.y -
             initialiseHandler.getBoundingClientRect().height / 2 +
             "px";
     }
@@ -146,13 +221,13 @@ const deletePath = () => {
     if (selected.length > 0) {
         pathList = selected.map((path) => path.exportJSON()); //dont use paper ref
         console.log(pathList);
-        undoStack.push({
+        mainSketch.stack.undoStack.push({
             type: "delete-event",
             data: pathList,
         });
         selected.map((path) => path.remove());
     }
-    if (boundingBox) {
+    if (mainSketch.boundingBox) {
         hideSelectUI();
     }
 };
@@ -163,15 +238,13 @@ const stopClip = () => {
             status: "stop",
         })
     );
-    drawButton.innerHTML = "Redraw";
-    continueButton.innerHTML = "Continue";
 };
 
 // switchControls();
 
 const resetHistory = () => {
     step = 0; // reset since not continuing
-    historyHolder = [{ svg: "" }];
+    mainSketch.stack.historyHolder = [{ svg: "" }];
     timeKeeper.style.width = "0";
     timeKeeper.setAttribute("max", "0");
     timeKeeper.value = "0";
@@ -195,10 +268,10 @@ const parseFromSvg = (svg) => {
 
             // // pathEffect.position.y += 100;
             // // pathEffect.strokeColor = "#FFFF00";
-            // pathEffect.opacity = 0.8;
-            // pathEffect.strokeWidth = strokeWidth * 2;
+            // pathEffect.mainSketch.opacity = 0.8;
+            // pathEffect.mainSketch.strokeWidth = mainSketch.strokeWidth * 2;
             // userLayer.addChild(pathEffect);
-            // try opacity
+            // try mainSketch.opacity
         }
 
         const pathEffect = child.clone({ insert: false });
@@ -209,24 +282,29 @@ const parseFromSvg = (svg) => {
         // userLayer.addChild(child);
     }
     paperObject.remove();
-    console.log(userLayer);
+    mainSketch.svg = paper.project.exportSVG({
+        asString: true,
+    });
     return paperObject;
 };
 
 const getHistoryBatch = (maxSize, startIdx) => {
-    let len = historyHolder.length;
+    let len = mainSketch.stack.historyHolder.length;
     if (len <= 1) return null;
     let lossList = [];
     let batchSize = Math.min(maxSize, startIdx); // not first item
     for (let i = 0; i < batchSize; i++) {
-        lossList.push(historyHolder[startIdx - i]);
+        lossList.push(mainSketch.stack.historyHolder[startIdx - i]);
     }
     return lossList;
 };
 
 // update because loss varies a lot??
 const calcRollingLoss = () => {
-    const items = getHistoryBatch(setTraces.value, historyHolder.length - 1);
+    const items = getHistoryBatch(
+        setTraces.value,
+        mainSketch.stack.historyHolder.length - 1
+    );
     console.log(items);
     if (items) {
         const sum = items.reduce(
@@ -235,13 +313,13 @@ const calcRollingLoss = () => {
         );
         const newRollingLoss = sum / items.length;
         lossText.innerHTML = `Rolling loss: ${newRollingLoss}`;
-        // if (lastRollingLoss !== undefined) {
-        //     if (Math.abs(lastRollingLoss - newRollingLoss) < 0.0001) {
+        // if (mainSketch.lastRollingLoss !== undefined) {
+        //     if (Math.abs(mainSketch.lastRollingLoss - newRollingLoss) < 0.0001) {
         //         lossText.innerHTML = `Converged at: ${newRollingLoss}`;
         //         stopClip();
         //     }
         // }
-        lastRollingLoss = newRollingLoss;
+        mainSketch.lastRollingLoss = newRollingLoss;
     }
 };
 
@@ -251,7 +329,7 @@ const showTraceHistoryFrom = (fromIndex) => {
     for (let pastGen of items) {
         refList.push(parseFromSvg(pastGen.svg));
     }
-    traces = refList;
+    mainSketch.traces = refList;
 };
 
 const moveSelecterTo = (elem) => {
@@ -268,33 +346,36 @@ const moveSelecterTo = (elem) => {
 };
 
 ws.onmessage = function(event) {
-    result = JSON.parse(event.data);
-    console.log(result);
-    // if (clipDrawing)
+    try {
+        result = JSON.parse(event.data);
+    } catch (e) {
+        console.log("Unexpected JSON event\n", e);
+    }
+    // if (mainSketch.clipDrawing)
 
     if (result.status === "stop") {
         console.log("Stopped drawer");
-        clipDrawing = false;
+        mainSketch.clipDrawing = false;
         // stop exemplars also?
     }
 
     if (result.status === "draw") {
         //sketch
-        if (isFirstIteration) {
+        if (mainSketch.isFirstIteration) {
             userLayer.clear();
-            isFirstIteration = false;
+            mainSketch.isFirstIteration = false;
         } else {
-            // Delete ref to last gen and old traces
-            if (lastRender) {
-                lastRender.remove();
+            // Delete ref to last gen and old mainSketch.traces
+            if (mainSketch.lastRender) {
+                mainSketch.lastRender.remove();
             }
-            if (traces) {
-                for (const trace of traces) {
+            if (mainSketch.traces) {
+                for (const trace of mainSketch.traces) {
                     trace.remove();
                 }
             }
         }
-        historyHolder.push(result);
+        mainSketch.stack.historyHolder.push(result);
         step += 1; //avoid disconnected iteration after stopping
         timeKeeper.style.width = "100%";
         timeKeeper.setAttribute("max", String(step));
@@ -302,13 +383,14 @@ ws.onmessage = function(event) {
         setTraces.setAttribute("max", String(step));
 
         // draw and save current
-        lastRender = parseFromSvg(result.svg);
-        // draw and save traces
+        // to do, delete because stored on svg now??
+        mainSketch.lastRender = parseFromSvg(result.svg);
+        // draw and save mainSketch.traces
 
-        // To do change this so it is just max num traces
-        // if (showTraces) {
+        // To do change this so it is just max num mainSketch.traces
+        // if (mainSketch.showTraces) {
         //     // setTraces.value = String(step);
-        //     showTraceHistoryFrom(historyHolder.length - 1);
+        //     showTraceHistoryFrom(mainSketch.stack.historyHolder.length - 1);
         // }
 
         calcRollingLoss();

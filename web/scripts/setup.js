@@ -1,10 +1,6 @@
 const ws = new WebSocket("ws://localhost:8000/ws");
-const localHost = "http://localhost:8000";
 
-// Sketch
 const canvas = document.getElementById("canvas");
-
-// Main UI
 const prompt = document.getElementById("messageText");
 const modal = document.getElementById("modal");
 const controlPanel = document.getElementById("control-panel");
@@ -18,125 +14,46 @@ const timeKeeper = document.getElementById("time-slider");
 const lossText = document.getElementById("rolling-loss");
 const setTraces = document.getElementById("num-traces");
 const selectDot = document.getElementById("contain-pen-dot");
-const drawButton = document.getElementById("draw");
-const continueButton = document.getElementById("continue");
-const generateButton = document.getElementById("generate");
 
-// Select UI
+const drawButton = document.getElementById("draw");
+const redrawButton = document.getElementById("redraw");
+// const continueButton = document.getElementById("continue");
+const generateButton = document.getElementById("generate");
+const stopButton = document.getElementById("stop");
+
 const deleteHandler = document.getElementById("delete-handler");
 const rotateHandler = document.getElementById("rotate-handler");
 const initialiseHandler = document.getElementById("initialise-handler");
 
-// Default draw settings
-let strokeColor = "#181818";
-let strokeWidth = 12;
-let opacity = 0.8; //ink feel
-let penMode = "pen";
-let clipDrawing = false;
-let buttonControlLeft = true;
-let showTraces = true;
+// Utility
 let step = 1;
-let myPath,
-    regionPath,
-    drawRegion,
-    currentSelectedPath,
-    lastRender,
-    lastPrompt,
-    erasePath,
-    tmpGroup,
-    mask,
-    isFirstIteration,
-    lastRollingLoss,
-    traces,
-    boundingBox,
-    exemplarSize;
+let myPath, erasePath, regionPath, tmpGroup, mask;
+const exemplarSize = document
+    .querySelector(".square")
+    .getBoundingClientRect().width;
 
-let undoStack = [];
-let redoStack = [];
-let historyHolder = [];
-
-// Setup
+// Paper Setup
 paper.install(window);
+const exemplarScope = new PaperScope();
 
 // Exemplars
-const canvas1 = document.getElementById("canvas1");
-const canvas2 = document.getElementById("canvas2");
-const canvas3 = document.getElementById("canvas3");
-const canvas4 = document.getElementById("canvas4");
-const exemplars = [canvas1, canvas2, canvas3, canvas4];
+const exemplars = [
+    document.getElementById("canvas1"),
+    document.getElementById("canvas2"),
+    document.getElementById("canvas3"),
+    document.getElementById("canvas4"),
+];
+exemplars.forEach((exemplar) => exemplarScope.setup(exemplar));
+// exemplarScope.setup(exemplars[0]);
 
-console.log(document.querySelector(".square").getBoundingClientRect());
-exemplarSize = document.querySelector(".square").getBoundingClientRect().width;
-console.log(exemplarSize);
-exemplars.forEach((exemplar) => {
-    exemplar.style.width = exemplarSize + "px";
-    exemplar.style.height = exemplarSize + "px";
-});
-
-if (window.innerWidth <= 600) {
-    document.getElementById("mobile-art-controls").appendChild(artControls);
-    document
-        .getElementById("mobile-art-controls")
-        .appendChild(document.getElementById("contain-dot"));
-}
-
-const exemplarScope = new PaperScope();
-exemplarScope.setup(canvas1);
-exemplarScope.setup(canvas2);
-exemplarScope.setup(canvas3);
-exemplarScope.setup(canvas4);
-
-// For sketching
 const scope = new PaperScope();
 scope.setup(canvas);
 scope.activate();
 
 const userLayer = new Layer(); //for drawing + erase mask
-timeKeeper.style.width = "0";
 const multiTool = new Tool();
-multiTool.minDistance = 5;
 const eraseTool = new Tool();
+
+timeKeeper.style.width = "0";
+multiTool.minDistance = 5;
 eraseTool.minDistance = 10;
-
-// class UndoStack {
-//     constructor() {
-//         this.undoStack = [];
-//         this.redoStack = [];
-//         this.historyHolder = [];
-//     }
-// }
-
-// class SketchHandler {
-//     constructor() {
-//         this.prompt;
-//         this.svg;
-
-//         // let strokeColor = "#181818";
-//         // let strokeWidth = 12;
-//         // let opacity = 0.8; //ink feel
-//         // let penMode = "pen";
-//         // let clipDrawing = false;
-//         // let buttonControlLeft = true;
-//         // let showTraces = true;
-
-//         // Update these
-//         this.drawRegion = null;
-//         this.currentSelectedPath = null;
-//         this.lastRender = null;
-//         this.lastPrompt = null;
-//         this.erasePath = null;
-//         this.tmpGroup = null;
-//         this.mask = null;
-//         this.isFirstIteration = null;
-//         this.lastRollingLoss = null;
-//         this.traces = null;
-//         this.boundingBox = null;
-//     }
-//     send() {}
-//     draw() {}
-//     redraw() {}
-//     showExemplars() {}
-//     stop() {}
-// }
-
-// mainSketch = new SketchHandler();

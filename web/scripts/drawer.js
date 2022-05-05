@@ -1,6 +1,6 @@
 multiTool.onMouseDown = function(event) {
     // refactor for multitouch
-    switch (penMode) {
+    switch (mainSketch.penMode) {
         case "select":
             path = null;
             let hitResult = paper.project.hitTest(event.point, {
@@ -12,14 +12,12 @@ multiTool.onMouseDown = function(event) {
 
             // TO change to simple hit test
             let isInBounds = true;
-            if (boundingBox) {
-                console.log(event);
-                console.log(boundingBox);
+            if (mainSketch.boundingBox) {
                 isInBounds =
-                    event.point.x > boundingBox.bounds.left &&
-                    event.point.x < boundingBox.bounds.right &&
-                    event.point.y > boundingBox.bounds.top &&
-                    event.point.y < boundingBox.bounds.bottom;
+                    event.point.x > mainSketch.boundingBox.bounds.left &&
+                    event.point.x < mainSketch.boundingBox.bounds.right &&
+                    event.point.y > mainSketch.boundingBox.bounds.top &&
+                    event.point.y < mainSketch.boundingBox.bounds.bottom;
             }
 
             if (!hitResult && !isInBounds) {
@@ -28,13 +26,13 @@ multiTool.onMouseDown = function(event) {
                     console.log(path);
                     path.selected = false;
                 });
-                if (boundingBox) {
+                if (mainSketch.boundingBox) {
                     hideSelectUI();
                 }
             }
             if (hitResult) {
                 // got path
-                if (boundingBox) {
+                if (mainSketch.boundingBox) {
                     hideSelectUI();
                 }
 
@@ -46,15 +44,15 @@ multiTool.onMouseDown = function(event) {
                     return !bbox ? item.bounds : bbox.unite(item.bounds);
                 }, null);
                 // Add stroke width so no overflow over bounds?
-                boundingBox = new Path.Rectangle(bbox);
-                boundingBox.strokeColor = "#D2D2D2";
-                boundingBox.strokeWidth = 2;
-                boundingBox.data.state = "moving";
+                mainSketch.boundingBox = new Path.Rectangle(bbox);
+                mainSketch.boundingBox.strokeColor = "#D2D2D2";
+                mainSketch.boundingBox.strokeWidth = 2;
+                mainSketch.boundingBox.data.state = "moving";
                 updateSelectUI();
             }
-            if (boundingBox) {
+            if (mainSketch.boundingBox) {
                 if (
-                    boundingBox.hitTest(event.point, {
+                    mainSketch.boundingBox.hitTest(event.point, {
                         segments: true,
                         tolerance: 3,
                     })
@@ -62,25 +60,28 @@ multiTool.onMouseDown = function(event) {
                     // got rectangle segment
                     // find which segment point was hit
                     var i;
-                    for (i = 0; i < boundingBox.segments.length; i++) {
-                        var p = boundingBox.segments[i].point;
+                    for (i = 0; i < mainSketch.boundingBox.segments.length; i++) {
+                        var p = mainSketch.boundingBox.segments[i].point;
                         if (p.isClose(event.point, 3)) {
                             break;
                         }
                     }
                     var opposite = (i + 2) % 4;
-                    boundingBox.data.from = boundingBox.segments[opposite].point;
-                    boundingBox.data.to = boundingBox.segments[i].point;
-                    boundingBox.data.state = "resizing";
-                    boundingBox.data.corner = boundingBox.segments[i].point;
+                    mainSketch.boundingBox.data.from =
+                        mainSketch.boundingBox.segments[opposite].point;
+                    mainSketch.boundingBox.data.to =
+                        mainSketch.boundingBox.segments[i].point;
+                    mainSketch.boundingBox.data.state = "resizing";
+                    mainSketch.boundingBox.data.corner =
+                        mainSketch.boundingBox.segments[i].point;
                 }
             }
             break;
         case "pen":
             myPath = new Path({
-                strokeColor: strokeColor,
-                strokeWidth: strokeWidth,
-                opacity: opacity,
+                strokeColor: mainSketch.strokeColor,
+                strokeWidth: mainSketch.strokeWidth,
+                opacity: mainSketch.opacity,
                 strokeCap: "round",
                 strokeJoin: "round",
             });
@@ -91,66 +92,66 @@ multiTool.onMouseDown = function(event) {
             }); //make a segment on touch down (one point)
             break;
         case "lasso":
-            drawRegion = new Rectangle(event.point);
+            mainSketch.drawRegion = new Rectangle(event.point);
             break;
     }
 };
 
 multiTool.onMouseDrag = function(event) {
-    switch (penMode) {
+    switch (mainSketch.penMode) {
         case "pen":
             myPath.add(event.point);
             myPath.smooth();
             break;
         case "select":
-            if (boundingBox) {
-                if (boundingBox.data.state === "moving") {
+            if (mainSketch.boundingBox) {
+                if (mainSketch.boundingBox.data.state === "moving") {
                     const selectedPaths = getSelectedPaths(); // all selected
                     selectedPaths.forEach((path) => {
                         path.position.x += event.delta.x;
                         path.position.y += event.delta.y;
                     });
-                    boundingBox.position.x += event.delta.x;
-                    boundingBox.position.y += event.delta.y;
+                    mainSketch.boundingBox.position.x += event.delta.x;
+                    mainSketch.boundingBox.position.y += event.delta.y;
 
                     updateSelectUI();
-                } else if (boundingBox.data.state === "resizing") {
+                } else if (mainSketch.boundingBox.data.state === "resizing") {
                     // Enforce 1:1 rect only
-                    boundingBox.bounds = new Rectangle(
-                        boundingBox.data.from,
+                    mainSketch.boundingBox.bounds = new Rectangle(
+                        mainSketch.boundingBox.data.from,
                         event.point
                     );
-                    boundingBox.strokeColor = "#D2D2D2";
-                    boundingBox.strokeWidth = 2;
-                    boundingBox.data.state = "resizing";
+                    mainSketch.boundingBox.strokeColor = "#D2D2D2";
+                    mainSketch.boundingBox.strokeWidth = 2;
+                    mainSketch.boundingBox.data.state = "resizing";
 
                     const selectedPaths = getSelectedPaths(); // all selected
                     let boundedSelection = new Group({ children: selectedPaths });
                     boundedSelection.scale(
                         event.delta.length / 5.5,
-                        boundingBox.data.from
+                        mainSketch.boundingBox.data.from
                     );
                     // UNGROUP
 
                     updateSelectUI();
-                } else if (boundingBox.data.state === "rotating") {
+                } else if (mainSketch.boundingBox.data.state === "rotating") {
                     // rotate by difference of angles, relative to center, of
                     // the last two points.
-                    var center = boundingBox.center;
+                    var center = mainSketch.boundingBox.center;
                     var baseVec = center - e.lastPoint;
                     var nowVec = center - e.point;
                     var angle = nowVec.angle - baseVec.angle;
-                    boundingBox.rotate(angle);
+                    mainSketch.boundingBox.rotate(angle);
                     // adjustRect(rect);
                     updateSelectUI();
                 }
             }
             break;
         case "lasso":
-            drawRegion.width += event.delta.x;
-            drawRegion.height += event.delta.y;
+            mainSketch.drawRegion.width += event.delta.x;
+            mainSketch.drawRegion.height += event.delta.y;
             if (regionPath !== undefined) regionPath.remove(); // redraw
-            regionPath = new Path.Rectangle(drawRegion);
+            regionPath = new Path.Rectangle(mainSketch.drawRegion);
             regionPath.set({
                 fillColor: "#e9e9ff",
                 opacity: 0.4,
@@ -161,26 +162,33 @@ multiTool.onMouseDrag = function(event) {
     }
 };
 multiTool.onMouseUp = function(event) {
-    switch (penMode) {
+    mainSketch.svg = paper.project.exportSVG({
+        asString: true,
+    });
+
+    switch (mainSketch.penMode) {
         case "pen":
             myPath.simplify();
             // sendPaths();
-            undoStack.push({
+            mainSketch.stack.undoStack.push({
                 type: "draw-event",
                 data: myPath,
             });
             break;
         case "lasso":
             resetHistory(); //reset since not continuing
-            startDrawing(prompt.value === lastPrompt ? "redraw" : "draw", true);
-            clipDrawing = true;
+            startDrawing(
+                prompt.value === mainSketch.lastPrompt ? "redraw" : "draw",
+                true
+            );
+            mainSketch.mainSketch.clipDrawing = true;
             break;
     }
 };
 
 eraseTool.onMouseDown = function(event) {
     erasorPath = new Path({
-        strokeWidth: strokeWidth * 2,
+        strokeWidth: mainSketch.strokeWidth * 2,
         strokeCap: "round",
         strokeJoin: "round",
         strokeColor: "white",
@@ -202,7 +210,7 @@ eraseTool.onMouseDrag = function(event) {
 
 eraseTool.onMouseUp = function(event) {
     erasorPath.simplify();
-    const eraseRadius = (strokeWidth * 2) / 2;
+    const eraseRadius = (mainSketch.strokeWidth * 2) / 2;
     const outerPath = OffsetUtils.offsetPath(erasorPath, eraseRadius);
     const innerPath = OffsetUtils.offsetPath(erasorPath, -eraseRadius);
     erasorPath.remove();
@@ -257,4 +265,8 @@ eraseTool.onMouseUp = function(event) {
     });
     userLayer.addChildren(tmpGroup.removeChildren());
     mask.remove();
+
+    mainSketch.svg = paper.project.exportSVG({
+        asString: true,
+    });
 };

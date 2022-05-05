@@ -1,10 +1,10 @@
 // Drawing Controls
 document.querySelectorAll(".pen-mode").forEach((elem) => {
     elem.addEventListener("click", () => {
-        let lastPenMode = penMode;
-        penMode = elem.id;
+        let lastPenMode = mainSketch.penMode;
+        mainSketch.penMode = elem.id;
 
-        switch (penMode) {
+        switch (mainSketch.penMode) {
             case "erase":
                 eraseTool.activate();
                 moveSelecterTo(elem);
@@ -20,7 +20,7 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
             case "lasso":
                 multiTool.activate();
                 if (noPrompt()) {
-                    penMode = lastPenMode;
+                    mainSketch.penMode = lastPenMode;
                     openModal({
                         title: "Add a prompt first!",
                         message: "You need a prompt to generate sketches with the region tool.",
@@ -32,30 +32,30 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
         }
 
         // Not-pen mode
-        if (penMode !== "select") {
+        if (mainSketch.penMode !== "select") {
             userLayer.getItems().forEach((path) => {
                 // console.log(path);
                 path.selected = false;
             });
             hideSelectUI();
         }
-        // if (penMode !== "pen" && penMode !== "erase") {
+        // if (mainSketch.penMode !== "pen" && mainSketch.penMode !== "erase") {
         //     palette.style.display = "none";
         //     artControls.style.display = "none";
         // } else {
         //     palette.style.display = "block";
         // }
-        // if (penMode !== "pen" && penMode !== "select") {
+        // if (mainSketch.penMode !== "pen" && mainSketch.penMode !== "select") {
         //     artControls.style.display = "none";
         // }
-        if (penMode !== "lasso" && penMode !== "select") {
-            drawRegion = undefined;
+        if (mainSketch.penMode !== "lasso" && mainSketch.penMode !== "select") {
+            mainSketch.drawRegion = undefined;
             if (regionPath) regionPath.remove();
         }
-        if (penMode !== "lasso") {
+        if (mainSketch.penMode !== "lasso") {
             // userLayer.activate();
         }
-        // console.log(penMode);
+        // console.log(mainSketch.penMode);
     });
 });
 
@@ -64,8 +64,8 @@ document.getElementById("delete").addEventListener("click", () =>
         title: "Clearing Canvas",
         message: "Are you sure you want to delete your drawing? :(",
         confirmAction: () => {
-            lastPrompt = null; //clear for draw (not redraw)
-            drawButton.innerHTML = "Draw";
+            mainSketch.lastPrompt = null; //clear for draw (not redraw)
+            // drawButton.innerHTML = "Draw";
             userLayer.clear();
             // prompt.value = "";
             modal.style.display = "none";
@@ -85,7 +85,7 @@ deleteHandler.addEventListener("click", (e) => {
     deletePath();
 });
 rotateHandler.addEventListener("click", (e) => {
-    boundingBox.data.state === "rotating";
+    mainSketch.boundingBox.data.state === "rotating";
 });
 initialiseHandler.addEventListener("click", (e) => {
     const fullCanvas = userLayer.exportJSON();
@@ -94,32 +94,44 @@ initialiseHandler.addEventListener("click", (e) => {
     const svg = paper.project.exportSVG();
     userLayer.clear();
     userLayer.importJSON(fullCanvas);
+
+    // Special case
     console.log(svg);
-    startDrawing(prompt.value === lastPrompt ? "redraw" : "draw", false, svg);
+    startDrawing(
+        prompt.value === mainSketch.lastPrompt ? "redraw" : "draw",
+        false,
+        svg
+    );
 });
 
 drawButton.addEventListener("click", (e) => {
-    if (!clipDrawing) {
-        resetHistory(); //reset since not continuing
-        startDrawing(prompt.value === lastPrompt ? "redraw" : "draw", false);
-        drawButton.innerHTML = "Stop";
-    } else {
-        stopClip();
-    }
-    clipDrawing = !clipDrawing;
+    mainSketch.draw();
 });
-continueButton.addEventListener("click", (e) => {
-    if (!clipDrawing) {
-        startDrawing("continue", false);
-        continueButton.innerHTML = "Stop";
-    } else {
-        stopClip();
-    }
-    clipDrawing = !clipDrawing;
+redrawButton.addEventListener("click", (e) => {
+    mainSketch.redraw();
 });
+
 generateButton.addEventListener("click", (e) => {
-    startDrawing("sketch_exemplars", false);
+    mainSketch.generate();
 });
+
+stopButton.addEventListener("click", (e) => {
+    mainSketch.stop();
+});
+
+prompt.addEventListener("input", (e) => {
+    mainSketch.prompt = e.target.value;
+});
+
+// continueButton.addEventListener("click", (e) => {
+//     if (!mainSketch.clipDrawing) {
+//         startDrawing("continue", false);
+//         continueButton.innerHTML = "Stop";
+//     } else {
+//         stopClip();
+//     }
+//     mainSketch.clipDrawing = !mainSketch.clipDrawing;
+// });
 
 document.getElementById("begin").addEventListener("click", () => {
     document.getElementById("sliding-overlay").style.bottom = "100%";
@@ -128,8 +140,8 @@ document.getElementById("begin").addEventListener("click", () => {
 //     switchControls();
 // });
 document.getElementById("undo").addEventListener("click", () => {
-    if (undoStack.length > 0) {
-        const lastEvent = undoStack.pop();
+    if (mainSketch.stack.undoStack.length > 0) {
+        const lastEvent = mainSketch.stack.undoStack.pop();
         if (lastEvent.type === "draw-event") {
             let thisPath; //json from redo, otherwise path
             try {
@@ -139,7 +151,7 @@ document.getElementById("undo").addEventListener("click", () => {
                 thisPath = lastEvent.data;
             }
             let copy = thisPath.exportJSON();
-            redoStack.push({
+            mainSketch.stack.redoStack.push({
                 type: "draw-event",
                 data: copy,
             }); //so remove does not remove reference
@@ -152,7 +164,7 @@ document.getElementById("undo").addEventListener("click", () => {
                 thisPath = thisPath.importJSON(redrawPath);
                 pathData.push(thisPath);
             });
-            redoStack.push({
+            mainSketch.stack.redoStack.push({
                 type: "delete-event",
                 data: pathData, //use ref
             });
@@ -163,12 +175,12 @@ document.getElementById("undo").addEventListener("click", () => {
     }
 });
 document.getElementById("redo").addEventListener("click", () => {
-    if (redoStack.length > 0) {
-        const lastEvent = redoStack.pop();
+    if (mainSketch.stack.redoStack.length > 0) {
+        const lastEvent = mainSketch.stack.redoStack.pop();
         if (lastEvent.type === "draw-event") {
             let item = new Path();
             item.importJSON(lastEvent.data);
-            undoStack.push(lastEvent);
+            mainSketch.stack.undoStack.push(lastEvent);
         }
         if (lastEvent.type === "delete-event") {
             let pathList = [];
@@ -177,7 +189,7 @@ document.getElementById("redo").addEventListener("click", () => {
                 path.remove();
                 pathList.push(pathCopy);
             });
-            undoStack.push({
+            mainSketch.stack.undoStack.push({
                 type: "delete-event",
                 data: pathList,
             }); // need to store a json to redraw
@@ -207,7 +219,13 @@ document.getElementById("save").addEventListener("click", () => {
     });
 });
 document.getElementById("width-slider").oninput = function() {
-    strokeWidth = this.value;
+    mainSketch.strokeWidth = this.value;
+    const point = document.getElementById("point-size");
+    point.style.width = mainSketch.strokeWidth + "px";
+    point.style.height = mainSketch.strokeWidth + "px";
+    getSelectedPaths().forEach(
+        (item) => (item.strokeWidth = mainSketch.strokeWidth)
+    );
 };
 document.getElementById("settings").addEventListener("click", () => {
     openModal({
@@ -245,21 +263,13 @@ timeKeeper.oninput = function() {
     if (this.value === 0) return; // 0 is pre-generation state
     historyIndex = this.value;
     userLayer.clear();
-    if (showTraces) {
+    if (mainSketch.mainSketch.showTraces) {
         showTraceHistoryFrom(historyIndex);
     } else {
-        let svg = historyHolder[historyIndex].svg;
+        let svg = mainSketch.stack.historyHolder[historyIndex].svg;
         parseFromSvg(svg);
     }
 };
-
-prompt.addEventListener("input", (e) => {
-    if (prompt.value === lastPrompt) {
-        drawButton.innerHTML = "Redraw";
-    } else {
-        drawButton.innerHTML = "Draw";
-    }
-});
 
 palette.addEventListener("click", () => {
     toggleArtControls();
@@ -273,10 +283,46 @@ const picker = new Picker({
     editorFormat: "hex", // or 'rgb', 'hsl'
 });
 
-picker.setColor(strokeColor);
+picker.setColor(mainSketch.strokeColor);
 picker.onChange = (color) => {
-    strokeColor = color.rgbaString;
-    document.getElementById("pen-color").style.background = strokeColor;
+    mainSketch.strokeColor = color.rgbaString;
+    document.getElementById("pen-color").style.background =
+        mainSketch.strokeColor;
+    getSelectedPaths().forEach(
+        (item) => (item.strokeColor = mainSketch.strokeColor)
+    );
 };
 
 moveSelecterTo(document.querySelectorAll(".pen-mode")[1]);
+
+// Random partial sketch
+// const partial = userLayer.importSVG(sketches[Math.floor(Math.random() * 3)]);
+// partial.scale(1000);
+// partial.set({
+//     position: new Point(540, 540),
+//     strokeWidth: mainSketch.strokeWidth,
+//     opacity: mainSketch.opacity,
+//     strokeCap: "round",
+//     strokeJoin: "round",
+// });
+// partial.getItems().forEach((path) => userLayer.addChild(path));
+// partial.remove();
+
+// UI Setup
+exemplars.forEach((exemplar) => {
+    exemplar.style.width = exemplarSize + "px";
+    exemplar.style.height = exemplarSize + "px";
+});
+
+if (window.innerWidth <= 600) {
+    document.getElementById("mobile-art-controls").appendChild(artControls);
+    document
+        .getElementById("mobile-art-controls")
+        .appendChild(document.getElementById("contain-dot"));
+}
+
+// const maxPointSize = document
+//     .getElementById("describe-card")
+//     .getBoundingClientRect();
+const maxPointSize = 79.99;
+document.getElementById("width-slider").setAttribute("max", maxPointSize);

@@ -975,19 +975,18 @@ input[type="range"]::-moz-range-thumb {
     }
 }
 
-#button-panel .fa-solid {
+
+/* #button-panel .fa-solid {
     font-size: 0.8em;
 }
 
 .icon-outer-circle {
     padding: 0.3em;
-}
+} */
 
+
+/* 
 @media screen and (min-height: 50em) {
-    /* body {
-        display: flex;
-        flex-direction: column-reverse;
-    } */
     #describe-top {
         display: block;
     }
@@ -1000,7 +999,7 @@ input[type="range"]::-moz-range-thumb {
     #describe-card {
         padding: 2em;
     }
-}
+} */
 
 
 /* @media screen and (min-height: 55em) {
