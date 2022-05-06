@@ -181,7 +181,7 @@ multiTool.onMouseUp = function(event) {
                 prompt.value === mainSketch.lastPrompt ? "redraw" : "draw",
                 true
             );
-            mainSketch.mainSketch.clipDrawing = true;
+            mainSketch.clipDrawing = true;
             break;
     }
 };

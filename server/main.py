@@ -54,16 +54,16 @@ async def websocket_endpoint(websocket: WebSocket):
                     logging.error("Failed to update drawer")
                 artefact_drawer.run_loop()
 
-            if data["status"] == "continue":
-                try:
-                    await artefact_drawer.continue_update(data)
-                except:
-                    logging.error("Failed to update drawer")
-                artefact_drawer.run_loop()
+            # if data["status"] == "continue":
+            #     try:
+            #         await artefact_drawer.continue_update(data)
+            #     except:
+            #         logging.error("Failed to update drawer")
+            #     artefact_drawer.run_loop()
             
             if data["status"] == "sketch_exemplars":
                 for drawer in exemplar_drawers:
-                    drawer.frame_size = data["data"]['frame_exemplar']
+                    drawer.frame_size = data["data"]['frame_size']
                     await drawer.draw_update(data)
                     drawer.run_loop()
 

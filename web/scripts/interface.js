@@ -1,61 +1,7 @@
 // Drawing Controls
 document.querySelectorAll(".pen-mode").forEach((elem) => {
     elem.addEventListener("click", () => {
-        let lastPenMode = mainSketch.penMode;
-        mainSketch.penMode = elem.id;
-
-        switch (mainSketch.penMode) {
-            case "erase":
-                eraseTool.activate();
-                moveSelecterTo(elem);
-                break;
-            case "pen":
-                multiTool.activate();
-                moveSelecterTo(elem);
-                break;
-            case "select":
-                multiTool.activate();
-                moveSelecterTo(elem);
-                break;
-            case "lasso":
-                multiTool.activate();
-                if (noPrompt()) {
-                    mainSketch.penMode = lastPenMode;
-                    openModal({
-                        title: "Add a prompt first!",
-                        message: "You need a prompt to generate sketches with the region tool.",
-                    });
-                    break;
-                }
-                moveSelecterTo(elem);
-                break;
-        }
-
-        // Not-pen mode
-        if (mainSketch.penMode !== "select") {
-            userLayer.getItems().forEach((path) => {
-                // console.log(path);
-                path.selected = false;
-            });
-            hideSelectUI();
-        }
-        // if (mainSketch.penMode !== "pen" && mainSketch.penMode !== "erase") {
-        //     palette.style.display = "none";
-        //     artControls.style.display = "none";
-        // } else {
-        //     palette.style.display = "block";
-        // }
-        // if (mainSketch.penMode !== "pen" && mainSketch.penMode !== "select") {
-        //     artControls.style.display = "none";
-        // }
-        if (mainSketch.penMode !== "lasso" && mainSketch.penMode !== "select") {
-            mainSketch.drawRegion = undefined;
-            if (regionPath) regionPath.remove();
-        }
-        if (mainSketch.penMode !== "lasso") {
-            // userLayer.activate();
-        }
-        // console.log(mainSketch.penMode);
+        setPenMode(elem.id, elem);
     });
 });
 
@@ -226,6 +172,7 @@ document.getElementById("width-slider").oninput = function() {
     getSelectedPaths().forEach(
         (item) => (item.strokeWidth = mainSketch.strokeWidth)
     );
+    // setPenMode("pen", document.getElementById("pen"));
 };
 document.getElementById("settings").addEventListener("click", () => {
     openModal({
@@ -263,7 +210,7 @@ timeKeeper.oninput = function() {
     if (this.value === 0) return; // 0 is pre-generation state
     historyIndex = this.value;
     userLayer.clear();
-    if (mainSketch.mainSketch.showTraces) {
+    if (mainSketch.showTraces) {
         showTraceHistoryFrom(historyIndex);
     } else {
         let svg = mainSketch.stack.historyHolder[historyIndex].svg;
@@ -291,9 +238,26 @@ picker.onChange = (color) => {
     getSelectedPaths().forEach(
         (item) => (item.strokeColor = mainSketch.strokeColor)
     );
+    // setPenMode("pen", document.getElementById("pen"));
 };
 
+// UI Setup
 moveSelecterTo(document.querySelectorAll(".pen-mode")[1]);
+
+exemplars.forEach((exemplar) => {
+    exemplar.style.width = exemplarSize + "px";
+    exemplar.style.height = exemplarSize + "px";
+});
+
+if (window.innerWidth <= 600) {
+    document.getElementById("mobile-art-controls").appendChild(artControls);
+    document
+        .getElementById("mobile-art-controls")
+        .appendChild(document.getElementById("contain-dot"));
+}
+
+const maxPointSize = 79.99;
+document.getElementById("width-slider").setAttribute("max", maxPointSize);
 
 // Random partial sketch
 // const partial = userLayer.importSVG(sketches[Math.floor(Math.random() * 3)]);
@@ -307,22 +271,3 @@ moveSelecterTo(document.querySelectorAll(".pen-mode")[1]);
 // });
 // partial.getItems().forEach((path) => userLayer.addChild(path));
 // partial.remove();
-
-// UI Setup
-exemplars.forEach((exemplar) => {
-    exemplar.style.width = exemplarSize + "px";
-    exemplar.style.height = exemplarSize + "px";
-});
-
-if (window.innerWidth <= 600) {
-    document.getElementById("mobile-art-controls").appendChild(artControls);
-    document
-        .getElementById("mobile-art-controls")
-        .appendChild(document.getElementById("contain-dot"));
-}
-
-// const maxPointSize = document
-//     .getElementById("describe-card")
-//     .getBoundingClientRect();
-const maxPointSize = 79.99;
-document.getElementById("width-slider").setAttribute("max", maxPointSize);

@@ -293,6 +293,7 @@ class Clip_Draw_Optimiser:
     async def redraw_update(self):
         """Use original paths with origional prompt to try new options from same settings"""
         logging.info("Starting redraw")
+        # self.iteration = 0 ????
         return self.activate()
 
     async def continue_update(self, data):

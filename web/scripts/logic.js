@@ -77,6 +77,7 @@ class SketchHandler {
             frameSize: this.frameSize,
             prompt: this.prompt,
         });
+        this.clipDrawing = true;
     }
     redraw(withRegion = false) {
         this.updateDrawer({
@@ -84,6 +85,7 @@ class SketchHandler {
             hasRegion: withRegion,
             frameSize: this.frameSize,
         });
+        this.clipDrawing = true;
     }
     generate() {
         this.updateDrawer({
@@ -93,9 +95,11 @@ class SketchHandler {
             frameSize: exemplarSize,
             prompt: this.prompt,
         });
+        this.clipDrawing = true;
     }
     stop() {
         this.updateDrawer({ status: "stop" });
+        this.clipDrawing = false;
     }
 }
 
@@ -291,12 +295,16 @@ const parseFromSvg = (svg) => {
 const getHistoryBatch = (maxSize, startIdx) => {
     let len = mainSketch.stack.historyHolder.length;
     if (len <= 1) return null;
-    let lossList = [];
+    let traceList = [];
     let batchSize = Math.min(maxSize, startIdx); // not first item
+    // num traces
     for (let i = 0; i < batchSize; i++) {
-        lossList.push(mainSketch.stack.historyHolder[startIdx - i]);
+        traceList.push(mainSketch.stack.historyHolder[startIdx - i - 1]);
     }
-    return lossList;
+    console.log(mainSketch.stack.historyHolder);
+    console.log(batchSize);
+    console.log(traceList);
+    return traceList;
 };
 
 // update because loss varies a lot??
@@ -305,7 +313,6 @@ const calcRollingLoss = () => {
         setTraces.value,
         mainSketch.stack.historyHolder.length - 1
     );
-    console.log(items);
     if (items) {
         const sum = items.reduce(
             (partialSum, historyItem) => partialSum + historyItem.loss,
@@ -324,6 +331,7 @@ const calcRollingLoss = () => {
 };
 
 const showTraceHistoryFrom = (fromIndex) => {
+    console.log(setTraces.value, fromIndex);
     const items = getHistoryBatch(setTraces.value, fromIndex);
     let refList = [];
     for (let pastGen of items) {
@@ -346,69 +354,133 @@ const moveSelecterTo = (elem) => {
 };
 
 ws.onmessage = function(event) {
-    try {
-        result = JSON.parse(event.data);
-    } catch (e) {
-        console.log("Unexpected JSON event\n", e);
-    }
-    // if (mainSketch.clipDrawing)
+    if (mainSketch.clipDrawing) {
+        //only react if active
 
-    if (result.status === "stop") {
-        console.log("Stopped drawer");
-        mainSketch.clipDrawing = false;
-        // stop exemplars also?
-    }
+        try {
+            result = JSON.parse(event.data);
+        } catch (e) {
+            console.log("Unexpected JSON event\n", e);
+        }
 
-    if (result.status === "draw") {
-        //sketch
-        if (mainSketch.isFirstIteration) {
-            userLayer.clear();
-            mainSketch.isFirstIteration = false;
-        } else {
-            // Delete ref to last gen and old mainSketch.traces
-            if (mainSketch.lastRender) {
-                mainSketch.lastRender.remove();
-            }
-            if (mainSketch.traces) {
-                for (const trace of mainSketch.traces) {
-                    trace.remove();
+        if (result.status === "stop") {
+            console.log("Stopped drawer");
+            mainSketch.clipDrawing = false;
+            // stop exemplars also?
+        }
+
+        if (result.status === "draw") {
+            //sketch
+            if (mainSketch.isFirstIteration) {
+                userLayer.clear();
+                mainSketch.isFirstIteration = false;
+            } else {
+                // Delete ref to last gen and old mainSketch.traces
+                if (mainSketch.lastRender) {
+                    mainSketch.lastRender.remove();
+                }
+                if (mainSketch.traces) {
+                    for (const trace of mainSketch.traces) {
+                        trace.remove();
+                    }
                 }
             }
+            mainSketch.stack.historyHolder.push(result);
+            timeKeeper.style.width = "100%";
+            timeKeeper.setAttribute("max", String(step));
+            timeKeeper.value = String(step);
+            setTraces.setAttribute("max", String(step));
+            step += 1; //avoid disconnected iteration after stopping
+
+            // draw and save current
+            // to do, delete because stored on svg now??
+            mainSketch.lastRender = parseFromSvg(result.svg);
+            // draw and save mainSketch.traces
+
+            // To do change this so it is just max num mainSketch.traces
+            // if (mainSketch.showTraces) {
+            //     // setTraces.value = String(step);
+            //     showTraceHistoryFrom(mainSketch.stack.historyHolder.length - 1);
+            // }
+
+            calcRollingLoss();
+            console.log(
+                `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`
+            );
         }
-        mainSketch.stack.historyHolder.push(result);
-        step += 1; //avoid disconnected iteration after stopping
-        timeKeeper.style.width = "100%";
-        timeKeeper.setAttribute("max", String(step));
-        timeKeeper.value = String(step);
-        setTraces.setAttribute("max", String(step));
+        var matches = result.status.match(/\d+/g);
+        if (matches != null) {
+            let exemplar_canvas = exemplarScope.projects[parseInt(result.status)];
+            console.log(exemplar_canvas);
+            // exemplars
+            exemplar_canvas.activate();
+            exemplar_canvas.clear();
+            let svg = result.svg;
+            if (svg === "") return null;
+            console.log(svg);
+            exemplar_canvas.importSVG(result.svg);
 
-        // draw and save current
-        // to do, delete because stored on svg now??
-        mainSketch.lastRender = parseFromSvg(result.svg);
-        // draw and save mainSketch.traces
-
-        // To do change this so it is just max num mainSketch.traces
-        // if (mainSketch.showTraces) {
-        //     // setTraces.value = String(step);
-        //     showTraceHistoryFrom(mainSketch.stack.historyHolder.length - 1);
-        // }
-
-        calcRollingLoss();
-        console.log(
-            `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`
-        );
+            document.querySelectorAll(".card-info div p")[
+                parseInt(result.status)
+            ].innerHTML = `Loss: ${result.loss.toPrecision(5)}`;
+        }
     }
-    var matches = result.status.match(/\d+/g);
-    if (matches != null) {
-        let exemplar_canvas = exemplarScope.projects[parseInt(result.status)];
-        exemplar_canvas.activate();
-        exemplar_canvas.clear();
-        let svg = result.svg;
-        if (svg === "") return null;
-        exemplar_canvas.importSVG(result.svg);
+};
 
-        document.querySelectorAll(".card-info div p")[
-            parseInt(result.status)
-        ].innerHTML = `Loss: ${result.loss.toPrecision(5)}`;
+const setPenMode = (mode, accentTarget) => {
+    let lastPenMode = mainSketch.penMode;
+    mainSketch.penMode = mode;
+
+    switch (mainSketch.penMode) {
+        case "erase":
+            eraseTool.activate();
+            moveSelecterTo(accentTarget);
+            break;
+        case "pen":
+            multiTool.activate();
+            moveSelecterTo(accentTarget);
+            break;
+        case "select":
+            multiTool.activate();
+            moveSelecterTo(accentTarget);
+            break;
+        case "lasso":
+            multiTool.activate();
+            if (noPrompt()) {
+                mainSketch.penMode = lastPenMode;
+                openModal({
+                    title: "Add a prompt first!",
+                    message: "You need a prompt to generate sketches with the region tool.",
+                });
+                break;
+            }
+            moveSelecterTo(accentTarget);
+            break;
     }
+
+    // Not-pen mode
+    if (mainSketch.penMode !== "select") {
+        userLayer.getItems().forEach((path) => {
+            // console.log(path);
+            path.selected = false;
+        });
+        hideSelectUI();
+    }
+    // if (mainSketch.penMode !== "pen" && mainSketch.penMode !== "erase") {
+    //     palette.style.display = "none";
+    //     artControls.style.display = "none";
+    // } else {
+    //     palette.style.display = "block";
+    // }
+    // if (mainSketch.penMode !== "pen" && mainSketch.penMode !== "select") {
+    //     artControls.style.display = "none";
+    // }
+    if (mainSketch.penMode !== "lasso" && mainSketch.penMode !== "select") {
+        mainSketch.drawRegion = undefined;
+        if (regionPath) regionPath.remove();
+    }
+    if (mainSketch.penMode !== "lasso") {
+        // userLayer.activate();
+    }
+    // console.log(mainSketch.penMode);
 };
