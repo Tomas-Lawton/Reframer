@@ -173,7 +173,7 @@ const switchControls = () => {
 };
 
 // dragging moves select elements + ui
-const hideSelectUI = () => {
+const hideSelectUI = (includeTransform = true) => {
     // remove rect
     if (mainSketch.boundingBox) {
         mainSketch.boundingBox.remove();
@@ -181,22 +181,32 @@ const hideSelectUI = () => {
     }
     // hide ui
     deleteHandler.style.display = "none";
-    rotateHandler.style.display = "none";
+    // rotateHandler.style.display = "none";
     initialiseHandler.style.display = "none";
+    if (includeTransform) {
+        transformControl.style.display = "none";
+    }
+};
+
+const updateRectBounds = (from, to) => {
+    mainSketch.boundingBox.bounds = new Rectangle(from, to);
+    mainSketch.boundingBox.strokeColor = "#D2D2D2";
+    mainSketch.boundingBox.strokeWidth = 2;
+    mainSketch.boundingBox.data.state = "resizing";
 };
 
 const updateSelectUI = () => {
     if (mainSketch.boundingBox) {
-        rotateHandler.style.display = "block";
+        // rotateHandler.style.display = "block";
         deleteHandler.style.display = "block";
         initialiseHandler.style.display = "block";
-
-        rotateHandler.style.left =
-            mainSketch.boundingBox.bounds.bottomCenter.x + "px";
-        rotateHandler.style.top =
-            mainSketch.boundingBox.bounds.bottomCenter.y +
-            rotateHandler.getBoundingClientRect().height / 2 +
-            "px";
+        transformControl.style.display = "flex";
+        // rotateHandler.style.left =
+        //     mainSketch.boundingBox.bounds.bottomCenter.x + "px";
+        // rotateHandler.style.top =
+        //     mainSketch.boundingBox.bounds.bottomCenter.y +
+        //     rotateHandler.getBoundingClientRect().height / 2 +
+        //     "px";
 
         deleteHandler.style.left =
             mainSketch.boundingBox.bounds.topRight.x +

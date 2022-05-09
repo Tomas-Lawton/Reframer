@@ -207,11 +207,19 @@
         </div>
 
         <div id="sketch-view">
-
             <div id="contain-dot">
                 <input type="range" id="time-slider" value="0" min="0" max="0">
                 <div class="icon-outer-circle" id="palette">
                     <i class="palette fa-solid fa-palette fa-fw"></i>
+                </div>
+            </div>
+
+            <div id="transform-ui">
+                <div id="rotate-handler">
+                    <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
+                </div>
+                <div id="scale-handler">
+                    <input type="range" id="scale-slider" value="15" min="1" max="20">
                 </div>
             </div>
 
@@ -220,11 +228,14 @@
                     <i class="basic-grey fa-solid fa-trash fa-fw"></i>
                 </div>
             </div>
-            <div id="rotate-handler" class="select-ui">
+            <!-- <div id="rotate-handler" class="select-ui">
                 <div class="icon-outer-circle">
                     <i class="basic-grey fa-solid fa-rotate fa-fw"></i>
                 </div>
-            </div>
+            </div> -->
+
+
+
             <div id="initialise-handler" class="select-ui">
                 <div class="icon-outer-circle">
                     <i class="basic-grey fa-solid fa-brain fa-fw"></i>

@@ -30,10 +30,11 @@ multiTool.onMouseDown = function(event) {
                     hideSelectUI();
                 }
             }
+
             if (hitResult) {
                 // got path
                 if (mainSketch.boundingBox) {
-                    hideSelectUI();
+                    hideSelectUI(); // draw a new one containing selection
                 }
 
                 path = hitResult.item;
@@ -50,6 +51,7 @@ multiTool.onMouseDown = function(event) {
                 mainSketch.boundingBox.data.state = "moving";
                 updateSelectUI();
             }
+
             if (mainSketch.boundingBox) {
                 if (
                     mainSketch.boundingBox.hitTest(event.point, {
@@ -59,21 +61,21 @@ multiTool.onMouseDown = function(event) {
                 ) {
                     // got rectangle segment
                     // find which segment point was hit
-                    var i;
-                    for (i = 0; i < mainSketch.boundingBox.segments.length; i++) {
-                        var p = mainSketch.boundingBox.segments[i].point;
+                    for (let i = 0; i < mainSketch.boundingBox.segments.length; i++) {
+                        let p = mainSketch.boundingBox.segments[i].point;
                         if (p.isClose(event.point, 3)) {
+                            let opposite = (i + 2) % 4;
+
+                            mainSketch.boundingBox.data.from =
+                                mainSketch.boundingBox.segments[opposite].point;
+                            mainSketch.boundingBox.data.to =
+                                mainSketch.boundingBox.segments[i].point;
+                            mainSketch.boundingBox.data.state = "resizing";
+                            mainSketch.boundingBox.data.corner =
+                                mainSketch.boundingBox.segments[i].point;
                             break;
                         }
                     }
-                    var opposite = (i + 2) % 4;
-                    mainSketch.boundingBox.data.from =
-                        mainSketch.boundingBox.segments[opposite].point;
-                    mainSketch.boundingBox.data.to =
-                        mainSketch.boundingBox.segments[i].point;
-                    mainSketch.boundingBox.data.state = "resizing";
-                    mainSketch.boundingBox.data.corner =
-                        mainSketch.boundingBox.segments[i].point;
                 }
             }
             break;
@@ -105,6 +107,9 @@ multiTool.onMouseDrag = function(event) {
             break;
         case "select":
             if (mainSketch.boundingBox) {
+                // let oldBounds = mainSketch.boundingBox.bounds;
+                console.log("Component: ", event.delta);
+
                 if (mainSketch.boundingBox.data.state === "moving") {
                     const selectedPaths = getSelectedPaths(); // all selected
                     selectedPaths.forEach((path) => {
@@ -113,38 +118,30 @@ multiTool.onMouseDrag = function(event) {
                     });
                     mainSketch.boundingBox.position.x += event.delta.x;
                     mainSketch.boundingBox.position.y += event.delta.y;
-
                     updateSelectUI();
                 } else if (mainSketch.boundingBox.data.state === "resizing") {
                     // Enforce 1:1 rect only
-                    mainSketch.boundingBox.bounds = new Rectangle(
-                        mainSketch.boundingBox.data.from,
-                        event.point
-                    );
-                    mainSketch.boundingBox.strokeColor = "#D2D2D2";
-                    mainSketch.boundingBox.strokeWidth = 2;
-                    mainSketch.boundingBox.data.state = "resizing";
+                    let x1 = mainSketch.boundingBox.data.to.x;
+                    let y1 = mainSketch.boundingBox.data.to.y;
+                    let x2 = event.point.x;
+                    let r = x2 / x1;
+                    let y2 = y1 * r;
+                    let newCorner = new Point(x2, y2);
 
-                    const selectedPaths = getSelectedPaths(); // all selected
-                    let boundedSelection = new Group({ children: selectedPaths });
-                    boundedSelection.scale(
-                        event.delta.length / 5.5,
+                    // New rect
+                    updateRectBounds(mainSketch.boundingBox.data.from, newCorner);
+                    let selectedPaths = getSelectedPaths(); // all selected
+                    let itemGroup = new Group({ children: selectedPaths });
+                    itemGroup.scale(
+                        // event.delta.length / 5.5,
+                        r,
                         mainSketch.boundingBox.data.from
                     );
                     // UNGROUP
 
                     updateSelectUI();
-                } else if (mainSketch.boundingBox.data.state === "rotating") {
-                    // rotate by difference of angles, relative to center, of
-                    // the last two points.
-                    var center = mainSketch.boundingBox.center;
-                    var baseVec = center - e.lastPoint;
-                    var nowVec = center - e.point;
-                    var angle = nowVec.angle - baseVec.angle;
-                    mainSketch.boundingBox.rotate(angle);
-                    // adjustRect(rect);
-                    updateSelectUI();
                 }
+                // rotate in slider interface
             }
             break;
         case "lasso":
@@ -183,6 +180,9 @@ multiTool.onMouseUp = function(event) {
             );
             mainSketch.clipDrawing = true;
             break;
+    }
+    if (mainSketch.boundingBox) {
+        mainSketch.boundingBox.data.state = "moving";
     }
 };
 

@@ -22,12 +22,16 @@ const generateButton = document.getElementById("generate");
 const stopButton = document.getElementById("stop");
 
 const deleteHandler = document.getElementById("delete-handler");
-const rotateHandler = document.getElementById("rotate-handler");
+const rotateHandler = document.getElementById("rotate-slider");
+const scaleHandler = document.getElementById("scale-slider");
 const initialiseHandler = document.getElementById("initialise-handler");
+const transformControl = document.getElementById("transform-ui");
 
 // Utility
 let step = 1;
+let doneTransform = 500;
 let myPath, erasePath, regionPath, tmpGroup, mask;
+
 const exemplarSize = document
     .querySelector(".square")
     .getBoundingClientRect().width;

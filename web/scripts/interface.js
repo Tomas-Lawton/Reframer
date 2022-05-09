@@ -30,9 +30,7 @@ document.body.addEventListener("keydown", function(event) {
 deleteHandler.addEventListener("click", (e) => {
     deletePath();
 });
-rotateHandler.addEventListener("click", (e) => {
-    mainSketch.boundingBox.data.state === "rotating";
-});
+
 initialiseHandler.addEventListener("click", (e) => {
     const fullCanvas = userLayer.exportJSON();
     const remove = userLayer.getItems().filter((path) => !path.selected);
@@ -174,6 +172,50 @@ document.getElementById("width-slider").oninput = function() {
     );
     // setPenMode("pen", document.getElementById("pen"));
 };
+
+selectGroup = null;
+
+rotateHandler.onmousedown = function() {
+    console.log("test");
+};
+
+rotateHandler.oninput = function() {
+    // if (mainSketch.boundingBox.data.state === "rotating") {
+    hideSelectUI(false);
+    // selectTimer = setTimeout(doneSelect, doneTransform);
+    let r = this.value;
+    let selectedPaths = getSelectedPaths(); // all selected
+    let newGroup = new Group({ children: selectedPaths });
+    if (!selectGroup) {
+        selectGroup = newGroup;
+        selectGroup.transformContent = false;
+    }
+    selectGroup.rotation = r;
+
+    // New rect
+    // let from = mainSketch.selectGroup.bounds.segments[0].point;
+    // let newCorner = mainSketch.selectGroup.bounds.segments[2].point;
+    // updateRectBounds(from, newCorner);
+    // updateSelectUI();
+    // ungroup
+};
+
+scaleHandler.oninput = function() {
+    // if (mainSketch.boundingBox.data.state === "rotating") {
+    hideSelectUI(false);
+    let selectedPaths = getSelectedPaths(); // all selected
+    for (child of selectedPaths) {
+        child.applyMatrix = false;
+        child.scaling = this.value / 5;
+    }
+    // updateRectBounds(from, newCorner);
+    // updateSelectUI();
+    // ungroup
+};
+scaleHandler.onmouseup = function() {
+    console.log("done");
+};
+
 document.getElementById("settings").addEventListener("click", () => {
     openModal({
         title: "Settings",
@@ -181,30 +223,6 @@ document.getElementById("settings").addEventListener("click", () => {
         ui: document.getElementById("settings-ui"),
     });
 });
-
-// document.getElementById("scale-slider").oninput = function() {
-//     let newScale = this.value / 10;
-//     let selected = getSelectedPaths();
-//     for (child of selected) {
-//         child.applyMatrix = false;
-//         child.scaling = newScale;
-//     }
-// };
-// document.getElementById("rotate-slider").oninput = function() {
-//     let angle = this.value;
-//     console.log(angle);
-//     let selected = getSelectedPaths();
-//     for (child of selected) {
-//         // implement all of these methods for selecting shapes
-//         // http://sketch.paperjs.org/#V/0.12.7/S/nVdtb9s2EP4rrArUEqqoibcMqL1gQNpuK9BhRZJtH+J8oCXKVkOTBknnZUH++46vImUl2WYggXk83tvz3JF+yBjekGyWnV8TVa+zMqt5o9c3WKB1p37fqo4ziU7Qw4ItlCSrDWFKzpASO1IakRL8mkSCtqM0WipOicCsBpXjBXucg4y1O1Zru6gR+PZXcpfflqguESvACYKPcQ4+GblFX7FaV2dktaNYfOX0fsVZbuS8Yyo/OjwsEfwrSvRDiW7ROzQt5tbIupKEklqR5gOnXIC5iYJA5BYLSGHitOz/GnZr9OoE7VhD2o6RBv0EghlaZK/Je/K+bReZO8B0XENVZlQhE3y/EyroritdXX0gCHR1fDx1kDZY4WrdrdYU/pTL/BfBd9vclUQHue5oA7HP0OUGX5NTDhHIfA2p6+UHLhgR/fqiU5TA6qoMBixUxvsMTV7jKZ627aTfv+lkt6QAVIupJFb8WCSFEkTtBENrED4mSMYh8BJJD6WmjhyWS0K5juc91qsk4yLaqa1J2L8MYSJeLU3uleLbL6RV5fjWma7l2N6SAys3T520u+aw3b1y8bhYqpaLT7he5z733G6UqCtQj9YYiWuF2QpQibSMYeAjAUicnXRTdn8DIrIXBkT0Z1XhpvmgiQFQzweQObBWo2A5+nAPlFN+PlrhhbNQr8jnvhNLQuADgwb3np5stsmS4vp6EsHvW8E0+wW5U3EwoZWgclHRag7VZGo23qXctGSkbpvir65R6xk6HFRQeVJYiCAankrSSqu9ItgR9FmRTV9pCFDCUKwoX+WL7NxoIK2yyEoXn/fPwwwD13qkBnk6MSrXui9oLUXHVhf8ZwElyvcRqynB4tw5zH24W8G/gSREoiMdaQKu+f+QwBBl+QeTz+X5Qk5mHg3Z7ePC4P+GfMH3RMTV8mcGpOQ3wPw7EhFf82ypRQbdQQx+5l4eXYXvzr85c3l4VW257Izxk73JlKgePalqhk2iOx3X7SdXov3dc9re+H4hXHfGhVDPFmF69R/6IvWHm287qYZDp2tz500qrADqE7hGITSg6SKL2bQXU5KvX3iKIALYo+eOh5QAPxt4lENEypgv3rpLzcx3cncEB/0zZgoPEdCKqa81jPMSha99HMXcW3IvqxJtYfjOrUw717M4YrPBiHPq5uIFfM2tES2tNh372EEp4bkFGkeH/Q5nv/GdJB/5rS5Z6FpyA06L5HEH21vrlO0o1RaUewyeEbmjZt+1HsguiFTWCqDQ6QT6V6MJTHUtyl+F04VxZQZEOm2M7kLZSWoWj/Z03nt+86YPo1L3W0cYfRFYuljLLvxetYOhE5tEL9t0xQCzaGh3dCACkVwGfRl7u07mNCAnW7ENb7q2028KfWkJTm0OvbekNyAqweGraQ5nqqf6s8cIvCLiY6liaAAj8n1MOSN5PKAH1mtMySmW2kOEPzpIrfhpYIIdvx2CzaLHKKL+PjoTDfgkkMvr+uKNXQz9KykhhWfdWNH8GAqwhptca/uT6TX3mXUKfboxxCmHUIT0HvfbUuDVeFuOFatMp8WeC10Uz0Kg915yKSUKzx57EcZUiNgR8cCMK41+inwld0v4gVWrPMG+qChhK0Dy3Rh53ObAuqJ/Ev1KTC/TJx1sAM5uS+9zY7YYGFuKxFh0Kf5PgzB4T32Z9BDuX8o27rcoMVe6CAbiYu5t9tajzrG2T4e1T67RnoduDMBgeRH3MEGiwWZ+afmbfLR9k4ICbrak7syBowHFUpmX+rBg/HZUfzuiawqpkzdnKrs88D7tOjoCGVuVH9Fh/F4I1TT5kvzg++MYxv0XwvDAQP/fI4CM8Mn6h8eN7zqjFV4zb31LNYQq7GbMUy71JMnKbCkIvja1lNns8urxHw==
-//     }
-// };
-
-// setTraces.oninput = function() {
-//     // rerender the traces
-//     userLayer.clear();
-//     showTraceHistoryFrom(timeKeeper.value);
-// };
 
 timeKeeper.oninput = function() {
     if (this.value === 0) return; // 0 is pre-generation state
