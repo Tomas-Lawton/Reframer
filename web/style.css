@@ -70,9 +70,11 @@ body {
     z-index: 8;
 }
 
-canvas {
+.exemplar {
     display: block;
     background-color: #fcfcfc;
+    width: 100%;
+    height: auto;
 }
 
 canvas[resize] {
@@ -516,6 +518,14 @@ button[right-button] {
     font-size: 1.2;
     color: #363636;
     /* color: #7b66ff; */
+}
+
+#describe-actions #stop {
+    background-color: #ff6060;
+}
+
+#describe-actions #stop i {
+    color: #ffffff;
 }
 
 #control-actions {

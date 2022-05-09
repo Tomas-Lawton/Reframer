@@ -32,9 +32,10 @@ let step = 1;
 let doneTransform = 500;
 let myPath, erasePath, regionPath, tmpGroup, mask;
 
-const exemplarSize = document
-    .querySelector(".square")
-    .getBoundingClientRect().width;
+// const exemplarSize = document
+//     .querySelector(".square")
+//     .getBoundingClientRect().width;
+const exemplarSize = 252.31;
 
 // Paper Setup
 paper.install(window);
