@@ -169,11 +169,8 @@ multiTool.onMouseUp = function(event) {
             });
             break;
         case "lasso":
-            resetHistory(); //reset since not continuing
-            startDrawing(
-                prompt.value === mainSketch.lastPrompt ? "redraw" : "draw",
-                true
-            );
+            mainSketch.resetHistory(); //reset since not continuing
+            mainSketch.draw(true);
             mainSketch.clipDrawing = true;
             break;
     }

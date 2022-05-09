@@ -101,6 +101,13 @@ class SketchHandler {
         this.updateDrawer({ status: "stop" });
         this.clipDrawing = false;
     }
+    resetHistory() {
+        step = 0; // reset since not continuing
+        mainSketch.stack.historyHolder = [{ svg: "" }];
+        timeKeeper.style.width = "0";
+        timeKeeper.setAttribute("max", "0");
+        timeKeeper.value = "0";
+    }
 }
 
 mainSketch = new SketchHandler();
@@ -266,14 +273,6 @@ const stopClip = () => {
 };
 
 // switchControls();
-
-const resetHistory = () => {
-    step = 0; // reset since not continuing
-    mainSketch.stack.historyHolder = [{ svg: "" }];
-    timeKeeper.style.width = "0";
-    timeKeeper.setAttribute("max", "0");
-    timeKeeper.value = "0";
-};
 
 const parseFromSvg = (svg) => {
     if (svg === "") return null;

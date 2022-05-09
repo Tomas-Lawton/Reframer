@@ -33,7 +33,6 @@ class Clip_Draw_Optimiser:
         self.is_running = False
         self.nouns = get_noun_data()
         self.is_initialised = False
-        self.use_user_paths = True
         self.use_neg_prompts = False
         self.normalize_clip = True
         # Canvas parameters
@@ -72,26 +71,21 @@ class Clip_Draw_Optimiser:
         logging.info("Updated CLIP prompt features")
         return
 
-    def parse_svg(self, region):
-        path_list = []
+    def parse_svg(self, region = None):
+        use_region = region['activate']
         try:
-            if self.use_user_paths:
-                (
-                    path_list,
-                    self.user_canvas_w,
-                    self.user_canvas_h,
-                    self.resizeScaleFactor,
-                    normaliseScaleFactor,
-                ) = parse_svg('data/interface_paths.svg', region['activate'])
+            (
+                self.path_list,
+                self.user_canvas_w,
+                self.user_canvas_h,
+                self.resizeScaleFactor,
+                normaliseScaleFactor,
+            ) = parse_svg('data/interface_paths.svg', use_region)
 
-                if region['activate']:
-                    self.drawing_area = calculate_draw_region(region, normaliseScaleFactor)
-            else:
-                path_list = parse_local_svg('data/drawing_flower_vase.svg')
+            if use_region:
+                self.drawing_area = calculate_draw_region(region, normaliseScaleFactor)
         except:
             logging.error("SVG Parsing failed")
-        self.path_list = path_list
-
 
     def activate(self):
         self.is_active = True
@@ -244,26 +238,25 @@ class Clip_Draw_Optimiser:
         }
 
         # Update sketch
-        if self.use_user_paths:
-            if self.exemplar_count is not None:
-                self.resizeScaleFactor = 224 / self.frame_size
+        if self.exemplar_count is not None:
+            self.resizeScaleFactor = 224 / self.frame_size
 
-            render_shapes, render_shape_groups = rescale_constants(
-                self.shapes, self.shape_groups, self.resizeScaleFactor
-            )
-            pydiffvg.save_svg(
-                f"results/img-{str(self.exemplar_count)}.png",
-                224,
-                224,
-                self.shapes, self.shape_groups,
-            )
-            pydiffvg.save_svg(
-                f"results/output-{str(self.exemplar_count)}.svg",
-                self.user_canvas_w,
-                self.user_canvas_h,
-                render_shapes,
-                render_shape_groups,
-            )
+        render_shapes, render_shape_groups = rescale_constants(
+            self.shapes, self.shape_groups, self.resizeScaleFactor
+        )
+        pydiffvg.save_svg(
+            f"results/img-{str(self.exemplar_count)}.png",
+            224,
+            224,
+            self.shapes, self.shape_groups,
+        )
+        pydiffvg.save_svg(
+            f"results/output-{str(self.exemplar_count)}.svg",
+            self.user_canvas_w,
+            self.user_canvas_h,
+            render_shapes,
+            render_shape_groups,
+        )
         self.iteration += 1
         return self.iteration, loss.item()
     
@@ -284,6 +277,7 @@ class Clip_Draw_Optimiser:
             prompt_features = self.clip_interface.encode_text_classes([prompt])
             neg_prompt_features = self.clip_interface.encode_text_classes(neg_prompt)
             self.set_text_features(prompt_features, neg_prompt_features)
+            self.last_region = region
             self.parse_svg(region)
             logging.info("Got features")
             return self.activate()
@@ -293,7 +287,8 @@ class Clip_Draw_Optimiser:
     async def redraw_update(self):
         """Use original paths with origional prompt to try new options from same settings"""
         logging.info("Starting redraw")
-        # self.iteration = 0 ????
+        self.parse_svg(self.last_region)
+        self.iteration = 0
         return self.activate()
 
     async def continue_update(self, data):
