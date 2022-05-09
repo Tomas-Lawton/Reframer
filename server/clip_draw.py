@@ -269,8 +269,12 @@ class Clip_Draw_Optimiser:
         svg_string = data["data"]["svg"]
         region = data["data"]["region"]
         self.clip_interface.positive = prompt
-        async with aiofiles.open('data/interface_paths.svg', 'w') as f:
-            await f.write(svg_string)
+        if svg_string != None:
+            async with aiofiles.open('data/interface_paths.svg', 'w') as f:
+                await f.write(svg_string)
+        else:
+            async with aiofiles.open('data/interface_paths.svg', 'w') as f:
+                await f.write("")   
         try:
             self.reset()
             logging.info("Starting clip drawer")
@@ -291,23 +295,23 @@ class Clip_Draw_Optimiser:
         self.iteration = 0
         return self.activate()
 
-    async def continue_update(self, data):
-        """Use origional paths with origional prompt to try new options from same settings"""
-        logging.info("Continuing...")
-        prompt = data["data"]["prompt"]
-        neg_prompt = []
-        # if same as last prompt, retrieve last iteration
-        if prompt == self.clip_interface.positive:
-            await self.socket.send_json(self.last_result)
-        else:
-            self.clip_interface.positive = prompt
-        try:
-            prompt_features = self.clip_interface.encode_text_classes([prompt])
-            neg_prompt_features = self.clip_interface.encode_text_classes(neg_prompt)
-            self.set_text_features(prompt_features, neg_prompt_features)
-            logging.info("Got features")
-        except:
-            logging.error("Failed to encode features in clip")
+    # async def continue_update(self, data):
+    #     """Use origional paths with origional prompt to try new options from same settings"""
+    #     logging.info("Continuing...")
+    #     prompt = data["data"]["prompt"]
+    #     neg_prompt = []
+    #     # if same as last prompt, retrieve last iteration
+    #     if prompt == self.clip_interface.positive:
+    #         await self.socket.send_json(self.last_result)
+    #     else:
+    #         self.clip_interface.positive = prompt
+    #     try:
+    #         prompt_features = self.clip_interface.encode_text_classes([prompt])
+    #         neg_prompt_features = self.clip_interface.encode_text_classes(neg_prompt)
+    #         self.set_text_features(prompt_features, neg_prompt_features)
+    #         logging.info("Got features")
+    #     except:
+    #         logging.error("Failed to encode features in clip")
 
     async def run(self):
         # Refactor so that the code is a thin layer of the looper

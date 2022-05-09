@@ -500,3 +500,12 @@ const setPenMode = (mode, accentTarget) => {
     }
     // console.log(mainSketch.penMode);
 };
+
+const getRGBA = () => {
+    let rgba = mainSketch.strokeColor.replace(/[^\d,]/g, "").split(",");
+    rgba[3] = mainSketch.opacity;
+    let col = `rgba(${rgba.join()})`;
+    console.log(col);
+    document.getElementById("pen-color").style.background = col;
+    document.getElementById("point-size").style.background = col;
+};

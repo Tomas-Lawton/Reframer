@@ -106,51 +106,47 @@
         <!-- Grid -->
 
         <div id="exemplar-grid">
-            <div class="exemplar-grid-verticle">
-                <div class="exemplar-card">
-                    <canvas id="canvas1" class="exemplar"></canvas>
-                    <div class="card-info">
-                        <div>
-                            <h3>Exemplar 1</h3>
-                            <p>Loss: 0</p>
-                        </div>
-                        <i class="fa-solid fa-plus fa-fw"></i>
+            <div class="exemplar-card">
+                <canvas id="canvas1" class="exemplar"></canvas>
+                <div class="card-info">
+                    <div>
+                        <h3>Exemplar 1</h3>
+                        <p>Loss: 0</p>
                     </div>
-                </div>
-
-                <div class="exemplar-card">
-                    <canvas id="canvas2" class="exemplar"></canvas>
-                    <div class="card-info">
-                        <div>
-                            <h3>Exemplar 2</h3>
-                            <p>Loss: 0</p>
-                        </div>
-                        <i class="fa-solid fa-plus fa-fw"></i>
-                    </div>
+                    <i class="fa-solid fa-plus fa-fw"></i>
                 </div>
             </div>
 
-            <div class="grid-verticle">
-                <div class="exemplar-card">
-                    <canvas id="canvas3" class="exemplar"></canvas>
-                    <div class="card-info">
-                        <div>
-                            <h3>Exemplar 3</h3>
-                            <p>Loss: 0</p>
-                        </div>
-                        <i class="fa-solid fa-plus fa-fw"></i>
+            <div class="exemplar-card">
+                <canvas id="canvas2" class="exemplar"></canvas>
+                <div class="card-info">
+                    <div>
+                        <h3>Exemplar 2</h3>
+                        <p>Loss: 0</p>
                     </div>
+                    <i class="fa-solid fa-plus fa-fw"></i>
                 </div>
+            </div>
 
-                <div class="exemplar-card">
-                    <canvas id="canvas4" class="exemplar"></canvas>
-                    <div class="card-info">
-                        <div>
-                            <h3>Exemplar 4</h3>
-                            <p>Loss: 0</p>
-                        </div>
-                        <i class="fa-solid fa-plus fa-fw"></i>
+            <div class="exemplar-card">
+                <canvas id="canvas3" class="exemplar"></canvas>
+                <div class="card-info">
+                    <div>
+                        <h3>Exemplar 3</h3>
+                        <p>Loss: 0</p>
                     </div>
+                    <i class="fa-solid fa-plus fa-fw"></i>
+                </div>
+            </div>
+
+            <div class="exemplar-card">
+                <canvas id="canvas4" class="exemplar"></canvas>
+                <div class="card-info">
+                    <div>
+                        <h3>Exemplar 4</h3>
+                        <p>Loss: 0</p>
+                    </div>
+                    <i class="fa-solid fa-plus fa-fw"></i>
                 </div>
             </div>
         </div>
@@ -249,7 +245,12 @@
                 <div id="pen-styles">
                     <div id="color-picker"></div>
                     <div id="fine-control">
-                        <input type="range" id="width-slider" value="12" min="1" max="40">
+                        <div id="art-sliders">
+                            <p>Stroke Opacity</p>
+                            <input type="range" id="opacity-slider" value="75" min="0" max="100">
+                            <p>Line Width</p>
+                            <input type="range" id="width-slider" value="12" min="1" max="40">
+                        </div>
                         <div id="art-control-final">
                             <div id="stroke-dot">
                                 <div id="point-size"></div>

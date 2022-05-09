@@ -14,13 +14,16 @@ const timeKeeper = document.getElementById("time-slider");
 const lossText = document.getElementById("rolling-loss");
 const setTraces = document.getElementById("num-traces");
 const selectDot = document.getElementById("contain-pen-dot");
+const opacitySlider = document.getElementById("opacity-slider");
 
+// AI UI
 const drawButton = document.getElementById("draw");
 const redrawButton = document.getElementById("redraw");
 // const continueButton = document.getElementById("continue");
 const generateButton = document.getElementById("generate");
 const stopButton = document.getElementById("stop");
 
+// Select UI
 const deleteHandler = document.getElementById("delete-handler");
 const rotateHandler = document.getElementById("rotate-slider");
 const scaleHandler = document.getElementById("scale-slider");

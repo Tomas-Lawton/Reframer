@@ -111,10 +111,13 @@ def parse_local_svg(path_to_svg_file):
 
 
 def parse_svg(path_to_svg_file, skip_box_select=False):
-    paths, attributes = svg2paths(path_to_svg_file)
-    path_list = []
-    parsed_svg = SVG.parse(path_to_svg_file)  # access <g> tag for non-path styles
-    elements_list = list(parsed_svg.elements())
+    try:
+        paths, attributes = svg2paths(path_to_svg_file)
+        path_list = []
+        parsed_svg = SVG.parse(path_to_svg_file)  # access <g> tag for non-path styles
+        elements_list = list(parsed_svg.elements())
+    except:
+        logging.error("Couldn't read svg file")
     path_group = {}
     parent_svg = {}
 
@@ -132,11 +135,15 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
         except (KeyError, AttributeError):
             pass
 
-    width = int(parent_svg['attributes']['width'])
-    height = int(parent_svg['attributes']['height'])
-    frame_size = max(width, height)
-    normaliseScaleFactor = 1 / frame_size
-    resizeScaleFactor = 224 / frame_size
+    try:
+        print(parent_svg['attributes'])
+        width = float(parent_svg['attributes']['width'])
+        height = float(parent_svg['attributes']['height'])
+        frame_size = max(width, height)
+        normaliseScaleFactor = 1 / frame_size
+        resizeScaleFactor = 224 / frame_size
+    except:
+        logging.error("Couldn't parse SVG Parent")
 
     count = 0
     num_paths = len(attributes)
@@ -152,6 +159,10 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
                 color_code = str(att['stroke'])
             else:
                 color_code = str(path_group['attributes']['stroke'])
+        except:
+            logging.error("Couldn't parse stroke")
+
+        try:
             if 'stroke-width' in att:
                 stroke_width = float(att['stroke-width']) * normaliseScaleFactor
             else:
@@ -159,11 +170,18 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
                     float(path_group['attributes']['stroke-width'])
                     * normaliseScaleFactor
                 )
-            if 'stroke-opacity' in att:
-                opacity = float(att['stroke-opacity'])
-                # if not opacity, just use "1" since not in group attrib
         except:
-            logging.error("Couldn't parse sketch")
+            logging.error("Couldn't parse stroke width")
+            # if 'stroke-opacity' in att:
+                # opacity = float(att['stroke-opacity'])
+
+        try:
+            if 'opacity' in att:
+                opacity = float(att['opacity'])
+            else:
+                opacity = str(path_group['attributes']['opacity'])
+        except:
+            logging.error("Couldn't parse stroke opacity")
 
         color = get_color(color_code, opacity)
         num_segments = len(att['d'].split(',')) // 3
@@ -195,11 +213,10 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
             path = [x0] + points_array
             path_list.append(data_to_tensor(color, stroke_width, path, num_segments))
         except:
-            logging.error("Unexpected paths from canvas")
+            logging.error("Unexpected paths in canvas")
         count += 1
 
     logging.info(f"Returning list of paths: \n {path_list}")
-    print(resizeScaleFactor)
     return path_list, width, height, resizeScaleFactor, normaliseScaleFactor
 
 

@@ -4,6 +4,15 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
         setPenMode(elem.id, elem);
     });
 });
+document.querySelectorAll(".swatch").forEach((elem) => {
+    elem.addEventListener("click", () => {
+        let col = window.getComputedStyle(elem).backgroundColor;
+        mainSketch.strokeColor = col;
+        opacitySlider.value = 100;
+        picker.setColor(col);
+        getRGBA();
+    });
+});
 
 document.getElementById("delete").addEventListener("click", () =>
     openModal({
@@ -204,6 +213,12 @@ scaleHandler.onmouseup = function() {
     console.log("done");
 };
 
+opacitySlider.oninput = function() {
+    mainSketch.opacity = this.value / 100;
+    getRGBA();
+    getSelectedPaths().forEach((item) => (item.opacity = mainSketch.opacity));
+};
+
 document.getElementById("settings").addEventListener("click", () => {
     openModal({
         title: "Settings",
@@ -230,7 +245,7 @@ palette.addEventListener("click", () => {
 const picker = new Picker({
     parent: document.getElementById("color-picker"),
     popup: false,
-    alpha: true,
+    alpha: false,
     defaultColor: "#0cf",
     editor: false,
     editorFormat: "hex", // or 'rgb', 'hsl'
@@ -239,8 +254,7 @@ const picker = new Picker({
 picker.setColor(mainSketch.strokeColor);
 picker.onChange = (color) => {
     mainSketch.strokeColor = color.rgbaString;
-    document.getElementById("pen-color").style.background =
-        mainSketch.strokeColor;
+    getRGBA();
     getSelectedPaths().forEach(
         (item) => (item.strokeColor = mainSketch.strokeColor)
     );
