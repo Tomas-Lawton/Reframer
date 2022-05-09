@@ -428,18 +428,14 @@ ws.onmessage = function(event) {
                 `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`
             );
         }
-        var matches = result.status.match(/\d+/g);
+        var matches = result.status.match(/\d+/g); //if status contains a number
         if (matches != null) {
-            let exemplar_canvas = exemplarScope.projects[parseInt(result.status)];
-            console.log(exemplar_canvas);
-            // exemplars
-            exemplar_canvas.activate();
-            exemplar_canvas.clear();
-            let svg = result.svg;
-            if (svg === "") return null;
-            console.log(svg);
-            exemplar_canvas.importSVG(result.svg);
-
+            if (result.svg === "") return null;
+            let thisCanvas = exemplarScope.projects[parseInt(result.status)];
+            // exemplar_canvas.activate();
+            thisCanvas.clear();
+            let imported = thisCanvas.importSVG(result.svg);
+            console.log(imported);
             document.querySelectorAll(".card-info div p")[
                 parseInt(result.status)
             ].innerHTML = `Loss: ${result.loss.toPrecision(5)}`;

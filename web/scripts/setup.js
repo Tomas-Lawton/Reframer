@@ -35,7 +35,7 @@ let myPath, erasePath, regionPath, tmpGroup, mask;
 const exemplarSize = document
     .querySelector(".square")
     .getBoundingClientRect().width;
-console.log(exemplarSize);
+
 // Paper Setup
 paper.install(window);
 const scope = new PaperScope();
@@ -48,8 +48,11 @@ const exemplars = [
     document.getElementById("canvas3"),
     document.getElementById("canvas4"),
 ];
-exemplars.forEach((exemplar) => exemplarScope.setup(exemplar));
-// exemplarScope.setup(exemplars[0]);
+exemplars.forEach((exemplar) => {
+    exemplarScope.setup(exemplar);
+});
+exemplarScope.activate();
+// exemplarScope.projects.forEach((project) => project.activate());
 scope.setup(canvas);
 scope.activate();
 
