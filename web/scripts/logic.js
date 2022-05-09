@@ -105,6 +105,17 @@ class SketchHandler {
 
 mainSketch = new SketchHandler();
 
+const fitToSelection = (items, state) => {
+    let bbox = items.reduce((bbox, item) => {
+        return !bbox ? item.bounds : bbox.unite(item.bounds);
+    }, null);
+    // Add stroke width so no overflow over bounds?
+    mainSketch.boundingBox = new Path.Rectangle(bbox);
+    mainSketch.boundingBox.strokeColor = "#D2D2D2";
+    mainSketch.boundingBox.strokeWidth = 2;
+    mainSketch.boundingBox.data.state = state;
+};
+
 const getSelectedPaths = () =>
     userLayer.getItems().filter((path) => path.selected);
 

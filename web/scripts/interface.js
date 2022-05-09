@@ -180,37 +180,25 @@ rotateHandler.onmousedown = function() {
 };
 
 rotateHandler.oninput = function() {
-    // if (mainSketch.boundingBox.data.state === "rotating") {
     hideSelectUI(false);
-    // selectTimer = setTimeout(doneSelect, doneTransform);
     let r = this.value;
-    let selectedPaths = getSelectedPaths(); // all selected
-    let newGroup = new Group({ children: selectedPaths });
-    if (!selectGroup) {
-        selectGroup = newGroup;
-        selectGroup.transformContent = false;
-    }
-    selectGroup.rotation = r;
-
-    // New rect
-    // let from = mainSketch.selectGroup.bounds.segments[0].point;
-    // let newCorner = mainSketch.selectGroup.bounds.segments[2].point;
-    // updateRectBounds(from, newCorner);
-    // updateSelectUI();
-    // ungroup
+    mainSketch.rotationGroup.rotation = r;
+    let items = getSelectedPaths();
+    fitToSelection(items, "rotating");
+    updateSelectUI();
 };
 
 scaleHandler.oninput = function() {
     // if (mainSketch.boundingBox.data.state === "rotating") {
     hideSelectUI(false);
     let selectedPaths = getSelectedPaths(); // all selected
+
     for (child of selectedPaths) {
         child.applyMatrix = false;
         child.scaling = this.value / 5;
     }
-    // updateRectBounds(from, newCorner);
-    // updateSelectUI();
-    // ungroup
+    fitToSelection(selectedPaths, "scaling");
+    updateSelectUI();
 };
 scaleHandler.onmouseup = function() {
     console.log("done");

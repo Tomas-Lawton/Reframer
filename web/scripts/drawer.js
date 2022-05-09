@@ -41,43 +41,41 @@ multiTool.onMouseDown = function(event) {
                 path.selected = true; //fix so that this happens with no drag but with drag it won't toggle !path.selected
 
                 let items = getSelectedPaths();
-                let bbox = items.reduce((bbox, item) => {
-                    return !bbox ? item.bounds : bbox.unite(item.bounds);
-                }, null);
-                // Add stroke width so no overflow over bounds?
-                mainSketch.boundingBox = new Path.Rectangle(bbox);
-                mainSketch.boundingBox.strokeColor = "#D2D2D2";
-                mainSketch.boundingBox.strokeWidth = 2;
-                mainSketch.boundingBox.data.state = "moving";
+                fitToSelection(items, "moving");
+                //include new path in rotation group
+                let rotationGroup = new Group({ children: items });
+                rotateHandler.value = 0;
+                rotationGroup.transformContent = false;
+                mainSketch.rotationGroup = rotationGroup;
                 updateSelectUI();
             }
 
-            if (mainSketch.boundingBox) {
-                if (
-                    mainSketch.boundingBox.hitTest(event.point, {
-                        segments: true,
-                        tolerance: 3,
-                    })
-                ) {
-                    // got rectangle segment
-                    // find which segment point was hit
-                    for (let i = 0; i < mainSketch.boundingBox.segments.length; i++) {
-                        let p = mainSketch.boundingBox.segments[i].point;
-                        if (p.isClose(event.point, 3)) {
-                            let opposite = (i + 2) % 4;
+            // if (mainSketch.boundingBox) {
+            //     if (
+            //         mainSketch.boundingBox.hitTest(event.point, {
+            //             segments: true,
+            //             tolerance: 3,
+            //         })
+            //     ) {
+            //         // got rectangle segment
+            //         // find which segment point was hit
+            //         for (let i = 0; i < mainSketch.boundingBox.segments.length; i++) {
+            //             let p = mainSketch.boundingBox.segments[i].point;
+            //             if (p.isClose(event.point, 3)) {
+            //                 let opposite = (i + 2) % 4;
 
-                            mainSketch.boundingBox.data.from =
-                                mainSketch.boundingBox.segments[opposite].point;
-                            mainSketch.boundingBox.data.to =
-                                mainSketch.boundingBox.segments[i].point;
-                            mainSketch.boundingBox.data.state = "resizing";
-                            mainSketch.boundingBox.data.corner =
-                                mainSketch.boundingBox.segments[i].point;
-                            break;
-                        }
-                    }
-                }
-            }
+            //                 mainSketch.boundingBox.data.from =
+            //                     mainSketch.boundingBox.segments[opposite].point;
+            //                 mainSketch.boundingBox.data.to =
+            //                     mainSketch.boundingBox.segments[i].point;
+            //                 mainSketch.boundingBox.data.state = "resizing";
+            //                 mainSketch.boundingBox.data.corner =
+            //                     mainSketch.boundingBox.segments[i].point;
+            //                 break;
+            //             }
+            //         }
+            //     }
+            // }
             break;
         case "pen":
             myPath = new Path({
@@ -107,9 +105,6 @@ multiTool.onMouseDrag = function(event) {
             break;
         case "select":
             if (mainSketch.boundingBox) {
-                // let oldBounds = mainSketch.boundingBox.bounds;
-                console.log("Component: ", event.delta);
-
                 if (mainSketch.boundingBox.data.state === "moving") {
                     const selectedPaths = getSelectedPaths(); // all selected
                     selectedPaths.forEach((path) => {
@@ -119,29 +114,30 @@ multiTool.onMouseDrag = function(event) {
                     mainSketch.boundingBox.position.x += event.delta.x;
                     mainSketch.boundingBox.position.y += event.delta.y;
                     updateSelectUI();
-                } else if (mainSketch.boundingBox.data.state === "resizing") {
-                    // Enforce 1:1 rect only
-                    let x1 = mainSketch.boundingBox.data.to.x;
-                    let y1 = mainSketch.boundingBox.data.to.y;
-                    let x2 = event.point.x;
-                    let r = x2 / x1;
-                    let y2 = y1 * r;
-                    let newCorner = new Point(x2, y2);
-
-                    // New rect
-                    updateRectBounds(mainSketch.boundingBox.data.from, newCorner);
-                    let selectedPaths = getSelectedPaths(); // all selected
-                    let itemGroup = new Group({ children: selectedPaths });
-                    itemGroup.scale(
-                        // event.delta.length / 5.5,
-                        r,
-                        mainSketch.boundingBox.data.from
-                    );
-                    // UNGROUP
-
-                    updateSelectUI();
                 }
-                // rotate in slider interface
+                // else if (mainSketch.boundingBox.data.state === "resizing") {
+                //     // Enforce 1:1 rect only
+                //     let x1 = mainSketch.boundingBox.data.to.x;
+                //     let y1 = mainSketch.boundingBox.data.to.y;
+                //     let x2 = event.point.x;
+                //     let r = x2 / x1;
+                //     let y2 = y1 * r;
+                //     let newCorner = new Point(x2, y2);
+
+                //     // New rect
+                //     updateRectBounds(mainSketch.boundingBox.data.from, newCorner);
+                //     let selectedPaths = getSelectedPaths(); // all selected
+                //     let itemGroup = new Group({ children: selectedPaths });
+                //     itemGroup.scale(
+                //         // event.delta.length / 5.5,
+                //         r,
+                //         mainSketch.boundingBox.data.from
+                //     );
+                //     // UNGROUP
+
+                //     updateSelectUI();
+                // }
+                // // rotate in slider interface
             }
             break;
         case "lasso":
