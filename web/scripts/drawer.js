@@ -184,7 +184,9 @@ eraseTool.onMouseDown = function(event) {
         strokeWidth: mainSketch.strokeWidth * 2,
         strokeCap: "round",
         strokeJoin: "round",
-        strokeColor: "white",
+        // strokeColor: "white",
+        // opacity: 0.9,
+        strokeColor: "rgb(255, 0, 0)",
     });
     tmpGroup = new Group({
         children: userLayer.removeChildren(),

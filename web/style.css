@@ -68,6 +68,9 @@ body {
 #contain-pen-dot {
     position: absolute;
     z-index: 8;
+    top: 0;
+    left: 0;
+    margin: 0.2em;
 }
 
 .exemplar {
@@ -386,6 +389,7 @@ button[right-button] {
 #time-slider {
     margin-left: 2em;
     margin-right: 0;
+    visibility: hidden;
 }
 
 #palette {
@@ -667,7 +671,6 @@ button[right-button] {
 
 #pen-styles {
     display: flex;
-    padding: 1em;
     flex-direction: column;
 }
 
@@ -719,7 +722,7 @@ button[right-button] {
 .select-ui i {
     box-shadow: 2px 3px 9px rgba(48, 48, 48, 0.17);
     border-radius: 50%;
-    font-size: 1em;
+    font-size: 2em;
     padding: 0.1em;
     color: #363636;
 }
@@ -736,7 +739,7 @@ button[right-button] {
     background: #f8f8f8;
     box-shadow: 10px 9px 27px rgba(48, 48, 48, 0.12);
     border-radius: 1em;
-    padding: 2em;
+    padding: 3em;
 }
 
 #art-panel h2 {
@@ -756,6 +759,7 @@ button[right-button] {
     background: #ededed;
     padding: 0.6em 0;
     width: 100%;
+    border-radius: 0.5em 0.5em 0 0;
 }
 
 .swatch {
@@ -783,10 +787,11 @@ button[right-button] {
     flex-direction: column;
 }
 
-
-/* #fine-control p {
-    margin: 1em 0 0 0;
-} */
+#fine-control p {
+    font-weight: 500;
+    color: #5c5c5c;
+    font-size: 1.2em;
+}
 
 #art-sliders {
     margin: 1em 0 0 0;
@@ -806,6 +811,7 @@ button[right-button] {
     width: 5em;
     height: 5em;
     position: relative;
+    box-shadow: inset 2px 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 #stroke-dot div {
@@ -822,7 +828,8 @@ button[right-button] {
 #pen-color {
     border-radius: 0.5em;
     width: 74%;
-    background-color: #12b700;
+    /* background-color: #12b700; */
+    box-shadow: inset 2px 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 
@@ -831,6 +838,10 @@ button[right-button] {
 .layout_default.picker_wrapper {
     padding: 0;
     font-size: 1em;
+}
+
+.layout_default.picker_slider {
+    border-radius: 2em;
 }
 
 .picker_wrapper {
@@ -859,11 +870,16 @@ button[right-button] {
 
 .picker_sl {
     box-shadow: none !important;
+    /* border-radius: 30em !important; */
     /* padding: 10px 0 0 10px; */
+    border-radius: 0 0 0.5em 0.5em;
 }
 
+
+/* IMPORTANT */
+
 .layout_default.picker_wrapper>* {
-    margin: 0.2em !important;
+    margin: 0.01em !important;
 }
 
 .layout_default.picker_wrapper {
@@ -895,6 +911,7 @@ input[type="range"]::-webkit-slider-runnable-track {
     background: #ededed;
     border-radius: 50px;
     border: 0px solid #000000;
+    box-shadow: inset 2px 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 input[type="range"]::-webkit-slider-thumb {

@@ -39,6 +39,7 @@ class SketchHandler {
         this.stack = new SimpleStack();
     }
     updateDrawer({ status, svg, hasRegion, frameSize, prompt }) {
+        timeKeeper.style.visibility = "visible";
         mainSketch.isFirstIteration = true; //reset canvas
         const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
         mainSketch.lastPrompt = prompt;
@@ -364,6 +365,7 @@ const moveSelecterTo = (elem) => {
     selectDot.style.left = elem.getBoundingClientRect().x + "px";
     selectDot.style.top = elem.getBoundingClientRect().y + "px";
     let colorClass = elem.firstChild.nextElementSibling.classList[0];
+    colorClass === undefined && (colorClass = "brush");
     selectDot.firstElementChild.firstElementChild.classList.remove(
         "brush",
         "select",

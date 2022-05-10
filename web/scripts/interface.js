@@ -262,7 +262,7 @@ picker.onChange = (color) => {
 };
 
 // UI Setup
-moveSelecterTo(document.querySelectorAll(".pen-mode")[1]);
+// moveSelecterTo(document.querySelectorAll(".pen-mode")[1]);
 
 // exemplars.forEach((exemplar) => {
 //     exemplar.style.width = exemplarSize + "px";
