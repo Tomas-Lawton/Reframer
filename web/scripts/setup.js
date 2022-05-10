@@ -1,6 +1,5 @@
 const ws = new WebSocket("ws://localhost:8000/ws");
 
-const canvas = document.getElementById("canvas");
 const prompt = document.getElementById("messageText");
 const modal = document.getElementById("modal");
 const controlPanel = document.getElementById("control-panel");
@@ -34,6 +33,25 @@ const transformControl = document.getElementById("transform-ui");
 let step = 1;
 let doneTransform = 500;
 let myPath, erasePath, regionPath, tmpGroup, mask;
+
+const canvas = document.getElementById("canvas");
+const resizeSketch = () => {
+    let containerRect = document
+        .getElementById("contain-canvas")
+        .getBoundingClientRect();
+    if (containerRect.width > window.innerHeight) {
+        canvas.width = window.innerHeight;
+        canvas.height = window.innerHeight;
+    } else {
+        canvas.height = containerRect.width;
+        canvas.width = containerRect.width;
+    }
+};
+
+window.addEventListener("resize", () => {
+    resizeSketch();
+});
+resizeSketch();
 
 // const exemplarSize = document
 //     .querySelector(".square")

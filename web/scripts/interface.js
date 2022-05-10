@@ -291,3 +291,9 @@ document.getElementById("width-slider").setAttribute("max", maxPointSize);
 // });
 // partial.getItems().forEach((path) => userLayer.addChild(path));
 // partial.remove();
+
+window.addEventListener("resize", (e) => {
+    console.log(e);
+    // resize main canvas;
+    // resize mini canvas
+});
