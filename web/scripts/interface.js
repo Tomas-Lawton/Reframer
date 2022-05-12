@@ -60,9 +60,7 @@ initialiseHandler.addEventListener("click", (e) => {
 document.getElementById("begin").addEventListener("click", () => {
     document.getElementById("sliding-overlay").style.bottom = "100%";
 });
-// document.getElementById("switch-side").addEventListener("click", () => {
-//     switchControls();
-// });
+
 document.getElementById("undo").addEventListener("click", () => {
     if (mainSketch.stack.undoStack.length > 0) {
         const lastEvent = mainSketch.stack.undoStack.pop();
@@ -94,16 +92,13 @@ document.getElementById("undo").addEventListener("click", () => {
             });
         }
         if (lastEvent.type === "erase-event") {
-            // fix blending tomorrow!!!!!!!!
-            // TO DO
-            // userLayer.exportJSON();
+            let afterErase = userLayer.exportJSON();
             userLayer.clear();
             let lastItems = userLayer.importJSON(lastEvent.data);
-            lastItems.getItems().forEach((path) => {
-                console.log("");
+            mainSketch.stack.redoStack.push({
+                type: "erase-event",
+                data: afterErase, //use ref
             });
-            // remove blend path
-            lastItems.lastChild.remove();
         }
     }
 });
@@ -128,7 +123,13 @@ document.getElementById("redo").addEventListener("click", () => {
             }); // need to store a json to redraw
         }
         if (lastEvent.type === "erase-event") {
-            // TO DO
+            let beforeErase = userLayer.exportJSON();
+            userLayer.clear();
+            let eraseItems = userLayer.importJSON(lastEvent.data);
+            mainSketch.stack.undoStack.push({
+                type: "erase-event",
+                data: beforeErase, //use ref
+            });
         }
     }
 });

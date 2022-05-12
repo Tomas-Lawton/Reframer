@@ -167,6 +167,10 @@ multiTool.onMouseUp = function(event) {
 };
 
 eraseTool.onMouseDown = function(event) {
+    mainSketch.stack.undoStack.push({
+        type: "erase-event",
+        data: userLayer.exportJSON(),
+    });
     erasorPath = new Path({
         strokeWidth: mainSketch.strokeWidth * 2,
         strokeCap: "round",
@@ -191,10 +195,6 @@ eraseTool.onMouseDrag = function(event) {
 };
 
 eraseTool.onMouseUp = function(event) {
-    mainSketch.stack.undoStack.push({
-        type: "erase-event",
-        data: userLayer.exportJSON(),
-    });
     erasorPath.simplify();
     const eraseRadius = (mainSketch.strokeWidth * 2) / 2;
     const outerPath = OffsetUtils.offsetPath(erasorPath, eraseRadius);

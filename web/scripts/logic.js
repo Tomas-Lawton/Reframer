@@ -70,14 +70,8 @@ const getSelectedPaths = () =>
 
 const toggleArtControls = () => {
     let rect = palette.getBoundingClientRect();
-    console.log(rect);
-    // artControls.style.right = `10px`;
-
-    console.log(canvas.width);
     artControls.style.right = `${rect.width / 2}px`;
-
     artControls.style.top = `${rect.bottom - rect.height / 2}px`;
-
     if (!artControls.style.display || artControls.style.display === "none") {
         artControls.style.display = "block";
     } else {

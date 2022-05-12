@@ -255,6 +255,8 @@ if (window.innerWidth <= 990) {
     document
         .getElementById("right-background")
         .prepend(document.getElementById("moodboard-header"));
+} else {
+    setPenMode("pen", document.getElementById("pen"));
 }
 
 // Random partial sketch

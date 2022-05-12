@@ -55,15 +55,15 @@ body {
     flex-direction: column;
 }
 
-#pen {
+
+/* #pen {
     position: relative;
-}
+} */
 
 #penmode-inner-circle {
     width: 0.6em;
     height: 0.6em;
     border-radius: 50%;
-    background-color: #e4a591;
 }
 
 #penmode-outer-circle {
@@ -993,6 +993,12 @@ input[type="range"]::-moz-range-thumb {
     }
     #moodboard-header {
         padding: 1.5em;
+    }
+    #canvas {
+        border-radius: 0;
+    }
+    .canvas-drop {
+        border-radius: 0;
     }
 }
 
