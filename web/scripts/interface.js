@@ -124,7 +124,7 @@ document.getElementById("redo").addEventListener("click", () => {
     }
 });
 document.getElementById("save").addEventListener("click", () => {
-    userLayer.view.element.toBlob((blob) => {
+    canvas.toBlob((blob) => {
         let url = window.URL || window.webkitURL;
         let link = url.createObjectURL(blob);
         // window.open(link, "_blank");
@@ -154,10 +154,6 @@ document.getElementById("width-slider").oninput = function() {
 };
 
 selectGroup = null;
-
-rotateSlider.onmousedown = function() {
-    console.log("test");
-};
 
 rotateSlider.oninput = function() {
     hideSelectUI(false);
@@ -192,8 +188,8 @@ opacitySlider.oninput = function() {
 
 document.getElementById("settings").addEventListener("click", () => {
     openModal({
-        title: "Settings",
-        message: "Change how artefacts and exemplars are shown.",
+        title: "Advanced",
+        message: "Change the drawing behaviour and UI.",
         ui: document.getElementById("settings-ui"),
     });
 });
@@ -263,30 +259,5 @@ picker.onChange = (color) => {
     );
     // setPenMode("pen", document.getElementById("pen"));
 };
-
-// UI Setup
-// moveSelecterTo(document.querySelectorAll(".pen-mode")[1]);
-if (window.innerWidth <= 600) {
-    document.getElementById("mobile-art-controls").appendChild(artControls);
-    document
-        .getElementById("mobile-art-controls")
-        .appendChild(document.getElementById("contain-dot"));
-}
-
-const maxPointSize = 79.99;
-document.getElementById("width-slider").setAttribute("max", maxPointSize);
-
-// Random partial sketch
-// const partial = userLayer.importSVG(sketches[Math.floor(Math.random() * 3)]);
-// partial.scale(1000);
-// partial.set({
-//     position: new Point(540, 540),
-//     strokeWidth: mainSketch.strokeWidth,
-//     opacity: mainSketch.opacity,
-//     strokeCap: "round",
-//     strokeJoin: "round",
-// });
-// partial.getItems().forEach((path) => userLayer.addChild(path));
-// partial.remove();
 
 setActionUI("inactive");

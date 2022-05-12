@@ -20,12 +20,17 @@ multiTool.onMouseDown = function(event) {
                     event.point.y < mainSketch.boundingBox.bounds.bottom;
             }
 
+            // Deselect all
             if (!hitResult && !isInBounds) {
                 // outside bound + no path
+                console.log(mainSketch.rotationGroup);
+
+                flattenRotationGroup();
+
                 userLayer.getItems().forEach((path) => {
-                    console.log(path);
                     path.selected = false;
                 });
+
                 mainSketch.rotationGroup = null;
                 if (mainSketch.boundingBox) {
                     hideSelectUI();
@@ -37,15 +42,26 @@ multiTool.onMouseDown = function(event) {
                 if (mainSketch.boundingBox) {
                     hideSelectUI(); // draw a new one containing selection
                 }
+                flattenRotationGroup();
                 path = hitResult.item;
                 path.selected = true; //fix so that this happens with no drag but with drag it won't toggle !path.selected
+
                 let items = getSelectedPaths();
                 fitToSelection(items, "moving");
-                let rotationGroup = new Group({ children: items });
+                updateSelectUI();
+
+                // Revise this grouping logic
+                // creates a group which can be rotated and resets the slider
+                // rotation slider can then act on this group (not the paths inside it)
+                // group should be removed so the paths are flattened
+
+                //can't group on input because group must already be set. so the rotation is set non-functionally to the group
+
+                // GROUP ALSO NEEDED FOR CORRECT SCALING OF MULTIPLE ITEMS. ???
                 rotateSlider.value = 0;
+                let rotationGroup = new Group({ children: items });
                 rotationGroup.transformContent = false;
                 mainSketch.rotationGroup = rotationGroup;
-                updateSelectUI();
             }
             break;
         case "pen":

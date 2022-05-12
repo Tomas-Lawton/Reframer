@@ -32,6 +32,7 @@
                 <i id="modal-cross" class="fa-solid fa-xmark"></i>
             </div>
             <p id="modal-message"></p>
+            <hr />
             <div id="modalContent"></div>
             <div id="action">
                 <button id="cancel-modal">Cancel</button>
@@ -48,7 +49,13 @@
     </div>
 
     <div id="settings-ui">
-        <label>Maximum number of traces</label>
+        <label>Use advanced prompts</label>
+        <input id="advanced-prompts" type="checkbox">
+        <label>Include AI squiggles</label>
+        <input id="use-squiggles" type="checkbox" checked>
+        <label>Number of squiggles (default: 32)</label>
+        <input id="num-squiggles" type="number" min="1" value="32" max="100">
+        <label>Trace history (default: 1)</label>
         <input id="num-traces" type="number" min="1" value="1">
     </div>
 
@@ -85,9 +92,6 @@
                 </div>
             </div>
             <div id="bottom-buttons" class="button-container">
-                <div class="icon-outer-circle" id="settings">
-                    <i class="basic-grey fa-solid fa-cog fa-fw"></i>
-                </div>
                 <div class="icon-outer-circle" id="save">
                     <i class="save fa-solid fa-save fa-fw"></i>
                 </div>
@@ -173,7 +177,12 @@
                 </div> -->
     <div id="right-background">
         <div id="describe-card">
-            <h1>What to draw?</h1>
+            <div id="top-action">
+                <h1>What to draw?</h1>
+                <div class="icon-outer-circle" id="settings">
+                    <i class="basic-grey fa-solid fa-cog fa-fw"></i>
+                </div>
+            </div>
             <div id="prompt-input">
                 <i class="fas fa-search"></i>
                 <input type="text" id="messageText" placeholder="Sketch of a majestic rainbow unicorn..." />
@@ -204,7 +213,7 @@
             <div id="moodboard-header">
                 <h2>AI Moodboard...</h2>
                 <button id="open-moodboard">
-                    <i class="fas fa-image"></i>
+                    <i class="fas fa-image"></i> +
                 </button>
             </div>
 
@@ -261,10 +270,6 @@
             </div>
         </div>
     </div>
-
-
-    <div id="mobile-art-controls"></div>
-
 </body>
 
 </html>

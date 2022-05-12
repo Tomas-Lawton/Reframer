@@ -1,149 +1,3 @@
-class SimpleStack {
-    constructor() {
-        this.undoStack = [];
-        this.redoStack = [];
-        this.historyHolder = [];
-    }
-}
-
-class SketchHandler {
-    // Maintains a logical state for sending over WS
-    constructor() {
-        this.drawState = null;
-
-        // Sketching Data
-        this.prompt = null;
-        this.svg = null;
-        this.frameSize = canvas.getBoundingClientRect().width;
-
-        // Defaults
-        this.strokeColor = "#181818";
-        this.strokeWidth = 12;
-        this.opacity = 0.75;
-        this.penMode = "pen";
-        this.clipDrawing = false;
-        this.maximumTraces = 1; // todo change
-
-        // TODO Refactor
-        this.buttonControlLeft = true;
-        this.showTraces = true;
-
-        // User Initialised
-        this.drawRegion = null;
-        this.lastRender = null;
-        this.lastPrompt = null;
-        this.isFirstIteration = null;
-        this.lastRollingLoss = null;
-        this.traces = null;
-        this.boundingBox = null;
-
-        // Undo/redo stack
-        this.stack = new SimpleStack();
-    }
-    updateDrawer({ status, svg, hasRegion, frameSize, prompt }) {
-        timeKeeper.style.visibility = "visible";
-        mainSketch.isFirstIteration = true; //reset canvas
-        const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
-        mainSketch.lastPrompt = prompt;
-        const res = {
-            status: status,
-            data: {
-                prompt: prompt,
-                svg: svg,
-                frame_size: frameSize,
-                region: {
-                    activate: hasRegion,
-                    x1: mainSketch.drawRegion ? mainSketch.drawRegion.x : 0,
-                    y1: mainSketch.drawRegion ?
-                        canvasBounds.height - mainSketch.drawRegion.y :
-                        0,
-                    x2: mainSketch.drawRegion ?
-                        mainSketch.drawRegion.x + mainSketch.drawRegion.width :
-                        canvasBounds.width,
-                    y2: mainSketch.drawRegion ?
-                        canvasBounds.height -
-                        mainSketch.drawRegion.y -
-                        mainSketch.drawRegion.height // use non-web y coords
-                        :
-                        canvasBounds.height, // same as width
-                },
-            },
-        };
-        ws.send(JSON.stringify(res));
-        console.log(res);
-    }
-    draw(withRegion = false) {
-        if (noPrompt()) {
-            openModal({
-                title: "Type a prompt first!",
-                message: "You need a target for AI sketching.",
-            });
-            return;
-        }
-        this.updateDrawer({
-            status: "draw",
-            svg: this.svg,
-            hasRegion: withRegion,
-            frameSize: this.frameSize,
-            prompt: this.prompt,
-        });
-        this.clipDrawing = true;
-        this.drawState = "active";
-        setActionUI("active");
-    }
-    generate() {
-        if (noPrompt()) {
-            openModal({
-                title: "Type a prompt first!",
-                message: "You need a target for AI exemplars.",
-            });
-            return;
-        }
-        this.updateDrawer({
-            status: "sketch_exemplars",
-            svg: this.svg,
-            hasRegion: false,
-            frameSize: exemplarSize,
-            prompt: this.prompt,
-        });
-        this.clipDrawing = true;
-        this.drawState = "active";
-        setActionUI("active");
-    }
-    redraw() {
-        this.updateDrawer({
-            status: "redraw",
-        });
-        this.clipDrawing = true;
-        this.drawState = "active";
-        setActionUI("active");
-    }
-    continue () {
-        this.updateDrawer({
-            status: "continue",
-            frameSize: this.frameSize, //can remove?
-        });
-        this.clipDrawing = true;
-        this.drawState = "active";
-        setActionUI("active");
-    }
-    stop() {
-        this.updateDrawer({ status: "stop" });
-        this.clipDrawing = false;
-        this.drawState = "stop";
-        setActionUI("stop");
-    }
-    resetHistory() {
-        step = 0; // reset since not continuing
-        mainSketch.stack.historyHolder = [{ svg: "" }];
-        timeKeeper.style.width = "0";
-        timeKeeper.setAttribute("max", "0");
-        timeKeeper.value = "0";
-    }
-}
-
-mainSketch = new SketchHandler();
-
 const setActionUI = (state) => {
     switch (state) {
         case "inactive":
@@ -169,6 +23,35 @@ const setActionUI = (state) => {
             break;
     }
     mainSketch.drawState = state;
+};
+
+const flattenRotationGroup = () => {
+    if (mainSketch.rotationGroup !== null) {
+        // unpack the rotate group before repacking
+        // let rotation = mainSketch.rotationGroup.rotation;
+        // let children = mainSketch.rotationGroup.getItems().forEach((item) => {
+        //     item.rotate(rotation);
+        // });
+        // let children = mainSketch.rotationGroup.children;
+        // mainSketch.rotationGroup.removeChildren(children);
+        // Add the groups rotation to each element.
+        // console.log(mainSketch.rotationGroup);
+        // // console.log(mainSketch.rotationGroup.position);
+        // let pointPositions = mainSketch.rotationGroup.children.map(
+        //     (path) => path.position
+        // );
+        // console.log(pointPositions);
+        // let children = mainSketch.rotationGroup.removeChildren();
+        // console.log(children);
+        // let flattenedItems = userLayer.addChildren(children);
+        // mainSketch.rotationGroup.remove();
+        // flattenedItems.forEach((item, index) => {
+        //     item.position = pointPositions[index];
+        //     // item.rotate(rotation);
+        // });
+        // console.log(flattenedItems);
+        // mainSketch.rotationGroup = null;
+    }
 };
 
 const fitToSelection = (items, state) => {
