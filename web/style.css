@@ -446,7 +446,7 @@ button[right-button] {
     font-weight: lighter;
     color: white;
     align-items: center;
-    /* margin: 1em 0; */
+    margin-top: 1em;
 }
 
 #describe-card h1,
@@ -968,6 +968,9 @@ input[type="range"]::-moz-range-thumb {
         grid-template-columns: repeat(2, minmax(150px, 2fr));
         grid-template-rows: repeat(2, minmax(150px, 2fr));
         height: 100%;
+    }
+    #moodboard-header {
+        padding: 1.5em;
     }
 }
 
