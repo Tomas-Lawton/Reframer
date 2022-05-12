@@ -35,24 +35,24 @@ body {
     /* flex-direction: row-reverse;
     justify-content: space-between;
     flex-flow: column wrap; */
+    background: #fbfbfb;
 }
 
 #left-background {
     /* display: flex; */
-    background: #ffffff;
-    box-shadow: 10px 9px 27px rgba(48, 48, 48, 0.04);
+    /* background: #ffffff; */
+    /* box-shadow: 10px 9px 27px rgba(48, 48, 48, 0.04); */
     /* display: block; */
     display: flex;
     flex-direction: column-reverse;
-    width: 75%;
 }
 
 #right-background {
-    margin: 0;
-    padding: 0 2em;
+    /* margin: 0; */
+    /* padding: 0 2em; */
+    /* padding: 0 2em 2em 0; */
     display: flex;
     flex-direction: column;
-    width: 25%;
 }
 
 #penmode-inner-circle {
@@ -86,7 +86,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-left: 2em;
+    /* padding-left: 2em; */
+    padding-left: 0;
+    padding: 2em;
 }
 
 #canvas {
@@ -419,7 +421,8 @@ button[right-button] {
     border-radius: 3em;
     flex-direction: column;
     padding: 3em;
-    margin-top: 2.5em;
+    /* margin-top: 2.5em; */
+    margin: 2em 2em 1em 0;
     box-shadow: 10px 9px 27px rgba(48, 48, 48, 0.12);
 }
 
@@ -445,20 +448,26 @@ button[right-button] {
     justify-content: flex-end;
 }
 
-#describe-actions div {
+.ai-action {
     margin: 0 0.1em;
-    box-shadow: none;
+    box-shadow: 3px 6px 9px rgba(48, 48, 48, 0.19);
+    background-color: #7b66ff;
+}
+
+.inactive-action {
+    background-color: #e1e1e1;
+    color: #ededed;
 }
 
 #describe-actions i {
     padding: 0.2em;
     font-size: 1.2;
-    color: #363636;
-    /* color: #7b66ff; */
+    color: white;
 }
 
 #describe-actions #stop {
     background-color: #ff6060;
+    border: none;
 }
 
 #describe-actions #stop i {
@@ -482,6 +491,7 @@ button[right-button] {
     align-items: center;
     background: white;
     color: #7b66ff;
+    border: 1px solid #7b66ff;
 }
 
 #prompt-input i {
@@ -504,7 +514,7 @@ button[right-button] {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
-    margin: 2em 0em 0em 0em;
+    margin: 0 2em 1em 0em;
 }
 
 #open-moodboard {
@@ -517,8 +527,10 @@ button[right-button] {
 
 #exemplar-grid {
     display: flex;
-    margin-bottom: 2.5em;
     flex-flow: row wrap;
+    overflow: scroll;
+    margin: 0 2em 2em 0;
+    padding: 1.5em;
 }
 
 .exemplar-card {
@@ -530,10 +542,11 @@ button[right-button] {
     display: flex;
     flex-direction: column;
     flex: 1;
-    justify-content: space-between;
-    margin: 0.5em;
-    background-color: #fcfcfc;
-    flex: 40%;
+    justify-content: space-around;
+    /* margin: 0.5em; */
+    /* background-color: #fcfcfc; */
+    background: white;
+    /* flex: 40%; */
     /* flex: 1 1 0px; */
 }
 
@@ -552,7 +565,7 @@ button[right-button] {
 } */
 
 .exemplar {
-    background-color: red;
+    /* background-color: red; */
     width: 100%;
     height: 0;
     content: "";
@@ -564,7 +577,7 @@ button[right-button] {
     /* ?????????? NOT SURE */
     width: 100%;
     height: auto;
-    background-color: #0095ff;
+    /* background-color: #0095ff; */
 }
 
 .iteration-count {
@@ -579,6 +592,7 @@ button[right-button] {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin: 1em;
 }
 
 .card-info div {
@@ -588,6 +602,7 @@ button[right-button] {
 
 .card-info h3 {
     color: #7b66ff;
+    font-weight: 500;
 }
 
 .card-info p {
@@ -915,6 +930,10 @@ input[type="range"]::-moz-range-thumb {
 @media screen and (min-width: 990px) {
     #left-background {
         flex-direction: row;
+        width: 75%;
+    }
+    #right-background {
+        width: 25%;
     }
     #button-panel {
         flex-flow: column;
@@ -927,20 +946,25 @@ input[type="range"]::-moz-range-thumb {
         justify-content: space-between;
     }
     #describe-card {
-        padding: 0.5em;
+        /* padding: 0.5em; */
+        /* background-color: #363636; */
     }
-    #describe-top h1 {
+    /* #describe-top h1 {
         display: none;
-    }
-    #exemplar-grid {
+    } */
+    /* #exemplar-grid {
         display: none;
-    }
-    #exemplar-grid {
+    } */
+    /* #exemplar-grid {
         display: grid;
         grid-row: auto auto;
         grid-column-gap: 20px;
         grid-row-gap: 20px;
         grid-template-columns: repeat(2, minmax(150px, 2fr));
         grid-template-rows: repeat(2, minmax(150px, 2fr));
+        height: 100%;
+    } */
+    #exemplar-grid {
+        flex-flow: column;
     }
 }

@@ -35,16 +35,22 @@ let doneTransform = 500;
 let myPath, erasePath, regionPath, tmpGroup, mask;
 
 const canvas = document.getElementById("canvas");
+const padding = parseInt(
+    window
+    .getComputedStyle(document.getElementById("contain-canvas"), null)
+    .getPropertyValue("padding-left")
+);
+// console.log(padding);
 const resizeSketch = () => {
     let containerRect = document
         .getElementById("contain-canvas")
         .getBoundingClientRect();
     if (containerRect.width > window.innerHeight) {
-        canvas.width = window.innerHeight;
-        canvas.height = window.innerHeight;
+        canvas.width = window.innerHeight - 2 * padding;
+        canvas.height = window.innerHeigh - 2 * padding;
     } else {
-        canvas.height = containerRect.width;
-        canvas.width = containerRect.width;
+        canvas.height = containerRect.width - 2 * padding;
+        canvas.width = containerRect.width - 2 * padding;
     }
 };
 
@@ -54,9 +60,9 @@ window.addEventListener("resize", () => {
 resizeSketch();
 
 // const exemplarSize = document
-//     .querySelector(".square")
+//     .querySelector(".exemplar-canvas")
 //     .getBoundingClientRect().width;
-const exemplarSize = 252.31;
+const exemplarSize = 100;
 
 // Paper Setup
 paper.install(window);
@@ -71,6 +77,8 @@ const exemplars = [
     document.getElementById("canvas4"),
 ];
 exemplars.forEach((exemplar) => {
+    exemplar.width = exemplarSize;
+    exemplar.height = exemplarSize;
     exemplarScope.setup(exemplar);
 });
 exemplarScope.activate();

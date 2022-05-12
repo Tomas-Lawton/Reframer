@@ -263,12 +263,6 @@ picker.onChange = (color) => {
 
 // UI Setup
 // moveSelecterTo(document.querySelectorAll(".pen-mode")[1]);
-
-// exemplars.forEach((exemplar) => {
-//     exemplar.style.width = exemplarSize + "px";
-//     exemplar.style.height = exemplarSize + "px";
-// });
-
 if (window.innerWidth <= 600) {
     document.getElementById("mobile-art-controls").appendChild(artControls);
     document

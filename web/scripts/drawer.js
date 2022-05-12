@@ -26,6 +26,7 @@ multiTool.onMouseDown = function(event) {
                     console.log(path);
                     path.selected = false;
                 });
+                mainSketch.rotationGroup = null;
                 if (mainSketch.boundingBox) {
                     hideSelectUI();
                 }
@@ -36,46 +37,16 @@ multiTool.onMouseDown = function(event) {
                 if (mainSketch.boundingBox) {
                     hideSelectUI(); // draw a new one containing selection
                 }
-
                 path = hitResult.item;
                 path.selected = true; //fix so that this happens with no drag but with drag it won't toggle !path.selected
-
                 let items = getSelectedPaths();
                 fitToSelection(items, "moving");
-                //include new path in rotation group
                 let rotationGroup = new Group({ children: items });
                 rotateHandler.value = 0;
                 rotationGroup.transformContent = false;
                 mainSketch.rotationGroup = rotationGroup;
                 updateSelectUI();
             }
-
-            // if (mainSketch.boundingBox) {
-            //     if (
-            //         mainSketch.boundingBox.hitTest(event.point, {
-            //             segments: true,
-            //             tolerance: 3,
-            //         })
-            //     ) {
-            //         // got rectangle segment
-            //         // find which segment point was hit
-            //         for (let i = 0; i < mainSketch.boundingBox.segments.length; i++) {
-            //             let p = mainSketch.boundingBox.segments[i].point;
-            //             if (p.isClose(event.point, 3)) {
-            //                 let opposite = (i + 2) % 4;
-
-            //                 mainSketch.boundingBox.data.from =
-            //                     mainSketch.boundingBox.segments[opposite].point;
-            //                 mainSketch.boundingBox.data.to =
-            //                     mainSketch.boundingBox.segments[i].point;
-            //                 mainSketch.boundingBox.data.state = "resizing";
-            //                 mainSketch.boundingBox.data.corner =
-            //                     mainSketch.boundingBox.segments[i].point;
-            //                 break;
-            //             }
-            //         }
-            //     }
-            // }
             break;
         case "pen":
             myPath = new Path({

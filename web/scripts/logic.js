@@ -9,6 +9,8 @@ class SimpleStack {
 class SketchHandler {
     // Maintains a logical state for sending over WS
     constructor() {
+        this.drawState = null;
+
         // Sketching Data
         this.prompt = null;
         this.svg = null;
