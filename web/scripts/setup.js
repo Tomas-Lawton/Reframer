@@ -60,6 +60,17 @@ if (containerRect.width > window.innerHeight) {
     canvas.width = containerRect.width - 2 * padding;
 }
 
+const scaleRatio = canvas.width / exemplarSize;
+// const importToSketch = () => {
+//     // Clear the sketch
+//     // scale the whole exemplar
+//     let expandedExemplar = exemplar.scale(scaleRatio);
+//     // import each path individually.
+//     expandedExemplar.getItems.forEach((item) => {
+//         userLayer.importChild(item);
+//     });
+// };
+
 // Paper Setup
 paper.install(window);
 const scope = new PaperScope();

@@ -925,6 +925,10 @@ input[type="range"]::-moz-range-thumb {
     flex-direction: column;
 }
 
+#settings-ui * {
+    margin-top: 0.6em;
+}
+
 
 /* Mobile Stuff */
 
