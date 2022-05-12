@@ -42,7 +42,7 @@ multiTool.onMouseDown = function(event) {
                 let items = getSelectedPaths();
                 fitToSelection(items, "moving");
                 let rotationGroup = new Group({ children: items });
-                rotateHandler.value = 0;
+                rotateSlider.value = 0;
                 rotationGroup.transformContent = false;
                 mainSketch.rotationGroup = rotationGroup;
                 updateSelectUI();

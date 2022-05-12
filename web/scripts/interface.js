@@ -57,35 +57,6 @@ initialiseHandler.addEventListener("click", (e) => {
     );
 });
 
-drawButton.addEventListener("click", (e) => {
-    mainSketch.draw();
-});
-redrawButton.addEventListener("click", (e) => {
-    mainSketch.redraw();
-});
-
-generateButton.addEventListener("click", (e) => {
-    mainSketch.generate();
-});
-
-stopButton.addEventListener("click", (e) => {
-    mainSketch.stop();
-});
-
-prompt.addEventListener("input", (e) => {
-    mainSketch.prompt = e.target.value;
-});
-
-// continueButton.addEventListener("click", (e) => {
-//     if (!mainSketch.clipDrawing) {
-//         startDrawing("continue", false);
-//         continueButton.innerHTML = "Stop";
-//     } else {
-//         stopClip();
-//     }
-//     mainSketch.clipDrawing = !mainSketch.clipDrawing;
-// });
-
 document.getElementById("begin").addEventListener("click", () => {
     document.getElementById("sliding-overlay").style.bottom = "100%";
 });
@@ -184,11 +155,11 @@ document.getElementById("width-slider").oninput = function() {
 
 selectGroup = null;
 
-rotateHandler.onmousedown = function() {
+rotateSlider.onmousedown = function() {
     console.log("test");
 };
 
-rotateHandler.oninput = function() {
+rotateSlider.oninput = function() {
     hideSelectUI(false);
     let r = this.value;
     mainSketch.rotationGroup.rotation = r;
@@ -197,7 +168,7 @@ rotateHandler.oninput = function() {
     updateSelectUI();
 };
 
-scaleHandler.oninput = function() {
+scaleSlider.oninput = function() {
     // if (mainSketch.boundingBox.data.state === "rotating") {
     hideSelectUI(false);
     let selectedPaths = getSelectedPaths(); // all selected
@@ -209,7 +180,7 @@ scaleHandler.oninput = function() {
     fitToSelection(selectedPaths, "scaling");
     updateSelectUI();
 };
-scaleHandler.onmouseup = function() {
+scaleSlider.onmouseup = function() {
     console.log("done");
 };
 
@@ -242,6 +213,38 @@ timeKeeper.oninput = function() {
 palette.addEventListener("click", () => {
     toggleArtControls();
 });
+
+prompt.addEventListener("input", (e) => {
+    mainSketch.prompt = e.target.value;
+});
+
+// Action controls
+actionControls[0].addEventListener("click", () => {
+    if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
+        mainSketch.draw();
+    }
+});
+actionControls[1].addEventListener("click", () => {
+    if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
+        mainSketch.generate();
+    }
+});
+actionControls[2].addEventListener("click", () => {
+    if (mainSketch.drawState === "stop") {
+        mainSketch.redraw();
+    }
+});
+actionControls[3].addEventListener("click", () => {
+    if (mainSketch.drawState === "stop") {
+        mainSketch.continue();
+    }
+});
+actionControls[4].addEventListener("click", () => {
+    if (mainSketch.drawState === "active") {
+        mainSketch.stop();
+    }
+});
+
 const picker = new Picker({
     parent: document.getElementById("color-picker"),
     popup: false,
@@ -286,8 +289,4 @@ document.getElementById("width-slider").setAttribute("max", maxPointSize);
 // partial.getItems().forEach((path) => userLayer.addChild(path));
 // partial.remove();
 
-window.addEventListener("resize", (e) => {
-    console.log(e);
-    // resize main canvas;
-    // resize mini canvas
-});
+setActionUI("inactive");

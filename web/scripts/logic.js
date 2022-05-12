@@ -73,6 +73,13 @@ class SketchHandler {
         console.log(res);
     }
     draw(withRegion = false) {
+        if (noPrompt()) {
+            openModal({
+                title: "Type a prompt first!",
+                message: "You need a target for AI sketching.",
+            });
+            return;
+        }
         this.updateDrawer({
             status: "draw",
             svg: this.svg,
@@ -81,16 +88,17 @@ class SketchHandler {
             prompt: this.prompt,
         });
         this.clipDrawing = true;
-    }
-    redraw(withRegion = false) {
-        this.updateDrawer({
-            status: "redraw",
-            hasRegion: withRegion,
-            frameSize: this.frameSize,
-        });
-        this.clipDrawing = true;
+        this.drawState = "active";
+        setActionUI("active");
     }
     generate() {
+        if (noPrompt()) {
+            openModal({
+                title: "Type a prompt first!",
+                message: "You need a target for AI exemplars.",
+            });
+            return;
+        }
         this.updateDrawer({
             status: "sketch_exemplars",
             svg: this.svg,
@@ -99,10 +107,31 @@ class SketchHandler {
             prompt: this.prompt,
         });
         this.clipDrawing = true;
+        this.drawState = "active";
+        setActionUI("active");
+    }
+    redraw() {
+        this.updateDrawer({
+            status: "redraw",
+        });
+        this.clipDrawing = true;
+        this.drawState = "active";
+        setActionUI("active");
+    }
+    continue () {
+        this.updateDrawer({
+            status: "continue",
+            frameSize: this.frameSize, //can remove?
+        });
+        this.clipDrawing = true;
+        this.drawState = "active";
+        setActionUI("active");
     }
     stop() {
         this.updateDrawer({ status: "stop" });
         this.clipDrawing = false;
+        this.drawState = "stop";
+        setActionUI("stop");
     }
     resetHistory() {
         step = 0; // reset since not continuing
@@ -114,6 +143,33 @@ class SketchHandler {
 }
 
 mainSketch = new SketchHandler();
+
+const setActionUI = (state) => {
+    switch (state) {
+        case "inactive":
+            actionControls.forEach((elem) => elem.classList.add("inactive-action"));
+            //draw or exemplar
+            actionControls[0].classList.remove("inactive-action");
+            actionControls[1].classList.remove("inactive-action");
+            break;
+        case "active":
+            actionControls.forEach((elem) => elem.classList.add("inactive-action"));
+            actionControls[0].classList.add("inactive-action");
+            actionControls[1].classList.add("inactive-action");
+            // stop
+            actionControls[4].classList.remove("inactive-action");
+            actionControls[4].style.background = "#ff6060";
+            break;
+        case "stop":
+            // all possible
+            actionControls.forEach((elem) =>
+                elem.classList.remove("inactive-action")
+            );
+            actionControls[4].style.background = "#e1e1e1";
+            break;
+    }
+    mainSketch.drawState = state;
+};
 
 const fitToSelection = (items, state) => {
     let bbox = items.reduce((bbox, item) => {
@@ -147,9 +203,9 @@ const toggleArtControls = () => {
 };
 
 const noPrompt = () =>
-    prompt.value === "" ||
-    prompt.value === undefined ||
-    prompt.value === prompt.getAttribute("placeholder");
+    mainSketch.prompt === "" ||
+    mainSketch.prompt === null ||
+    mainSketch.prompt === prompt.getAttribute("placeholder");
 
 const openModal = (data) => {
     if (data.hasOwnProperty("ui")) {
@@ -202,7 +258,7 @@ const hideSelectUI = (includeTransform = true) => {
     }
     // hide ui
     deleteHandler.style.display = "none";
-    // rotateHandler.style.display = "none";
+    // rotateSlider.style.display = "none";
     initialiseHandler.style.display = "none";
     if (includeTransform) {
         transformControl.style.display = "none";
@@ -218,15 +274,15 @@ const updateRectBounds = (from, to) => {
 
 const updateSelectUI = () => {
     if (mainSketch.boundingBox) {
-        // rotateHandler.style.display = "block";
+        // rotateSlider.style.display = "block";
         deleteHandler.style.display = "block";
         initialiseHandler.style.display = "block";
         transformControl.style.display = "flex";
-        // rotateHandler.style.left =
+        // rotateSlider.style.left =
         //     mainSketch.boundingBox.bounds.bottomCenter.x + "px";
-        // rotateHandler.style.top =
+        // rotateSlider.style.top =
         //     mainSketch.boundingBox.bounds.bottomCenter.y +
-        //     rotateHandler.getBoundingClientRect().height / 2 +
+        //     rotateSlider.getBoundingClientRect().height / 2 +
         //     "px";
 
         deleteHandler.style.left =

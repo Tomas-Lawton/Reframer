@@ -322,12 +322,6 @@ button[right-button] {
     /* flex-direction: column; */
 }
 
-.icon-outer-circle {
-    margin: 0.5em 0;
-    transition: transform 0.2s;
-    padding: 0.5em;
-}
-
 
 /* 
 .icon-outer-circle:hover {
@@ -350,7 +344,7 @@ button[right-button] {
 #button-panel .fa-solid {
     color: white;
     border-radius: 50%;
-    padding: 0.6em;
+    padding: 0.5em;
     font-size: 1em;
     transition: 0.5s;
 }
@@ -391,6 +385,9 @@ button[right-button] {
     border-radius: 50%;
     background: #ffffff;
     box-shadow: 10px 9px 27px rgba(48, 48, 48, 0.12);
+    margin: 0.5em 0;
+    transition: transform 0.2s;
+    padding: 0.3em;
 }
 
 #button-panel .fa-solid .active {
@@ -420,9 +417,9 @@ button[right-button] {
     background-color: white;
     border-radius: 3em;
     flex-direction: column;
-    padding: 3em;
+    padding: 2.5em;
     /* margin-top: 2.5em; */
-    margin: 2em 2em 1em 0;
+    margin: 2em 2em 1.5em 0;
     box-shadow: 10px 9px 27px rgba(48, 48, 48, 0.12);
 }
 
@@ -433,19 +430,26 @@ button[right-button] {
     font-weight: lighter;
     color: white;
     align-items: center;
-    margin: 1em 0;
+    /* margin: 1em 0; */
 }
 
-#describe-top h1 {
+#describe-card h1,
+p {
     font-size: 1.2em;
     font-weight: 500;
     color: #363636;
 }
 
+
+/* #describe-top:first-child {
+    display: block;
+} */
+
 #describe-actions {
     display: flex;
-    justify-content: space-between;
-    justify-content: flex-end;
+    /* justify-content: space-between;
+    justify-content: flex-end; */
+    flex-flow: wrap;
 }
 
 .ai-action {
@@ -459,19 +463,15 @@ button[right-button] {
     color: #ededed;
 }
 
+.stop-action .inactive-action {
+    background-color: #e1e1e1;
+    color: #ededed;
+}
+
 #describe-actions i {
     padding: 0.2em;
     font-size: 1.2;
     color: white;
-}
-
-#describe-actions #stop {
-    background-color: #ff6060;
-    border: none;
-}
-
-#describe-actions #stop i {
-    color: #ffffff;
 }
 
 #control-actions {
@@ -514,14 +514,15 @@ button[right-button] {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
-    margin: 0 2em 1em 0em;
+    align-items: center;
 }
 
 #open-moodboard {
-    background: black;
+    /* background: black; */
+    background: #7b66ff;
     color: white;
     font-weight: bold;
-    padding: 0em 2em;
+    padding: 0.5em 1em;
     border-radius: 3em;
 }
 
@@ -530,11 +531,15 @@ button[right-button] {
     flex-flow: row wrap;
     overflow: scroll;
     margin: 0 2em 2em 0;
-    padding: 1.5em;
+    padding: 0 1.5em 1.5em 1.5em;
+    border-radius: 2em;
+}
+
+#exemplar-grid>div {
+    margin-bottom: 1em;
 }
 
 .exemplar-card {
-    /* background: #ffffff; */
     border-radius: 1em;
     filter: drop-shadow(10px 9px 27px rgba(48, 48, 48, 0.12));
     padding: 1em;
@@ -543,26 +548,8 @@ button[right-button] {
     flex-direction: column;
     flex: 1;
     justify-content: space-around;
-    /* margin: 0.5em; */
-    /* background-color: #fcfcfc; */
     background: white;
-    /* flex: 40%; */
-    /* flex: 1 1 0px; */
 }
-
-
-/* .exemplar {
-    background-color: red;
-    width: 100%;
-}
-.exemplar:after {
-    content: "";
-    display: block;
-    padding-bottom: 100%;
-}
-.inner-canvas {
-    background-color: #0095ff;
-} */
 
 .exemplar {
     /* background-color: red; */
@@ -621,6 +608,7 @@ button[right-button] {
 #moodboard-header h2 {
     color: black;
     font-weight: 500;
+    font-size: 1em;
 }
 
 #moodboard-header p {
@@ -945,16 +933,6 @@ input[type="range"]::-moz-range-thumb {
         flex-flow: row;
         justify-content: space-between;
     }
-    #describe-card {
-        /* padding: 0.5em; */
-        /* background-color: #363636; */
-    }
-    /* #describe-top h1 {
-        display: none;
-    } */
-    /* #exemplar-grid {
-        display: none;
-    } */
     /* #exemplar-grid {
         display: grid;
         grid-row: auto auto;
@@ -966,5 +944,26 @@ input[type="range"]::-moz-range-thumb {
     } */
     #exemplar-grid {
         flex-flow: column;
+    }
+}
+
+@media screen and (max-width: 1150px) {
+    #button-panel {
+        padding: 1em;
+    }
+    #exemplar-card {
+        padding: 0.5em;
+    }
+    #prompt-input {
+        align-items: center;
+        padding: 0.5em 1em;
+        font-size: 0.8em;
+    }
+    #prompt-input i {
+        margin-right: 0.5em;
+    }
+    #describe-card {
+        padding: 1em;
+        border-radius: 2em;
     }
 }

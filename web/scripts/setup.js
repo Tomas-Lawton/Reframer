@@ -1,5 +1,25 @@
 const ws = new WebSocket("ws://localhost:8000/ws");
 
+// Sketching UI
+const canvas = document.getElementById("canvas");
+const exemplars = [
+    document.getElementById("canvas1"),
+    document.getElementById("canvas2"),
+    document.getElementById("canvas3"),
+    document.getElementById("canvas4"),
+];
+
+// Actions
+const actionControls = document.querySelectorAll(".ai-action");
+
+// Select UI
+const deleteHandler = document.getElementById("delete-handler");
+const rotateSlider = document.getElementById("rotate-slider");
+const scaleSlider = document.getElementById("scale-slider");
+const initialiseHandler = document.getElementById("initialise-handler");
+const transformControl = document.getElementById("transform-ui");
+
+// General UI
 const prompt = document.getElementById("messageText");
 const modal = document.getElementById("modal");
 const controlPanel = document.getElementById("control-panel");
@@ -15,67 +35,36 @@ const setTraces = document.getElementById("num-traces");
 const selectDot = document.getElementById("contain-pen-dot");
 const opacitySlider = document.getElementById("opacity-slider");
 
-// AI UI
-const drawButton = document.getElementById("draw");
-const redrawButton = document.getElementById("redraw");
-// const continueButton = document.getElementById("continue");
-const generateButton = document.getElementById("generate");
-const stopButton = document.getElementById("stop");
-
-// Select UI
-const deleteHandler = document.getElementById("delete-handler");
-const rotateHandler = document.getElementById("rotate-slider");
-const scaleHandler = document.getElementById("scale-slider");
-const initialiseHandler = document.getElementById("initialise-handler");
-const transformControl = document.getElementById("transform-ui");
-
 // Utility
 let step = 1;
 let doneTransform = 500;
 let myPath, erasePath, regionPath, tmpGroup, mask;
 
-const canvas = document.getElementById("canvas");
 const padding = parseInt(
     window
     .getComputedStyle(document.getElementById("contain-canvas"), null)
     .getPropertyValue("padding-left")
 );
-// console.log(padding);
-const resizeSketch = () => {
-    let containerRect = document
-        .getElementById("contain-canvas")
-        .getBoundingClientRect();
-    if (containerRect.width > window.innerHeight) {
-        canvas.width = window.innerHeight - 2 * padding;
-        canvas.height = window.innerHeigh - 2 * padding;
-    } else {
-        canvas.height = containerRect.width - 2 * padding;
-        canvas.width = containerRect.width - 2 * padding;
-    }
-};
+const exemplarSize = document
+    .querySelector(".exemplar-canvas")
+    .getBoundingClientRect().width;
+const containerRect = document
+    .getElementById("contain-canvas")
+    .getBoundingClientRect();
 
-window.addEventListener("resize", () => {
-    resizeSketch();
-});
-resizeSketch();
-
-// const exemplarSize = document
-//     .querySelector(".exemplar-canvas")
-//     .getBoundingClientRect().width;
-const exemplarSize = 100;
+if (containerRect.width > window.innerHeight) {
+    canvas.width = window.innerHeight - 2 * padding;
+    canvas.height = window.innerHeight - 2 * padding;
+} else {
+    canvas.height = containerRect.width - 2 * padding;
+    canvas.width = containerRect.width - 2 * padding;
+}
 
 // Paper Setup
 paper.install(window);
 const scope = new PaperScope();
 const exemplarScope = new PaperScope();
 
-// Exemplars
-const exemplars = [
-    document.getElementById("canvas1"),
-    document.getElementById("canvas2"),
-    document.getElementById("canvas3"),
-    document.getElementById("canvas4"),
-];
 exemplars.forEach((exemplar) => {
     exemplar.width = exemplarSize;
     exemplar.height = exemplarSize;
