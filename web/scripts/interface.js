@@ -94,7 +94,16 @@ document.getElementById("undo").addEventListener("click", () => {
             });
         }
         if (lastEvent.type === "erase-event") {
+            // fix blending tomorrow!!!!!!!!
             // TO DO
+            // userLayer.exportJSON();
+            userLayer.clear();
+            let lastItems = userLayer.importJSON(lastEvent.data);
+            lastItems.getItems().forEach((path) => {
+                console.log("");
+            });
+            // remove blend path
+            lastItems.lastChild.remove();
         }
     }
 });

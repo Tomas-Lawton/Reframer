@@ -135,6 +135,13 @@ class SketchHandler {
         this.traces = null;
         this.boundingBox = null;
         this.rotationGroup = null;
+
+        // Settings panel
+        this.useAdvanced = false;
+        this.initRandomCurves = true;
+        this.numRandomCurves = 32;
+        this.numTraces = 1;
+
         // Undo/redo stack
         this.stack = new SimpleStack();
     }
@@ -251,15 +258,15 @@ if (window.innerWidth <= 990) {
 }
 
 // Random partial sketch
-const partial = userLayer.importSVG(sketches[Math.floor(Math.random() * 3)]);
-partial.scale(1000);
-// TO DO: Scale to canvas size
-partial.set({
-    position: new Point(540, 540),
-    strokeWidth: mainSketch.strokeWidth,
-    opacity: mainSketch.opacity,
-    strokeCap: "round",
-    strokeJoin: "round",
-});
-partial.getItems().forEach((path) => userLayer.addChild(path));
-partial.remove();
+// const partial = userLayer.importSVG(sketches[Math.floor(Math.random() * 3)]);
+// partial.scale(1000);
+// // TO DO: Scale to canvas size
+// partial.set({
+//     position: new Point(540, 540),
+//     strokeWidth: mainSketch.strokeWidth,
+//     opacity: mainSketch.opacity,
+//     strokeCap: "round",
+//     strokeJoin: "round",
+// });
+// partial.getItems().forEach((path) => userLayer.addChild(path));
+// partial.remove();
