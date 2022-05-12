@@ -422,7 +422,7 @@ button[right-button] {
     font-weight: lighter;
     align-items: center;
     margin-top: 1em;
-    color: white;
+    color: #7b66ff;
 }
 
 #describe-card {
@@ -460,10 +460,10 @@ button[right-button] {
 
 #describe-card p {
     /* font-size: 3.6em; */
-    font-weight: 500;
     /* line-height: 1em; */
     /* color: #7b66ff; */
     font-size: 0.75em;
+    font-weight: 600;
 }
 
 #describe-actions {
@@ -472,9 +472,9 @@ button[right-button] {
 }
 
 .ai-action {
-    margin: 0 0.1em;
+    margin: 0.5em;
     box-shadow: 3px 6px 9px rgba(48, 48, 48, 0.19);
-    background-color: #7b66ff;
+    background-color: #f2effe;
     display: flex;
     flex-flow: column;
     align-items: center;
@@ -482,30 +482,27 @@ button[right-button] {
     /* flex-basis: 100%; */
     /* flex: 1 1 0; */
     /* padding: 2em; */
-    width: 4em;
-    height: 4em;
+    width: 4.5em;
+    height: 4.5em;
     /* width: 100%;
     margin-bottom: 0.5em; */
     box-shadow: none;
-}
-
-.ai-action p {
-    font-weight: 500;
 }
 
 #describe-actions div {
     border-radius: 0.8em;
 }
 
-.inactive-action {
+
+/* .inactive-action {
     background-color: #e1e1e1;
     color: #ededed;
-}
+} */
 
 #describe-actions i {
     padding: 0.2em;
     font-size: 1.2;
-    color: white;
+    color: #7b66ff;
 }
 
 #control-actions {
