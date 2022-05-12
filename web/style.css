@@ -425,12 +425,10 @@ hr {
 
 #describe-card {
     display: flex;
-    /* background: linear-gradient( 144.19deg, #a091ff 20.96%, #a091ff 20.96%, rgba(133, 58, 255, 0.33) 89.93%); */
     background-color: white;
     border-radius: 3em;
     flex-direction: column;
     padding: 2.5em;
-    /* margin-top: 2.5em; */
     margin: 2em 2em 1.5em 0;
     box-shadow: 10px 9px 27px rgba(48, 48, 48, 0.12);
 }
@@ -443,15 +441,12 @@ hr {
 #settings {
     margin-top: 0;
     display: inline-flex;
-    /* padding: 0; */
-    /* box-shadow: none; */
 }
 
 #describe-card h1 {
     font-size: 3.6em;
     font-weight: 500;
     line-height: 1em;
-    /* color: #4e4e4e; */
     color: #7b66ff;
 }
 
@@ -477,6 +472,23 @@ hr {
     width: 4.5em;
     height: 4.5em;
     box-shadow: none;
+    color: #7b66ff;
+    cursor: pointer;
+}
+
+.ai-action p {
+    margin-top: 0.3em;
+}
+
+.ai-action:hover {
+    transition: 0.5s;
+    background-color: #6944fc;
+    color: white;
+}
+
+.ai-action:hover i {
+    transition: 0.5s;
+    color: white;
 }
 
 #describe-actions div {
@@ -487,24 +499,27 @@ hr {
     color: white;
 }
 
-
-/* 
-.stop-action i {
-    color: white;
-}
-
 .inactive-action {
-    background-color: #e1e1e1;
+    background-color: #ededed;
+    /* color: #d2d2d2; */
+    color: white;
+    cursor: default;
 }
 
 .inactive-action i {
-    color: #ededed;
-} */
+    /* color: #d4d4d4; */
+    color: white;
+}
 
-#describe-actions i {
-    padding: 0.2em;
-    font-size: 1.2;
-    color: #7b66ff;
+.inactive-action:hover {
+    background-color: #ededed;
+    /* color: #d2d2d2; */
+    color: white;
+}
+
+.inactive-action:hover i {
+    /* color: #d4d4d4; */
+    color: white;
 }
 
 #control-actions {
