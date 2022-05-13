@@ -1,3 +1,27 @@
+const importToSketch = () => {
+    console.log("IMPORTING");
+    // Clear the sketch
+    // scale the whole exemplar
+    console.log(exemplarScope.projects[0]);
+    let expandedExemplar = exemplarScope.projects[0].activeLayer
+        .scale(scaleRatio)
+        .exportJSON();
+    let reducedSketch = userLayer.scale(1 / scaleRatio).exportJSON();
+
+    exemplarScope.projects[0].activeLayer.clear();
+    userLayer.clear();
+
+    let newSketch = userLayer.importJSON(expandedExemplar);
+    let newExemplar =
+        exemplarScope.projects[0].activeLayer.importJSON(reducedSketch);
+    newSketch.position = new Point(canvas.width / 2, canvas.width / 2);
+    newExemplar.position = new Point(
+        exemplarSize.width / 2,
+        exemplarSize.width / 2
+    );
+    // import each path individually.
+};
+
 const setActionUI = (state) => {
     switch (state) {
         case "inactive":
@@ -25,32 +49,15 @@ const setActionUI = (state) => {
     mainSketch.drawState = state;
 };
 
-const flattenRotationGroup = () => {
+const unpackGroup = () => {
     if (mainSketch.rotationGroup !== null) {
-        // unpack the rotate group before repacking
-        // let rotation = mainSketch.rotationGroup.rotation;
-        // let children = mainSketch.rotationGroup.getItems().forEach((item) => {
-        //     item.rotate(rotation);
-        // });
-        // let children = mainSketch.rotationGroup.children;
-        // mainSketch.rotationGroup.removeChildren(children);
-        // Add the groups rotation to each element.
-        // console.log(mainSketch.rotationGroup);
-        // // console.log(mainSketch.rotationGroup.position);
-        // let pointPositions = mainSketch.rotationGroup.children.map(
-        //     (path) => path.position
-        // );
-        // console.log(pointPositions);
-        // let children = mainSketch.rotationGroup.removeChildren();
-        // console.log(children);
-        // let flattenedItems = userLayer.addChildren(children);
-        // mainSketch.rotationGroup.remove();
-        // flattenedItems.forEach((item, index) => {
-        //     item.position = pointPositions[index];
-        //     // item.rotate(rotation);
-        // });
-        // console.log(flattenedItems);
-        // mainSketch.rotationGroup = null;
+        mainSketch.rotationGroup.applyMatrix = true;
+        userLayer.insertChildren(
+            mainSketch.rotationGroup.index,
+            mainSketch.rotationGroup.removeChildren()
+        );
+        mainSketch.rotationGroup.remove();
+        mainSketch.rotationGroup = null;
     }
 };
 

@@ -23,7 +23,7 @@ multiTool.onMouseDown = function(event) {
             // Deselect all
             if (!hitResult && !isInBounds) {
                 // outside bound + no path
-                flattenRotationGroup();
+                unpackGroup();
 
                 userLayer.getItems().forEach((path) => {
                     path.selected = false;
@@ -41,7 +41,7 @@ multiTool.onMouseDown = function(event) {
                 if (mainSketch.boundingBox) {
                     hideSelectUI(); // draw a new one containing selection
                 }
-                flattenRotationGroup();
+                unpackGroup();
                 path = hitResult.item;
                 path.selected = true; //fix so that this happens with no drag but with drag it won't toggle !path.selected
 
@@ -59,6 +59,7 @@ multiTool.onMouseDown = function(event) {
                 rotateSlider.value = 0;
                 let rotationGroup = new Group({ children: items });
                 rotationGroup.transformContent = false;
+                // rotationGroup.applyMatrix = true;
                 mainSketch.rotationGroup = rotationGroup;
             }
             break;

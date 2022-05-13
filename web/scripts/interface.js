@@ -248,6 +248,32 @@ actionControls[4].addEventListener("click", () => {
     }
 });
 
+// LOAD UI
+
+// Random partial sketch
+// const partial = userLayer.importSVG(sketches[Math.floor(Math.random() * 3)]);
+// partial.scale(1000);
+// // TO DO: Scale to canvas size
+// partial.set({
+//     position: new Point(540, 540),
+//     strokeWidth: mainSketch.strokeWidth,
+//     opacity: mainSketch.opacity,
+//     strokeCap: "round",
+//     strokeJoin: "round",
+// });
+// partial.getItems().forEach((path) => userLayer.addChild(path));
+// partial.remove();
+
+if (window.innerWidth <= 990) {
+    const aiCard = document.getElementById("describe-card");
+    document.querySelector("body").prepend(aiCard);
+    document
+        .getElementById("right-background")
+        .prepend(document.getElementById("moodboard-header"));
+} else {
+    setPenMode("pen", document.getElementById("pen"));
+}
+
 const picker = new Picker({
     parent: document.getElementById("color-picker"),
     popup: false,
@@ -268,3 +294,7 @@ picker.onChange = (color) => {
 };
 
 setActionUI("inactive");
+
+addExemplarButtonsdocument.addEventListener("click", () => {
+    importToSketch();
+});

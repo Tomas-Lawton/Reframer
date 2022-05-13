@@ -51,6 +51,7 @@ const exemplarSize = document
 const containerRect = document
     .getElementById("contain-canvas")
     .getBoundingClientRect();
+const addExemplarButtonsdocument = document.querySelector(".add-exemplar");
 
 if (containerRect.width > window.innerHeight) {
     canvas.width = window.innerHeight - 2 * padding;
@@ -61,15 +62,6 @@ if (containerRect.width > window.innerHeight) {
 }
 
 const scaleRatio = canvas.width / exemplarSize;
-// const importToSketch = () => {
-//     // Clear the sketch
-//     // scale the whole exemplar
-//     let expandedExemplar = exemplar.scale(scaleRatio);
-//     // import each path individually.
-//     expandedExemplar.getItems.forEach((item) => {
-//         userLayer.importChild(item);
-//     });
-// };
 
 // Paper Setup
 paper.install(window);
@@ -248,27 +240,3 @@ class SketchHandler {
 }
 
 mainSketch = new SketchHandler();
-
-if (window.innerWidth <= 990) {
-    const aiCard = document.getElementById("describe-card");
-    document.querySelector("body").prepend(aiCard);
-    document
-        .getElementById("right-background")
-        .prepend(document.getElementById("moodboard-header"));
-} else {
-    setPenMode("pen", document.getElementById("pen"));
-}
-
-// Random partial sketch
-// const partial = userLayer.importSVG(sketches[Math.floor(Math.random() * 3)]);
-// partial.scale(1000);
-// // TO DO: Scale to canvas size
-// partial.set({
-//     position: new Point(540, 540),
-//     strokeWidth: mainSketch.strokeWidth,
-//     opacity: mainSketch.opacity,
-//     strokeCap: "round",
-//     strokeJoin: "round",
-// });
-// partial.getItems().forEach((path) => userLayer.addChild(path));
-// partial.remove();
