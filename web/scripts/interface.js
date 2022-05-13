@@ -41,6 +41,18 @@ deleteHandler.addEventListener("click", (e) => {
 });
 
 initialiseHandler.addEventListener("click", (e) => {
+    // need to unpack the group, but keep a ref to the selected/grouped paths
+
+    // Reference selected
+    // Unpack to SVG
+    // Save the unpakced SVG
+    // Clear the canvas
+    // Import the referenced paths
+    // Export full sketch
+    // Initialise using the resulting SVG
+    // DONE
+    // Don't need to import saved because overwritten by drawer.
+
     const fullCanvas = userLayer.exportJSON();
     console.log(paper.project.exportSVG());
     const remove = userLayer.getItems().filter((path) => !path.selected);
@@ -50,8 +62,9 @@ initialiseHandler.addEventListener("click", (e) => {
     userLayer.importJSON(fullCanvas);
 
     // Special case
-    console.log(svg);
-    mainSketch.draw(false, svg);
+    // unpackGroup();
+
+    mainSketch.draw(false, svg); //breaks with group
 });
 
 document.getElementById("begin").addEventListener("click", () => {

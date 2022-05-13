@@ -403,10 +403,11 @@ hr {
 
 #rolling-loss {
     position: absolute;
-    left: 8px;
     z-index: 10;
-    bottom: 8px;
+    bottom: 0.5em;
     color: #707070;
+    width: 100%;
+    text-align: center;
 }
 
 #settings i {
