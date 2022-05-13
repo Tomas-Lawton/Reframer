@@ -53,18 +53,19 @@ initialiseHandler.addEventListener("click", (e) => {
     // DONE
     // Don't need to import saved because overwritten by drawer.
 
-    const fullCanvas = userLayer.exportJSON();
-    console.log(paper.project.exportSVG());
+    // let selectedItems = getSelectedPaths();
     const remove = userLayer.getItems().filter((path) => !path.selected);
     remove.forEach((item) => item.remove());
-    const svg = paper.project.exportSVG();
-    userLayer.clear();
-    userLayer.importJSON(fullCanvas);
+    unpackGroup();
+    const svg = paper.project.exportSVG({
+        asString: true,
+    });
+    console.log(svg);
+    // userLayer.clear();
+    mainSketch.draw(false, svg); //breaks with group
 
     // Special case
     // unpackGroup();
-
-    mainSketch.draw(false, svg); //breaks with group
 });
 
 document.getElementById("begin").addEventListener("click", () => {
