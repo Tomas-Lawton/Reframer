@@ -168,24 +168,31 @@ const updateSelectUI = () => {
         //     mainSketch.boundingBox.bounds.bottomCenter.y +
         //     rotateSlider.getBoundingClientRect().height / 2 +
         //     "px";
-
+        console.log(padding);
+        console.log(mainSketch.boundingBox.bounds);
         deleteHandler.style.left =
             mainSketch.boundingBox.bounds.topRight.x +
+            padding +
             // deleteHandler.getBoundingClientRect().width / 2 +
             "px";
         deleteHandler.style.bottom =
             mainSketch.frameSize -
-            mainSketch.boundingBox.bounds.topRight.y -
+            mainSketch.boundingBox.bounds.top +
+            largerPadding -
+            // padding +
             deleteHandler.getBoundingClientRect().height / 2 +
             "px";
 
         initialiseHandler.style.left =
             mainSketch.boundingBox.bounds.topLeft.x +
-            // initialiseHandler.getBoundingClientRect().width / 2
+            padding +
+            // initialiseHandler.getBoundingClientRect().width / 2 +
             "px";
         initialiseHandler.style.bottom =
             mainSketch.frameSize -
-            mainSketch.boundingBox.bounds.topRight.y -
+            mainSketch.boundingBox.bounds.top +
+            largerPadding -
+            // padding +
             initialiseHandler.getBoundingClientRect().height / 2 +
             "px";
     }
@@ -294,7 +301,6 @@ const calcRollingLoss = () => {
 };
 
 const showTraceHistoryFrom = (fromIndex) => {
-    console.log(setTraces.value, fromIndex);
     const items = getHistoryBatch(setTraces.value, fromIndex);
     let refList = [];
     for (let pastGen of items) {
@@ -356,16 +362,13 @@ ws.onmessage = function(event) {
             setTraces.setAttribute("max", String(step));
             step += 1; //avoid disconnected iteration after stopping
 
-            // draw and save current
-            // to do, delete because stored on svg now??
             mainSketch.lastRender = parseFromSvg(result.svg);
-            // draw and save mainSketch.traces
 
             // To do change this so it is just max num mainSketch.traces
-            // if (mainSketch.showTraces) {
-            //     // setTraces.value = String(step);
-            //     showTraceHistoryFrom(mainSketch.stack.historyHolder.length - 1);
-            // }
+            if (mainSketch.showTraces > 1) {
+                // setTraces.value = String(step);
+                showTraceHistoryFrom(mainSketch.stack.historyHolder.length - 1);
+            }
 
             calcRollingLoss();
             console.log(

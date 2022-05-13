@@ -417,6 +417,10 @@ hr {
     border-radius: 50%;
 }
 
+#contain-num-squiggles {
+    display: contents;
+}
+
 #describe-top {
     display: flex;
     flex-flow: row wrap;

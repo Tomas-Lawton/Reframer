@@ -140,11 +140,10 @@ multiTool.onMouseDrag = function(event) {
             break;
     }
 };
-multiTool.onMouseUp = function(event) {
+multiTool.onMouseUp = function() {
     mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
-    console.log(mainSketch.svg);
     switch (mainSketch.penMode) {
         case "pen":
             myPath.simplify();
