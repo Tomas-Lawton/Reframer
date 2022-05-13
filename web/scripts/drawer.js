@@ -23,8 +23,6 @@ multiTool.onMouseDown = function(event) {
             // Deselect all
             if (!hitResult && !isInBounds) {
                 // outside bound + no path
-                console.log(mainSketch.rotationGroup);
-
                 flattenRotationGroup();
 
                 userLayer.getItems().forEach((path) => {
@@ -35,6 +33,7 @@ multiTool.onMouseDown = function(event) {
                 if (mainSketch.boundingBox) {
                     hideSelectUI();
                 }
+                console.log(paper.project.exportSVG());
             }
 
             if (hitResult) {
@@ -54,7 +53,6 @@ multiTool.onMouseDown = function(event) {
                 // creates a group which can be rotated and resets the slider
                 // rotation slider can then act on this group (not the paths inside it)
                 // group should be removed so the paths are flattened
-
                 //can't group on input because group must already be set. so the rotation is set non-functionally to the group
 
                 // GROUP ALSO NEEDED FOR CORRECT SCALING OF MULTIPLE ITEMS. ???
@@ -145,7 +143,7 @@ multiTool.onMouseUp = function(event) {
     mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
-
+    console.log(mainSketch.svg);
     switch (mainSketch.penMode) {
         case "pen":
             myPath.simplify();

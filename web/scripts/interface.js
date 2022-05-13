@@ -42,6 +42,7 @@ deleteHandler.addEventListener("click", (e) => {
 
 initialiseHandler.addEventListener("click", (e) => {
     const fullCanvas = userLayer.exportJSON();
+    console.log(paper.project.exportSVG());
     const remove = userLayer.getItems().filter((path) => !path.selected);
     remove.forEach((item) => item.remove());
     const svg = paper.project.exportSVG();
@@ -50,11 +51,7 @@ initialiseHandler.addEventListener("click", (e) => {
 
     // Special case
     console.log(svg);
-    startDrawing(
-        prompt.value === mainSketch.lastPrompt ? "redraw" : "draw",
-        false,
-        svg
-    );
+    mainSketch.draw(false, svg);
 });
 
 document.getElementById("begin").addEventListener("click", () => {

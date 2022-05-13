@@ -410,7 +410,10 @@ hr {
 }
 
 #settings i {
+    font-size: 1.2em;
     color: #363636;
+    padding: 0.3em;
+    border-radius: 50%;
 }
 
 #describe-top {

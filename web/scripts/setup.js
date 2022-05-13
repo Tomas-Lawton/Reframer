@@ -177,7 +177,7 @@ class SketchHandler {
         ws.send(JSON.stringify(res));
         console.log(res);
     }
-    draw(withRegion = false) {
+    draw(withRegion = false, svg = null) {
         if (noPrompt()) {
             openModal({
                 title: "Type a prompt first!",
@@ -187,7 +187,7 @@ class SketchHandler {
         }
         this.updateDrawer({
             status: "draw",
-            svg: this.svg,
+            svg: svg || this.svg,
             hasRegion: withRegion,
             frameSize: this.frameSize,
             prompt: this.prompt,
