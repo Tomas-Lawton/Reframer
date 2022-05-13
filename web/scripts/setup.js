@@ -45,7 +45,6 @@ const padding = parseInt(
     .getComputedStyle(document.getElementById("contain-canvas"), null)
     .getPropertyValue("padding-left")
 );
-
 const exemplarSize = document
     .querySelector(".exemplar-canvas")
     .getBoundingClientRect().width;
@@ -56,16 +55,12 @@ const addExemplarButtonsdocument = document.querySelector(".add-exemplar");
 
 let largerPadding;
 if (containerRect.width > window.innerHeight) {
-    // wider than tall
     canvas.width = window.innerHeight - 2 * padding;
     canvas.height = window.innerHeight - 2 * padding;
-    console.log("here");
     largerPadding = canvas.getBoundingClientRect().left;
 } else {
-    //taller than wide
     canvas.height = containerRect.width - 2 * padding;
     canvas.width = containerRect.width - 2 * padding;
-    console.log("here2");
     largerPadding = canvas.getBoundingClientRect().top;
 }
 

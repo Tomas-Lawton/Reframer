@@ -158,41 +158,43 @@ const updateRectBounds = (from, to) => {
 
 const updateSelectUI = () => {
     if (mainSketch.boundingBox) {
-        // rotateSlider.style.display = "block";
         deleteHandler.style.display = "block";
         initialiseHandler.style.display = "block";
         transformControl.style.display = "flex";
-        // rotateSlider.style.left =
-        //     mainSketch.boundingBox.bounds.bottomCenter.x + "px";
-        // rotateSlider.style.top =
-        //     mainSketch.boundingBox.bounds.bottomCenter.y +
-        //     rotateSlider.getBoundingClientRect().height / 2 +
-        //     "px";
-        console.log(padding);
-        console.log(mainSketch.boundingBox.bounds);
+
+        // Large is applied to top for taller screen
+        const smallTopPadding =
+            containerRect.width < window.innerHeight ? 0 : padding;
+        const largeTopPadding =
+            containerRect.width < window.innerHeight ? largerPadding : 0;
+        // Large is applied to left for width screen
+        const smallLeftPadding =
+            containerRect.width < window.innerHeight ? padding : 0;
+        const largeLeftPadding =
+            containerRect.width < window.innerHeight ? 0 : largerPadding;
+
         deleteHandler.style.left =
             mainSketch.boundingBox.bounds.topRight.x +
-            padding +
-            // deleteHandler.getBoundingClientRect().width / 2 +
+            largeLeftPadding +
+            smallLeftPadding +
+            "px";
+        initialiseHandler.style.left =
+            mainSketch.boundingBox.bounds.topLeft.x +
+            largeLeftPadding +
+            smallLeftPadding +
             "px";
         deleteHandler.style.bottom =
             mainSketch.frameSize -
             mainSketch.boundingBox.bounds.top +
-            largerPadding -
-            // padding +
+            smallTopPadding +
+            largeTopPadding -
             deleteHandler.getBoundingClientRect().height / 2 +
-            "px";
-
-        initialiseHandler.style.left =
-            mainSketch.boundingBox.bounds.topLeft.x +
-            padding +
-            // initialiseHandler.getBoundingClientRect().width / 2 +
             "px";
         initialiseHandler.style.bottom =
             mainSketch.frameSize -
             mainSketch.boundingBox.bounds.top +
-            largerPadding -
-            // padding +
+            smallTopPadding +
+            largeTopPadding -
             initialiseHandler.getBoundingClientRect().height / 2 +
             "px";
     }
