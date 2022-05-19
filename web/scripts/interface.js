@@ -326,3 +326,17 @@ setActionUI("inactive");
 addExemplarButtonsdocument.addEventListener("click", () => {
     importToSketch();
 });
+
+let events = 0;
+document.getElementById("save-events").onclick = () => {
+    dumpUserEvents({
+        user_id: uuid,
+        recorded_data: {
+            events: {
+                hello: "world",
+            },
+            events: events,
+        },
+    });
+    events += 1;
+};

@@ -6,3 +6,5 @@ numba
 torch-tools
 visdom
 svgelements
+pymongo
+'pymongo[srv]'
