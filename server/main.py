@@ -32,7 +32,7 @@ app.add_middleware(
 )
 
 try:
-    cluster = MongoClient(f"mongodb+srv://Tomas:gNFphe9r9dT9ZIjJ@cluster0.x5opj.mongodb.net/?retryWrites=true&w=majority")
+    cluster = MongoClient(f"mongodb+srv://{os.environ.get('DBCREDENTIAL')}@cluster0.x5opj.mongodb.net/?retryWrites=true&w=majority")
     db = cluster["vector_ai"]
     collection = db["interaction_events"]
 except ValueError as e:
