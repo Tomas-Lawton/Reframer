@@ -332,13 +332,13 @@ class L2_(torch.nn.Module):
 
 
 class CLIPVisualEncoder(nn.Module):
-    def __init__(self, clip_model):
+    def __init__(self, Clip):
         super().__init__()
-        self.clip_model = clip_model
+        self.Clip = Clip
         self.featuremaps = None
 
         for i in range(12):  # 12 resblocks in VIT visual transformer
-            self.clip_model.visual.transformer.resblocks[i].register_forward_hook(
+            self.Clip.visual.transformer.resblocks[i].register_forward_hook(
                 self.make_hook(i)
             )
 
@@ -355,28 +355,28 @@ class CLIPVisualEncoder(nn.Module):
 
     def forward(self, x):
         self.featuremaps = collections.OrderedDict()
-        fc_features = self.clip_model.encode_image(x).float()
+        fc_features = self.Clip.encode_image(x).float()
         featuremaps = [self.featuremaps[k] for k in range(12)]
 
         return fc_features, featuremaps
 
 
-def l2_layers(xs_conv_features, ys_conv_features, clip_model_name):
+def l2_layers(xs_conv_features, ys_conv_features, Clip_name):
     return [
         torch.square(x_conv - y_conv).mean()
         for x_conv, y_conv in zip(xs_conv_features, ys_conv_features)
     ]
 
 
-def l1_layers(xs_conv_features, ys_conv_features, clip_model_name):
+def l1_layers(xs_conv_features, ys_conv_features, Clip_name):
     return [
         torch.abs(x_conv - y_conv).mean()
         for x_conv, y_conv in zip(xs_conv_features, ys_conv_features)
     ]
 
 
-def cos_layers(xs_conv_features, ys_conv_features, clip_model_name):
-    if "RN" in clip_model_name:
+def cos_layers(xs_conv_features, ys_conv_features, Clip_name):
+    if "RN" in Clip_name:
         return [
             torch.square(x_conv, y_conv, dim=1).mean()
             for x_conv, y_conv in zip(xs_conv_features, ys_conv_features)
@@ -390,8 +390,8 @@ def cos_layers(xs_conv_features, ys_conv_features, clip_model_name):
 class CLIPConvLoss(torch.nn.Module):
     def __init__(self, args):
         super(CLIPConvLoss, self).__init__()
-        self.clip_model_name = args.clip_model_name
-        assert self.clip_model_name in [
+        self.Clip_name = args.Clip_name
+        assert self.Clip_name in [
             "RN50",
             "RN101",
             "RN50x4",
@@ -416,10 +416,10 @@ class CLIPConvLoss(torch.nn.Module):
         self.distance_metrics = {"L2": l2_layers, "L1": l1_layers, "Cos": cos_layers}
 
         self.model, clip_preprocess = clip.load(
-            self.clip_model_name, args.device, jit=False
+            self.Clip_name, args.device, jit=False
         )
 
-        if self.clip_model_name.startswith("ViT"):
+        if self.Clip_name.startswith("ViT"):
             self.visual_encoder = CLIPVisualEncoder(self.model)
 
         else:
@@ -496,7 +496,7 @@ class CLIPConvLoss(torch.nn.Module):
         xs = torch.cat(sketch_augs, dim=0).to(self.device)
         ys = torch.cat(img_augs, dim=0).to(self.device)
 
-        if self.clip_model_name.startswith("RN"):
+        if self.Clip_name.startswith("RN"):
             xs_fc_features, xs_conv_features = self.forward_inspection_clip_resnet(
                 xs.contiguous()
             )
@@ -509,7 +509,7 @@ class CLIPConvLoss(torch.nn.Module):
             ys_fc_features, ys_conv_features = self.visual_encoder(ys)
 
         conv_loss = self.distance_metrics[self.clip_conv_loss_type](
-            xs_conv_features, ys_conv_features, self.clip_model_name
+            xs_conv_features, ys_conv_features, self.Clip_name
         )
 
         for layer, w in enumerate(self.args.clip_conv_layer_weights):
@@ -546,13 +546,13 @@ class CLIPConvLoss(torch.nn.Module):
 class CLIPConvLoss2(torch.nn.Module):
     def __init__(self, device):
         super(CLIPConvLoss2, self).__init__()
-        self.clip_model_name = "RN101"
+        self.Clip_name = "RN101"
         self.clip_conv_loss_type = "L2"
         self.clip_fc_loss_type = "Cos"  # "L2"
 
         self.distance_metrics = {"L2": l2_layers, "L1": l1_layers, "Cos": cos_layers}
 
-        self.model, clip_preprocess = clip.load(self.clip_model_name, device, jit=False)
+        self.model, clip_preprocess = clip.load(self.Clip_name, device, jit=False)
 
         self.visual_model = self.model.visual
         layers = list(self.model.visual.children())
@@ -624,7 +624,7 @@ class CLIPConvLoss2(torch.nn.Module):
         xs = torch.cat(sketch_augs, dim=0).to(self.device)
         ys = torch.cat(img_augs, dim=0).to(self.device)
 
-        if self.clip_model_name.startswith("RN"):
+        if self.Clip_name.startswith("RN"):
             xs_fc_features, xs_conv_features = self.forward_inspection_clip_resnet(
                 xs.contiguous()
             )
@@ -637,7 +637,7 @@ class CLIPConvLoss2(torch.nn.Module):
             ys_fc_features, ys_conv_features = self.visual_encoder(ys)
 
         conv_loss = self.distance_metrics[self.clip_conv_loss_type](
-            xs_conv_features, ys_conv_features, self.clip_model_name
+            xs_conv_features, ys_conv_features, self.Clip_name
         )
 
         for layer, w in enumerate([0, 0, 1.0, 1.0, 0]):

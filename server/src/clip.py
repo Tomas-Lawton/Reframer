@@ -7,14 +7,14 @@ from util import load_model_defaults, run_preprocess, get_noun_data
 import logging
 
 # TO DO Reorganise around the drawer code
-class Clip_Model:
+class Clip:
     """Init clip, then configure the classifier type, then set the required img/class/prompt parameters"""
 
     __instance = None
 
     def __init__(self):
         if (
-            Clip_Model.__instance != None
+            Clip.__instance != None
         ):  # Should this all be refactored to not be a "class instance" since it is only used once?
             raise Exception("Clip is already instantiated.")
 
@@ -25,7 +25,7 @@ class Clip_Model:
 
         run_preprocess(preprocess)
         logging.info("Model ready")
-        Clip_Model.__instance == self
+        Clip.__instance == self
 
     def set_image_descriptions(self, description_map):
         """Ensure every description has an image whose name matches the description list"""

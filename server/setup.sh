@@ -6,15 +6,15 @@
 # conda install --file setup/conda-requirements.txt
 # pip install -r setup/pip_requirements.txt
 
-cd app
-rm -rf app/diffvg
-rm -rf app/results
-rm -rf app/tmp
-mkdir app/results
-mkdir app/tmp
+cd src
+rm -rf src/diffvg
+rm -rf src/results
+rm -rf src/tmp
+mkdir src/results
+mkdir src/tmp
 
 git clone https://github.com/BachiLi/diffvg.git
-cp fix_problem.py app/diffvg/fix_problem.py
+cp fix_problem.py src/diffvg/fix_problem.py
 cd diffvg
 git submodule update --init --recursive
 python3 fix_problem.py
