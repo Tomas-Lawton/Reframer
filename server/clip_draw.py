@@ -1,9 +1,5 @@
-from importlib.resources import path
 import torch
 import pydiffvg
-import torchvision.transforms as transforms
-import datetime
-import numpy as np
 
 from src.render_design import (
     UserSketch,
@@ -14,10 +10,9 @@ from src.render_design import (
 from src.processing import get_augment_trans
 # from src.loss import CLIPConvLoss2
 from src import utils
-
-# make a util directory???
-from util import *
 from src.render_design import *
+
+from util import *
 import logging
 import asyncio
 import aiofiles

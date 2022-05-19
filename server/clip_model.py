@@ -4,8 +4,6 @@ import clip
 import torch
 
 from util import load_model_defaults, run_preprocess, get_noun_data
-from clip_draw import Clip_Draw_Optimiser
-
 import logging
 
 # TO DO Reorganise around the drawer code

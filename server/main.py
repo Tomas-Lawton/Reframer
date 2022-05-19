@@ -27,7 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-clip_class = Clip_Class()
+clip_class = Clip_Model()
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
