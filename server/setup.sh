@@ -7,11 +7,11 @@ rm -rf diffvg
 rm -rf results
 rm -rf tmp
 
-conda install --file requirements.txt
-pip install -r pip_requirements.txt
+conda install --file setup/requirements.txt
+pip install -r setup/pip_requirements.txt
 
 git clone https://github.com/BachiLi/diffvg.git
-cp fix_problem.py diffvg/fix_problem.py
+cp setup/fix_problem.py diffvg/fix_problem.py
 cd diffvg
 git submodule update --init --recursive
 python3 fix_problem.py
