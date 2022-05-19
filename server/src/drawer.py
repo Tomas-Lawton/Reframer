@@ -17,7 +17,7 @@ from util import *
 import logging
 import asyncio
 import aiofiles
-class Clip_Draw_Optimiser:
+class drawer:
     def __init__(self, clip, websocket, exemplar_count = None):
         """These inputs are defaults and can have methods for setting them after the inital start up"""
 

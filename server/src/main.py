@@ -5,7 +5,7 @@ from pymongo import MongoClient
 import logging
 import os
 
-from clip_draw import Clip_Draw_Optimiser
+from drawer import drawer
 from clip import Clip
 
 # TO DO add environment var to set log mode
@@ -56,8 +56,8 @@ if os.environ.get('CONNECTAI') == "True":
     @app.websocket("/ws")
     async def websocket_endpoint(websocket: WebSocket):
         clip_class = Clip()
-        artefact_drawer = Clip_Draw_Optimiser(clip_class, websocket)
-        exemplar_drawers = [Clip_Draw_Optimiser(clip_class, websocket, i) for i in range (4)]
+        artefact_drawer = drawer(clip_class, websocket)
+        exemplar_drawers = [drawer(clip_class, websocket, i) for i in range (4)]
 
         await websocket.accept()
         logging.info("Websocket Client Connected")
