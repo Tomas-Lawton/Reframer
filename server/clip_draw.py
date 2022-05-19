@@ -16,7 +16,7 @@ from src.processing import get_augment_trans
 from src import utils
 
 # make a util directory???
-from clip_util import *
+from util import *
 from src.render_design import *
 import logging
 import asyncio
@@ -295,23 +295,23 @@ class Clip_Draw_Optimiser:
         self.iteration = 0
         return self.activate()
 
-    # async def continue_update(self, data):
-    #     """Use origional paths with origional prompt to try new options from same settings"""
-    #     logging.info("Continuing...")
-    #     prompt = data["data"]["prompt"]
-    #     neg_prompt = []
-    #     # if same as last prompt, retrieve last iteration
-    #     if prompt == self.clip_interface.positive:
-    #         await self.socket.send_json(self.last_result)
-    #     else:
-    #         self.clip_interface.positive = prompt
-    #     try:
-    #         prompt_features = self.clip_interface.encode_text_classes([prompt])
-    #         neg_prompt_features = self.clip_interface.encode_text_classes(neg_prompt)
-    #         self.set_text_features(prompt_features, neg_prompt_features)
-    #         logging.info("Got features")
-    #     except:
-    #         logging.error("Failed to encode features in clip")
+    async def continue_update(self, data):
+        """Keep the last drawer running"""
+        logging.info("Continuing...")
+        prompt = data["data"]["prompt"]
+        neg_prompt = []
+        try:
+            logging.info("Encountered a problem updating drawer")
+            if prompt == self.clip_interface.positive:
+                await self.socket.send_json(self.last_result)
+            else:
+                self.clip_interface.positive = prompt
+                prompt_features = self.clip_interface.encode_text_classes([prompt])
+                neg_prompt_features = self.clip_interface.encode_text_classes(neg_prompt)
+                self.set_text_features(prompt_features, neg_prompt_features)
+                logging.info("Continuing with new prompt")
+        except:
+            logging.error("Failed to encode features in clip")
 
     async def run(self):
         # Refactor so that the code is a thin layer of the looper

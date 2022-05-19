@@ -1,7 +1,7 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 import logging
-from class_interface import Clip_Class
+from clip_model import Clip_Model
 from clip_draw import Clip_Draw_Optimiser
 
 # TO DO add environment var to set log mode
@@ -54,12 +54,12 @@ async def websocket_endpoint(websocket: WebSocket):
                     logging.error("Failed to update drawer")
                 artefact_drawer.run_loop()
 
-            # if data["status"] == "continue":
-            #     try:
-            #         await artefact_drawer.continue_update(data)
-            #     except:
-            #         logging.error("Failed to update drawer")
-            #     artefact_drawer.run_loop()
+            if data["status"] == "continue":
+                try:
+                    await artefact_drawer.continue_update(data)
+                except:
+                    logging.error("Failed to update drawer")
+                artefact_drawer.run_loop()
             
             if data["status"] == "sketch_exemplars":
                 for drawer in exemplar_drawers:

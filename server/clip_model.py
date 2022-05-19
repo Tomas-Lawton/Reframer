@@ -3,20 +3,20 @@ from PIL import Image
 import clip
 import torch
 
-from clip_util import load_model_defaults, run_preprocess, get_noun_data
+from util import load_model_defaults, run_preprocess, get_noun_data
 from clip_draw import Clip_Draw_Optimiser
 
 import logging
 
 # TO DO Reorganise around the drawer code
-class Clip_Class:
+class Clip_Model:
     """Init clip, then configure the classifier type, then set the required img/class/prompt parameters"""
 
     __instance = None
 
     def __init__(self):
         if (
-            Clip_Class.__instance != None
+            Clip_Model.__instance != None
         ):  # Should this all be refactored to not be a "class instance" since it is only used once?
             raise Exception("Clip is already instantiated.")
 
@@ -27,7 +27,7 @@ class Clip_Class:
 
         run_preprocess(preprocess)
         logging.info("Model ready")
-        Clip_Class.__instance == self
+        Clip_Model.__instance == self
 
     def set_image_descriptions(self, description_map):
         """Ensure every description has an image whose name matches the description list"""
@@ -128,11 +128,3 @@ class Clip_Class:
             self.similarity = (
                 text_features.cpu().numpy() @ image_features.cpu().numpy().T
             )
-
-    # def create_clip_draw(self, encode_nouns):
-    #     noun_features = []
-    #     if encode_nouns:
-    #         logging.info("Encoding nouns")
-    #         nouns = get_noun_data()
-    #         noun_features = self.encode_text_classes(nouns)
-    #     self.clip_draw_optimiser = Clip_Draw_Optimiser(self.model, noun_features)
