@@ -27,10 +27,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-clip_class = Clip_Model()
 
+# TO DO: Check env before opening websocket connection
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    clip_class = Clip_Model()
     artefact_drawer = Clip_Draw_Optimiser(clip_class, websocket)
     exemplar_drawers = [Clip_Draw_Optimiser(clip_class, websocket, i) for i in range (4)]
 
