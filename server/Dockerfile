@@ -1,0 +1,1 @@
+RUN source setup.sh

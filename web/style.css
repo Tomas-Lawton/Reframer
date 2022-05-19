@@ -29,13 +29,10 @@ button {
 html,
 body {
     display: flex;
-    /* background: #fbfbfb; */
     flex-flow: column;
     height: 100vh;
-    /* flex-direction: row-reverse;
-    justify-content: space-between;
-    flex-flow: column wrap; */
-    background: #fbfbfb;
+    /* background: #fbfbfb; */
+    background: #f3f3f3;
 }
 
 #left-background {
@@ -97,13 +94,13 @@ body {
 
 #canvas {
     background-color: white;
-    border-radius: 6em;
+    border-radius: 2em;
 }
 
 .canvas-drop {
     box-shadow: 10px 9px 27px rgb(48 48 48 / 18%);
     position: relative;
-    border-radius: 6em;
+    border-radius: 2em;
 }
 
 #multiple-canvas {
@@ -119,7 +116,8 @@ body {
     width: 100%;
     position: relative;
     justify-content: space-between;
-    background: #fbfbfb;
+    /* background: #fbfbfb; */
+    background: #f3f3f3;
 }
 
 #sliding-overlay {
@@ -308,7 +306,7 @@ button[confirm] {
 
 #button-panel {
     display: flex;
-    border-radius: 0 4em 4em 0;
+    border-radius: 0 2em 2em 0;
     z-index: 4;
     justify-content: space-between;
     padding: 2em;

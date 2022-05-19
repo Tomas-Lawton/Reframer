@@ -1,13 +1,14 @@
 #!/bin/bash
 conda update -n base -c defaults conda
 conda create -n conda_env python=3.8 -y -y
+conda create -n conda_env python=3.8.13 -y -y
 conda activate conda_env
 
 rm -rf diffvg
 rm -rf results
 rm -rf tmp
 
-conda install --file setup/requirements.txt
+conda install --file setup/conda-requirements.txt
 pip install -r setup/pip_requirements.txt
 
 git clone https://github.com/BachiLi/diffvg.git
@@ -24,4 +25,4 @@ mkdir tmp
 CONDA_BASE=$(conda info --base)
 source $CONDA_BASE/etc/profile.d/conda.sh
 conda activate
-uvicorn main:app --reload
+uvicorn main:app
