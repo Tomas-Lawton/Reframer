@@ -10,11 +10,12 @@ RUN pip install 'pymongo[srv]'
 
 COPY conda_requirements.txt /code/conda_requirements.txt
 RUN conda install --file conda_requirements.txt
+# RUN src/setup.sh
 
-COPY setup.sh /code/setup.sh
-RUN ./setup.sh
+# RUN src/setup.sh
 
-# COPY ./src /code/src
-COPY /src .
- 
+# RUN python3 src/diffvg/setup.py install
+
+COPY /src /code/src
+
 CMD ["uvicorn", "main:app", "--host=0.0.0.0"]
