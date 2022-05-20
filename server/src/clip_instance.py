@@ -3,7 +3,7 @@ from PIL import Image
 import clip
 import torch
 import logging
-from src.clip_utility import *
+from util.clip_utility import *
 
 # TO DO Reorganise around the drawer code
 class Clip_Instance:

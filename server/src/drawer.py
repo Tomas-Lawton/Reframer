@@ -1,21 +1,22 @@
 import torch
 import pydiffvg
 
-from src.render_design import (
+from util.render_design import (
     UserSketch,
     add_shape_groups,
     treebranch_initialization,
     calculate_draw_region
 )
 
-from src.processing import get_augment_trans
-# from src.loss import CLIPConvLoss2
-from src import utils
-from src.render_design import *
-from src.clip_utility import *
+from util.processing import get_augment_trans
+# from util.loss import CLIPConvLoss2
+from util.utils import *
+from util.render_design import *
+from util.clip_utility import *
 import logging
 import asyncio
 import aiofiles
+
 class Drawer:
     def __init__(self, clip, websocket, exemplar_count = None):
         """These inputs are defaults and can have methods for setting them after the inital start up"""

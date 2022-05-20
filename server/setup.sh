@@ -1,5 +1,6 @@
 #!/bin/bash
 # rm -rf src/diffvg
+echo "Running setup.sh"
 ls
 rm -rf src/results
 rm -rf src/tmp

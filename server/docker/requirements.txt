@@ -1,0 +1,10 @@
+svgwrite
+svgpathtools
+cssutils
+numba
+torch-tools
+visdom
+svgelements
+pymongo
+fastapi
+websockets

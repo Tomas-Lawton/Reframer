@@ -1,0 +1,14 @@
+ffmpeg
+cmake
+pip
+uvicorn
+numpy
+ftfy
+regex
+tqdm
+scikit-image
+setuptools
+aiofiles==0.6.0
+black
+pytorch 
+torchvision
