@@ -120,7 +120,7 @@ class CLIPLoss(torch.nn.Module):
         super(CLIPLoss, self).__init__()
 
         self.args = args
-        self.model, clip_preprocess = clip.load('ViT-B/32', args.device, jit=False)
+        self.model, clip_preprocess = clip_model.load('ViT-B/32', args.device, jit=False)
         self.model.eval()
         self.preprocess = transforms.Compose(
             [clip_preprocess.transforms[-1]]
@@ -415,7 +415,7 @@ class CLIPConvLoss(torch.nn.Module):
 
         self.distance_metrics = {"L2": l2_layers, "L1": l1_layers, "Cos": cos_layers}
 
-        self.model, clip_preprocess = clip.load(
+        self.model, clip_preprocess = clip_model.load(
             self.Clip_name, args.device, jit=False
         )
 
@@ -552,7 +552,7 @@ class CLIPConvLoss2(torch.nn.Module):
 
         self.distance_metrics = {"L2": l2_layers, "L1": l1_layers, "Cos": cos_layers}
 
-        self.model, clip_preprocess = clip.load(self.Clip_name, device, jit=False)
+        self.model, clip_preprocess = clip_model.load(self.Clip_name, device, jit=False)
 
         self.visual_model = self.model.visual
         layers = list(self.model.visual.children())
@@ -676,7 +676,7 @@ class CLIPTextLoss(torch.nn.Module):
         super(CLIPTextLoss, self).__init__()
 
         self.args = args
-        self.model, clip_preprocess = clip.load('ViT-B/32', args.device, jit=False)
+        self.model, clip_preprocess = clip_model.load('ViT-B/32', args.device, jit=False)
         self.model.eval()
         self.preprocess = transforms.Compose(
             [clip_preprocess.transforms[-1]]
@@ -703,7 +703,7 @@ class CLIPTextLoss(torch.nn.Module):
         self.counter = 0
         self.augment_both = args.augment_both
         self.text_target = args.text_target
-        text_input = clip.tokenize(self.text_target).to(self.device)
+        text_input = clip_model.tokenize(self.text_target).to(self.device)
         with torch.no_grad():
             self.targets_features = self.model.encode_text(text_input)
 

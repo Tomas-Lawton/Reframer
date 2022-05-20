@@ -12,12 +12,11 @@ from src.processing import get_augment_trans
 # from src.loss import CLIPConvLoss2
 from src import utils
 from src.render_design import *
-
-from util import *
+from src.clip_utility import *
 import logging
 import asyncio
 import aiofiles
-class drawer:
+class Drawer:
     def __init__(self, clip, websocket, exemplar_count = None):
         """These inputs are defaults and can have methods for setting them after the inital start up"""
 

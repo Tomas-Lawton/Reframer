@@ -8,4 +8,3 @@ svgelements
 pymongo
 fastapi
 websockets
-svgpathtools
