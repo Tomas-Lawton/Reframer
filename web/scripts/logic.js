@@ -159,7 +159,9 @@ const updateRectBounds = (from, to) => {
 const updateSelectUI = () => {
     if (mainSketch.boundingBox) {
         deleteHandler.style.display = "block";
-        initialiseHandler.style.display = "block";
+        if (showAI) {
+            initialiseHandler.style.display = "block";
+        }
         transformControl.style.display = "flex";
 
         // Large is applied to top for taller screen

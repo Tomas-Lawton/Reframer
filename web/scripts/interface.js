@@ -293,13 +293,20 @@ document.getElementById("num-squiggles").oninput = function() {
 // partial.remove();
 
 if (window.innerWidth <= 990) {
-    const aiCard = document.getElementById("describe-card");
+    document
+        .querySelector("body")
+        .prepend(document.getElementById("contain-dot"));
     document.querySelector("body").prepend(aiCard);
+
+    document.querySelector("body").prepend(artControls);
     document
         .getElementById("right-background")
         .prepend(document.getElementById("moodboard-header"));
 } else {
     setPenMode("pen", document.getElementById("pen"));
+    if (!showAI) {
+        document.getElementById("left-background").style.width = "100%";
+    }
 }
 
 const picker = new Picker({
@@ -323,20 +330,26 @@ picker.onChange = (color) => {
 
 setActionUI("inactive");
 
-addExemplarButtonsdocument.addEventListener("click", () => {
+addExemplarButtons.addEventListener("click", () => {
     importToSketch();
 });
 
-let events = 0;
-document.getElementById("save-events").onclick = () => {
-    dumpUserEvents({
-        user_id: uuid,
-        recorded_data: {
-            events: {
-                hello: "world",
-            },
-            events: events,
-        },
-    });
-    events += 1;
-};
+// Just a test
+// let events = 0;
+// document.getElementById("save-events").onclick = () => {
+//     dumpUserEvents({
+//         user_id: uuid,
+//         recorded_data: {
+//             events: {
+//                 hello: "world",
+//             },
+//             events: events,
+//         },
+//     });
+//     events += 1;
+// };
+
+if (!showAI) {
+    aiCard.style.display = "none";
+    document.getElementById("right-background").style.display = "none";
+}

@@ -7,6 +7,12 @@
     outline: none !important;
 }
 
+span {
+    font-weight: 300;
+    color: #363636;
+    /* font-style: italic; */
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -177,7 +183,7 @@ body {
 }
 
 #simple-modal {
-    width: 400px;
+    /* width: 400px; */
     display: flex;
     background-color: #ffffff;
     position: absolute;
@@ -432,7 +438,7 @@ hr {
 #describe-card {
     display: flex;
     background-color: white;
-    border-radius: 3em;
+    border-radius: 1em;
     flex-direction: column;
     padding: 2.5em;
     margin: 2em 2em 1.5em 0;
@@ -450,7 +456,8 @@ hr {
 }
 
 #describe-card h1 {
-    font-size: 3.6em;
+    /* font-size: 3.6em; */
+    font-size: 1.6em;
     font-weight: 500;
     line-height: 1em;
     color: #7b66ff;
@@ -468,15 +475,18 @@ hr {
 }
 
 .ai-action {
-    margin: 0.5em;
+    /* margin: 0.5em; */
     box-shadow: 3px 6px 9px rgba(48, 48, 48, 0.19);
     background-color: #f2effe;
     display: flex;
     flex-flow: column;
     align-items: center;
     justify-content: center;
-    width: 4.5em;
-    height: 4.5em;
+    margin: 0.1em;
+    width: 3.4em;
+    height: 3.4em;
+    /* width: 4.5em;
+    height: 4.5em; */
     box-shadow: none;
     color: #7b66ff;
     cursor: pointer;
@@ -582,6 +592,7 @@ hr {
 }
 
 #exemplar-grid {
+    /* display: none; */
     display: flex;
     flex-flow: row wrap;
     overflow: scroll;
@@ -596,14 +607,15 @@ hr {
 
 .exemplar-card {
     border-radius: 1em;
-    filter: drop-shadow(10px 9px 27px rgba(48, 48, 48, 0.12));
+    /* filter: drop-shadow(10px 9px 27px rgba(48, 48, 48, 0.12)); */
     padding: 1em;
     position: relative;
     display: flex;
     flex-direction: column;
     flex: 1;
     justify-content: space-around;
-    background: white;
+    /* background: white; */
+    background: #e5e2ff;
 }
 
 .exemplar {
@@ -635,6 +647,7 @@ hr {
     align-items: center;
     justify-content: space-between;
     margin: 1em;
+    flex-direction: column;
 }
 
 .card-info div {
@@ -645,6 +658,7 @@ hr {
 .card-info h3 {
     color: #7b66ff;
     font-weight: 500;
+    font-size: 0.9em;
 }
 
 .card-info p {
@@ -830,7 +844,7 @@ hr {
 
 #pen-color {
     border-radius: 0.5em;
-    width: 74%;
+    width: 60%;
     /* background-color: #12b700; */
     box-shadow: inset 2px 4px 10px rgba(0, 0, 0, 0.15);
 }
@@ -979,7 +993,34 @@ input[type="range"]::-moz-range-thumb {
     display: none;
 }
 
+@media screen and (max-width: 500px) {
+    #art-control-final {
+        flex-direction: column;
+    }
+    #pen-color {
+        margin-top: 1em;
+        height: 2em;
+        width: 100%;
+    }
+}
+
 @media screen and (max-width: 990px) {
+    #contain-dot {
+        position: inherit;
+    }
+    .swatch {
+        width: 0.7em;
+        height: 0.7em;
+    }
+    #art-panel {
+        padding: 1.5em;
+    }
+    .layout_default.picker_wrapper {
+        max-width: 40vw !important;
+    }
+    #fine-control p {
+        font-size: 0.8em;
+    }
     #right-background {
         padding: 0em;
     }

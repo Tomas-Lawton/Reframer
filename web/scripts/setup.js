@@ -1,4 +1,5 @@
 const ws = new WebSocket("ws://localhost:8000/ws");
+const showAI = true;
 
 // Sketching UI
 const canvas = document.getElementById("canvas");
@@ -11,6 +12,7 @@ const exemplars = [
 
 // Actions
 const actionControls = document.querySelectorAll(".ai-action");
+const aiCard = document.getElementById("describe-card");
 
 // Select UI
 const deleteHandler = document.getElementById("delete-handler");
@@ -51,7 +53,7 @@ const exemplarSize = document
 const containerRect = document
     .getElementById("contain-canvas")
     .getBoundingClientRect();
-const addExemplarButtonsdocument = document.querySelector(".add-exemplar");
+const addExemplarButtons = document.querySelector(".add-exemplar");
 
 let largerPadding;
 if (containerRect.width > window.innerHeight) {
