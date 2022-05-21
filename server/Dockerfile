@@ -1,4 +1,5 @@
 FROM continuumio/miniconda3
+RUN apt-get update && apt-get install -y python3-pip
 
 RUN mkdir /code
 WORKDIR /code
@@ -7,18 +8,31 @@ COPY environment.yml /code/environment.yml
 COPY requirements.txt /code/requirements.txt
 
 RUN conda clean --all
-RUN pip uninstall -y setuptools && \
-    conda install setuptools && \
-    conda update conda
+RUN conda update conda
+
+# ENV PATH /opt/conda/bin/:$PATH
 RUN conda env create -f environment.yml python=3.8
 
-COPY src /code/
-RUN python3 diffvg/setup.py install
-SHELL ["conda", "run", "-n", "conda_env", "/bin/bash", "-c"]
+# SHELL ["conda", "run", "-n", "conda_env", "/bin/bash", "-c"]
 
 RUN pip install --no-cache-dir 'pymongo[srv]'
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir git+https://github.com/openai/CLIP.git
-RUN pip install setuptools
 
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "conda_env", "python", "main.py"]
+COPY src /code/
+
+RUN rm -rf diffvg
+RUN git clone https://github.com/BachiLi/diffvg.git
+RUN cp fix.py diffvg/fix.py
+RUN cd diffvg
+# RUN python diffvg/fix.py install
+RUN python diffvg/setup.py install
+
+# EXPOSE 8000
+# RUN /bin/bash -c "source activate conda_env"
+CMD [ "python", "main.py" ]
+
+# RUN echo "source activate myenv" > ~/.bashrc
+# ENV PATH /opt/conda/envs/env/bin:$PATH
+# COPY ./entrypoint.sh code
+# ENTRYPOINT ["/entrypoint.sh"]

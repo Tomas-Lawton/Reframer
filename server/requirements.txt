@@ -10,3 +10,4 @@ svgelements
 pymongo
 fastapi
 websockets
+setuptools
