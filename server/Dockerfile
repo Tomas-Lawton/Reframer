@@ -9,16 +9,15 @@ COPY requirements.txt /code/requirements.txt
 
 RUN conda clean --all
 RUN conda update conda
-
-# ENV PATH /opt/conda/bin/:$PATH
 RUN conda env create -f environment.yml python=3.8
+RUN conda list
 
 # SHELL ["conda", "run", "-n", "conda_env", "/bin/bash", "-c"]
 
-RUN pip install --no-cache-dir 'pymongo[srv]'
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir git+https://github.com/openai/CLIP.git
-
+RUN pip install 'pymongo[srv]'
+RUN pip install -r requirements.txt
+RUN pip install git+https://github.com/openai/CLIP.git
+RUN pip list
 COPY src /code/
 
 RUN rm -rf diffvg

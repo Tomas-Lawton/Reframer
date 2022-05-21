@@ -1,7 +1,7 @@
 #!/bin/bash
 cd src
 conda update -n base -c defaults conda
-conda create -n conda_env python=3.8.13 -y -y
+conda env create -f environment.yml python=3.8 -y -y
 conda activate conda_env
 conda install --file conda_requirements.txt
 pip install -r requirements.txt
