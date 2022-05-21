@@ -1,5 +1,6 @@
 name: conda_env
 dependencies:
+  - python=3.8
   - ffmpeg
   - cmake
   - pip
@@ -9,8 +10,5 @@ dependencies:
   - regex
   - tqdm
   - scikit-image
-  - setuptools
   - aiofiles==0.6.0
   - black
-  - pytorch
-  - torchvision

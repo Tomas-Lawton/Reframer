@@ -4,6 +4,7 @@ from pymongo import MongoClient
 
 import logging
 import os
+import uvicorn
 
 from clip_instance import Clip_Instance
 from drawer import Drawer
@@ -102,3 +103,6 @@ if os.environ.get('CONNECTAI') == "True":
             logging.info("Client disconnected")
 else:
     logging.info("Running without AI")
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

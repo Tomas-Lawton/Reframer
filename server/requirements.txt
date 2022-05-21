@@ -2,7 +2,9 @@ svgwrite
 svgpathtools
 cssutils
 numba
+torch
 torch-tools
+torchvision
 visdom
 svgelements
 pymongo
