@@ -12,7 +12,7 @@ RUN conda update conda
 RUN conda env create -f environment.yml python=3.8
 RUN conda list
 
-# SHELL ["conda", "run", "-n", "conda_env", "/bin/bash", "-c"]
+SHELL ["conda", "run", "-n", "conda_env", "/bin/bash", "-c"]
 
 RUN pip install 'pymongo[srv]'
 RUN pip install -r requirements.txt
@@ -21,11 +21,14 @@ RUN pip list
 COPY src /code/
 
 RUN rm -rf diffvg
-RUN git clone https://github.com/BachiLi/diffvg.git
+RUN git clone https://github.com/BachiLi/diffvg.git && \
+    cd diffvg  && \
+    git submodule update --init --recursive 
+
 RUN cp fix.py diffvg/fix.py
-RUN cd diffvg
-# RUN python diffvg/fix.py install
-RUN python diffvg/setup.py install
+RUN ls diffvg
+RUN python3 diffvg/fix.py install
+RUN python3 diffvg/setup.py install
 
 # EXPOSE 8000
 # RUN /bin/bash -c "source activate conda_env"

@@ -1,11 +1,13 @@
 name: conda_env
 dependencies:
   - python=3.8
-  - pytorch
   - ffmpeg
   - cmake
   - pip
   - uvicorn
+  - pytorch=1.7.1
+  - torchvision
+  - cudatoolkit=11.0
   - numpy
   - ftfy
   - regex
