@@ -120,7 +120,9 @@ class CLIPLoss(torch.nn.Module):
         super(CLIPLoss, self).__init__()
 
         self.args = args
-        self.model, clip_preprocess = clip_model.load('ViT-B/32', args.device, jit=False)
+        self.model, clip_preprocess = clip_model.load(
+            'ViT-B/32', args.device, jit=False
+        )
         self.model.eval()
         self.preprocess = transforms.Compose(
             [clip_preprocess.transforms[-1]]
@@ -437,7 +439,9 @@ class CLIPConvLoss(torch.nn.Module):
         self.img_size = clip_preprocess.transforms[1].size
         self.model.eval()
         self.target_transform = transforms.Compose(
-            [transforms.ToTensor(),]
+            [
+                transforms.ToTensor(),
+            ]
         )  # clip normalisation
         self.normalize_transform = transforms.Compose(
             [
@@ -566,7 +570,9 @@ class CLIPConvLoss2(torch.nn.Module):
         self.img_size = clip_preprocess.transforms[1].size
         self.model.eval()
         self.target_transform = transforms.Compose(
-            [transforms.ToTensor(),]
+            [
+                transforms.ToTensor(),
+            ]
         )  # clip normalisation
         self.normalize_transform = transforms.Compose(
             [
@@ -676,7 +682,9 @@ class CLIPTextLoss(torch.nn.Module):
         super(CLIPTextLoss, self).__init__()
 
         self.args = args
-        self.model, clip_preprocess = clip_model.load('ViT-B/32', args.device, jit=False)
+        self.model, clip_preprocess = clip_model.load(
+            'ViT-B/32', args.device, jit=False
+        )
         self.model.eval()
         self.preprocess = transforms.Compose(
             [clip_preprocess.transforms[-1]]

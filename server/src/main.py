@@ -10,7 +10,7 @@ from pymongo import MongoClient
 
 # TO DO add environment var to set log mode
 logging.basicConfig(
-    encoding='utf-8',
+    # encoding='utf-8',
     level=logging.DEBUG,
     format=f'APP LOGGING: %(levelname)s %(name)s %(threadName)s : %(message)s',
 )
@@ -18,8 +18,6 @@ logging.basicConfig(
 app = FastAPI(title="Clip Algorithm API")
 origins = [
     "http://localhost",
-    "http://localhost:8080",
-    "http://127.0.0.1:5500",
     "http://127.0.0.1:8000",
 ]
 
@@ -32,37 +30,44 @@ app.add_middleware(
 )
 
 try:
-    cluster = MongoClient(f"mongodb+srv://{os.environ.get('DBCREDENTIAL')}@cluster0.x5opj.mongodb.net/?retryWrites=true&w=majority")
+    cluster = MongoClient(
+        f"mongodb+srv://{os.environ.get('DBCREDENTIAL')}@cluster0.x5opj.mongodb.net/?retryWrites=true&w=majority"
+    )
     db = cluster["vector_ai"]
     collection = db["interaction_events"]
 except ValueError as e:
     logging.error("Bad credentials \n", e)
 
+
 @app.post("/save_interactions")
-async def getInformation(info : Request):
+async def getInformation(info: Request):
     interaction_json = await info.json()
     try:
         collection.find_one_and_update(
             {"user_id": interaction_json["user_id"]},
             {"$set": {"recorded_data": interaction_json["recorded_data"]}},
-            upsert=True)
+            upsert=True,
+        )
         return {
-            "status" : "SUCCESS",
+            "status": "SUCCESS",
         }
     except Exception as e:
         logging.error(e)
+
 
 @app.get("/")
 async def home():
     return {"hello", "world"}
 
+
 if os.environ.get('CONNECTAI') == "True":
+
     @app.websocket("/ws")
     async def websocket_endpoint(websocket: WebSocket):
         logging.info("Connecting...")
         clip_class = Clip_Instance()
         artefact_drawer = Drawer(clip_class, websocket)
-        exemplar_drawers = [Drawer(clip_class, websocket, i) for i in range (4)]
+        exemplar_drawers = [Drawer(clip_class, websocket, i) for i in range(4)]
 
         await websocket.accept()
         logging.info("Websocket Client Connected")
@@ -73,24 +78,27 @@ if os.environ.get('CONNECTAI') == "True":
                 if data["status"] == "draw":
                     try:
                         await artefact_drawer.draw_update(data)
-                    except:
+                    except Exception as e:
+                        logging.error(e)
                         logging.error("Failed to update drawer")
                     artefact_drawer.run_loop()
 
                 if data["status"] == "redraw":
                     try:
                         await artefact_drawer.redraw_update()
-                    except:
+                    except Exception as e:
+                        logging.error(e)
                         logging.error("Failed to update drawer")
                     artefact_drawer.run_loop()
 
                 if data["status"] == "continue":
                     try:
                         await artefact_drawer.continue_update(data)
-                    except:
+                    except Exception as e:
+                        logging.error(e)
                         logging.error("Failed to update drawer")
                     artefact_drawer.run_loop()
-                
+
                 if data["status"] == "sketch_exemplars":
                     for drawer in exemplar_drawers:
                         drawer.frame_size = data["data"]['frame_size']
@@ -105,8 +113,9 @@ if os.environ.get('CONNECTAI') == "True":
         except WebSocketDisconnect:
             await artefact_drawer.stop()
             logging.info("Client disconnected")
+
 else:
     logging.info("Running without AI")
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

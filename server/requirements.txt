@@ -11,15 +11,9 @@ pymongo
 fastapi
 websockets
 setuptools
-ffmpeg
-cmake
-pip
 uvicorn
-torchvision
-numpy
 ftfy
 regex
 tqdm
-scikit-image
 aiofiles==0.6.0
 black

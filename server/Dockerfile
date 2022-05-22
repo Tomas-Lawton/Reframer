@@ -18,11 +18,11 @@ RUN rm -rf /opt/conda && \
     
 ENV PATH /opt/conda/bin:$PATH
 
-COPY ./env_config.yml /tmp/env_config.yml
-COPY ./env_pip_config.txt /tmp/env_pip_config.txt
+COPY ./environment.yml /tmp/environment.yml
+COPY ./requirements.txt /tmp/requirements.txt
 
 RUN conda update conda \
-    && conda env create -f /tmp/env_config.yml
+    && conda env create -f /tmp/environment.yml
 RUN echo "Envrionment Created. Trying Diffvg"
 
 ENV PATH /opt/conda/envs/conda_env/bin:$PATH
@@ -30,7 +30,7 @@ ENV CONDA_DEFAULT_ENV conda_env
 
 SHELL ["conda", "run", "-n", "conda_env", "/bin/bash", "-c"]
 
-RUN pip install -r /tmp/env_pip_config.txt
+RUN pip install -r /tmp/requirements.txt
 
 RUN rm -rf diffvg
 
@@ -39,8 +39,8 @@ RUN git clone https://github.com/BachiLi/diffvg.git && \
     git submodule update --init --recursive 
 COPY src/fix.py /app/diffvg/fix.py
 RUN cd diffvg && \ 
-    python3 fix.py && \ 
-    python3 setup.py install
+    python fix.py && \ 
+    python setup.py install
 
 COPY src/ .
 EXPOSE 8080

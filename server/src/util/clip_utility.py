@@ -6,6 +6,7 @@ from PIL import ImageColor
 import logging
 import numpy as np
 
+
 class DrawingPath:
     def __init__(self, path, color, width, num_segments):
         self.path = path
@@ -115,7 +116,8 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
         path_list = []
         parsed_svg = SVG.parse(path_to_svg_file)  # access <g> tag for non-path styles
         elements_list = list(parsed_svg.elements())
-    except:
+    except Exception as e:
+        logging.error(e)
         logging.error("Couldn't read svg file")
     path_group = {}
     parent_svg = {}
@@ -141,7 +143,8 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
         frame_size = max(width, height)
         normaliseScaleFactor = 1 / frame_size
         resizeScaleFactor = 224 / frame_size
-    except:
+    except Exception as e:
+        logging.error(e)
         logging.error("Couldn't parse SVG Parent")
 
     count = 0
@@ -158,7 +161,8 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
                 color_code = str(att['stroke'])
             else:
                 color_code = str(path_group['attributes']['stroke'])
-        except:
+        except Exception as e:
+            logging.error(e)
             logging.error("Couldn't parse stroke")
 
         try:
@@ -169,17 +173,19 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
                     float(path_group['attributes']['stroke-width'])
                     * normaliseScaleFactor
                 )
-        except:
+        except Exception as e:
+            logging.error(e)
             logging.error("Couldn't parse stroke width")
             # if 'stroke-opacity' in att:
-                # opacity = float(att['stroke-opacity'])
+            # opacity = float(att['stroke-opacity'])
 
         try:
             if 'opacity' in att:
                 opacity = float(att['opacity'])
             else:
                 opacity = str(path_group['attributes']['opacity'])
-        except:
+        except Exception as e:
+            logging.error(e)
             logging.error("Couldn't parse stroke opacity")
 
         color = get_color(color_code, opacity)
@@ -211,7 +217,8 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
             x0 = [start_x, start_y]
             path = [x0] + points_array
             path_list.append(data_to_tensor(color, stroke_width, path, num_segments))
-        except:
+        except Exception as e:
+            logging.error(e)
             logging.error("Unexpected paths in canvas")
         count += 1
 

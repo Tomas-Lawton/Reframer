@@ -3,9 +3,9 @@ from PIL import Image
 import clip
 import torch
 import logging
-from util.clip_utility import *
+from util.clip_utility import run_preprocess, load_model_defaults
+from util.clip_utility import get_noun_data
 
-# TO DO Reorganise around the drawer code
 class Clip_Instance:
     """Init clip, then configure the classifier type, then set the required img/class/prompt parameters"""
 
@@ -13,7 +13,7 @@ class Clip_Instance:
 
     def __init__(self):
         if (
-            Clip_Instance.__instance != None
+            Clip_Instance.__instance is not None
         ):  # Should this all be refactored to not be a "class instance" since it is only used once?
             raise Exception("Clip is already instantiated.")
 
@@ -90,7 +90,8 @@ class Clip_Instance:
         if token_list != []:
             try:
                 tokens = clip.tokenize(token_list)
-            except:
+            except Exception as e:
+                logging.error(e)
                 logging.error(f"Failed to tokenize: {token_list}")
         if tokens == []:
             return tokens

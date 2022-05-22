@@ -1,24 +1,20 @@
 import torch
 import pydiffvg
 
-from util.render_design import (
-    UserSketch,
-    add_shape_groups,
-    treebranch_initialization,
-    calculate_draw_region
-)
-
 from util.processing import get_augment_trans
+
 # from util.loss import CLIPConvLoss2
-from util.utils import *
-from util.render_design import *
-from util.clip_utility import *
+from util.utils import area_mask
+from util.render_design import rescale_constants, calculate_draw_region, UserSketch
+from util.render_design import add_shape_groups, treebranch_initialization
+from util.clip_utility import get_noun_data, parse_svg
 import logging
 import asyncio
 import aiofiles
 
+
 class Drawer:
-    def __init__(self, clip, websocket, exemplar_count = None):
+    def __init__(self, clip, websocket, exemplar_count=None):
         """These inputs are defaults and can have methods for setting them after the inital start up"""
 
         self.clip_interface = clip
@@ -67,7 +63,7 @@ class Drawer:
         logging.info("Updated CLIP prompt features")
         return
 
-    def parse_svg(self, region = None):
+    def parse_svg(self, region=None):
         use_region = region['activate']
         try:
             (
@@ -80,7 +76,8 @@ class Drawer:
 
             if use_region:
                 self.drawing_area = calculate_draw_region(region, normaliseScaleFactor)
-        except:
+        except Exception as e:
+            logging.error(e)
             logging.error("SVG Parsing failed")
 
     def activate(self):
@@ -252,7 +249,8 @@ class Drawer:
             f"results/img-{str(self.exemplar_count)}.png",
             224,
             224,
-            self.shapes, self.shape_groups,
+            self.shapes,
+            self.shape_groups,
         )
         pydiffvg.save_svg(
             f"results/output-{str(self.exemplar_count)}.svg",
@@ -263,7 +261,7 @@ class Drawer:
         )
         self.iteration += 1
         return self.iteration, loss.item()
-    
+
     # RUN STUFF
     async def draw_update(self, data):
         """Use current paths with the given (possibly different) prompt to generate options"""
@@ -273,12 +271,12 @@ class Drawer:
         svg_string = data["data"]["svg"]
         region = data["data"]["region"]
         self.clip_interface.positive = prompt
-        if svg_string != None:
+        if svg_string is not None:
             async with aiofiles.open('data/interface_paths.svg', 'w') as f:
                 await f.write(svg_string)
         else:
             async with aiofiles.open('data/interface_paths.svg', 'w') as f:
-                await f.write("")   
+                await f.write("")
         try:
             self.reset()
             logging.info("Starting clip drawer")
@@ -289,7 +287,8 @@ class Drawer:
             self.parse_svg(region)
             logging.info("Got features")
             return self.activate()
-        except:
+        except Exception as e:
+            logging.error(e)
             logging.error("Failed to encode features in clip")
 
     async def redraw_update(self):
@@ -311,10 +310,13 @@ class Drawer:
             else:
                 self.clip_interface.positive = prompt
                 prompt_features = self.clip_interface.encode_text_classes([prompt])
-                neg_prompt_features = self.clip_interface.encode_text_classes(neg_prompt)
+                neg_prompt_features = self.clip_interface.encode_text_classes(
+                    neg_prompt
+                )
                 self.set_text_features(prompt_features, neg_prompt_features)
                 logging.info("Continuing with new prompt")
-        except:
+        except Exception as e:
+            logging.error(e)
             logging.error("Failed to encode features in clip")
 
     async def run(self):
@@ -322,16 +324,18 @@ class Drawer:
         logging.info("Running iteration...")
         svg = ''
         i, loss = self.run_epoch()
-        async with aiofiles.open(f"results/output-{str(self.exemplar_count)}.svg", "r") as f:
+        async with aiofiles.open(
+            f"results/output-{str(self.exemplar_count)}.svg", "r"
+        ) as f:
             svg = await f.read()
         status = "draw"
-        if (isinstance(self.exemplar_count, int)):
+        if isinstance(self.exemplar_count, int):
             logging.info(f"Sending exemplar {self.exemplar_count}")
             status = str(self.exemplar_count)
         result = {"status": status, "svg": svg, "iterations": i, "loss": loss}
         await self.socket.send_json(result)
         logging.info(f"Completed run {i} in drawer {str(self.exemplar_count)}")
-        
+
         self.last_result = result  # won't go to client unless continued is used
 
     async def stop(self):
