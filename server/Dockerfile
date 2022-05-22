@@ -43,6 +43,6 @@ RUN cd diffvg && \
     python3 setup.py install
 
 COPY src/ .
-
+EXPOSE 8080
 CMD ["python3", "main.py"]
 

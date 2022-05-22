@@ -1,4 +1,8 @@
-const ws = new WebSocket("ws://localhost:8000/ws");
+// const ws = new WebSocket("ws://localhost:8000/ws");
+const http = "http://";
+const base = "0.0.0.0:8080/";
+const ws = new WebSocket("ws://" + base + "/ws");
+
 const showAI = true;
 
 // Sketching UI

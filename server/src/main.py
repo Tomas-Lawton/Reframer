@@ -52,9 +52,14 @@ async def getInformation(info : Request):
     except Exception as e:
         logging.error(e)
 
+@app.get("/")
+async def home():
+    return {"hello", "world"}
+
 if os.environ.get('CONNECTAI') == "True":
     @app.websocket("/ws")
     async def websocket_endpoint(websocket: WebSocket):
+        logging.info("Connecting...")
         clip_class = Clip_Instance()
         artefact_drawer = Drawer(clip_class, websocket)
         exemplar_drawers = [Drawer(clip_class, websocket, i) for i in range (4)]
@@ -104,4 +109,4 @@ else:
     logging.info("Running without AI")
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8080)

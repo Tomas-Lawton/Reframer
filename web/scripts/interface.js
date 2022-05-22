@@ -335,19 +335,19 @@ addExemplarButtons.addEventListener("click", () => {
 });
 
 // Just a test
-// let events = 0;
-// document.getElementById("save-events").onclick = () => {
-//     dumpUserEvents({
-//         user_id: uuid,
-//         recorded_data: {
-//             events: {
-//                 hello: "world",
-//             },
-//             events: events,
-//         },
-//     });
-//     events += 1;
-// };
+let events = 0;
+document.getElementById("save-events").onclick = () => {
+    dumpUserEvents({
+        user_id: uuid,
+        recorded_data: {
+            events: {
+                hello: "world",
+            },
+            events: events,
+        },
+    });
+    events += 1;
+};
 
 if (!showAI) {
     aiCard.style.display = "none";
