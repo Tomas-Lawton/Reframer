@@ -1,0 +1,60 @@
+# FROM continuumio/miniconda3
+# WORKDIR /code
+
+# COPY environment.yml /code/environment.yml
+# COPY requirements.txt /code/requirements.txt
+
+# RUN conda clean --all
+# RUN conda update conda
+# RUN conda env create -f environment.yml python=3.8
+# SHELL ["conda", "run", "-n", "conda_env", "/bin/bash", "-c"]
+# RUN pip install 'pymongo[srv]'
+# RUN pip install -r requirements.txt
+# RUN pip install git+https://github.com/openai/CLIP.git
+
+# COPY src /code/
+
+# RUN conda list
+# RUN pip list
+
+# RUN rm -rf diffvg
+# RUN git clone https://github.com/BachiLi/diffvg.git && \
+#     cd diffvg  && \
+#     git submodule update --init --recursive 
+
+# EXPOSE 8000
+# CMD [ "python", "main.py" ]
+
+
+
+
+# install python in the container
+# FROM python:3.8.8-slim 
+FROM continuumio/miniconda3
+
+WORKDIR /code
+
+COPY environment.yml /code/environment.yml
+
+RUN conda clean --all
+RUN conda update conda
+RUN conda env create -f environment.yml python=3.8
+SHELL ["conda", "run", "-n", "conda_env", "/bin/bash", "-c"]
+
+# COPY ./requirements.txt /code/requirements.txt
+# RUN pip install -r /code/requirements.txt
+RUN rm -rf diffvg
+# RUN apt-get update && \
+#     apt-get upgrade -y && \
+#     apt-get install -y git
+RUN git clone https://github.com/BachiLi/diffvg.git && \
+    cd diffvg  && \
+    git submodule update --init --recursive 
+COPY src/fix.py /code/diffvg/fix.py
+RUN cd diffvg && \ 
+    python3 fix.py && \ 
+    python3 setup.py install
+
+EXPOSE 8000
+COPY src/ /code/
+CMD ["python3", "main.py"]

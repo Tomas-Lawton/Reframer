@@ -1,0 +1,10 @@
+name: conda_env
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - pip
+  - cudatoolkit=11.0
+
+prefix: C:\Users\ABC\.conda\envs\conda_env

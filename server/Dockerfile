@@ -1,40 +1,48 @@
-FROM continuumio/miniconda3
-RUN apt-get update && apt-get install -y python3-pip
+FROM python:3.8
 
-RUN mkdir /code
-WORKDIR /code
+WORKDIR /app
 
-COPY environment.yml /code/environment.yml
-COPY requirements.txt /code/requirements.txt
+RUN apt-get update -y \
+    && apt-get install -y wget \
+    && apt-get clean
+    
+RUN rm -rf /opt/conda && \
+    wget --quiet https://repo.anaconda.com/archive/Anaconda3-2020.11-Linux-x86_64.sh -O ~/anaconda.sh && \
+    /bin/bash ~/anaconda.sh -b -p /opt/conda && \
+    rm ~/anaconda.sh && \
+    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
+    echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    find /opt/conda/ -follow -type f -name '*.a' -delete && \
+    find /opt/conda/ -follow -type f -name '*.js.map' -delete && \
+    /opt/conda/bin/conda clean -afy
+    
+ENV PATH /opt/conda/bin:$PATH
 
-RUN conda clean --all
-RUN conda update conda
-RUN conda env create -f environment.yml python=3.8
-RUN conda list
+COPY ./env_config.yml /tmp/env_config.yml
+COPY ./env_pip_config.txt /tmp/env_pip_config.txt
+
+RUN conda update conda \
+    && conda env create -f /tmp/env_config.yml
+RUN echo "Envrionment Created. Trying Diffvg"
+
+ENV PATH /opt/conda/envs/conda_env/bin:$PATH
+ENV CONDA_DEFAULT_ENV conda_env
 
 SHELL ["conda", "run", "-n", "conda_env", "/bin/bash", "-c"]
 
-RUN pip install 'pymongo[srv]'
-RUN pip install -r requirements.txt
-RUN pip install git+https://github.com/openai/CLIP.git
-RUN pip list
-COPY src /code/
+RUN pip install -r /tmp/env_pip_config.txt
 
 RUN rm -rf diffvg
+
 RUN git clone https://github.com/BachiLi/diffvg.git && \
     cd diffvg  && \
     git submodule update --init --recursive 
+COPY src/fix.py /app/diffvg/fix.py
+RUN cd diffvg && \ 
+    python3 fix.py && \ 
+    python3 setup.py install
 
-RUN cp fix.py diffvg/fix.py
-RUN ls diffvg
-RUN python3 diffvg/fix.py install
-RUN python3 diffvg/setup.py install
+COPY src/ .
 
-# EXPOSE 8000
-# RUN /bin/bash -c "source activate conda_env"
-CMD [ "python", "main.py" ]
+CMD ["python3", "main.py"]
 
-# RUN echo "source activate myenv" > ~/.bashrc
-# ENV PATH /opt/conda/envs/env/bin:$PATH
-# COPY ./entrypoint.sh code
-# ENTRYPOINT ["/entrypoint.sh"]
