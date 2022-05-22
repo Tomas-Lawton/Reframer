@@ -3,10 +3,7 @@ cd src
 conda update -n base -c defaults conda
 conda env create -f environment.yml python=3.8 -y -y
 conda activate conda_env
-conda install --file conda_requirements.txt
 pip install -r requirements.txt
-pip install git+https://github.com/openai/CLIP.git
-pip install 'pymongo[srv]'
 
 rm -rf diffvg
 rm -rf results
