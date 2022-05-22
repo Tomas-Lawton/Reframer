@@ -7,6 +7,16 @@
     outline: none !important;
 }
 
+
+/* 
+#right-background {
+    display: none !important;
+}
+
+#left-background {
+    width: 100% !important;
+} */
+
 span {
     font-weight: 300;
     color: #363636;
@@ -107,6 +117,7 @@ body {
     box-shadow: 10px 9px 27px rgb(48 48 48 / 18%);
     position: relative;
     border-radius: 2em;
+    display: flex;
 }
 
 #multiple-canvas {
@@ -363,6 +374,7 @@ hr {
     position: absolute;
     display: flex;
     justify-content: space-between;
+    pointer-events: none;
 }
 
 #time-slider {
