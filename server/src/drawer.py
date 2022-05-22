@@ -109,19 +109,27 @@ class Drawer:
         self.points_vars = []
         self.stroke_width_vars = []
         self.color_vars = []
+        print(self.shapes)
         for path in self.shapes:
             path.points.requires_grad = True
             self.points_vars.append(path.points)
             path.stroke_width.requires_grad = True
             self.stroke_width_vars.append(path.stroke_width)
+        print(self.shape_groups)
         for group in self.shape_groups:
             group.stroke_color.requires_grad = True
             self.color_vars.append(group.stroke_color)
-
+        print('here')
         self.render = pydiffvg.RenderFunction.apply
-        self.mask = utils.area_mask(self.canvas_w, self.canvas_h, self.drawing_area).to(
+        print('test')
+        print(self.canvas_w)
+        print(self.canvas_h)
+        print(self.drawing_area)
+        print(self.device)
+        self.mask = area_mask(self.canvas_w, self.canvas_h, self.drawing_area).to(
             self.device
         )
+        print('here2')
         self.user_sketch.init_vars()
         self.points_vars0 = self.user_sketch.points_vars
         self.stroke_width_vars0 = self.user_sketch.stroke_width_vars

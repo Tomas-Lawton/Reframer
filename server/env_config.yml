@@ -6,5 +6,4 @@ channels:
 dependencies:
   - pip
   - cudatoolkit=11.0
-
-prefix: C:\Users\ABC\.conda\envs\conda_env
+# prefix: C:\Users\ABC\.conda\envs\conda_env
