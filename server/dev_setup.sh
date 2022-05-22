@@ -1,6 +1,5 @@
 #!/bin/bash
 conda update -n base -c defaults conda
-conda env create -f environment.yml
 conda create -f environment.yml python=3.8.13 -y -y
 
 conda activate conda_env

@@ -13,4 +13,4 @@ dependencies:
   - cmake
   - ffmpeg
   - pip
-# prefix: C:\Users\ABC\.conda\envs\conda_env
+prefix: C:\Users\ABC\.conda\envs\conda_env
