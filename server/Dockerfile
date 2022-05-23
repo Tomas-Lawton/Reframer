@@ -22,17 +22,21 @@ COPY ./environment.yml /tmp/environment.yml
 COPY ./requirements.txt /tmp/requirements.txt
 
 RUN conda update conda \
-    && conda env create -f /tmp/environment.yml
-RUN echo "Envrionment Created. Trying Diffvg"
+    && conda env create -f /tmp/environment.yml python=3.8.13
 
-ENV PATH /opt/conda/envs/conda_env/bin:$PATH
-ENV CONDA_DEFAULT_ENV conda_env
+ENV PATH /opt/conda/envs/env/bin:$PATH
+ENV CONDA_DEFAULT_ENV env
 
-SHELL ["conda", "run", "-n", "conda_env", "/bin/bash", "-c"]
+SHELL ["conda", "run", "-n", "env", "/bin/bash", "-c"]
 
 RUN pip install -r /tmp/requirements.txt
+RUN echo "Trying Diffvg..."
 
-RUN rm -rf diffvg
+RUN rm -rf diffvg && \
+    rm -rf results  && \
+    rm -rf tmp && \
+    mkdir results && \
+    mkdir tmp
 
 RUN git clone https://github.com/BachiLi/diffvg.git && \
     cd diffvg  && \
