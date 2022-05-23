@@ -7,8 +7,8 @@ dependencies:
   - python=3.8
   - cudatoolkit
   - thrust
-  - pytorch==1.9.1
-  - torchvision==0.10.1
+  - pytorch
+  - torchvision
   - numpy
   - scikit-image
   - cmake
