@@ -60,15 +60,17 @@ async def home():
     return {"hello", "world"}
 
 
-if os.environ.get('CONNECTAI') == "True":
 
+
+if os.environ.get('CONNECTAI') == "True":
+    logging.info("Starting with AI Socket")
+    clip_class = Clip_Instance()
+    logging.info("Loaded Clip...")
     @app.websocket("/ws")
     async def websocket_endpoint(websocket: WebSocket):
-        logging.info("Connecting...")
-        clip_class = Clip_Instance()
         artefact_drawer = Drawer(clip_class, websocket)
         exemplar_drawers = [Drawer(clip_class, websocket, i) for i in range(4)]
-
+        logging.info("Connecting...")
         await websocket.accept()
         logging.info("Websocket Client Connected")
         try:
@@ -117,5 +119,5 @@ if os.environ.get('CONNECTAI') == "True":
 else:
     logging.info("Running without AI")
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# if __name__ == "__main__":
+#     uvicorn.run(app, host="0.0.0.0", port=8000)

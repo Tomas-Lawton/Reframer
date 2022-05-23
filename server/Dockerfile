@@ -44,5 +44,7 @@ RUN cd diffvg && \
 
 COPY src/ .
 EXPOSE 8080
-CMD ["python3", "main.py"]
+
+CMD ["uvicorn",  "main:app"]
+# CMD ["python3", "main.py"]
 
