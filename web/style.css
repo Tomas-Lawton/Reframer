@@ -8,13 +8,16 @@
 }
 
 
-/* 
-#right-background {
+/* Overrides */
+
+
+/* #right-background {
     display: none !important;
 }
 
 #left-background {
     width: 100% !important;
+    display: block;
 } */
 
 span {

@@ -3,6 +3,7 @@ from clip_instance import Clip_Instance
 
 import logging
 import os
+import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
@@ -118,5 +119,6 @@ if os.environ.get('CONNECTAI') == "True":
 else:
     logging.info("Running without AI")
 
-# if __name__ == "__main__":
-#     uvicorn.run(app, host="0.0.0.0", port=8000)
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

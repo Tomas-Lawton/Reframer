@@ -1,6 +1,6 @@
-// const ws = new WebSocket("ws://localhost:8000/ws");
 const http = "http://";
 const base = "0.0.0.0:8000";
+// const base = "aiappserver.herokuapp.com";
 // const base = "localhost:8000";
 const ws = new WebSocket("ws://" + base + "/ws");
 

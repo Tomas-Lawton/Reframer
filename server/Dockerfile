@@ -47,11 +47,11 @@ RUN cd diffvg && \
     python setup.py install
 
 COPY src/ .
-EXPOSE 8000
+# EXPOSE 8000
 RUN conda config --add channels conda-forge
 RUN conda install pytorch==1.9.1 torchvision==0.10.1
 RUN pip list
 RUN conda list
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-# CMD ["python3", "main.py"]
+# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python3", "main.py"]
 
