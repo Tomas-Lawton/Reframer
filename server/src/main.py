@@ -3,7 +3,6 @@ from clip_instance import Clip_Instance
 
 import logging
 import os
-import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient

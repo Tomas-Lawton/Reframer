@@ -43,8 +43,8 @@ RUN cd diffvg && \
     python setup.py install
 
 COPY src/ .
-EXPOSE 8080
+EXPOSE 8000
 
-CMD ["uvicorn",  "main:app"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
 # CMD ["python3", "main.py"]
 
