@@ -17,7 +17,7 @@ document.querySelectorAll(".swatch").forEach((elem) => {
 document.getElementById("delete").addEventListener("click", () =>
     openModal({
         title: "Clearing Canvas",
-        message: "Are you sure you want to delete your drawing? :(",
+        message: "Are you sure you want to delete your drawing?",
         confirmAction: () => {
             mainSketch.lastPrompt = null; //clear for draw (not redraw)
             // drawButton.innerHTML = "Draw";

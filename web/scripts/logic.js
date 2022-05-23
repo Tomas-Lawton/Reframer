@@ -51,7 +51,9 @@ const setActionUI = (state) => {
 
 const unpackGroup = () => {
     if (mainSketch.rotationGroup !== null) {
+        // Need to apply the group scale to the paths within the group
         mainSketch.rotationGroup.applyMatrix = true;
+        // how does scaling the group change the path children?
         userLayer.insertChildren(
             mainSketch.rotationGroup.index,
             mainSketch.rotationGroup.removeChildren()
@@ -141,12 +143,11 @@ const hideSelectUI = (includeTransform = true) => {
         mainSketch.boundingBox = null;
     }
     // hide ui
-    deleteHandler.style.display = "none";
-    // rotateSlider.style.display = "none";
-    initialiseHandler.style.display = "none";
     if (includeTransform) {
         transformControl.style.display = "none";
     }
+    deleteHandler.style.display = "none";
+    initialiseHandler.style.display = "none";
 };
 
 const updateRectBounds = (from, to) => {
@@ -154,6 +155,16 @@ const updateRectBounds = (from, to) => {
     mainSketch.boundingBox.strokeColor = "#D2D2D2";
     mainSketch.boundingBox.strokeWidth = 2;
     mainSketch.boundingBox.data.state = "resizing";
+    updateSelectPosition();
+};
+
+const updateSelectPosition = () => {
+    let uiOffset = deleteHandler.getBoundingClientRect().height / 2;
+    deleteHandler.style.left = mainSketch.boundingBox.bounds.topRight.x + "px";
+    initialiseHandler.style.left = mainSketch.boundingBox.bounds.topLeft.x + "px";
+    deleteHandler.style.top = mainSketch.boundingBox.bounds.top - uiOffset + "px";
+    initialiseHandler.style.top =
+        mainSketch.boundingBox.bounds.top - uiOffset + "px";
 };
 
 const updateSelectUI = () => {
@@ -163,42 +174,7 @@ const updateSelectUI = () => {
             initialiseHandler.style.display = "block";
         }
         transformControl.style.display = "flex";
-
-        // Large is applied to top for taller screen
-        const smallTopPadding =
-            containerRect.width < window.innerHeight ? 0 : padding;
-        const largeTopPadding =
-            containerRect.width < window.innerHeight ? largerPadding : 0;
-        // Large is applied to left for width screen
-        const smallLeftPadding =
-            containerRect.width < window.innerHeight ? padding : 0;
-        const largeLeftPadding =
-            containerRect.width < window.innerHeight ? 0 : largerPadding;
-
-        deleteHandler.style.left =
-            mainSketch.boundingBox.bounds.topRight.x +
-            largeLeftPadding +
-            smallLeftPadding +
-            "px";
-        initialiseHandler.style.left =
-            mainSketch.boundingBox.bounds.topLeft.x +
-            largeLeftPadding +
-            smallLeftPadding +
-            "px";
-        deleteHandler.style.bottom =
-            mainSketch.frameSize -
-            mainSketch.boundingBox.bounds.top +
-            smallTopPadding +
-            largeTopPadding -
-            deleteHandler.getBoundingClientRect().height / 2 +
-            "px";
-        initialiseHandler.style.bottom =
-            mainSketch.frameSize -
-            mainSketch.boundingBox.bounds.top +
-            smallTopPadding +
-            largeTopPadding -
-            initialiseHandler.getBoundingClientRect().height / 2 +
-            "px";
+        updateSelectPosition();
     }
 };
 
@@ -216,6 +192,7 @@ const deletePath = () => {
     if (mainSketch.boundingBox) {
         hideSelectUI();
     }
+    mainSketch.rotationGroup = null;
 };
 
 const stopClip = () => {
@@ -316,7 +293,9 @@ const showTraceHistoryFrom = (fromIndex) => {
 const moveSelecterTo = (elem) => {
     selectDot.style.left = elem.getBoundingClientRect().x + "px";
     selectDot.style.top = elem.getBoundingClientRect().y + "px";
-    let colorClass = elem.firstChild.nextElementSibling.classList[0];
+    // let colorClass = elem.firstChild.nextElementSibling.classList[0];
+
+    let colorClass = elem.nextElementSibling.classList[0];
     colorClass === undefined && (colorClass = "brush");
     selectDot.firstElementChild.firstElementChild.classList.remove(
         "brush",

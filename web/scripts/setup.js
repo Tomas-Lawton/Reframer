@@ -33,7 +33,6 @@ const controlPanel = document.getElementById("control-panel");
 const buttonPanel = document.getElementById("button-panel");
 const artControls = document.getElementById("art-panel");
 const penControls = document.getElementById("pen-controls");
-const selectControls = document.getElementById("select-controls");
 const message = document.getElementById("message");
 const palette = document.getElementById("palette");
 const timeKeeper = document.getElementById("time-slider");
@@ -58,16 +57,23 @@ const exemplarSize = document
 const containerRect = document
     .getElementById("contain-canvas")
     .getBoundingClientRect();
+
 const addExemplarButtons = document.querySelector(".add-exemplar");
 
 let largerPadding;
+// change to padding left and padding right
 if (containerRect.width > window.innerHeight) {
-    canvas.width = window.innerHeight - 2 * padding;
-    canvas.height = window.innerHeight - 2 * padding;
-    largerPadding = canvas.getBoundingClientRect().left;
+    canvas.width =
+        window.innerHeight - buttonPanel.getBoundingClientRect().height;
+    canvas.height =
+        window.innerHeight - buttonPanel.getBoundingClientRect().height;
+    largerPadding = canvas.getBoundingClientRect().left; // padding left
+    // paddingTop = 0
 } else {
-    canvas.height = containerRect.width - 2 * padding;
-    canvas.width = containerRect.width - 2 * padding;
+    canvas.height =
+        containerRect.width - buttonPanel.getBoundingClientRect().height;
+    canvas.width =
+        containerRect.width - buttonPanel.getBoundingClientRect().height;
     largerPadding = canvas.getBoundingClientRect().top;
 }
 

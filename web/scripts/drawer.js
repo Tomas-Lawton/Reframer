@@ -24,7 +24,6 @@ multiTool.onMouseDown = function(event) {
             if (!hitResult && !isInBounds) {
                 // outside bound + no path
                 unpackGroup();
-
                 userLayer.getItems().forEach((path) => {
                     path.selected = false;
                 });
@@ -48,18 +47,10 @@ multiTool.onMouseDown = function(event) {
                 let items = getSelectedPaths();
                 fitToSelection(items, "moving");
                 updateSelectUI();
-
-                // Revise this grouping logic
-                // creates a group which can be rotated and resets the slider
-                // rotation slider can then act on this group (not the paths inside it)
-                // group should be removed so the paths are flattened
                 //can't group on input because group must already be set. so the rotation is set non-functionally to the group
-
-                // GROUP ALSO NEEDED FOR CORRECT SCALING OF MULTIPLE ITEMS. ???
                 rotateSlider.value = 0;
                 let rotationGroup = new Group({ children: items });
                 rotationGroup.transformContent = false;
-                // rotationGroup.applyMatrix = true;
                 mainSketch.rotationGroup = rotationGroup;
             }
             break;
