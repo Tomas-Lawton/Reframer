@@ -40,9 +40,9 @@ const lossText = document.getElementById("rolling-loss");
 const setTraces = document.getElementById("num-traces");
 const selectDot = document.getElementById("contain-pen-dot");
 const opacitySlider = document.getElementById("opacity-slider");
+const stopButton = document.getElementById("stop");
 
 // Utility
-let step = 1;
 let doneTransform = 500;
 let myPath, erasePath, regionPath, tmpGroup, mask;
 

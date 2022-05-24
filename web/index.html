@@ -79,6 +79,9 @@
                     <i class="fa-solid fa-brain fa-fw"></i>
                     <p>Draw</p>
                 </div>
+                <div class="ai-action icon-outer-circle" id="lasso">
+                    <i class="region fa-solid fa-object-group fa-fw pen-mode"></i>
+                </div>
                 <div class="ai-action icon-outer-circle" id="generate">
                     <i class="fa-solid fa-border-all fa-fw"></i>
                     <p>Trial</p>
@@ -95,6 +98,9 @@
                     <i class="fa-solid fa-stop fa-fw"></i>
                     <p>Stop</p>
                 </div>
+                <div class="icon-outer-circle" id="settings">
+                    <i class="basic-grey fa-solid fa-cog fa-fw"></i>
+                </div>
             </div>
         </div>
 
@@ -106,9 +112,11 @@
         <div id="bar">
             <div id="top-buttons" class="button-container">
                 <i class="select fa-solid fa-arrow-pointer fa-fw pen-mode" id="select"></i>
+                <div class="icon-outer-circle" id="palette">
+                    <i class="palette fa-solid fa-palette fa-fw" id="palette"></i>
+                </div>
                 <i class="brush fa-solid fa-pen fa-fw pen-mode" id="pen"></i>
                 <i class="erase fa-solid fa-eraser fa-fw pen-mode" id="erase"></i>
-                <i class="region fa-solid fa-object-group fa-fw pen-mode" id="lasso"></i>
                 <div class="center">
                     <hr id="divider">
                 </div>
@@ -169,9 +177,6 @@
 
                     <div id="contain-dot">
                         <input type="range" id="time-slider" value="0" min="0" max="0">
-                        <div class="icon-outer-circle" id="palette">
-                            <i class="palette fa-solid fa-palette fa-fw"></i>
-                        </div>
                     </div>
                     <canvas id="canvas"></canvas>
                     <div id="transform-ui">
@@ -190,7 +195,7 @@
     </div>
 
     <div id="right-background">
-        <div id="describe-card">
+        <!-- <div id="describe-card">
             <div id="top-action">
                 <h1><span>Let's </span>Draw!</h1>
                 <div>
@@ -200,7 +205,7 @@
                 </div>
             </div>
             <div id="describe-top">
-                <!-- <div id="describe-actions">
+                <div id="describe-actions">
                     <div class="ai-action icon-outer-circle" id="draw">
                         <i class="fa-solid fa-brain fa-fw"></i>
                         <p>Draw</p>
@@ -221,9 +226,9 @@
                         <i class="fa-solid fa-stop fa-fw"></i>
                         <p>Stop</p>
                     </div>
-                </div> -->
+                </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- <div id="save-events">
             <i class="fa-solid fa-save fa-fw"></i>

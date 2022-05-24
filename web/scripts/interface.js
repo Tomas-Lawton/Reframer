@@ -264,7 +264,7 @@ actionControls[4].addEventListener("click", () => {
 });
 
 document.getElementById("use-squiggles").addEventListener("change", (event) => {
-    mainSketch.initRandomCurves = mainSketch.initRandomCurves;
+    mainSketch.initRandomCurves = !mainSketch.initRandomCurves;
     let container = document.getElementById("contain-num-squiggles");
     if (container.style.display === "none") {
         container.style.display = "contents";

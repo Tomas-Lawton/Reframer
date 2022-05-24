@@ -18,11 +18,13 @@ class SketchHandler {
 
         // Defaults
         this.strokeColor = "#181818";
-        this.strokeWidth = 12;
-        this.opacity = 0.75;
+        this.strokeWidth = 8;
+        this.opacity = 1;
         this.penMode = "pen";
         this.clipDrawing = false;
         this.maximumTraces = 1; // todo change
+        this.step = 1;
+        this.lastRollingLoss = 0;
 
         // TODO Refactor
         this.buttonControlLeft = true;
@@ -57,7 +59,7 @@ class SketchHandler {
             data: {
                 prompt: prompt,
                 svg: svg,
-                randomCurves: this.initRandomCurves ? this.numRandomCurves : 0,
+                random_curves: this.initRandomCurves ? this.numRandomCurves : 0,
                 frame_size: frameSize,
                 region: {
                     activate: hasRegion,
@@ -95,6 +97,7 @@ class SketchHandler {
             frameSize: this.frameSize,
             prompt: this.prompt,
         });
+        this.step = 1;
         this.clipDrawing = true;
         this.drawState = "active";
         setActionUI("active");
@@ -122,6 +125,7 @@ class SketchHandler {
         this.updateDrawer({
             status: "redraw",
         });
+        this.step = 1;
         this.clipDrawing = true;
         this.drawState = "active";
         setActionUI("active");
@@ -142,7 +146,7 @@ class SketchHandler {
         setActionUI("stop");
     }
     resetHistory() {
-        step = 0; // reset since not continuing
+        mainSketch.step = 1; // reset since not continuing
         mainSketch.stack.historyHolder = [{ svg: "" }];
         timeKeeper.style.width = "0";
         timeKeeper.setAttribute("max", "0");
@@ -189,15 +193,15 @@ const setActionUI = (state) => {
             actionControls[0].classList.add("inactive-action");
             actionControls[1].classList.add("inactive-action");
             // stop
-            actionControls[4].classList.remove("inactive-action");
-            actionControls[4].style.background = "#ff6060";
+            stopButton.classList.remove("inactive-action");
+            stopButton.style.background = "#ff6060";
             break;
         case "stop":
             // all possible
             actionControls.forEach((elem) =>
                 elem.classList.remove("inactive-action")
             );
-            actionControls[4].style.background = "#e1e1e1";
+            stopButton.style.background = "#e1e1e1";
             break;
     }
     mainSketch.drawState = state;
@@ -349,14 +353,6 @@ const deletePath = () => {
     mainSketch.rotationGroup = null;
 };
 
-const stopClip = () => {
-    ws.send(
-        JSON.stringify({
-            status: "stop",
-        })
-    );
-};
-
 // switchControls();
 
 const parseFromSvg = (svg) => {
@@ -368,19 +364,21 @@ const parseFromSvg = (svg) => {
         const child = paperObject.children[0].children[returnedIndex];
         child.smooth();
         // AI Stroke Effects
-        if (returnedIndex >= numPaths - 50) {
-            // console.log("AI Path: ", child);
-            child.opacity = 0.5;
+        if (mainSketch.initRandomCurves) {
+            if (returnedIndex >= numPaths - mainSketch.numRandomCurves) {
+                // console.log("AI Path: ", child);
+                child.opacity = 0.5;
 
-            // const pathEffect = child.clone({ insert: false });
-            // userLayer.addChild(pathEffect);
+                // const pathEffect = child.clone({ insert: false });
+                // userLayer.addChild(pathEffect);
 
-            // // pathEffect.position.y += 100;
-            // // pathEffect.strokeColor = "#FFFF00";
-            // pathEffect.mainSketch.opacity = 0.8;
-            // pathEffect.mainSketch.strokeWidth = mainSketch.strokeWidth * 2;
-            // userLayer.addChild(pathEffect);
-            // try mainSketch.opacity
+                // // pathEffect.position.y += 100;
+                // // pathEffect.strokeColor = "#FFFF00";
+                // pathEffect.mainSketch.opacity = 0.8;
+                // pathEffect.mainSketch.strokeWidth = mainSketch.strokeWidth * 2;
+                // userLayer.addChild(pathEffect);
+                // try mainSketch.opacity
+            }
         }
 
         const pathEffect = child.clone({ insert: false });
@@ -424,7 +422,6 @@ const calcRollingLoss = () => {
             0
         );
         const newRollingLoss = sum / items.length;
-        lossText.innerHTML = `Rolling loss: ${newRollingLoss}`;
         // if (mainSketch.lastRollingLoss !== undefined) {
         //     if (Math.abs(mainSketch.lastRollingLoss - newRollingLoss) < 0.0001) {
         //         lossText.innerHTML = `Converged at: ${newRollingLoss}`;
@@ -494,10 +491,10 @@ ws.onmessage = function(event) {
             }
             mainSketch.stack.historyHolder.push(result);
             timeKeeper.style.width = "100%";
-            timeKeeper.setAttribute("max", String(step));
-            timeKeeper.value = String(step);
-            setTraces.setAttribute("max", String(step));
-            step += 1; //avoid disconnected iteration after stopping
+            timeKeeper.setAttribute("max", String(mainSketch.step));
+            timeKeeper.value = String(mainSketch.step);
+            setTraces.setAttribute("max", String(mainSketch.step));
+            mainSketch.step += 1; //avoid disconnected iteration after stopping
 
             mainSketch.lastRender = parseFromSvg(result.svg);
 
@@ -508,6 +505,10 @@ ws.onmessage = function(event) {
             }
 
             calcRollingLoss();
+            lossText.innerHTML = `Step: ${
+        mainSketch.step
+      }\nLoss: ${mainSketch.lastRollingLoss.toPrecision(5)}`;
+
             console.log(
                 `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`
             );
