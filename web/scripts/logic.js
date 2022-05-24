@@ -505,9 +505,11 @@ ws.onmessage = function(event) {
             }
 
             calcRollingLoss();
-            lossText.innerHTML = `Step: ${
-        mainSketch.step
-      }\nLoss: ${mainSketch.lastRollingLoss.toPrecision(5)}`;
+            lossText.innerHTML = `Step: ${mainSketch.step - 1}\nLoss: ${
+        mainSketch.lastRollingLoss > 0
+          ? mainSketch.lastRollingLoss.toPrecision(5)
+          : 0
+      }`;
 
             console.log(
                 `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`

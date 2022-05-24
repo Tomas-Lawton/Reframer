@@ -257,7 +257,7 @@ actionControls[3].addEventListener("click", () => {
         mainSketch.continue();
     }
 });
-actionControls[4].addEventListener("click", () => {
+stopButton.addEventListener("click", () => {
     if (mainSketch.drawState === "active") {
         mainSketch.stop();
     }
