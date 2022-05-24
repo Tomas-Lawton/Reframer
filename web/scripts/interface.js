@@ -24,6 +24,7 @@ document.getElementById("delete").addEventListener("click", () =>
             userLayer.clear();
             // prompt.value = "";
             modal.style.display = "none";
+            updateSelectUI();
         },
     })
 );
