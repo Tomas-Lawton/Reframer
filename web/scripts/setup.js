@@ -3,6 +3,9 @@ const base = "0.0.0.0:8000";
 // const base = "aiappserver.herokuapp.com";
 // const base = "localhost:8000";
 const ws = new WebSocket("ws://" + base + "/ws");
+ws.onclose = (event) => {
+    console.log("Closed socket... Running without AI\n" + event);
+};
 
 const showAI = true;
 
@@ -22,6 +25,8 @@ const aiCard = document.getElementById("describe-card");
 // Select UI
 const deleteHandler = document.getElementById("delete-handler");
 const rotateSlider = document.getElementById("rotate-slider");
+const rotateNumber = document.getElementById("rotate-number");
+
 const scaleSlider = document.getElementById("scale-slider");
 const initialiseHandler = document.getElementById("initialise-handler");
 const transformControl = document.getElementById("transform-ui");

@@ -28,7 +28,6 @@ class SketchHandler {
 
         // TODO Refactor
         this.buttonControlLeft = true;
-        this.showTraces = true;
 
         // User Initialised
         this.drawRegion = null;
@@ -50,7 +49,6 @@ class SketchHandler {
         this.stack = new SimpleStack();
     }
     updateDrawer({ status, svg, hasRegion, frameSize, prompt }) {
-        timeKeeper.style.visibility = "visible";
         mainSketch.isFirstIteration = true; //reset canvas
         const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
         mainSketch.lastPrompt = prompt;
@@ -140,6 +138,10 @@ class SketchHandler {
         setActionUI("active");
     }
     stop() {
+        if (this.drawState === "active") {
+            timeKeeper.style.visibility = "visible";
+        }
+
         this.updateDrawer({ status: "stop" });
         this.clipDrawing = false;
         this.drawState = "stop";
@@ -357,7 +359,6 @@ const deletePath = () => {
 
 const parseFromSvg = (svg) => {
     if (svg === "") return null;
-    userLayer.clear();
     let paperObject = userLayer.importSVG(svg);
     const numPaths = paperObject.children[0].children.length;
     for (const returnedIndex in paperObject.children[0].children) {
@@ -404,9 +405,6 @@ const getHistoryBatch = (maxSize, startIdx) => {
     for (let i = 0; i < batchSize; i++) {
         traceList.push(mainSketch.stack.historyHolder[startIdx - i - 1]);
     }
-    console.log(mainSketch.stack.historyHolder);
-    console.log(batchSize);
-    console.log(traceList);
     return traceList;
 };
 
@@ -433,12 +431,16 @@ const calcRollingLoss = () => {
 };
 
 const showTraceHistoryFrom = (fromIndex) => {
-    const items = getHistoryBatch(setTraces.value, fromIndex);
-    let refList = [];
-    for (let pastGen of items) {
-        refList.push(parseFromSvg(pastGen.svg));
+    const items = getHistoryBatch(mainSketch.numTraces, fromIndex);
+    if (items) {
+        mainSketch.traces = null;
+        let refList = [];
+        for (let pastGen of items) {
+            userLayer.importSVG(pastGen.svg);
+            refList.push(parseFromSvg(pastGen.svg));
+        }
+        mainSketch.traces = refList;
     }
-    mainSketch.traces = refList;
 };
 
 const moveSelecterTo = (elem) => {
@@ -496,12 +498,15 @@ ws.onmessage = function(event) {
             setTraces.setAttribute("max", String(mainSketch.step));
             mainSketch.step += 1; //avoid disconnected iteration after stopping
 
-            mainSketch.lastRender = parseFromSvg(result.svg);
-
             // To do change this so it is just max num mainSketch.traces
-            if (mainSketch.showTraces > 1) {
+            if (mainSketch.numTraces > 1) {
                 // setTraces.value = String(step);
+                // getHistoryBatch
+                userLayer.clear();
                 showTraceHistoryFrom(mainSketch.stack.historyHolder.length - 1);
+            } else {
+                userLayer.clear();
+                mainSketch.lastRender = parseFromSvg(result.svg);
             }
 
             calcRollingLoss();
@@ -535,6 +540,20 @@ const setPenMode = (mode, accentTarget) => {
     mainSketch.penMode = mode;
 
     switch (mainSketch.penMode) {
+        case "pen-drop":
+            let dropdown = document.getElementById("pen-dropdown");
+            if (dropdown.style.display === "none") {
+                dropdown.style.display = "flex";
+                let penButton = document
+                    .getElementById("pen-drop")
+                    .getBoundingClientRect();
+                let bar = buttonPanel.getBoundingClientRect();
+                dropdown.style.top = bar.bottom + "px";
+                dropdown.style.left = penButton.left + penButton.width / 2 + "px";
+            } else {
+                dropdown.style.display = "none";
+            }
+            break;
         case "erase":
             eraseTool.activate();
             moveSelecterTo(accentTarget);

@@ -49,6 +49,7 @@ multiTool.onMouseDown = function(event) {
                 updateSelectUI();
                 //can't group on input because group must already be set. so the rotation is set non-functionally to the group
                 rotateSlider.value = 0;
+                rotateNumber.value = 0;
                 let rotationGroup = new Group({ children: items });
                 rotationGroup.transformContent = false;
                 mainSketch.rotationGroup = rotationGroup;

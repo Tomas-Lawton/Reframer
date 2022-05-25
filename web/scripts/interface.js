@@ -186,6 +186,15 @@ rotateSlider.oninput = function() {
     updateSelectUI();
 };
 
+rotateNumber.oninput = function() {
+    hideSelectUI(false);
+    let r = this.value;
+    mainSketch.rotationGroup.rotation = r;
+    let items = getSelectedPaths();
+    fitToSelection(items, "rotating");
+    updateSelectUI();
+};
+
 scaleSlider.oninput = function() {
     // if (mainSketch.boundingBox.data.state === "rotating") {
     hideSelectUI(false);
@@ -220,9 +229,10 @@ timeKeeper.oninput = function() {
     if (this.value === 0) return; // 0 is pre-generation state
     historyIndex = this.value;
     userLayer.clear();
-    if (mainSketch.showTraces) {
+    if (mainSketch.numTraces > 1) {
         showTraceHistoryFrom(historyIndex);
     } else {
+        userLayer.clear();
         let svg = mainSketch.stack.historyHolder[historyIndex].svg;
         parseFromSvg(svg);
     }
@@ -263,18 +273,91 @@ stopButton.addEventListener("click", () => {
     }
 });
 
-document.getElementById("use-squiggles").addEventListener("change", (event) => {
-    mainSketch.initRandomCurves = !mainSketch.initRandomCurves;
-    let container = document.getElementById("contain-num-squiggles");
-    if (container.style.display === "none") {
-        container.style.display = "contents";
-    } else {
-        container.style.display = "none";
+artControls.onmousedown = (e) => {
+    let content;
+    document.querySelectorAll(".tab-item").forEach((tab) => {
+        if (tab.classList.contains("active-tab")) {
+            if (tab.id === "collab-tab") {
+                content = document.getElementById("ai-content");
+            } else {
+                content = document.getElementById("style-content");
+            }
+        }
+    });
+    let bounds = content.getBoundingClientRect();
+    e = e || window.event;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    if (
+        pos3 < bounds.left ||
+        pos3 > bounds.right ||
+        pos4 < bounds.top ||
+        pos4 > bounds.bottom
+    ) {
+        console.log("moving");
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
     }
+};
+
+function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    artControls.style.top = artControls.offsetTop - pos2 + "px";
+    artControls.style.left = artControls.offsetLeft - pos1 + "px";
+}
+
+function closeDragElement() {
+    document.onmouseup = null;
+    document.onmousemove = null;
+}
+
+document.querySelectorAll(".tab-item").forEach((tab) => {
+    tab.addEventListener("click", () => {
+        if (!tab.classList.contains("active-tab")) {
+            document
+                .querySelectorAll(".tab-item")
+                .forEach((tabItem) => tabItem.classList.toggle("active-tab"));
+
+            if (tab.id == "style-tab") {
+                document.getElementById("style-content").parentElement.style.display =
+                    "block";
+                document.getElementById("ai-content").parentElement.style.display =
+                    "none";
+            } else {
+                document.getElementById("style-content").parentElement.style.display =
+                    "none";
+                document.getElementById("ai-content").parentElement.style.display =
+                    "block";
+            }
+        }
+    });
 });
+
+// document.getElementById("use-squiggles").addEventListener("change", (event) => {
+//     mainSketch.initRandomCurves = !mainSketch.initRandomCurves;
+//     let container = document.getElementById("contain-num-squiggles");
+//     if (container.style.display === "none") {
+//         container.style.display = "contents";
+//     } else {
+//         container.style.display = "none";
+//     }
+// });
 
 document.getElementById("num-squiggles").oninput = function() {
     mainSketch.numRandomCurves = parseInt(this.value);
+};
+
+document.getElementById("num-traces").oninput = function() {
+    mainSketch.numTraces = parseInt(this.value);
+};
+
+document.getElementById("set-background").onclick = function() {
+    canvas.style.backgroundColor = mainSketch.strokeColor;
 };
 
 // LOAD UI
@@ -293,22 +376,22 @@ document.getElementById("num-squiggles").oninput = function() {
 // partial.getItems().forEach((path) => userLayer.addChild(path));
 // partial.remove();
 
-if (window.innerWidth <= 990) {
-    document
-        .querySelector("body")
-        .prepend(document.getElementById("contain-dot"));
-    document.querySelector("body").prepend(aiCard);
+// if (window.innerWidth <= 990) {
+//     document
+//         .querySelector("body")
+//         .prepend(document.getElementById("contain-dot"));
+//     document.querySelector("body").prepend(aiCard);
 
-    document.querySelector("body").prepend(artControls);
-    document
-        .getElementById("right-background")
-        .prepend(document.getElementById("moodboard-header"));
-} else {
-    setPenMode("pen", document.getElementById("pen"));
-    if (!showAI) {
-        document.getElementById("left-background").style.width = "100%";
-    }
-}
+//     document.querySelector("body").prepend(artControls);
+//     document
+//         .getElementById("right-background")
+//         .prepend(document.getElementById("moodboard-header"));
+// } else {
+//     setPenMode("pen", document.getElementById("pen"));
+//     if (!showAI) {
+//         document.getElementById("left-background").style.width = "100%";
+//     }
+// }
 
 const picker = new Picker({
     parent: document.getElementById("color-picker"),
