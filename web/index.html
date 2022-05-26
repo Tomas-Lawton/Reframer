@@ -50,8 +50,6 @@
         <hr />
         <!-- <label>Use advanced prompts</label>
         <input id="advanced-prompts" type="checkbox"> -->
-        <!-- <label>Include Random Curves</label>
-        <input id="use-squiggles" type="checkbox" checked> -->
         <label>Trace History (default: 1)</label>
         <input id="num-traces" type="number" min="1" value="1" max="5">
     </div>
@@ -72,30 +70,22 @@
         </div>
     </div>
 
-    <div id="contain-pen-dot">
-        <div id="penmode-outer-circle">
-            <div id="penmode-inner-circle"></div>
-        </div>
+    <div class="top-action">
+        <i class="select fa-solid fa-arrow-pointer fa-fw pen-mode" id="select"></i>
+        <i class="brush fa-solid fa-pen fa-fw pen-mode" id="pen-drop"></i>
+        <!-- <i class="fa-solid fa-sliders fa-fw" id="palette"></i> -->
+        <i class="undo fa-solid fa-rotate-left fa-fw" id="undo"></i>
+        <i class="redo fa-solid fa-rotate-right fa-fw" id="redo"></i>
     </div>
 
+    <div class="top-action" id="top-action-right">
+        <i class="trash fa-solid fa-trash fa-fw" id="delete"></i>
+        <i class="save fa-solid fa-save fa-fw" id="save"></i>
+        <i class="fa-solid fa-cog fa-fw" id="settings"></i>
+    </div>
     <!-- <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i> -->
 
     <div id="content">
-        <div id="button-panel">
-            <div id="top-left">
-                <i class="select fa-solid fa-arrow-pointer fa-fw pen-mode" id="select"></i>
-                <i class="brush fa-solid fa-pen fa-fw pen-mode" id="pen-drop"></i>
-                <!-- <i class="region fa-solid fa-object-group fa-fw  pen-mode" id="lasso"></i>
-                <i class="erase fa-solid fa-eraser fa-fw pen-mode" id="erase"></i> -->
-                <i class="fa-solid fa-sliders fa-fw" id="palette"></i>
-                <i class="redo fa-solid fa-rotate-right fa-fw" id="redo"></i>
-                <i class="undo fa-solid fa-rotate-left fa-fw" id="undo"></i>
-                <i class="trash fa-solid fa-trash fa-fw" id="delete"></i>
-            </div>
-            <!-- <label>Add</label> -->
-            <!-- <p>At least 600px width for AI controls.</p> -->
-        </div>
-
         <div id="sketch-view">
             <div id="art-panel">
                 <div id="tabs">
@@ -119,37 +109,19 @@
 
                         <div id="prompt-input">
                             <i class="fas fa-comment"></i>
-                            <input type="text" id="messageText" placeholder="Sketch of a majestic rainbow unicorn..." />
+                            <input type="text" id="messageText" placeholder="A majestic rainbow unicorn..." />
                         </div>
 
                         <div>
-                            <h3 class="sub-heading">Mode</h3>
+                            <div class="flex">
+                                <h3 class="sub-heading">Mode</h3>
+                                <div id="contain-num-squiggles">
+                                    <label>Add lines:</label>
+                                    <input id="num-squiggles" type="number" min="1" value="32" max="100">
+                                </div>
+                            </div>
                             <hr />
                             <div id="set-modes">
-                                <!-- <div id="describe-actions">
-                            <div class="ai-action icon-outer-circle" id="draw">
-                                <i class="fa-solid fa-marker fa-fw"></i>
-                                <p>Draw</p>
-                            </div>
-                            <div class="ai-action icon-outer-circle" id="generate">
-                                <i class="fa-solid fa-lightbulb fa-fw"></i>
-                                <p>Trial</p>
-                            </div>
-                            <div class="ai-action icon-outer-circle" id="redraw">
-                                <i class="fa-solid fa-repeat fa-fw"></i>
-                                <p>Redraw</p>
-                            </div>
-                            <div class="ai-action icon-outer-circle" id="continue">
-                                <i class="fa-solid fa-arrow-right fa-fw"></i>
-                                <p>Continue</p>
-                            </div>
-                            <div class="ai-action icon-outer-circle stop-action" id="stop">
-                                <i class="fa-solid fa-stop fa-fw"></i>
-                                <p>Stop</p>
-                            </div>
-                        </div>  -->
-
-
                                 <div class="ai-action mode" id="draw">
                                     <i class="fa-solid fa-marker fa-fw"></i>
                                     <p>Draw</p>
@@ -162,25 +134,26 @@
                                     <i class="fa-solid fa-lightbulb fa-fw"></i>
                                     <p>Brainstorm</p>
                                 </div>
+                                <div class="ai-action stop-action" id="stop">
+                                    <i class="fa-solid fa-stop fa-fw"></i>
+                                    <p>Stop</p>
+                                </div>
                             </div>
-                            <div class="ai-action icon-outer-circle stop-action" id="stop">
+                            <!-- <div class="ai-action icon-outer-circle stop-action" id="stop">
                                 <i class="fa-solid fa-stop fa-fw"></i>
                                 <p>Stop</p>
-                            </div>
+                            </div> -->
                         </div>
 
                         <div class="hide">
-                            <h3>Revise</h3>
+                            <h3 class="sub-heading">Revise</h3>
                             <hr />
-                            <div id="revise-controls">
+                            <div id="refine-controls">
                                 <div class="ai-action " id="go-back">
                                     <i class="fa-solid fa-arrow-left-long fa-fw"></i>
                                     <p>Back</p>
-                                    <div id="contain-num-squiggles">
-                                        <label>ADD</label>
-                                        <!-- <i class="region fa-solid fa-plus fa-fw"></i> -->
-                                        <input id="num-squiggles" type="number" min="1" value="32" max="100">
-                                    </div>
+                                    <!-- <label>Include Random Curves</label>
+        <input id="use-squiggles" type="checkbox" checked> -->
                                 </div>
                                 <div class="ai-action " id="redraw">
                                     <i class="fa-solid fa-repeat fa-fw"></i>
@@ -223,22 +196,6 @@
                                     <input type="range" id="opacity-slider" value="75" min="0" max="100">
                                     <p>Line Width</p>
                                     <input type="range" id="width-slider" value="12" min="1" max="40">
-
-                                    <div id="transform-ui">
-                                        <div class="transformer">
-                                            <div class="number-input">
-                                                <p>Rotate</p>
-                                                <input type="number" id="rotate-number" value="0" min="-180" max="180" step="1">
-                                            </div>
-                                            <div id="rotate-handler">
-                                                <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
-                                            </div>
-                                        </div>
-                                        <p>Scale</p>
-                                        <div id="scale-handler">
-                                            <input type="range" id="scale-slider" value="15" min="1" max="20">
-                                        </div>
-                                    </div>
                                 </div>
                                 <div id="art-control-final">
                                     <div id="stroke-dot">
@@ -247,6 +204,21 @@
                                     <div id="pen-color" class="off-black"></div>
                                 </div>
                                 <p id="set-background">Set background</p>
+                                <div id="transform-ui">
+                                    <div class="transformer">
+                                        <div class="number-input">
+                                            <p>Rotate</p>
+                                            <input type="number" id="rotate-number" value="0" min="-180" max="180" step="1">
+                                        </div>
+                                        <div id="rotate-handler">
+                                            <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
+                                        </div>
+                                    </div>
+                                    <p>Scale</p>
+                                    <div id="scale-handler">
+                                        <input type="range" id="scale-slider" value="15" min="1" max="20">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -276,54 +248,9 @@
                 </div>
             </div>
         </div>
-        <div id="bar">
-            <div id="bottom-buttons" class="button-container">
-                <div class="center">
-                    <hr id="divider">
-                </div>
-                <i class="save fa-solid fa-save fa-fw" id="save"></i>
-                <i class="fa-solid fa-cog fa-fw" id="settings"></i>
-            </div>
-        </div>
-
     </div>
 
     <div id="right-background">
-        <!-- <div id="describe-card">
-            <div id="top-action">
-                <h1><span>Let's </span>Draw!</h1>
-                <div>
-                    <div class="icon-outer-circle" id="settings">
-                        <i class="basic-grey fa-solid fa-cog fa-fw"></i>
-                    </div>
-                </div>
-            </div>
-            <div id="describe-top">
-                <div id="describe-actions">
-                    <div class="ai-action icon-outer-circle" id="draw">
-                        <i class="fa-solid fa-brain fa-fw"></i>
-                        <p>Draw</p>
-                    </div>
-                    <div class="ai-action icon-outer-circle" id="generate">
-                        <i class="fa-solid fa-border-all fa-fw"></i>
-                        <p>Trial</p>
-                    </div>
-                    <div class="ai-action icon-outer-circle" id="redraw">
-                        <i class="fa-solid fa-repeat fa-fw"></i>
-                        <p>Redraw</p>
-                    </div>
-                    <div class="ai-action icon-outer-circle" id="continue">
-                        <i class="fa-solid fa-arrow-right fa-fw"></i>
-                        <p>Continue</p>
-                    </div>
-                    <div class="ai-action icon-outer-circle stop-action" id="stop">
-                        <i class="fa-solid fa-stop fa-fw"></i>
-                        <p>Stop</p>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-
         <!-- <div id="save-events">
             <i class="fa-solid fa-save fa-fw"></i>
             <p>Save</p>

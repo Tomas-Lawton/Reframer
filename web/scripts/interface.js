@@ -238,41 +238,68 @@ timeKeeper.oninput = function() {
     }
 };
 
-palette.addEventListener("click", () => {
-    toggleArtControls();
-});
+// palette.addEventListener("click", () => {
+//     toggleArtControls();
+// });
 
 prompt.addEventListener("input", (e) => {
     mainSketch.prompt = e.target.value;
 });
 
-// Action controls
+// AI Actions
+
+// Draw
 actionControls[0].addEventListener("click", () => {
     if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
         mainSketch.draw();
     }
 });
+
+// Revise
+actionControls[1].addEventListener("click", () => {
+    console.log("revise");
+    if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
+        mainSketch.draw(null, null, true);
+    }
+});
+
+// Trial / Brainstorm
 actionControls[1].addEventListener("click", () => {
     if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
         mainSketch.generate();
     }
 });
-actionControls[2].addEventListener("click", () => {
-    if (mainSketch.drawState === "stop") {
-        mainSketch.redraw();
-    }
-});
-actionControls[3].addEventListener("click", () => {
-    if (mainSketch.drawState === "stop") {
-        mainSketch.continue();
-    }
-});
+
+// Stop
 stopButton.addEventListener("click", () => {
     if (mainSketch.drawState === "active") {
         mainSketch.stop();
     }
 });
 
+// AI Revise
+
+// Continue
+actionControls[4].addEventListener("click", () => {
+    if (mainSketch.drawState === "stop") {
+        mainSketch.goBack();
+    }
+});
+
+// Redraw
+actionControls[5].addEventListener("click", () => {
+    if (mainSketch.drawState === "stop") {
+        mainSketch.redraw();
+    }
+});
+// Contine
+actionControls[6].addEventListener("click", () => {
+    if (mainSketch.drawState === "stop") {
+        mainSketch.continue();
+    }
+});
+
+// Control panel
 artControls.onmousedown = (e) => {
     let content;
     document.querySelectorAll(".tab-item").forEach((tab) => {

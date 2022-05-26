@@ -25,6 +25,7 @@ class SketchHandler {
         this.maximumTraces = 1; // todo change
         this.step = 1;
         this.lastRollingLoss = 0;
+        this.linesDisabled = false;
 
         // TODO Refactor
         this.buttonControlLeft = true;
@@ -48,7 +49,7 @@ class SketchHandler {
         // Undo/redo stack
         this.stack = new SimpleStack();
     }
-    updateDrawer({ status, svg, hasRegion, frameSize, prompt }) {
+    updateDrawer({ status, svg, hasRegion, frameSize, prompt, lines }) {
         mainSketch.isFirstIteration = true; //reset canvas
         const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
         mainSketch.lastPrompt = prompt;
@@ -57,7 +58,7 @@ class SketchHandler {
             data: {
                 prompt: prompt,
                 svg: svg,
-                random_curves: this.initRandomCurves ? this.numRandomCurves : 0,
+                random_curves: lines,
                 frame_size: frameSize,
                 region: {
                     activate: hasRegion,
@@ -80,7 +81,7 @@ class SketchHandler {
         ws.send(JSON.stringify(res));
         console.log(res);
     }
-    draw(withRegion = false, svg = null) {
+    draw(withRegion = false, svg = null, disableLines = false) {
         if (noPrompt()) {
             openModal({
                 title: "Type a prompt first!",
@@ -88,12 +89,18 @@ class SketchHandler {
             });
             return;
         }
+        mainSketch.linesDisabled = disableLines;
         this.updateDrawer({
             status: "draw",
             svg: svg || this.svg,
             hasRegion: withRegion,
             frameSize: this.frameSize,
             prompt: this.prompt,
+            lines: disableLines ?
+                0 :
+                this.initRandomCurves ?
+                this.numRandomCurves :
+                0,
         });
         this.step = 1;
         this.clipDrawing = true;
@@ -114,6 +121,7 @@ class SketchHandler {
             hasRegion: false,
             frameSize: exemplarSize,
             prompt: this.prompt,
+            lines: this.initRandomCurves ? this.numRandomCurves : 0,
         });
         this.clipDrawing = true;
         this.drawState = "active";
@@ -365,7 +373,7 @@ const parseFromSvg = (svg) => {
         const child = paperObject.children[0].children[returnedIndex];
         child.smooth();
         // AI Stroke Effects
-        if (mainSketch.initRandomCurves) {
+        if (mainSketch.initRandomCurves && !mainSketch.linesDisabled) {
             if (returnedIndex >= numPaths - mainSketch.numRandomCurves) {
                 // console.log("AI Path: ", child);
                 child.opacity = 0.5;

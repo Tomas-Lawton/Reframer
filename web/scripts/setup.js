@@ -65,21 +65,12 @@ const containerRect = document
 
 const addExemplarButtons = document.querySelector(".add-exemplar");
 
-let largerPadding;
-// change to padding left and padding right
 if (containerRect.width > window.innerHeight) {
-    canvas.width =
-        window.innerHeight - buttonPanel.getBoundingClientRect().height;
-    canvas.height =
-        window.innerHeight - buttonPanel.getBoundingClientRect().height;
-    largerPadding = canvas.getBoundingClientRect().left; // padding left
-    // paddingTop = 0
+    canvas.width = window.innerHeight;
+    canvas.height = window.innerHeight;
 } else {
-    canvas.height =
-        containerRect.width - buttonPanel.getBoundingClientRect().height;
-    canvas.width =
-        containerRect.width - buttonPanel.getBoundingClientRect().height;
-    largerPadding = canvas.getBoundingClientRect().top;
+    canvas.height = containerRect.width;
+    canvas.width = containerRect.width;
 }
 
 const scaleRatio = canvas.width / exemplarSize;
