@@ -58,28 +58,24 @@
     <div id="pen-dropdown">
         <div class="simple-drop pen-mode" id="pen">
             <div>
-                <!-- <i class="fa-solid fa-fw fa-check"></i> -->
                 <i class="brush fa-solid fa-pen fa-fw"></i>
             </div>
             <p>Pen</p>
         </div>
         <div class="simple-drop pen-mode" id="erase">
             <div>
-                <!-- <i class="fa-solid fa-fw fa-check"></i> -->
                 <i class="erase fa-solid fa-eraser fa-fw"></i>
             </div>
             <p>Erase</p>
         </div>
-        <div class="simple-drop pen-mode" id="erase">
+        <!-- <div class="simple-drop pen-mode" id="erase">
             <div>
-                <!-- <i class="fa-solid fa-fw fa-check"></i> -->
                 <i class="erase fa-solid fa-circle-notch fa-fw"></i>
             </div>
             <p>Tidy</p>
-        </div>
+        </div> -->
         <div class="simple-drop pen-mode" id="lasso">
             <div>
-                <!-- <i class="fa-solid fa-fw fa-check"></i> -->
                 <i class="region fa-solid fa-object-group fa-fw"></i>
             </div>
             <p>AI Zone</p>
@@ -87,11 +83,11 @@
     </div>
 
     <div class="top-action">
-        <i class="select fa-solid fa-arrow-pointer fa-fw pen-mode" id="select"></i>
+        <i class="select fa-solid fa-arrow-pointer fa-fw pen-mode simple-hover" id="select"></i>
         <i class="brush fa-solid fa-pen fa-fw pen-mode" id="pen-drop"></i>
-        <!-- <i class="fa-solid fa-sliders fa-fw" id="palette"></i> -->
-        <i class="undo fa-solid fa-rotate-left fa-fw" id="undo"></i>
-        <i class="redo fa-solid fa-rotate-right fa-fw" id="redo"></i>
+        <i class="undo fa-solid fa-rotate-left fa-fw simple-hover" id="undo"></i>
+        <i class="redo fa-solid fa-rotate-right fa-fw simple-hover" id="redo"></i>
+        <i class="fa-solid fa-sliders fa-fw" id="palette"></i>
     </div>
 
     <div class="top-action" id="top-action-right">
@@ -119,7 +115,7 @@
                             <!-- <i class="fa-solid fa-robot space"></i> -->
                             Sketch-bot
                         </h1>
-                        <h2 class="panel-subtitle typed-out">What are we drawing?</h2>
+                        <h2 class="panel-subtitle">What shall we draw together?</h2>
                     </div>
                     <div id="spinner">
                         <i class="fa-solid fa-spinner button-animation " id="loading"></i>
@@ -127,7 +123,7 @@
                 </div>
 
                 <div id="prompt-input">
-                    <i class="fas fa-comment"></i>
+                    <i class="fas fa-robot"></i>
                     <input type="text" id="messageText" placeholder="A majestic rainbow unicorn..." />
                 </div>
 
@@ -158,31 +154,31 @@
                             <p>Stop</p>
                         </div>
                     </div>
-                    <!-- <div class="ai-action icon-outer-circle stop-action" id="stop">
-                        <i class="fa-solid fa-stop fa-fw"></i>
-                        <p>Stop</p>
-                    </div> -->
-                </div>
 
-                <div class="hide">
-                    <h3 class="sub-heading">Revise</h3>
-                    <hr />
-                    <div id="refine-controls">
-                        <div class="ai-action " id="go-back">
-                            <i class="fa-solid fa-arrow-left-long fa-fw"></i>
-                            <p>Back</p>
-                            <!-- <label>Include Random Curves</label>
+                    <div id="contain-dot">
+                        <h3 class="sub-heading">Revise</h3>
+                        <hr />
+                        <div id="refine-controls">
+                            <div class="ai-action " id="go-back">
+                                <i class="fa-solid fa-arrow-left-long fa-fw"></i>
+                                <p>Back</p>
+                                <!-- <label>Include Random Curves</label>
 <input id="use-squiggles" type="checkbox" checked> -->
+                            </div>
+                            <div class="ai-action " id="redraw">
+                                <i class="fa-solid fa-repeat fa-fw"></i>
+                                <p>Redraw</p>
+                            </div>
+                            <div class="ai-action " id="continue">
+                                <i class="fa-solid fa-arrow-right-long fa-fw"></i>
+                                <p>Continue</p>
+                            </div>
                         </div>
-                        <div class="ai-action " id="redraw">
-                            <i class="fa-solid fa-repeat fa-fw"></i>
-                            <p>Redraw</p>
-                        </div>
-                        <div class="ai-action " id="continue">
-                            <i class="fa-solid fa-arrow-right-long fa-fw"></i>
-                            <p>Continue</p>
-                        </div>
+                        <p id="rolling-loss"></p>
+                        <input type="range" id="time-slider" value="0" min="0" max="0">
                     </div>
+
+
                 </div>
             </div>
         </div>
@@ -260,15 +256,11 @@
                             <i class="basic-grey fa-solid fa-brain fa-fw"></i>
                         </div>
                     </div>
-
-                    <div id="contain-dot">
-                        <input type="range" id="time-slider" value="0" min="0" max="0">
-                    </div>
-                    <canvas id="canvas"></canvas>
-                    <p id="rolling-loss"></p>
                 </div>
+                <canvas id="canvas"></canvas>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- <div id="save-events">

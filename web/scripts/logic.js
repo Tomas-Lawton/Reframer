@@ -39,6 +39,7 @@ class SketchHandler {
 
         // User Initialised
         this.drawRegion = null;
+        this.selectionBox = null;
         this.lastRender = null;
         this.lastPrompt = null;
         this.isFirstIteration = null;
@@ -228,8 +229,11 @@ const setActionUI = (state) => {
 
         document.getElementById("spinner").style.display = "none";
 
-        aiMessage.innerHTML = "I'm Stopping! \nWhat can I draw next?";
+        aiMessage.innerHTML = "I'm stopping! \nWhat can I draw next?";
         aiMessage.classList.add("typed-out");
+
+        // timeKeeper
+        document.getElementById("contain-dot").style.display = "flex";
     }
     mainSketch.drawState = state;
 };
@@ -263,13 +267,10 @@ const getSelectedPaths = () =>
     userLayer.getItems().filter((path) => path.selected);
 
 const toggleArtControls = () => {
-    let rect = palette.getBoundingClientRect();
-    artControls.style.right = `${rect.width / 2}px`;
-    artControls.style.top = `${rect.bottom - rect.height / 2}px`;
-    if (!artControls.style.display || artControls.style.display === "none") {
-        artControls.style.display = "block";
-    } else {
+    if (artControls.style.display == "flex") {
         artControls.style.display = "none";
+    } else {
+        artControls.style.display = "flex";
     }
 };
 
@@ -548,13 +549,17 @@ const setPenMode = (mode, accentTarget) => {
     let lastPenMode = mainSketch.penMode;
     mainSketch.penMode = mode;
 
-    document
-        .querySelectorAll(".pen-mode")
-        .forEach((mode) => (mode.style.backgroundColor = "#2b2b2b"));
-    accentTarget.style.backgroundColor = "#7B66FF";
+    document.querySelectorAll(".pen-mode").forEach((mode) => {
+        mode.classList.remove("selected-mode");
+        mode.classList.add("simple-hover");
+    });
+    accentTarget.classList.add("selected-mode");
+    accentTarget.classList.remove("simple-hover");
 
     switch (mode) {
         case "pen-drop":
+            mainSketch.penMode = "pen";
+
             // if (!["erase", "pen", "lasso"].includes(lastPenMode)) {
             //     //default
             //     mainSketch.penMode = "pen";

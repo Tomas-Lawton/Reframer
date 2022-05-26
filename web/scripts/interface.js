@@ -238,9 +238,9 @@ timeKeeper.oninput = function() {
     }
 };
 
-// palette.addEventListener("click", () => {
-//     toggleArtControls();
-// });
+palette.addEventListener("click", () => {
+    toggleArtControls();
+});
 
 prompt.addEventListener("input", (e) => {
     mainSketch.prompt = e.target.value;
@@ -271,7 +271,6 @@ actionControls[2].addEventListener("click", () => {
 
 // Stop
 stopButton.addEventListener("click", () => {
-    console.log(mainSketch.drawState);
     if (mainSketch.activeStates.includes(mainSketch.drawState)) {
         mainSketch.stop();
     }

@@ -11,7 +11,7 @@ multiTool.onMouseDown = function(event) {
             });
 
             // TO change to simple hit test
-            let isInBounds = true;
+            let isInBounds = null;
             if (mainSketch.boundingBox) {
                 isInBounds =
                     event.point.x > mainSketch.boundingBox.bounds.left &&
@@ -20,22 +20,35 @@ multiTool.onMouseDown = function(event) {
                     event.point.y < mainSketch.boundingBox.bounds.bottom;
             }
 
-            // Deselect all
-            if (!hitResult && !isInBounds) {
-                // outside bound + no path
+            // Deselect all and create select region
+            if ((!hitResult && !isInBounds) || (!hitResult && isInBounds == null)) {
                 unpackGroup();
                 userLayer.getItems().forEach((path) => {
                     path.selected = false;
                 });
-
                 mainSketch.rotationGroup = null;
                 if (mainSketch.boundingBox) {
                     hideSelectUI();
                 }
-                console.log(paper.project.exportSVG());
+
+                // // Select box
+                // if (selectBox) {
+                //     selectBox.remove();
+                // }
+                // if (mainSketch.selectBox) {
+                //     mainSketch.selectBox = null;
+                // }
+                mainSketch.selectBox = new Rectangle(event.point);
             }
 
             if (hitResult) {
+                if (selectBox) {
+                    selectBox.remove();
+                }
+                if (mainSketch.selectBox) {
+                    mainSketch.selectBox = null;
+                }
+
                 // got path
                 if (mainSketch.boundingBox) {
                     hideSelectUI(); // draw a new one containing selection
@@ -43,7 +56,6 @@ multiTool.onMouseDown = function(event) {
                 unpackGroup();
                 path = hitResult.item;
                 path.selected = true; //fix so that this happens with no drag but with drag it won't toggle !path.selected
-
                 let items = getSelectedPaths();
                 fitToSelection(items, "moving");
                 updateSelectUI();
@@ -93,35 +105,24 @@ multiTool.onMouseDrag = function(event) {
                     mainSketch.boundingBox.position.y += event.delta.y;
                     updateSelectUI();
                 }
-                // else if (mainSketch.boundingBox.data.state === "resizing") {
-                //     // Enforce 1:1 rect only
-                //     let x1 = mainSketch.boundingBox.data.to.x;
-                //     let y1 = mainSketch.boundingBox.data.to.y;
-                //     let x2 = event.point.x;
-                //     let r = x2 / x1;
-                //     let y2 = y1 * r;
-                //     let newCorner = new Point(x2, y2);
-
-                //     // New rect
-                //     updateRectBounds(mainSketch.boundingBox.data.from, newCorner);
-                //     let selectedPaths = getSelectedPaths(); // all selected
-                //     let itemGroup = new Group({ children: selectedPaths });
-                //     itemGroup.scale(
-                //         // event.delta.length / 5.5,
-                //         r,
-                //         mainSketch.boundingBox.data.from
-                //     );
-                //     // UNGROUP
-
-                //     updateSelectUI();
-                // }
-                // // rotate in slider interface
+            }
+            // TO DO: Refactor the temporary boxes
+            if (mainSketch.selectBox != undefined) {
+                mainSketch.selectBox.width += event.delta.x;
+                mainSketch.selectBox.height += event.delta.y;
+                if (selectBox !== undefined) selectBox.remove(); // redraw //REFACTOR
+                selectBox = new Path.Rectangle(mainSketch.selectBox);
+                selectBox.set({
+                    fillColor: "#e9e9ff",
+                    opacity: 0.4,
+                    selected: true,
+                });
             }
             break;
         case "lasso":
             mainSketch.drawRegion.width += event.delta.x;
             mainSketch.drawRegion.height += event.delta.y;
-            if (regionPath !== undefined) regionPath.remove(); // redraw
+            if (regionPath !== undefined) regionPath.remove(); // redraw //REFACTOR
             regionPath = new Path.Rectangle(mainSketch.drawRegion);
             regionPath.set({
                 fillColor: "#e9e9ff",
@@ -137,6 +138,17 @@ multiTool.onMouseUp = function() {
         asString: true,
     });
     switch (mainSketch.penMode) {
+        case "select":
+            if (selectBox) {
+                let items = userLayer.getItems({ inside: selectBox.bounds });
+                items.forEach((item) => (item.selected = true));
+                items.pop();
+                mainSketch.selectBox = remove();
+                selectBox.remove();
+                fitToSelection(items, "moving");
+                updateSelectUI();
+            }
+            break;
         case "pen":
             myPath.simplify();
             // sendPaths();
@@ -149,6 +161,7 @@ multiTool.onMouseUp = function() {
             mainSketch.resetHistory(); //reset since not continuing
             mainSketch.draw(true);
             mainSketch.clipDrawing = true;
+            regionPath.remove();
             break;
     }
     if (mainSketch.boundingBox) {

@@ -52,7 +52,7 @@ const dropdown = document.getElementById("pen-dropdown");
 
 // Utility
 let doneTransform = 500;
-let myPath, erasePath, regionPath, tmpGroup, mask;
+let myPath, erasePath, regionPath, tmpGroup, mask, selectBox;
 
 const padding = parseInt(
     window
