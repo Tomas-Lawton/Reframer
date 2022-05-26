@@ -146,6 +146,8 @@ class SketchHandler {
         setActionUI("redrawing");
     }
     continue () {
+        // need to change this so it supports updating the prompt or using a new svg
+
         this.updateDrawer({
             status: "continue",
             frameSize: this.frameSize, //can remove?
@@ -161,6 +163,15 @@ class SketchHandler {
         this.updateDrawer({ status: "stop" });
         this.clipDrawing = false;
         setActionUI("stop");
+    }
+    pause() {
+        // if (this.drawState === "active") {
+        //     timeKeeper.style.visibility = "visible";
+        // }
+
+        this.updateDrawer({ status: "stop" });
+        this.clipDrawing = false;
+        // setActionUI("stop");
     }
     resetHistory() {
         mainSketch.step = 1; // reset since not continuing
@@ -198,7 +209,6 @@ const importToSketch = () => {
 };
 
 const setActionUI = (state) => {
-    let aiMessage = document.querySelector("#ai-content .panel-subtitle");
     aiMessage.classList.remove("typed-out");
 
     if (mainSketch.activeStates.includes(state)) {
@@ -212,15 +222,15 @@ const setActionUI = (state) => {
 
         document.getElementById("spinner").style.display = "flex";
         if (state == "drawing") {
-            aiMessage.innerHTML = `Got it! Drawing ${mainSketch.prompt} with ${mainSketch.numRandomCurves} lines...`;
+            aiMessage.innerHTML = `Got it! I'm drawing a ${mainSketch.prompt}!`;
         } else if (state == "refining") {
-            aiMessage.innerHTML = `Okay, refining the lines for ${mainSketch.prompt}...`;
+            aiMessage.innerHTML = `Okay, refining the lines for a ${mainSketch.prompt}...`;
         } else if (state == "redrawing") {
             aiMessage.innerHTML = `No worries, how about this instead?`;
         } else if (state == "generating") {
-            aiMessage.innerHTML = `Sure! Adding ${mainSketch.prompt} to the moodboard!`;
+            aiMessage.innerHTML = `Sure! Adding a ${mainSketch.prompt} to the moodboard!`;
         } else if (state == "continuing") {
-            aiMessage.innerHTML = `I'll keep going with ${mainSketch.prompt}.`;
+            aiMessage.innerHTML = `Cool idea, I'll make it a ${mainSketch.prompt}.`;
         }
         aiMessage.classList.add("typed-out");
     } else if (state === "stop") {

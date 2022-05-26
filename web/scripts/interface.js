@@ -278,25 +278,25 @@ stopButton.addEventListener("click", () => {
 
 // AI Revise
 
-// Continue
-actionControls[4].addEventListener("click", () => {
-    if (mainSketch.drawState === "stop") {
-        mainSketch.goBack();
-    }
-});
+// // Continue
+// actionControls[4].addEventListener("click", () => {
+//     if (mainSketch.drawState === "stop") {
+//         mainSketch.goBack();
+//     }
+// });
 
-// Redraw
-actionControls[5].addEventListener("click", () => {
-    if (mainSketch.drawState === "stop") {
-        mainSketch.redraw();
-    }
-});
-// Contine
-actionControls[6].addEventListener("click", () => {
-    if (mainSketch.drawState === "stop") {
-        mainSketch.continue();
-    }
-});
+// // Redraw
+// actionControls[5].addEventListener("click", () => {
+//     if (mainSketch.drawState === "stop") {
+//         mainSketch.redraw();
+//     }
+// });
+// // Contine
+// actionControls[6].addEventListener("click", () => {
+//     if (mainSketch.drawState === "stop") {
+//         mainSketch.continue();
+//     }
+// });
 
 // Control panel
 artControls.onmousedown = (e) => {

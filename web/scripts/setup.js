@@ -50,8 +50,10 @@ const moodboard = document.getElementById("moodboard-container");
 const buttonPanel = document.querySelector(".top-action");
 const dropdown = document.getElementById("pen-dropdown");
 
+const aiMessage = document.querySelector("#ai-content .panel-subtitle");
+
 // Utility
-let doneTransform = 500;
+let liveCollab = false;
 let myPath, erasePath, regionPath, tmpGroup, mask, selectBox;
 
 const padding = parseInt(

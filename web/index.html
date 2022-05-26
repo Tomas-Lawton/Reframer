@@ -119,6 +119,7 @@
                     </div>
                     <div id="spinner">
                         <i class="fa-solid fa-spinner button-animation " id="loading"></i>
+                        <!-- <i class="fa-solid fa-robot" id="loading"></i> -->
                     </div>
                 </div>
 
@@ -135,55 +136,29 @@
                             <input id="num-squiggles" type="number" min="1" value="32" max="100">
                         </div>
                     </div>
-                    <hr />
                     <div id="set-modes">
-                        <div class="ai-action mode" id="draw">
+                        <div class="ai-action" id="draw">
                             <i class="fa-solid fa-marker fa-fw"></i>
                             <p>Draw</p>
                         </div>
-                        <div class="ai-action mode" id="draw">
+                        <div class="ai-action" id="draw">
                             <i class="fa-solid fa-down-left-and-up-right-to-center fa-fw"></i>
                             <p>Revise</p>
                         </div>
-                        <div class="ai-action mode" id="generate">
+                        <div class="ai-action" id="generate">
                             <i class="fa-solid fa-lightbulb fa-fw"></i>
                             <p>Brainstorm</p>
                         </div>
-                        <div class="ai-action stop-action inactive-action" id="stop">
+                        <div class="ai-action inactive-action" id="stop">
                             <i class="fa-solid fa-stop fa-fw"></i>
                             <p>Stop</p>
                         </div>
                     </div>
 
-                    <div id="contain-dot">
-                        <h3 class="sub-heading">Revise</h3>
-                        <hr />
-                        <div id="refine-controls">
-                            <div class="ai-action " id="go-back">
-                                <i class="fa-solid fa-arrow-left-long fa-fw"></i>
-                                <p>Back</p>
-                                <!-- <label>Include Random Curves</label>
-<input id="use-squiggles" type="checkbox" checked> -->
-                            </div>
-                            <div class="ai-action " id="redraw">
-                                <i class="fa-solid fa-repeat fa-fw"></i>
-                                <p>Redraw</p>
-                            </div>
-                            <div class="ai-action " id="continue">
-                                <i class="fa-solid fa-arrow-right-long fa-fw"></i>
-                                <p>Continue</p>
-                            </div>
-                        </div>
-                        <p id="rolling-loss"></p>
-                        <input type="range" id="time-slider" value="0" min="0" max="0">
-                    </div>
-
-
                     <div>
                         <div class="flex">
                             <h3 class="sub-heading">Moodboard</h3>
                         </div>
-                        <hr />
                     </div>
 
                     <div class="flex">
@@ -204,7 +179,6 @@
                         <h1 class="panel-title">Styles</h1>
                         <h2 class="panel-subtitle">Colors and Transforms</h2>
                     </div>
-                    <!-- <i class="fa-solid fa-spinner button-animation " id="loading"></i> -->
                 </div>
 
                 <div id="swatches">
@@ -272,6 +246,26 @@
                     </div>
                 </div>
                 <canvas id="canvas"></canvas>
+                <div id="contain-dot">
+                    <h3 class="sub-heading">Revise</h3>
+                    <div id="refine-controls">
+                        <div id="go-back">
+                            <i class="fa-solid fa-arrow-left-long fa-fw"></i>
+                            <p>Back</p>
+                        </div>
+                        <div id="redraw">
+                            <i class="fa-solid fa-repeat fa-fw"></i>
+                            <p>Redraw</p>
+                        </div>
+                        <div id="continue">
+                            <i class="fa-solid fa-arrow-right-long fa-fw"></i>
+                            <p>Continue</p>
+                        </div>
+                    </div>
+                    <p id="rolling-loss"></p>
+                    <input type="range" id="time-slider" value="0" min="0" max="0">
+                </div>
+
             </div>
         </div>
     </div>

@@ -1,5 +1,14 @@
 multiTool.onMouseDown = function(event) {
     // refactor for multitouch
+
+    if (mainSketch.activeStates.includes(mainSketch.drawState)) {
+        liveCollab = true;
+        mainSketch.pause(); //continue on pen up
+        aiMessage.classList.remove("typed-out");
+        aiMessage.innerHTML = `All right, I'mma let you finish...`;
+        aiMessage.classList.add("typed-out");
+    }
+
     switch (mainSketch.penMode) {
         case "select":
             path = null;
@@ -156,6 +165,11 @@ multiTool.onMouseUp = function() {
                 type: "draw-event",
                 data: myPath,
             });
+
+            if (liveCollab) {
+                liveCollab = false;
+                mainSketch.continue();
+            }
             break;
         case "lasso":
             mainSketch.resetHistory(); //reset since not continuing

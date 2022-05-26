@@ -17,12 +17,12 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px #7b66ff inset !important;
-    box-shadow: 0 0 0 30px #7b66ff inset !important;
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    box-shadow: 0 0 0 30px white inset !important;
 }
 
 input:-webkit-autofill {
-    -webkit-text-fill-color: white !important;
+    -webkit-text-fill-color: #7b66ff !important;
 }
 
 button {
@@ -310,8 +310,9 @@ button[confirm] {
 }
 
 .sub-heading {
-    color: #7b66ff;
+    color: white;
     font-weight: 500;
+    margin: 1em 0;
 }
 
 .button-container {
@@ -455,8 +456,10 @@ hr {
 
 #contain-num-squiggles label {
     font-size: 0.8em;
+    font-weight: 500;
     /* color: #969696; */
-    color: #7b66ff;
+    /* color: #7b66ff; */
+    color: white;
 }
 
 #num-squiggles {
@@ -521,10 +524,7 @@ hr {
     flex-flow: column;
     align-items: center;
     justify-content: center;
-    /* margin: 0.1em; */
-    /* width: 5em; */
     height: 5em;
-    background: #f5f5f5;
     box-shadow: none;
     background: #7b66ff;
     color: white;
@@ -533,61 +533,54 @@ hr {
     height: 100%;
 }
 
-.ai-action p {
-    margin-top: 0.3em;
+.ai-action i {
+    margin-bottom: 0.3em;
 }
 
-
-/* .ai-action:hover {
+.ai-action:hover {
     transition: 0.5s;
-    background-color: #6944fc;
-    color: #7b5aff;
-} */
-
-.ai-action:hover i {
-    transition: 0.5s;
-    color: #a690ff;
+    background-color: #9277ff;
 }
 
-.ai-action:hover img {
-    transition: 0.5s;
-    color: #a690ff;
+.ai-action:hover>i {
+    transition: 0.3s;
+    font-size: 2em;
 }
 
-#describe-actions div {
-    border-radius: 0.8em;
-    background: white;
-}
 
-#describe-actions i {
-    padding: 0 1em;
-}
+/* Stop */
 
-#describe-actions img {
-    padding: 0 1em;
-}
-
-.stop-action {
+#stop {
     color: white;
 }
+
+#stop i {
+    color: white;
+}
+
+#stop i:hover {
+    color: white;
+}
+
+
+/* Stop */
+
+
+/* Inactive button */
 
 .inactive-action {
-    background-color: #ededed;
-    /* color: #d2d2d2; */
-    color: white;
+    background: #f5f5f5;
+    color: #d2d2d2;
     cursor: default;
 }
 
 .inactive-action i {
-    color: #d4d4d4;
-    /* color: white; */
+    color: #d2d2d2;
 }
 
 .inactive-action:hover {
-    background-color: #ededed;
-    /* color: #d2d2d2; */
-    /* color: white; */
-    color: #d4d4d4;
+    background: #f5f5f5;
+    color: #d2d2d2;
 }
 
 .inactive-action:hover i {
@@ -615,44 +608,36 @@ hr {
     align-items: center;
     background: white;
     color: white;
-    /* border: 1px solid #7B66FF; */
-    /* margin-top: 1em; */
     pointer-events: all;
     background: #f5f5f5;
-    /* background: #ededed; */
     flex: 1;
     display: flex;
-    /* font-size: 1.5em; */
     margin-bottom: 1em;
-    background: #7b66ff;
+    /* background: #7b66ff; */
+    background: white;
 }
 
-#prompt-input ::placeholder {
-    /* Chrome, Firefox, Opera, Safari 10.1+ */
-    color: white;
-    /* opacity: 0.4; */
-    /* Firefox */
-}
+
+/* #prompt-input ::placeholder {
+    color: #7b66ff;
+} */
 
 #prompt-input i {
-    /* margin-right: 1em; */
     margin-right: 0.4em;
     font-size: 1em;
+    color: #7b66ff;
 }
 
 #prompt-input input {
     margin: 0.1em;
     padding: -0.1em;
-    /* font-size: 1em;
-    border: none;
-    color: #7B66FF;
-    width: 100%;
-    background: #f5f5f5; */
     font-size: 1em;
     border: none;
     color: white;
     width: 100%;
-    background: #7b66ff;
+    /* background: #7b66ff; */
+    background: white;
+    color: #7b66ff;
 }
 
 .typed-out {
@@ -1055,8 +1040,6 @@ hr {
 
 #spinner {
     width: 100%;
-    /* margin: auto; */
-    /* align-items: center; */
     display: none;
     justify-content: center;
     margin: inherit;
@@ -1089,10 +1072,6 @@ hr {
     grid-template-rows: repeat(2, minmax(150px, 2fr));
     /* height: 100%; */
     grid-gap: 0.5em;
-}
-
-.mode {
-    flex: 1;
 }
 
 
