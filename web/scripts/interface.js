@@ -246,7 +246,7 @@ prompt.addEventListener("input", (e) => {
     mainSketch.prompt = e.target.value;
 });
 
-// AI Actions
+// AI Actions TODO Refactor into the setActionUI switch statement using states
 
 // Draw
 actionControls[0].addEventListener("click", () => {
@@ -257,14 +257,13 @@ actionControls[0].addEventListener("click", () => {
 
 // Revise
 actionControls[1].addEventListener("click", () => {
-    console.log("revise");
     if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
         mainSketch.draw(null, null, true);
     }
 });
 
 // Trial / Brainstorm
-actionControls[1].addEventListener("click", () => {
+actionControls[2].addEventListener("click", () => {
     if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
         mainSketch.generate();
     }

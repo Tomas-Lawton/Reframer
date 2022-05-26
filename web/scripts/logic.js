@@ -108,6 +108,9 @@ class SketchHandler {
         setActionUI("active");
     }
     generate() {
+        if (!exemplarSize) {
+            console.error("exemplars not found");
+        }
         if (noPrompt()) {
             openModal({
                 title: "Type a prompt first!",
@@ -197,11 +200,14 @@ const setActionUI = (state) => {
             //draw or exemplar
             actionControls[0].classList.remove("inactive-action");
             actionControls[1].classList.remove("inactive-action");
+            actionControls[2].classList.remove("inactive-action");
             break;
         case "active":
             actionControls.forEach((elem) => elem.classList.add("inactive-action"));
             actionControls[0].classList.add("inactive-action");
             actionControls[1].classList.add("inactive-action");
+            actionControls[2].classList.add("inactive-action");
+
             // stop
             stopButton.classList.remove("inactive-action");
             stopButton.style.background = "#ff6060";

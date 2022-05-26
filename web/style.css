@@ -674,7 +674,7 @@ hr {
 
 #exemplar-grid {
     /* display: flex; */
-    display: none;
+    /* display: none; */
     flex-flow: row wrap;
     overflow: scroll;
     margin: 0 2em 2em 0;
