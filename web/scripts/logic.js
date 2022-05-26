@@ -299,15 +299,15 @@ const openModal = (data) => {
     modal.style.display = "block";
 };
 
-const switchControls = () => {
-    if (mainSketch.buttonControlLeft) {
-        console.log(window.innerWidth);
-        buttonPanel.style.left = `${window.innerWidth - buttonPanel.offsetWidth}px`;
-    } else {
-        buttonPanel.style.left = 0;
-    }
-    mainSketch.buttonControlLeft = !mainSketch.buttonControlLeft;
-};
+// const switchControls = () => {
+//     if (mainSketch.buttonControlLeft) {
+//         console.log(window.innerWidth);
+//         buttonPanel.style.left = `${window.innerWidth - buttonPanel.offsetWidth}px`;
+//     } else {
+//         buttonPanel.style.left = 0;
+//     }
+//     mainSketch.buttonControlLeft = !mainSketch.buttonControlLeft;
+// };
 
 // dragging moves select elements + ui
 const hideSelectUI = (includeTransform = true) => {
@@ -457,22 +457,6 @@ const showTraceHistoryFrom = (fromIndex) => {
     }
 };
 
-const moveSelecterTo = (elem) => {
-    selectDot.style.left = elem.getBoundingClientRect().x + "px";
-    selectDot.style.top = elem.getBoundingClientRect().y + "px";
-    // let colorClass = elem.firstChild.nextElementSibling.classList[0];
-
-    let colorClass = elem.nextElementSibling.classList[0];
-    colorClass === undefined && (colorClass = "brush");
-    selectDot.firstElementChild.firstElementChild.classList.remove(
-        "brush",
-        "select",
-        "erase",
-        "region"
-    );
-    selectDot.firstElementChild.firstElementChild.classList.add(colorClass);
-};
-
 ws.onmessage = function(event) {
     if (mainSketch.clipDrawing) {
         //only react if active
@@ -553,10 +537,14 @@ const setPenMode = (mode, accentTarget) => {
     let lastPenMode = mainSketch.penMode;
     mainSketch.penMode = mode;
 
+    document
+        .querySelectorAll(".pen-mode")
+        .forEach((mode) => (mode.style.backgroundColor = "#2b2b2b"));
+    accentTarget.style.backgroundColor = "#7B66FF";
+
     switch (mainSketch.penMode) {
         case "pen-drop":
-            let dropdown = document.getElementById("pen-dropdown");
-            if (dropdown.style.display === "none") {
+            if (dropdown.style.display === "none" || !dropdown.style.display) {
                 dropdown.style.display = "flex";
                 let penButton = document
                     .getElementById("pen-drop")
@@ -570,15 +558,13 @@ const setPenMode = (mode, accentTarget) => {
             break;
         case "erase":
             eraseTool.activate();
-            moveSelecterTo(accentTarget);
             break;
         case "pen":
             multiTool.activate();
-            moveSelecterTo(accentTarget);
             break;
         case "select":
+            dropdown.style.display = "none";
             multiTool.activate();
-            moveSelecterTo(accentTarget);
             break;
         case "lasso":
             multiTool.activate();
@@ -590,7 +576,6 @@ const setPenMode = (mode, accentTarget) => {
                 });
                 break;
             }
-            moveSelecterTo(accentTarget);
             break;
     }
 

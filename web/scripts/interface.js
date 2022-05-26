@@ -386,6 +386,14 @@ document.getElementById("set-background").onclick = function() {
     canvas.style.backgroundColor = mainSketch.strokeColor;
 };
 
+document.getElementById("moodboard-cross").addEventListener("click", () => {
+    if (!moodboard.style.display || moodboard.style.display === "none") {
+        moodboard.style.display = "block";
+    } else {
+        moodboard.style.display = "none";
+    }
+});
+
 // LOAD UI
 
 // Random partial sketch

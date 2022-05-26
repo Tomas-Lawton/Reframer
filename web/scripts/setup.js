@@ -35,7 +35,6 @@ const transformControl = document.getElementById("transform-ui");
 const prompt = document.getElementById("messageText");
 const modal = document.getElementById("modal");
 const controlPanel = document.getElementById("control-panel");
-const buttonPanel = document.getElementById("button-panel");
 const artControls = document.getElementById("art-panel");
 const penControls = document.getElementById("pen-controls");
 const message = document.getElementById("message");
@@ -46,6 +45,10 @@ const setTraces = document.getElementById("num-traces");
 const selectDot = document.getElementById("contain-pen-dot");
 const opacitySlider = document.getElementById("opacity-slider");
 const stopButton = document.getElementById("stop");
+
+const moodboard = document.getElementById("moodboard-container");
+const buttonPanel = document.querySelector(".top-action");
+const dropdown = document.getElementById("pen-dropdown");
 
 // Utility
 let doneTransform = 500;

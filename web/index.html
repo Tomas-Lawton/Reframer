@@ -26,7 +26,7 @@
 <body>
     <div id="modal">
         <div id="simple-modal">
-            <div id="modal-status">
+            <div class="modal-status">
                 <h2 id="modal-title"></h2>
                 <i id="modal-cross" class="fa-solid fa-xmark"></i>
             </div>
@@ -57,16 +57,32 @@
 
     <div id="pen-dropdown">
         <div class="simple-drop pen-mode" id="pen">
-            <i class="brush fa-solid fa-pen fa-fw"></i>
+            <div>
+                <!-- <i class="fa-solid fa-fw fa-check"></i> -->
+                <i class="brush fa-solid fa-pen fa-fw"></i>
+            </div>
             <p>Pen</p>
         </div>
-        <div class="simple-drop pen-mode" id="lasso">
-            <i class="region fa-solid fa-object-group fa-fw"></i>
-            <p>Lasso</p>
+        <div class="simple-drop pen-mode" id="erase">
+            <div>
+                <!-- <i class="fa-solid fa-fw fa-check"></i> -->
+                <i class="erase fa-solid fa-eraser fa-fw"></i>
+            </div>
+            <p>Erase</p>
         </div>
         <div class="simple-drop pen-mode" id="erase">
-            <i class="erase fa-solid fa-eraser fa-fw"></i>
-            <p>Erase</p>
+            <div>
+                <!-- <i class="fa-solid fa-fw fa-check"></i> -->
+                <i class="erase fa-solid fa-circle-notch fa-fw"></i>
+            </div>
+            <p>Tidy</p>
+        </div>
+        <div class="simple-drop pen-mode" id="lasso">
+            <div>
+                <!-- <i class="fa-solid fa-fw fa-check"></i> -->
+                <i class="region fa-solid fa-object-group fa-fw"></i>
+            </div>
+            <p>AI Zone</p>
         </div>
     </div>
 
@@ -85,147 +101,150 @@
     </div>
     <!-- <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i> -->
 
+    <div id="art-panel">
+        <div id="tabs">
+            <div class="tab-item active-tab" id="collab-tab">
+                <h2>Collab</h2>
+            </div>
+            <div class="tab-item" id="style-tab">
+                <h2>Style</h2>
+            </div>
+        </div>
+
+        <div class="content-margin">
+            <div id="ai-content">
+                <div class="tab-info">
+                    <div>
+                        <h1 class="panel-title">
+                            <!-- <i class="fa-solid fa-robot space"></i> -->
+                            Sketch-bot
+                        </h1>
+                        <h2 class="panel-subtitle">What are we drawing?</h2>
+                    </div>
+                    <i class="fa-solid fa-spinner button-animation " id="loading"></i>
+                </div>
+
+                <div id="prompt-input">
+                    <i class="fas fa-comment"></i>
+                    <input type="text" id="messageText" placeholder="A majestic rainbow unicorn..." />
+                </div>
+
+                <div>
+                    <div class="flex">
+                        <h3 class="sub-heading">Mode</h3>
+                        <div id="contain-num-squiggles">
+                            <label>Add lines:</label>
+                            <input id="num-squiggles" type="number" min="1" value="32" max="100">
+                        </div>
+                    </div>
+                    <hr />
+                    <div id="set-modes">
+                        <div class="ai-action mode" id="draw">
+                            <i class="fa-solid fa-marker fa-fw"></i>
+                            <p>Draw</p>
+                        </div>
+                        <div class="ai-action mode" id="draw">
+                            <i class="fa-solid fa-down-left-and-up-right-to-center fa-fw"></i>
+                            <p>Revise</p>
+                        </div>
+                        <div class="ai-action mode" id="generate">
+                            <i class="fa-solid fa-lightbulb fa-fw"></i>
+                            <p>Brainstorm</p>
+                        </div>
+                        <div class="ai-action stop-action" id="stop">
+                            <i class="fa-solid fa-stop fa-fw"></i>
+                            <p>Stop</p>
+                        </div>
+                    </div>
+                    <!-- <div class="ai-action icon-outer-circle stop-action" id="stop">
+                        <i class="fa-solid fa-stop fa-fw"></i>
+                        <p>Stop</p>
+                    </div> -->
+                </div>
+
+                <div class="hide">
+                    <h3 class="sub-heading">Revise</h3>
+                    <hr />
+                    <div id="refine-controls">
+                        <div class="ai-action " id="go-back">
+                            <i class="fa-solid fa-arrow-left-long fa-fw"></i>
+                            <p>Back</p>
+                            <!-- <label>Include Random Curves</label>
+<input id="use-squiggles" type="checkbox" checked> -->
+                        </div>
+                        <div class="ai-action " id="redraw">
+                            <i class="fa-solid fa-repeat fa-fw"></i>
+                            <p>Redraw</p>
+                        </div>
+                        <div class="ai-action " id="continue">
+                            <i class="fa-solid fa-arrow-right-long fa-fw"></i>
+                            <p>Continue</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-margin">
+            <div id="style-content">
+                <div class="tab-info">
+                    <div>
+                        <h1 class="panel-title">Styles</h1>
+                        <h2 class="panel-subtitle">Colors and Transforms</h2>
+                    </div>
+                    <!-- <i class="fa-solid fa-spinner button-animation " id="loading"></i> -->
+                </div>
+
+                <div id="swatches">
+                    <div class="red swatch"></div>
+                    <div class="yellow swatch"></div>
+                    <div class="green swatch"></div>
+                    <div class="blue swatch"></div>
+                    <div class="pink swatch"></div>
+                    <div class="purple swatch"></div>
+                    <div class="off-black swatch"></div>
+                    <div class="white swatch"></div>
+                </div>
+                <div id="pen-styles">
+                    <div id="color-picker"></div>
+                    <div id="fine-control">
+                        <div id="art-sliders">
+                            <p>Stroke Opacity</p>
+                            <input type="range" id="opacity-slider" value="75" min="0" max="100">
+                            <p>Line Width</p>
+                            <input type="range" id="width-slider" value="12" min="1" max="40">
+                        </div>
+                        <div id="art-control-final">
+                            <div id="stroke-dot">
+                                <div id="point-size"></div>
+                            </div>
+                            <div id="pen-color" class="off-black"></div>
+                        </div>
+                        <p id="set-background">Set background</p>
+                        <div id="transform-ui">
+                            <div class="transformer">
+                                <div class="number-input">
+                                    <p>Rotate</p>
+                                    <input type="number" id="rotate-number" value="0" min="-180" max="180" step="1">
+                                </div>
+                                <div id="rotate-handler">
+                                    <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
+                                </div>
+                            </div>
+                            <p>Scale</p>
+                            <div id="scale-handler">
+                                <input type="range" id="scale-slider" value="15" min="1" max="20">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div id="content">
         <div id="sketch-view">
-            <div id="art-panel">
-                <div id="tabs">
-                    <div class="tab-item active-tab" id="collab-tab">
-                        <h2>Collab</h2>
-                    </div>
-                    <div class="tab-item" id="style-tab">
-                        <h2>Style</h2>
-                    </div>
-                </div>
-
-                <div class="content-margin">
-                    <div id="ai-content">
-                        <div class="tab-info">
-                            <div>
-                                <h1 class="panel-title">Sketch-bot</h1>
-                                <h2 class="panel-subtitle">What are we drawing?</h2>
-                            </div>
-                            <i class="fa-solid fa-spinner button-animation " id="loading"></i>
-                        </div>
-
-                        <div id="prompt-input">
-                            <i class="fas fa-comment"></i>
-                            <input type="text" id="messageText" placeholder="A majestic rainbow unicorn..." />
-                        </div>
-
-                        <div>
-                            <div class="flex">
-                                <h3 class="sub-heading">Mode</h3>
-                                <div id="contain-num-squiggles">
-                                    <label>Add lines:</label>
-                                    <input id="num-squiggles" type="number" min="1" value="32" max="100">
-                                </div>
-                            </div>
-                            <hr />
-                            <div id="set-modes">
-                                <div class="ai-action mode" id="draw">
-                                    <i class="fa-solid fa-marker fa-fw"></i>
-                                    <p>Draw</p>
-                                </div>
-                                <div class="ai-action mode" id="draw">
-                                    <i class="fa-solid fa-down-left-and-up-right-to-center fa-fw"></i>
-                                    <p>Revise</p>
-                                </div>
-                                <div class="ai-action mode" id="generate">
-                                    <i class="fa-solid fa-lightbulb fa-fw"></i>
-                                    <p>Brainstorm</p>
-                                </div>
-                                <div class="ai-action stop-action" id="stop">
-                                    <i class="fa-solid fa-stop fa-fw"></i>
-                                    <p>Stop</p>
-                                </div>
-                            </div>
-                            <!-- <div class="ai-action icon-outer-circle stop-action" id="stop">
-                                <i class="fa-solid fa-stop fa-fw"></i>
-                                <p>Stop</p>
-                            </div> -->
-                        </div>
-
-                        <div class="hide">
-                            <h3 class="sub-heading">Revise</h3>
-                            <hr />
-                            <div id="refine-controls">
-                                <div class="ai-action " id="go-back">
-                                    <i class="fa-solid fa-arrow-left-long fa-fw"></i>
-                                    <p>Back</p>
-                                    <!-- <label>Include Random Curves</label>
-        <input id="use-squiggles" type="checkbox" checked> -->
-                                </div>
-                                <div class="ai-action " id="redraw">
-                                    <i class="fa-solid fa-repeat fa-fw"></i>
-                                    <p>Redraw</p>
-                                </div>
-                                <div class="ai-action " id="continue">
-                                    <i class="fa-solid fa-arrow-right-long fa-fw"></i>
-                                    <p>Continue</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="content-margin">
-                    <div id="style-content">
-                        <div class="tab-info">
-                            <div>
-                                <h1 class="panel-title">Styles</h1>
-                                <h2 class="panel-subtitle">Colors and Transforms</h2>
-                            </div>
-                            <!-- <i class="fa-solid fa-spinner button-animation " id="loading"></i> -->
-                        </div>
-
-                        <div id="swatches">
-                            <div class="red swatch"></div>
-                            <div class="yellow swatch"></div>
-                            <div class="green swatch"></div>
-                            <div class="blue swatch"></div>
-                            <div class="pink swatch"></div>
-                            <div class="purple swatch"></div>
-                            <div class="off-black swatch"></div>
-                            <div class="white swatch"></div>
-                        </div>
-                        <div id="pen-styles">
-                            <div id="color-picker"></div>
-                            <div id="fine-control">
-                                <div id="art-sliders">
-                                    <p>Stroke Opacity</p>
-                                    <input type="range" id="opacity-slider" value="75" min="0" max="100">
-                                    <p>Line Width</p>
-                                    <input type="range" id="width-slider" value="12" min="1" max="40">
-                                </div>
-                                <div id="art-control-final">
-                                    <div id="stroke-dot">
-                                        <div id="point-size"></div>
-                                    </div>
-                                    <div id="pen-color" class="off-black"></div>
-                                </div>
-                                <p id="set-background">Set background</p>
-                                <div id="transform-ui">
-                                    <div class="transformer">
-                                        <div class="number-input">
-                                            <p>Rotate</p>
-                                            <input type="number" id="rotate-number" value="0" min="-180" max="180" step="1">
-                                        </div>
-                                        <div id="rotate-handler">
-                                            <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
-                                        </div>
-                                    </div>
-                                    <p>Scale</p>
-                                    <div id="scale-handler">
-                                        <input type="range" id="scale-slider" value="15" min="1" max="20">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
             <div id="contain-canvas">
                 <div class="canvas-drop">
                     <div id="delete-handler" class="select-ui">
@@ -254,64 +273,71 @@
             <i class="fa-solid fa-save fa-fw"></i>
             <p>Save</p>
         </div> -->
-    <div id="moodboard">
-        <div id="moodboard-header">
-            <h1 class="panel-title">Moodboard...</h1>
-            <button id="open-moodboard">
-                <i class="fas fa-image"></i> +
-            </button>
-        </div>
-        <div id="exemplar-grid">
 
-            <div class="exemplar-card">
-                <div class="exemplar">
-                    <canvas id="canvas1" class="exemplar-canvas"></canvas>
+    <div id="moodboard-container">
+        <div id="moodboard">
+            <div class="modal-status">
+                <div id="moodboard-header">
+                    <button id="open-moodboard">
+                        <i class="fas fa-image"></i>
+                    </button>
+                    <h1 class="panel-title">Moodboard...</h1>
                 </div>
-                <div class="card-info">
-                    <div>
-                        <h3>Exemplar 1</h3>
-                        <p>Loss: 0</p>
-                    </div>
-                    <i class="fa-solid fa-plus fa-fw add-exemplar"></i>
-                </div>
+                <i id="moodboard-cross" class="fa-solid fa-xmark"></i>
+
             </div>
+            <div id="exemplar-grid">
 
-            <div class="exemplar-card">
-                <div class="exemplar">
-                    <canvas id="canvas2" class="exemplar-canvas"></canvas>
-                </div>
-                <div class="card-info">
-                    <div>
-                        <h3>Exemplar 2</h3>
-                        <p>Loss: 0</p>
+                <div class="exemplar-card">
+                    <div class="exemplar">
+                        <canvas id="canvas1" class="exemplar-canvas"></canvas>
                     </div>
-                    <i class="fa-solid fa-plus fa-fw add-exemplar"></i>
+                    <div class="card-info">
+                        <div>
+                            <h3>Exemplar 1</h3>
+                            <p>Loss: 0</p>
+                        </div>
+                        <i class="fa-solid fa-plus fa-fw add-exemplar"></i>
+                    </div>
                 </div>
-            </div>
 
-            <div class="exemplar-card">
-                <div class="exemplar">
-                    <canvas id="canvas3" class="exemplar-canvas"></canvas>
-                </div>
-                <div class="card-info">
-                    <div>
-                        <h3>Exemplar 3</h3>
-                        <p>Loss: 0</p>
+                <div class="exemplar-card">
+                    <div class="exemplar">
+                        <canvas id="canvas2" class="exemplar-canvas"></canvas>
                     </div>
-                    <i class="fa-solid fa-plus fa-fw add-exemplar"></i>
+                    <div class="card-info">
+                        <div>
+                            <h3>Exemplar 2</h3>
+                            <p>Loss: 0</p>
+                        </div>
+                        <i class="fa-solid fa-plus fa-fw add-exemplar"></i>
+                    </div>
                 </div>
-            </div>
 
-            <div class="exemplar-card">
-                <div class="exemplar">
-                    <canvas id="canvas4" class="exemplar-canvas"></canvas>
-                </div>
-                <div class="card-info">
-                    <div>
-                        <h3>Exemplar 4</h3>
-                        <p>Loss: 0</p>
+                <div class="exemplar-card">
+                    <div class="exemplar">
+                        <canvas id="canvas3" class="exemplar-canvas"></canvas>
                     </div>
-                    <i class="fa-solid fa-plus fa-fw add-exemplar"></i>
+                    <div class="card-info">
+                        <div>
+                            <h3>Exemplar 3</h3>
+                            <p>Loss: 0</p>
+                        </div>
+                        <i class="fa-solid fa-plus fa-fw add-exemplar"></i>
+                    </div>
+                </div>
+
+                <div class="exemplar-card">
+                    <div class="exemplar">
+                        <canvas id="canvas4" class="exemplar-canvas"></canvas>
+                    </div>
+                    <div class="card-info">
+                        <div>
+                            <h3>Exemplar 4</h3>
+                            <p>Loss: 0</p>
+                        </div>
+                        <i class="fa-solid fa-plus fa-fw add-exemplar"></i>
+                    </div>
                 </div>
             </div>
         </div>
