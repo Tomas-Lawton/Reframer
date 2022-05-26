@@ -666,6 +666,24 @@ hr {
     background: #7b66ff;
 }
 
+.typed-out {
+    overflow: hidden;
+    border-right: 0.15em solid orange;
+    white-space: nowrap;
+    animation: typing 1s steps(20, end) forwards;
+    font-size: 1.6rem;
+    width: 0;
+}
+
+@keyframes typing {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+
 #moodboard-header {
     display: flex;
     align-items: center;
@@ -910,9 +928,9 @@ hr {
     /* background-color: #000000d6; */
     background: #262626;
     /* right: 2em; */
-    top: 50%;
+    top: 5em;
     left: 2em;
-    transform: translateY(-50%);
+    /* transform: translateY(-50%); */
 }
 
 .content-margin {
@@ -979,8 +997,12 @@ hr {
     justify-content: space-between;
     /* align-items: center; */
     margin: 1em 0;
-    /* flex-direction: column; */
-    align-items: center;
+    flex-direction: column;
+    /* align-items: center; */
+}
+
+.tab-info {
+    width: 100%;
 }
 
 .hide {
@@ -1019,8 +1041,17 @@ hr {
 }
 
 #loading {
-    font-size: 2em;
+    font-size: 3em;
     color: white;
+}
+
+#spinner {
+    width: 100%;
+    /* margin: auto; */
+    /* align-items: center; */
+    display: none;
+    justify-content: center;
+    margin: inherit;
 }
 
 .tab-item {

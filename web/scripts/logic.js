@@ -26,6 +26,13 @@ class SketchHandler {
         this.step = 1;
         this.lastRollingLoss = 0;
         this.linesDisabled = false;
+        this.activeStates = [
+            "drawing",
+            "generating",
+            "refining",
+            "redrawing",
+            "continuing",
+        ];
 
         // TODO Refactor
         this.buttonControlLeft = true;
@@ -104,8 +111,7 @@ class SketchHandler {
         });
         this.step = 1;
         this.clipDrawing = true;
-        this.drawState = "active";
-        setActionUI("active");
+        setActionUI(disableLines ? "refining" : "drawing");
     }
     generate() {
         if (!exemplarSize) {
@@ -127,8 +133,7 @@ class SketchHandler {
             lines: this.initRandomCurves ? this.numRandomCurves : 0,
         });
         this.clipDrawing = true;
-        this.drawState = "active";
-        setActionUI("active");
+        setActionUI("generating");
     }
     redraw() {
         this.updateDrawer({
@@ -136,8 +141,7 @@ class SketchHandler {
         });
         this.step = 1;
         this.clipDrawing = true;
-        this.drawState = "active";
-        setActionUI("active");
+        setActionUI("redrawing");
     }
     continue () {
         this.updateDrawer({
@@ -145,8 +149,7 @@ class SketchHandler {
             frameSize: this.frameSize, //can remove?
         });
         this.clipDrawing = true;
-        this.drawState = "active";
-        setActionUI("active");
+        setActionUI("continuing");
     }
     stop() {
         if (this.drawState === "active") {
@@ -155,7 +158,6 @@ class SketchHandler {
 
         this.updateDrawer({ status: "stop" });
         this.clipDrawing = false;
-        this.drawState = "stop";
         setActionUI("stop");
     }
     resetHistory() {
@@ -194,31 +196,40 @@ const importToSketch = () => {
 };
 
 const setActionUI = (state) => {
-    switch (state) {
-        case "inactive":
-            actionControls.forEach((elem) => elem.classList.add("inactive-action"));
-            //draw or exemplar
-            actionControls[0].classList.remove("inactive-action");
-            actionControls[1].classList.remove("inactive-action");
-            actionControls[2].classList.remove("inactive-action");
-            break;
-        case "active":
-            actionControls.forEach((elem) => elem.classList.add("inactive-action"));
-            actionControls[0].classList.add("inactive-action");
-            actionControls[1].classList.add("inactive-action");
-            actionControls[2].classList.add("inactive-action");
+    let aiMessage = document.querySelector("#ai-content .panel-subtitle");
+    aiMessage.classList.remove("typed-out");
 
-            // stop
-            stopButton.classList.remove("inactive-action");
-            stopButton.style.background = "#ff6060";
-            break;
-        case "stop":
-            // all possible
-            actionControls.forEach((elem) =>
-                elem.classList.remove("inactive-action")
-            );
-            stopButton.style.background = "#e1e1e1";
-            break;
+    if (mainSketch.activeStates.includes(state)) {
+        // AI is "thinking"
+        actionControls.forEach((elem) => elem.classList.add("inactive-action"));
+        actionControls[0].classList.add("inactive-action");
+        actionControls[1].classList.add("inactive-action");
+        actionControls[2].classList.add("inactive-action");
+        stopButton.classList.remove("inactive-action");
+        stopButton.style.background = "#ff6060";
+
+        document.getElementById("spinner").style.display = "flex";
+        if (state == "drawing") {
+            aiMessage.innerHTML = `Got it! Drawing ${mainSketch.prompt} with ${mainSketch.numRandomCurves} lines...`;
+        } else if (state == "refining") {
+            aiMessage.innerHTML = `Okay, refining the lines for ${mainSketch.prompt}...`;
+        } else if (state == "redrawing") {
+            aiMessage.innerHTML = `No worries, how about this instead?`;
+        } else if (state == "generating") {
+            aiMessage.innerHTML = `Sure! Adding ${mainSketch.prompt} to the moodboard!`;
+        } else if (state == "continuing") {
+            aiMessage.innerHTML = `I'll keep going with ${mainSketch.prompt}.`;
+        }
+        aiMessage.classList.add("typed-out");
+    } else if (state === "stop") {
+        // AI is waiting
+        actionControls.forEach((elem) => elem.classList.remove("inactive-action"));
+        stopButton.style.background = "#e1e1e1";
+
+        document.getElementById("spinner").style.display = "none";
+
+        aiMessage.innerHTML = "I'm Stopping! \nWhat can I draw next?";
+        aiMessage.classList.add("typed-out");
     }
     mainSketch.drawState = state;
 };
@@ -542,8 +553,16 @@ const setPenMode = (mode, accentTarget) => {
         .forEach((mode) => (mode.style.backgroundColor = "#2b2b2b"));
     accentTarget.style.backgroundColor = "#7B66FF";
 
-    switch (mainSketch.penMode) {
+    switch (mode) {
         case "pen-drop":
+            // if (!["erase", "pen", "lasso"].includes(lastPenMode)) {
+            //     //default
+            //     mainSketch.penMode = "pen";
+            //     multiTool.activate();
+            // } else {
+            //     mainSketch.penMode = lastPenMode; //override "pen-drop" mode
+            //     multiTool.activate();
+            // }
             if (dropdown.style.display === "none" || !dropdown.style.display) {
                 dropdown.style.display = "flex";
                 let penButton = document

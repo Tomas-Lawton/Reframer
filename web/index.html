@@ -119,9 +119,11 @@
                             <!-- <i class="fa-solid fa-robot space"></i> -->
                             Sketch-bot
                         </h1>
-                        <h2 class="panel-subtitle">What are we drawing?</h2>
+                        <h2 class="panel-subtitle typed-out">What are we drawing?</h2>
                     </div>
-                    <i class="fa-solid fa-spinner button-animation " id="loading"></i>
+                    <div id="spinner">
+                        <i class="fa-solid fa-spinner button-animation " id="loading"></i>
+                    </div>
                 </div>
 
                 <div id="prompt-input">
@@ -151,7 +153,7 @@
                             <i class="fa-solid fa-lightbulb fa-fw"></i>
                             <p>Brainstorm</p>
                         </div>
-                        <div class="ai-action stop-action" id="stop">
+                        <div class="ai-action stop-action inactive-action" id="stop">
                             <i class="fa-solid fa-stop fa-fw"></i>
                             <p>Stop</p>
                         </div>

@@ -246,7 +246,7 @@ prompt.addEventListener("input", (e) => {
     mainSketch.prompt = e.target.value;
 });
 
-// AI Actions TODO Refactor into the setActionUI switch statement using states
+// TODO Refactor into the setActionUI switch statement using states
 
 // Draw
 actionControls[0].addEventListener("click", () => {
@@ -271,7 +271,8 @@ actionControls[2].addEventListener("click", () => {
 
 // Stop
 stopButton.addEventListener("click", () => {
-    if (mainSketch.drawState === "active") {
+    console.log(mainSketch.drawState);
+    if (mainSketch.activeStates.includes(mainSketch.drawState)) {
         mainSketch.stop();
     }
 });
