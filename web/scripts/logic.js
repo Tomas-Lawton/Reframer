@@ -52,6 +52,7 @@ class SketchHandler {
         this.useAdvanced = false;
         this.initRandomCurves = true;
         this.numRandomCurves = 32;
+        this.showAICurves = 3;
         this.numTraces = 1;
 
         // Undo/redo stack
@@ -390,30 +391,22 @@ const parseFromSvg = (svg) => {
     for (const returnedIndex in paperObject.children[0].children) {
         const child = paperObject.children[0].children[returnedIndex];
         child.smooth();
+
         // AI Stroke Effects
         if (mainSketch.initRandomCurves && !mainSketch.linesDisabled) {
             if (returnedIndex >= numPaths - mainSketch.numRandomCurves) {
-                // console.log("AI Path: ", child);
+                // ai paths
                 child.opacity = 0.5;
-
-                // const pathEffect = child.clone({ insert: false });
-                // userLayer.addChild(pathEffect);
-
-                // // pathEffect.position.y += 100;
-                // // pathEffect.strokeColor = "#FFFF00";
-                // pathEffect.mainSketch.opacity = 0.8;
-                // pathEffect.mainSketch.strokeWidth = mainSketch.strokeWidth * 2;
-                // userLayer.addChild(pathEffect);
-                // try mainSketch.opacity
             }
         }
 
         const pathEffect = child.clone({ insert: false });
-        userLayer.addChild(pathEffect);
-
-        // Add all to main canvas by adding to user layer as children.
-        // Works but makes it harder to clear the canvas. So maybe just do this on draw stop!!
-        // userLayer.addChild(child);
+        if (returnedIndex < mainSketch.showAICurves) {
+            //only add a certain count of paths
+            userLayer.addChild(pathEffect);
+        }
+        // const pathEffect = child.clone({ insert: false });
+        // userLayer.addChild(pathEffect);
     }
     paperObject.remove();
     mainSketch.svg = paper.project.exportSVG({
@@ -516,6 +509,9 @@ ws.onmessage = function(event) {
                 showTraceHistoryFrom(mainSketch.stack.historyHolder.length - 1);
             } else {
                 userLayer.clear();
+                if (mainSketch.showAICurves < mainSketch.numRandomCurves) {
+                    mainSketch.showAICurves += Math.floor(Math.random() * 4);
+                }
                 mainSketch.lastRender = parseFromSvg(result.svg);
             }
 

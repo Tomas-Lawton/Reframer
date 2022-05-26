@@ -390,7 +390,7 @@ hr {
 #contain-dot {
     display: none;
     /* bottom: 0; */
-    display: flex;
+    /* display: flex; */
     flex-direction: column;
 }
 
@@ -676,11 +676,17 @@ hr {
 #moodboard-header {
     display: flex;
     align-items: center;
-    /* justify-content: space-between; */
+    color: #1b1b1b;
+    display: block;
 }
 
 #moodboard-header h1 {
-    color: #1b1b1b;
+    color: #7b66ff;
+    font-weight: 500;
+}
+
+#moodboard-header h2 {
+    font-weight: 500;
 }
 
 #moodboard-header p {
@@ -960,6 +966,11 @@ hr {
 
 #refine-controls>.ai-action {
     flex-basis: 33.333333%;
+}
+
+#moodboard-section {
+    color: white;
+    font-weight: 400;
 }
 
 .panel-title {

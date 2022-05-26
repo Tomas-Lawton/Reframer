@@ -452,6 +452,10 @@ addExemplarButtons.addEventListener("click", () => {
     importToSketch();
 });
 
+document.getElementById("open-moodboard").addEventListener("click", () => {
+    document.getElementById("moodboard-container").style.display = "flex";
+});
+
 // Just a test
 // let events = 0;
 // document.getElementById("save-events").onclick = () => {

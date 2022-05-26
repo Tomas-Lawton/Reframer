@@ -131,7 +131,7 @@
                     <div class="flex">
                         <h3 class="sub-heading">Mode</h3>
                         <div id="contain-num-squiggles">
-                            <label>Add lines:</label>
+                            <label>Max lines:</label>
                             <input id="num-squiggles" type="number" min="1" value="32" max="100">
                         </div>
                     </div>
@@ -178,6 +178,20 @@
                         <input type="range" id="time-slider" value="0" min="0" max="0">
                     </div>
 
+
+                    <div>
+                        <div class="flex">
+                            <h3 class="sub-heading">Moodboard</h3>
+                        </div>
+                        <hr />
+                    </div>
+
+                    <div class="flex">
+                        <h2 class="panel-subtitle" id="moodboard-section">Help me learn by adding to the moodboard!</h2>
+                        <button id="open-moodboard">
+                            <i class="fas fa-image"></i>
+                        </button>
+                    </div>
 
                 </div>
             </div>
@@ -272,10 +286,8 @@
         <div id="moodboard">
             <div class="modal-status">
                 <div id="moodboard-header">
-                    <button id="open-moodboard">
-                        <i class="fas fa-image"></i>
-                    </button>
                     <h1 class="panel-title">Moodboard...</h1>
+                    <h2>Add and import sketches to quickly explore ideas. Over time, this will give the sketch-bot an idea of what you mean when you ask to draw something!</h2>
                 </div>
                 <i id="moodboard-cross" class="fa-solid fa-xmark"></i>
 
