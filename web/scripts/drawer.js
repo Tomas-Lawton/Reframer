@@ -143,6 +143,7 @@ multiTool.onMouseDrag = function(event) {
     }
 };
 multiTool.onMouseUp = function() {
+    // so the latest sketch is available to the drawer
     mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
@@ -165,10 +166,9 @@ multiTool.onMouseUp = function() {
                 type: "draw-event",
                 data: myPath,
             });
-
             if (liveCollab) {
+                mainSketch.continueSketch();
                 liveCollab = false;
-                mainSketch.continue();
             }
             break;
         case "lasso":

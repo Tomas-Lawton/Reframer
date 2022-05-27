@@ -33,6 +33,7 @@ class SketchHandler {
             "redrawing",
             "continuing",
         ];
+        this.lastHistoryIndex = 0;
 
         // TODO Refactor
         this.buttonControlLeft = true;
@@ -147,12 +148,25 @@ class SketchHandler {
     }
     continue () {
         // need to change this so it supports updating the prompt or using a new svg
-
         this.updateDrawer({
             status: "continue",
+            prompt: this.prompt,
             frameSize: this.frameSize, //can remove?
         });
         this.clipDrawing = true;
+        console.log("continuing with potential updated prompt");
+        setActionUI("continuing");
+    }
+    continueSketch() {
+        // need to change this so it supports updating the prompt or using a new svg
+        console.log(this.svg);
+        this.updateDrawer({
+            status: "continue_sketch",
+            svg: this.svg,
+            frameSize: this.frameSize, //can remove?
+        });
+        this.clipDrawing = true;
+        console.log("continuing with updated sketch");
         setActionUI("continuing");
     }
     stop() {
@@ -213,34 +227,44 @@ const setActionUI = (state) => {
 
     if (mainSketch.activeStates.includes(state)) {
         // AI is "thinking"
-        actionControls.forEach((elem) => elem.classList.add("inactive-action"));
-        actionControls[0].classList.add("inactive-action");
-        actionControls[1].classList.add("inactive-action");
-        actionControls[2].classList.add("inactive-action");
+        actionControls.forEach((elem) => {
+            elem.classList.add("inactive-action");
+            elem.classList.remove("active");
+        });
+        // actionControls[0].classList.add("inactive-action");
+        // actionControls[1].classList.add("inactive-action");
+        // actionControls[2].classList.add("inactive-action");
         stopButton.classList.remove("inactive-action");
         stopButton.style.background = "#ff6060";
 
         document.getElementById("spinner").style.display = "flex";
         if (state == "drawing") {
             aiMessage.innerHTML = `Got it! I'm drawing a ${mainSketch.prompt}!`;
+            actionControls[0].classList.add("active");
         } else if (state == "refining") {
             aiMessage.innerHTML = `Okay, refining the lines for a ${mainSketch.prompt}...`;
+            actionControls[1].classList.add("active");
         } else if (state == "redrawing") {
             aiMessage.innerHTML = `No worries, how about this instead?`;
+            actionControls[2].classList.add("active");
         } else if (state == "generating") {
             aiMessage.innerHTML = `Sure! Adding a ${mainSketch.prompt} to the moodboard!`;
+            actionControls[3].classList.add("active");
         } else if (state == "continuing") {
             aiMessage.innerHTML = `Cool idea, I'll make it a ${mainSketch.prompt}.`;
         }
         aiMessage.classList.add("typed-out");
     } else if (state === "stop") {
         // AI is waiting
-        actionControls.forEach((elem) => elem.classList.remove("inactive-action"));
+        actionControls.forEach((elem) => {
+            elem.classList.remove("inactive-action");
+            elem.classList.remove("active");
+        });
         stopButton.style.background = "#e1e1e1";
 
         document.getElementById("spinner").style.display = "none";
 
-        aiMessage.innerHTML = "I'm stopping! \nWhat can I draw next?";
+        aiMessage.innerHTML = "I'm stopping! What can we draw next?";
         aiMessage.classList.add("typed-out");
 
         // timeKeeper

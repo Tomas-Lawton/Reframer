@@ -374,9 +374,9 @@ document.querySelectorAll(".tab-item").forEach((tab) => {
 //     }
 // });
 
-document.getElementById("num-squiggles").oninput = function() {
-    mainSketch.numRandomCurves = parseInt(this.value);
-};
+// document.getElementById("num-squiggles").oninput = function() {
+//     mainSketch.numRandomCurves = parseInt(this.value);
+// };
 
 document.getElementById("num-traces").oninput = function() {
     mainSketch.numTraces = parseInt(this.value);

@@ -98,7 +98,15 @@ if os.environ.get('CONNECTAI') == "True":
                         await artefact_drawer.continue_update(data)
                     except Exception as e:
                         logging.error(e)
-                        logging.error("Failed to update drawer")
+                        logging.error("Failed to update drawer for continue (prompt)")
+                    artefact_drawer.run_loop()
+
+                if data["status"] == "continue_sketch":
+                    try:
+                        await artefact_drawer.continue_update_sketch(data)
+                    except Exception as e:
+                        logging.error(e)
+                        logging.error("Failed to update drawer for new sketch")
                     artefact_drawer.run_loop()
 
                 if data["status"] == "sketch_exemplars":

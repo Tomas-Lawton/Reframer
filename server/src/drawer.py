@@ -64,6 +64,7 @@ class Drawer:
         return
 
     def parse_svg(self, region=None):
+        print("here")
         use_region = region['activate']
         try:
             (
@@ -106,27 +107,18 @@ class Drawer:
         self.points_vars = []
         self.stroke_width_vars = []
         self.color_vars = []
-        print(self.shapes)
         for path in self.shapes:
             path.points.requires_grad = True
             self.points_vars.append(path.points)
             path.stroke_width.requires_grad = True
             self.stroke_width_vars.append(path.stroke_width)
-        print(self.shape_groups)
         for group in self.shape_groups:
             group.stroke_color.requires_grad = True
             self.color_vars.append(group.stroke_color)
-        print('here')
         self.render = pydiffvg.RenderFunction.apply
-        print('test')
-        print(self.canvas_w)
-        print(self.canvas_h)
-        print(self.drawing_area)
-        print(self.device)
         self.mask = area_mask(self.canvas_w, self.canvas_h, self.drawing_area).to(
             self.device
         )
-        print('here2')
         self.user_sketch.init_vars()
         self.points_vars0 = self.user_sketch.points_vars
         self.stroke_width_vars0 = self.user_sketch.stroke_width_vars
@@ -284,6 +276,7 @@ class Drawer:
             neg_prompt_features = self.clip_interface.encode_text_classes(neg_prompt)
             self.set_text_features(prompt_features, neg_prompt_features)
             self.last_region = region
+            self.num_paths = data["data"]["random_curves"]
             self.parse_svg(region)
             logging.info("Got features")
             return self.activate()
@@ -304,7 +297,6 @@ class Drawer:
         prompt = data["data"]["prompt"]
         neg_prompt = []
         try:
-            logging.info("Encountered a problem updating drawer")
             if prompt == self.clip_interface.positive:
                 await self.socket.send_json(self.last_result)
             else:
@@ -318,6 +310,22 @@ class Drawer:
         except Exception as e:
             logging.error(e)
             logging.error("Failed to encode features in clip")
+
+    async def continue_update_sketch(self, data):
+        """Keep the last drawer running"""
+        logging.info("Continuing with new sketch...")
+
+        svg_string = data["data"]["svg"]
+        print(svg_string)
+        if svg_string is not None:
+            async with aiofiles.open('data/interface_paths.svg', 'w') as f:
+                await f.write(svg_string)
+        try:
+            self.parse_svg(self.last_region)
+            return self.activate()
+        except Exception as e:
+            logging.error(e)
+            logging.error("Failed to parse the new sketch")
 
     async def run(self):
         # Refactor so that the code is a thin layer of the looper

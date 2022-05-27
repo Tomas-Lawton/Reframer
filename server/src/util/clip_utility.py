@@ -182,8 +182,19 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
         try:
             if 'opacity' in att:
                 opacity = float(att['opacity'])
+                print(1)
+            elif 'stroke-opacity' in att:
+                opacity = float(att['stroke-opacity'])
+                print(2)
+            elif 'opacity' in path_group['attributes']:
+                opacity = str(path_group['attributes']['stroke-opacity'])
+                print(3)
+            elif 'stroke-opacity' in path_group['attributes']:
+                opacity = str(path_group['attributes']['stroke-opacity'])
+                print(4)
             else:
-                opacity = str(path_group['attributes']['opacity'])
+                opacity = 1
+
         except Exception as e:
             logging.error(e)
             logging.error("Couldn't parse stroke opacity")

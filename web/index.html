@@ -17,6 +17,7 @@
     <script type="text/javascript" src="scripts/svg.js" defer></script>
 
     <script type="text/javascript" src="scripts/setup.js" defer></script>
+    <script type="text/javascript" src="scripts/logger.js" defer></script>
     <script type="text/javascript" src="scripts/api.js" defer></script>
     <script type="text/javascript" src="scripts/drawer.js" defer></script>
     <script type="text/javascript" src="scripts/logic.js" defer></script>
@@ -124,17 +125,21 @@
                 </div>
 
                 <div id="prompt-input">
-                    <i class="fas fa-robot"></i>
                     <input type="text" id="messageText" placeholder="A majestic rainbow unicorn..." />
+                    <i class="fas fa-robot"></i>
                 </div>
 
                 <div>
                     <div class="flex">
-                        <h3 class="sub-heading">Mode</h3>
-                        <div id="contain-num-squiggles">
+                        <!-- <h3 class="sub-heading">Mode</h3> -->
+                        <h1 class="panel-title">
+                            Mode
+                        </h1>
+                        <h3 class="sub-heading">AI Controls</h3>
+                        <!-- <div id="contain-num-squiggles">
                             <label>Max lines:</label>
                             <input id="num-squiggles" type="number" min="1" value="32" max="100">
-                        </div>
+                        </div> -->
                     </div>
                     <div id="set-modes">
                         <div class="ai-action" id="draw">
@@ -159,6 +164,9 @@
                         <div class="flex">
                             <h3 class="sub-heading">Moodboard</h3>
                         </div>
+                        <!-- <h1 class="panel-title">
+                            Moodboard
+                        </h1> -->
                     </div>
 
                     <div class="flex">
@@ -233,39 +241,37 @@
         <div id="sketch-view">
             <div id="contain-canvas">
                 <div class="canvas-drop">
+                    <p id="rolling-loss"></p>
                     <div id="delete-handler" class="select-ui">
                         <div>
                             <i class="basic-grey fa-solid fa-trash fa-fw"></i>
                         </div>
                     </div>
-
                     <div id="initialise-handler" class="select-ui">
                         <div>
                             <i class="basic-grey fa-solid fa-brain fa-fw"></i>
                         </div>
                     </div>
-                </div>
-                <canvas id="canvas"></canvas>
-                <div id="contain-dot">
-                    <h3 class="sub-heading">Revise</h3>
-                    <div id="refine-controls">
-                        <div id="go-back">
-                            <i class="fa-solid fa-arrow-left-long fa-fw"></i>
-                            <p>Back</p>
+                    <div id="contain-dot">
+                        <!-- <h3 class="sub-heading">Revise</h3> -->
+                        <div id="refine-controls">
+                            <div id="go-back">
+                                <i class="fa-solid fa-arrow-left-long fa-fw"></i>
+                                <p>Back</p>
+                            </div>
+                            <div id="redraw">
+                                <i class="fa-solid fa-repeat fa-fw"></i>
+                                <p>Redraw</p>
+                            </div>
+                            <div id="continue">
+                                <i class="fa-solid fa-arrow-right-long fa-fw"></i>
+                                <p>Continue</p>
+                            </div>
                         </div>
-                        <div id="redraw">
-                            <i class="fa-solid fa-repeat fa-fw"></i>
-                            <p>Redraw</p>
-                        </div>
-                        <div id="continue">
-                            <i class="fa-solid fa-arrow-right-long fa-fw"></i>
-                            <p>Continue</p>
-                        </div>
+                        <input type="range" id="time-slider" value="0" min="0" max="0">
                     </div>
-                    <p id="rolling-loss"></p>
-                    <input type="range" id="time-slider" value="0" min="0" max="0">
+                    <canvas id="canvas"></canvas>
                 </div>
-
             </div>
         </div>
     </div>
@@ -281,7 +287,8 @@
             <div class="modal-status">
                 <div id="moodboard-header">
                     <h1 class="panel-title">Moodboard...</h1>
-                    <h2>Add and import sketches to quickly explore ideas. Over time, this will give the sketch-bot an idea of what you mean when you ask to draw something!</h2>
+                    <h2>Add and import sketches to quickly explore ideas. Over time, sketch-bot will learn and adapt!
+                    </h2>
                 </div>
                 <i id="moodboard-cross" class="fa-solid fa-xmark"></i>
 

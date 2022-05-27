@@ -1,5 +1,3 @@
-const uuid = "id" + Math.random().toString(16).slice(2);
-
 async function postData(url = "", data = {}) {
     const response = await fetch(url, {
         method: "POST",
