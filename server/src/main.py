@@ -10,7 +10,6 @@ from pymongo import MongoClient
 
 # TO DO add environment var to set log mode
 logging.basicConfig(
-    # encoding='utf-8',
     level=logging.DEBUG,
     format=f'APP LOGGING: %(levelname)s %(name)s %(threadName)s : %(message)s',
 )
@@ -44,8 +43,12 @@ async def getInformation(info: Request):
     interaction_json = await info.json()
     try:
         collection.find_one_and_update(
-            {"user_id": interaction_json["user_id"]},
-            {"$set": {"recorded_data": interaction_json["recorded_data"]}},
+            {"log_time": interaction_json["log_time"]}, # Log mode
+            {"$set": {
+                "user_id": interaction_json["user_id"],
+                "recorded_data": interaction_json["recorded_data"]
+                }
+            },
             upsert=True,
         )
         return {

@@ -40,18 +40,18 @@ multiTool.onMouseDown = function(event) {
                     hideSelectUI();
                 }
 
-                // // Select box
+                // Select box
                 mainSketch.selectBox = new Rectangle(event.point);
             }
 
             if (hitResult) {
                 // got path
                 if (mainSketch.boundingBox) {
-                    hideSelectUI(); // draw a new one containing selection
+                    hideSelectUI();
                 }
                 unpackGroup();
                 path = hitResult.item;
-                path.selected = true; //fix so that this happens with no drag but with drag it won't toggle !path.selected
+                path.selected = true;
                 let items = getSelectedPaths();
                 fitToSelection(items, "moving");
                 updateSelectUI();
