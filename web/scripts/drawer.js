@@ -41,23 +41,10 @@ multiTool.onMouseDown = function(event) {
                 }
 
                 // // Select box
-                // if (selectBox) {
-                //     selectBox.remove();
-                // }
-                // if (mainSketch.selectBox) {
-                //     mainSketch.selectBox = null;
-                // }
                 mainSketch.selectBox = new Rectangle(event.point);
             }
 
             if (hitResult) {
-                if (selectBox) {
-                    selectBox.remove();
-                }
-                if (mainSketch.selectBox) {
-                    mainSketch.selectBox = null;
-                }
-
                 // got path
                 if (mainSketch.boundingBox) {
                     hideSelectUI(); // draw a new one containing selection
@@ -114,12 +101,12 @@ multiTool.onMouseDrag = function(event) {
                     mainSketch.boundingBox.position.y += event.delta.y;
                     updateSelectUI();
                 }
-            }
-            // TO DO: Refactor the temporary boxes
-            if (mainSketch.selectBox != undefined) {
+            } else if (mainSketch.selectBox != undefined) {
                 mainSketch.selectBox.width += event.delta.x;
                 mainSketch.selectBox.height += event.delta.y;
-                if (selectBox !== undefined) selectBox.remove(); // redraw //REFACTOR
+                if (selectBox) {
+                    selectBox.remove();
+                } // redraw //REFACTOR
                 selectBox = new Path.Rectangle(mainSketch.selectBox);
                 selectBox.set({
                     fillColor: "#e9e9ff",
@@ -153,8 +140,12 @@ multiTool.onMouseUp = function() {
                 let items = userLayer.getItems({ inside: selectBox.bounds });
                 items.forEach((item) => (item.selected = true));
                 items.pop();
-                mainSketch.selectBox = remove();
+                // mainSketch.selectBox.remove();
+                if (mainSketch.selectBox) {
+                    mainSketch.selectBox = null;
+                }
                 selectBox.remove();
+                selectBox = null;
                 fitToSelection(items, "moving");
                 updateSelectUI();
             }

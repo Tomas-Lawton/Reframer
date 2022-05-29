@@ -932,6 +932,7 @@ hr {
     top: 5em;
     left: 2em;
     display: flex;
+    /* display: none; */
 }
 
 .content-margin {
@@ -1106,7 +1107,8 @@ hr {
     grid-row: auto auto;
     /* grid-column-gap: 20px;
     grid-row-gap: 20px; */
-    grid-template-columns: repeat(2, minmax(150px, 2fr));
+    /* grid-template-columns: repeat(2, minmax(150px, 2fr)); */
+    grid-template-columns: repeat(2, minmax(10px, 1fr));
     grid-template-rows: repeat(2, minmax(150px, 2fr));
     /* height: 100%; */
     grid-gap: 0.5em;
@@ -1352,7 +1354,12 @@ input[type="range"]::-moz-range-thumb {
     display: none;
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 500px) {}
+
+@media screen and (max-width: 990px) {
+    #set-modes {
+        grid-template-rows: none;
+    }
     #art-control-final {
         flex-direction: column;
     }
@@ -1361,18 +1368,54 @@ input[type="range"]::-moz-range-thumb {
         height: 2em;
         width: 100%;
     }
-}
-
-@media screen and (max-width: 990px) {
+    .top-action .fa-solid {
+        padding: 0.4em;
+    }
+    .top-action {
+        transform: translateX(-50%);
+        left: 50%;
+    }
+    #top-action-right {
+        bottom: 0;
+        right: auto;
+    }
+    #art-panel {
+        max-width: 60vw;
+        border-radius: 1em;
+    }
+    #tabs {
+        font-size: 0.5em;
+    }
+    .content-margin {
+        width: auto;
+        padding: 1em;
+    }
+    .panel-title {
+        font-size: 1.2em;
+    }
+    .panel-subtitle {
+        font-size: 0.7em;
+    }
+    .sub-heading {
+        font-size: 0.7em;
+    }
+    .ai-action {
+        font-size: 0.7em;
+        padding: 1em;
+    }
+    .fa-fw {
+        width: 1em;
+        font-size: 1em;
+    }
+    #prompt-input input {
+        font-size: 0.6em;
+    }
     #contain-dot {
         position: inherit;
     }
     .swatch {
         width: 0.7em;
         height: 0.7em;
-    }
-    #art-panel {
-        padding: 1.5em;
     }
     .layout_default.picker_wrapper {
         max-width: 40vw !important;
@@ -1400,7 +1443,7 @@ input[type="range"]::-moz-range-thumb {
     #button-panel {
         border-radius: 0;
     }
-    #contain-canvas {
+    /* #contain-canvas {
         padding: 0;
     }
     #exemplar-grid {
@@ -1424,7 +1467,7 @@ input[type="range"]::-moz-range-thumb {
     #sketch-view {
         height: auto;
         padding: 2.5em 0;
-    }
+    } */
 }
 
 @media screen and (max-width: 500px) {

@@ -26,8 +26,9 @@ const aiCard = document.getElementById("describe-card");
 const deleteHandler = document.getElementById("delete-handler");
 const rotateSlider = document.getElementById("rotate-slider");
 const rotateNumber = document.getElementById("rotate-number");
-
 const scaleSlider = document.getElementById("scale-slider");
+const scaleNumber = document.getElementById("scale-number");
+
 const initialiseHandler = document.getElementById("initialise-handler");
 const transformControl = document.getElementById("transform-ui");
 

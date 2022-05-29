@@ -100,27 +100,29 @@
 
     <div id="art-panel">
         <div id="tabs">
-            <div class="tab-item active-tab" id="collab-tab">
+            <!-- <div class="tab-item active-tab" id="collab-tab">
                 <h2>Collab</h2>
-            </div>
-            <div class="tab-item" id="style-tab">
+            </div> -->
+            <div class="tab-item active-tab" id="style-tab">
                 <h2>Style</h2>
             </div>
         </div>
+        <!-- <div id="contain-num-squiggles">
+                            <label>Max lines:</label>
+                            <input id="num-squiggles" type="number" min="1" value="32" max="100">
+                        </div> -->
 
-        <div class="content-margin">
+        <!-- <div class="content-margin">
             <div id="ai-content">
                 <div class="tab-info">
                     <div>
                         <h1 class="panel-title">
-                            <!-- <i class="fa-solid fa-robot space"></i> -->
                             Sketch-bot
                         </h1>
                         <h2 class="panel-subtitle">What shall we draw together?</h2>
                     </div>
                     <div id="spinner">
                         <i class="fa-solid fa-spinner button-animation " id="loading"></i>
-                        <!-- <i class="fa-solid fa-robot" id="loading"></i> -->
                     </div>
                 </div>
 
@@ -131,22 +133,17 @@
 
                 <div>
                     <div class="flex">
-                        <!-- <h3 class="sub-heading">Mode</h3> -->
                         <h1 class="panel-title">
                             Mode
                         </h1>
                         <h3 class="sub-heading">AI Controls</h3>
-                        <!-- <div id="contain-num-squiggles">
-                            <label>Max lines:</label>
-                            <input id="num-squiggles" type="number" min="1" value="32" max="100">
-                        </div> -->
                     </div>
                     <div id="set-modes">
                         <div class="ai-action" id="draw">
                             <i class="fa-solid fa-marker fa-fw"></i>
                             <p>Draw</p>
                         </div>
-                        <div class="ai-action" id="draw">
+                        <div class="ai-action" id="redraw">
                             <i class="fa-solid fa-down-left-and-up-right-to-center fa-fw"></i>
                             <p>Revise</p>
                         </div>
@@ -164,9 +161,6 @@
                         <div class="flex">
                             <h3 class="sub-heading">Moodboard</h3>
                         </div>
-                        <!-- <h1 class="panel-title">
-                            Moodboard
-                        </h1> -->
                     </div>
 
                     <div class="flex">
@@ -178,7 +172,7 @@
 
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <div class="content-margin">
             <div id="style-content">
@@ -214,7 +208,7 @@
                             </div>
                             <div id="pen-color" class="off-black"></div>
                         </div>
-                        <p id="set-background">Set background</p>
+                        <!-- <p id="set-background">Set background</p> -->
                         <div id="transform-ui">
                             <div class="transformer">
                                 <div class="number-input">
@@ -225,10 +219,18 @@
                                     <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
                                 </div>
                             </div>
-                            <p>Scale</p>
-                            <div id="scale-handler">
-                                <input type="range" id="scale-slider" value="15" min="1" max="20">
+
+                            <div class="transformer">
+                                <div class="scale-input">
+                                    <p>Scale</p>
+                                    <input type="number" id="scale-number" value="15" min="1" max="20">
+                                </div>
+                                <div id="scale-handler">
+                                    <input type="range" id="scale-slider" value="15" min="1" max="20">
+                                </div>
                             </div>
+
+
                         </div>
                     </div>
                 </div>
@@ -257,15 +259,15 @@
                         <div id="refine-controls">
                             <div id="go-back">
                                 <i class="fa-solid fa-arrow-left-long fa-fw"></i>
-                                <p>Back</p>
+                                <p>Go back</p>
                             </div>
                             <div id="redraw">
                                 <i class="fa-solid fa-repeat fa-fw"></i>
-                                <p>Redraw</p>
+                                <p>Try again</p>
                             </div>
                             <div id="continue">
                                 <i class="fa-solid fa-arrow-right-long fa-fw"></i>
-                                <p>Continue</p>
+                                <p>Keep going</p>
                             </div>
                         </div>
                         <input type="range" id="time-slider" value="0" min="0" max="0">
@@ -277,10 +279,6 @@
     </div>
     </div>
 
-    <!-- <div id="save-events">
-            <i class="fa-solid fa-save fa-fw"></i>
-            <p>Save</p>
-        </div> -->
 
     <div id="moodboard-container">
         <div id="moodboard">

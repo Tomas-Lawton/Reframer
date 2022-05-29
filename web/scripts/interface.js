@@ -207,8 +207,17 @@ scaleSlider.oninput = function() {
     fitToSelection(selectedPaths, "scaling");
     updateSelectUI();
 };
-scaleSlider.onmouseup = function() {
-    console.log("done");
+
+scaleNumber.oninput = function() {
+    hideSelectUI(false);
+    let selectedPaths = getSelectedPaths(); // all selected
+
+    for (child of selectedPaths) {
+        child.applyMatrix = false;
+        child.scaling = this.value / 5;
+    }
+    fitToSelection(selectedPaths, "scaling");
+    updateSelectUI();
 };
 
 opacitySlider.oninput = function() {
@@ -242,39 +251,39 @@ palette.addEventListener("click", () => {
     toggleArtControls();
 });
 
-prompt.addEventListener("input", (e) => {
-    mainSketch.prompt = e.target.value;
-});
+// prompt.addEventListener("input", (e) => {
+//     mainSketch.prompt = e.target.value;
+// });
 
 // TODO Refactor into the setActionUI switch statement using states
 
-// Draw
-actionControls[0].addEventListener("click", () => {
-    if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
-        mainSketch.draw();
-    }
-});
+// // Draw
+// actionControls[0].addEventListener("click", () => {
+//     if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
+//         mainSketch.draw();
+//     }
+// });
 
-// Revise
-actionControls[1].addEventListener("click", () => {
-    if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
-        mainSketch.draw(null, null, true);
-    }
-});
+// // Revise
+// actionControls[1].addEventListener("click", () => {
+//     if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
+//         mainSketch.draw(null, null, true);
+//     }
+// });
 
-// Trial / Brainstorm
-actionControls[2].addEventListener("click", () => {
-    if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
-        mainSketch.generate();
-    }
-});
+// // Trial / Brainstorm
+// actionControls[2].addEventListener("click", () => {
+//     if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
+//         mainSketch.generate();
+//     }
+// });
 
-// Stop
-stopButton.addEventListener("click", () => {
-    if (mainSketch.activeStates.includes(mainSketch.drawState)) {
-        mainSketch.stop();
-    }
-});
+// // Stop
+// stopButton.addEventListener("click", () => {
+//     if (mainSketch.activeStates.includes(mainSketch.drawState)) {
+//         mainSketch.stop();
+//     }
+// });
 
 // AI Revise
 
@@ -320,7 +329,6 @@ artControls.onmousedown = (e) => {
         pos4 < bounds.top ||
         pos4 > bounds.bottom
     ) {
-        console.log("moving");
         document.onmouseup = closeDragElement;
         document.onmousemove = elementDrag;
     }
@@ -382,9 +390,9 @@ document.getElementById("num-traces").oninput = function() {
     mainSketch.numTraces = parseInt(this.value);
 };
 
-document.getElementById("set-background").onclick = function() {
-    canvas.style.backgroundColor = mainSketch.strokeColor;
-};
+// document.getElementById("set-background").onclick = function() {
+//     canvas.style.backgroundColor = mainSketch.strokeColor;
+// };
 
 document.getElementById("moodboard-cross").addEventListener("click", () => {
     if (!moodboard.style.display || moodboard.style.display === "none") {
@@ -446,32 +454,14 @@ picker.onChange = (color) => {
     // setPenMode("pen", document.getElementById("pen"));
 };
 
-setActionUI("inactive");
-
 addExemplarButtons.addEventListener("click", () => {
     importToSketch();
 });
 
-document.getElementById("open-moodboard").addEventListener("click", () => {
-    document.getElementById("moodboard-container").style.display = "flex";
-});
+// AI STUFF
 
-// Just a test
-// let events = 0;
-// document.getElementById("save-events").onclick = () => {
-//     dumpUserEvents({
-//         user_id: uuid,
-//         recorded_data: {
-//             events: {
-//                 hello: "world",
-//             },
-//             events: events,
-//         },
-//     });
-//     events += 1;
-// };
+// document.getElementById("open-moodboard").addEventListener("click", () => {
+//     document.getElementById("moodboard-container").style.display = "flex";
+// });
 
-if (!showAI) {
-    aiCard.style.display = "none";
-    document.getElementById("right-background").style.display = "none";
-}
+// setActionUI("inactive");
