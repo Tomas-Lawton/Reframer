@@ -17,8 +17,6 @@ class SketchHandler {
         this.frameSize = canvas.getBoundingClientRect().width;
 
         // Defaults
-        // this.strokeColor = "#181818";
-
         this.strokeColor = "rgb(24,24,24)";
         this.strokeWidth = 8;
         this.opacity = 1;

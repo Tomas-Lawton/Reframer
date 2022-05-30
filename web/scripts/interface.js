@@ -452,3 +452,5 @@ addExemplarButtons.addEventListener("click", () => {
 // });
 
 // setActionUI("inactive");
+
+artControls.onclick = () => logger.event("test");

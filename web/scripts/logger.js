@@ -4,19 +4,18 @@ class UserData {
         self.events = 0;
         self.eventLog = [];
     }
-    logUserEvent() {
-        console.log("hello world");
-        self.eventLog.push("idek");
-    }
-    saveLogs() {
+    event(eventType) {
         dumpUserEvents({
-            user_id: self.uuid,
             log_time: Date.now(), //can use this just have to update backend
             recorded_data: {
-                events: eventLog,
-                events: self.events,
+                user_id: self.uuid,
+                event_type: eventType,
+                event_count: self.events,
+                data: mainSketch,
             },
         });
         self.events += 1;
     }
 }
+
+logger = new UserData();
