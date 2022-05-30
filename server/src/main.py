@@ -18,6 +18,7 @@ app = FastAPI(title="Clip Algorithm API")
 origins = [
     "http://localhost",
     "http://127.0.0.1:8000",
+    "http://127.0.0.1:5500"
 ]
 
 app.add_middleware(
@@ -41,6 +42,7 @@ except ValueError as e:
 @app.post("/save_interactions")
 async def getInformation(info: Request):
     interaction_json = await info.json()
+    print(interaction_json)
     try:
         collection.find_one_and_update(
             {"log_time": interaction_json["log_time"]}, # Log mode
