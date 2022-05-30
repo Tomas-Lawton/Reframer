@@ -21,6 +21,12 @@ document.getElementById("delete").addEventListener("click", () =>
         title: "Clearing Canvas",
         message: "Are you sure you want to delete your drawing?",
         confirmAction: () => {
+            // Save before clearing
+            mainSketch.svg = paper.project.exportSVG({
+                asString: true,
+            });
+            logger.event("clear-sketch");
+
             mainSketch.lastPrompt = null; //clear for draw (not redraw)
             // drawButton.innerHTML = "Draw";
             userLayer.clear();
@@ -114,6 +120,11 @@ document.getElementById("undo").addEventListener("click", () => {
                 data: afterErase, //use ref
             });
         }
+
+        mainSketch.svg = paper.project.exportSVG({
+            asString: true,
+        });
+        logger.event("undo-" + lastEvent.type);
     }
 });
 document.getElementById("redo").addEventListener("click", () => {
@@ -145,9 +156,19 @@ document.getElementById("redo").addEventListener("click", () => {
                 data: beforeErase, //use ref
             });
         }
+
+        mainSketch.svg = paper.project.exportSVG({
+            asString: true,
+        });
+        logger.event("redo-" + lastEvent.type);
     }
 });
 document.getElementById("save").addEventListener("click", () => {
+    mainSketch.svg = paper.project.exportSVG({
+        asString: true,
+    });
+    logger.event("save-sketch");
+
     canvas.toBlob((blob) => {
         let url = window.URL || window.webkitURL;
         let link = url.createObjectURL(blob);
@@ -452,5 +473,3 @@ addExemplarButtons.addEventListener("click", () => {
 // });
 
 // setActionUI("inactive");
-
-artControls.onclick = () => logger.event("test");

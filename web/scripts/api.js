@@ -12,7 +12,7 @@ async function postData(url = "", data = {}) {
     return response.json();
 }
 
-const dumpUserEvents = (latestJson) => {
+const logEventAPI = (latestJson) => {
     postData(http + base + "/save_interactions", latestJson)
         .then((res) => console.log(res))
         .catch((e) => console.error(e));

@@ -414,6 +414,11 @@ const deletePath = () => {
         hideSelectUI();
     }
     mainSketch.transformGroup = null;
+
+    mainSketch.svg = paper.project.exportSVG({
+        asString: true,
+    });
+    logger.event("deleted-path");
 };
 
 // switchControls();

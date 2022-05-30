@@ -167,6 +167,7 @@ multiTool.onMouseUp = function() {
                 mainSketch.continueSketch();
                 liveCollab = false;
             }
+
             break;
         case "lasso":
             mainSketch.resetHistory(); //reset since not continuing
@@ -175,9 +176,17 @@ multiTool.onMouseUp = function() {
             regionPath.remove();
             break;
     }
+    // remove??
     if (mainSketch.boundingBox) {
         mainSketch.boundingBox.data.state = "moving";
     }
+
+    // use updates
+    mainSketch.svg = paper.project.exportSVG({
+        asString: true,
+    });
+
+    logger.event(mainsketch.penMode + "-up");
 };
 
 eraseTool.onMouseDown = function(event) {
@@ -269,4 +278,6 @@ eraseTool.onMouseUp = function(event) {
     mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
+
+    logger.event("erase-up");
 };

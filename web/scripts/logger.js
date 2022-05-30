@@ -5,17 +5,24 @@ class UserData {
         self.eventLog = [];
     }
     event(eventType) {
-        dumpUserEvents({
-            log_time: Date.now(), //can use this just have to update backend
+        logEventAPI({
+            log_time: Date.now(),
+            user_id: self.uuid,
             recorded_data: {
-                user_id: self.uuid,
                 event_type: eventType,
                 event_count: self.events,
-                data: mainSketch,
+                data: {
+                    prompt: mainSketch.prompt,
+                    svg: mainSketch.svg,
+                    sketch_size: mainSketch.frameSize,
+                    exemplar_size: 0,
+                    mode: mainSketch.penMode,
+                    iteration_step: mainSketch.step,
+                    region: mainSketch.drawRegion,
+                },
             },
         });
         self.events += 1;
     }
 }
-
 logger = new UserData();
