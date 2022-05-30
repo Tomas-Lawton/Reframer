@@ -1,4 +1,4 @@
-name: base
+name: env_deploy
 channels:
   - pytorch
   - defaults
@@ -439,10 +439,8 @@ dependencies:
   - pip:
     - aiofiles==0.6.0
     - asgiref==3.5.2
-    - clip==1.0
     - coloredlogs==15.0.1
     - cssutils==2.4.0
-    - diffvg==0.0.1
     - dnspython==2.2.1
     - fastapi==0.78.0
     - ftfy==6.1.1

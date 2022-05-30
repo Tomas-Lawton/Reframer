@@ -1,5 +1,5 @@
 from drawer import Drawer
-from clip_instance import Clip_Instance
+# from clip_instance import Clip_Instance
 
 import logging
 import os
