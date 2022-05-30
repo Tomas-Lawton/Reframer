@@ -7,8 +7,10 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
 document.querySelectorAll(".swatch").forEach((elem) => {
     elem.addEventListener("click", () => {
         let col = window.getComputedStyle(elem).backgroundColor;
-        mainSketch.strokeColor = col;
+        mainSketch.opacity = 1;
         opacitySlider.value = 100;
+
+        mainSketch.strokeColor = col;
         picker.setColor(col);
         getRGBA();
     });
