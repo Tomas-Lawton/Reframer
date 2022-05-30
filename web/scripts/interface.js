@@ -180,7 +180,7 @@ selectGroup = null;
 rotateSlider.oninput = function() {
     hideSelectUI(false);
     let r = this.value;
-    mainSketch.rotationGroup.rotation = r;
+    mainSketch.transformGroup.rotation = r;
     let items = getSelectedPaths();
     fitToSelection(items, "rotating");
     updateSelectUI();
@@ -189,7 +189,7 @@ rotateSlider.oninput = function() {
 rotateNumber.oninput = function() {
     hideSelectUI(false);
     let r = this.value;
-    mainSketch.rotationGroup.rotation = r;
+    mainSketch.transformGroup.rotation = r;
     let items = getSelectedPaths();
     fitToSelection(items, "rotating");
     updateSelectUI();
@@ -310,15 +310,17 @@ palette.addEventListener("click", () => {
 // Control panel
 artControls.onmousedown = (e) => {
     let content;
-    document.querySelectorAll(".tab-item").forEach((tab) => {
-        if (tab.classList.contains("active-tab")) {
-            if (tab.id === "collab-tab") {
-                content = document.getElementById("ai-content");
-            } else {
-                content = document.getElementById("style-content");
-            }
-        }
-    });
+    // document.querySelectorAll(".tab-item").forEach((tab) => {
+    //     if (tab.classList.contains("active-tab")) {
+    //         if (tab.id === "collab-tab") {
+    //             content = document.getElementById("ai-content");
+    //         } else {
+    //             content = document.getElementById("style-content");
+    //         }
+    //     }
+    // });
+    content = document.getElementById("style-content");
+
     let bounds = content.getBoundingClientRect();
     e = e || window.event;
     pos3 = e.clientX;
@@ -417,23 +419,6 @@ document.getElementById("moodboard-cross").addEventListener("click", () => {
 // });
 // partial.getItems().forEach((path) => userLayer.addChild(path));
 // partial.remove();
-
-// if (window.innerWidth <= 990) {
-//     document
-//         .querySelector("body")
-//         .prepend(document.getElementById("contain-dot"));
-//     document.querySelector("body").prepend(aiCard);
-
-//     document.querySelector("body").prepend(artControls);
-//     document
-//         .getElementById("right-background")
-//         .prepend(document.getElementById("moodboard-header"));
-// } else {
-//     setPenMode("pen", document.getElementById("pen"));
-//     if (!showAI) {
-//         document.getElementById("left-background").style.width = "100%";
-//     }
-// }
 
 const picker = new Picker({
     parent: document.getElementById("color-picker"),

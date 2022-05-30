@@ -7,8 +7,6 @@ ws.onclose = (event) => {
     console.log("Closed socket... Running without AI\n" + event);
 };
 
-const showAI = true;
-
 // Sketching UI
 const canvas = document.getElementById("canvas");
 const exemplars = [
@@ -50,7 +48,7 @@ const stopButton = document.getElementById("stop");
 const moodboard = document.getElementById("moodboard-container");
 const buttonPanel = document.querySelector(".top-action");
 const dropdown = document.getElementById("pen-dropdown");
-
+const penDrop = document.getElementById("pen-drop");
 const aiMessage = document.querySelector("#ai-content .panel-subtitle");
 
 // Utility

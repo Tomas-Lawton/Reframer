@@ -69,12 +69,6 @@
             </div>
             <p>Erase</p>
         </div>
-        <!-- <div class="simple-drop pen-mode" id="erase">
-            <div>
-                <i class="erase fa-solid fa-circle-notch fa-fw"></i>
-            </div>
-            <p>Tidy</p>
-        </div> -->
         <div class="simple-drop pen-mode" id="lasso">
             <div>
                 <i class="region fa-solid fa-object-group fa-fw"></i>
@@ -85,7 +79,7 @@
 
     <div class="top-action">
         <i class="select fa-solid fa-arrow-pointer fa-fw pen-mode simple-hover" id="select"></i>
-        <i class="brush fa-solid fa-pen fa-fw pen-mode" id="pen-drop"></i>
+        <i class="brush fa-solid fa-pen fa-fw pen-mode selected-mode" id="pen-drop"></i>
         <i class="undo fa-solid fa-rotate-left fa-fw simple-hover" id="undo"></i>
         <i class="redo fa-solid fa-rotate-right fa-fw simple-hover" id="redo"></i>
         <i class="fa-solid fa-sliders fa-fw" id="palette"></i>
@@ -99,14 +93,15 @@
     <!-- <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i> -->
 
     <div id="art-panel">
-        <div id="tabs">
-            <!-- <div class="tab-item active-tab" id="collab-tab">
+        <!-- <div id="tabs">
+            <div class="tab-item active-tab" id="collab-tab">
                 <h2>Collab</h2>
-            </div> -->
+            </div>
             <div class="tab-item active-tab" id="style-tab">
                 <h2>Style</h2>
             </div>
-        </div>
+        </div> -->
+
         <!-- <div id="contain-num-squiggles">
                             <label>Max lines:</label>
                             <input id="num-squiggles" type="number" min="1" value="32" max="100">
@@ -221,7 +216,7 @@
                             </div>
 
                             <div class="transformer">
-                                <div class="scale-input">
+                                <div class="number-input">
                                     <p>Scale</p>
                                     <input type="number" id="scale-number" value="15" min="1" max="20">
                                 </div>

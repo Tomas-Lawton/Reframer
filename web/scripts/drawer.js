@@ -35,7 +35,7 @@ multiTool.onMouseDown = function(event) {
                 userLayer.getItems().forEach((path) => {
                     path.selected = false;
                 });
-                mainSketch.rotationGroup = null;
+                mainSketch.transformGroup = null;
                 if (mainSketch.boundingBox) {
                     hideSelectUI();
                 }
@@ -58,9 +58,9 @@ multiTool.onMouseDown = function(event) {
                 //can't group on input because group must already be set. so the rotation is set non-functionally to the group
                 rotateSlider.value = 0;
                 rotateNumber.value = 0;
-                let rotationGroup = new Group({ children: items });
-                rotationGroup.transformContent = false;
-                mainSketch.rotationGroup = rotationGroup;
+                let transformGroup = new Group({ children: items });
+                transformGroup.transformContent = false;
+                mainSketch.transformGroup = transformGroup;
             }
             break;
         case "pen":
@@ -148,6 +148,12 @@ multiTool.onMouseUp = function() {
                 selectBox = null;
                 fitToSelection(items, "moving");
                 updateSelectUI();
+                // Create group
+                rotateSlider.value = 0;
+                rotateNumber.value = 0;
+                let transformGroup = new Group({ children: items });
+                transformGroup.transformContent = false;
+                mainSketch.transformGroup = transformGroup;
             }
             break;
         case "pen":
@@ -184,7 +190,7 @@ eraseTool.onMouseDown = function(event) {
         strokeCap: "round",
         strokeJoin: "round",
         // strokeColor: "white",
-        // opacity: 0.9,
+        opacity: 0.9,
         strokeColor: "rgb(255, 0, 0)",
     });
     tmpGroup = new Group({
@@ -232,13 +238,13 @@ eraseTool.onMouseUp = function(event) {
     });
     deleteShape = deleteShape.unite(endCaps);
     deleteShape.simplify();
-    console.log(tmpGroup.getItems((erasorItem) => console.log(erasorItem)));
 
     const erasorItems = tmpGroup.getItems({
         overlapping: deleteShape.bounds,
     });
-
+    console.log(erasorItems);
     erasorItems.forEach(function(erasorItem) {
+        // subtract is not a function ? no erasor item?? or empty arr
         const result = erasorItem.subtract(deleteShape, {
             trace: false,
             insert: false,

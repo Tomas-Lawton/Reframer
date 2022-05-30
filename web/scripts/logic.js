@@ -34,6 +34,7 @@ class SketchHandler {
             "continuing",
         ];
         this.lastHistoryIndex = 0;
+        this.penDropMode = "pen";
 
         // TODO Refactor
         this.buttonControlLeft = true;
@@ -47,7 +48,7 @@ class SketchHandler {
         this.lastRollingLoss = null;
         this.traces = null;
         this.boundingBox = null;
-        this.rotationGroup = null;
+        this.transformGroup = null;
 
         // Settings panel
         this.useAdvanced = false;
@@ -274,16 +275,16 @@ const setActionUI = (state) => {
 };
 
 const unpackGroup = () => {
-    if (mainSketch.rotationGroup !== null) {
+    if (mainSketch.transformGroup !== null) {
         // Need to apply the group scale to the paths within the group
-        mainSketch.rotationGroup.applyMatrix = true;
+        mainSketch.transformGroup.applyMatrix = true;
         // how does scaling the group change the path children?
         userLayer.insertChildren(
-            mainSketch.rotationGroup.index,
-            mainSketch.rotationGroup.removeChildren()
+            mainSketch.transformGroup.index,
+            mainSketch.transformGroup.removeChildren()
         );
-        mainSketch.rotationGroup.remove();
-        mainSketch.rotationGroup = null;
+        mainSketch.transformGroup.remove();
+        mainSketch.transformGroup = null;
     }
 };
 
@@ -391,9 +392,8 @@ const updateSelectPosition = () => {
 const updateSelectUI = () => {
     if (mainSketch.boundingBox) {
         deleteHandler.style.display = "block";
-        if (showAI) {
-            initialiseHandler.style.display = "block";
-        }
+        // initialiseHandler.style.display = "block";
+
         transformControl.style.display = "flex";
         updateSelectPosition();
     }
@@ -413,7 +413,7 @@ const deletePath = () => {
     if (mainSketch.boundingBox) {
         hideSelectUI();
     }
-    mainSketch.rotationGroup = null;
+    mainSketch.transformGroup = null;
 };
 
 // switchControls();
@@ -588,16 +588,14 @@ const setPenMode = (mode, accentTarget) => {
 
     switch (mode) {
         case "pen-drop":
-            mainSketch.penMode = "pen";
-
-            // if (!["erase", "pen", "lasso"].includes(lastPenMode)) {
-            //     //default
-            //     mainSketch.penMode = "pen";
-            //     multiTool.activate();
-            // } else {
-            //     mainSketch.penMode = lastPenMode; //override "pen-drop" mode
-            //     multiTool.activate();
-            // }
+            // Default click
+            mainSketch.penMode = mainSketch.penDropMode;
+            if ((mainSketch.penMode = "erase")) {
+                eraseTool.activate();
+            } else {
+                multiTool.activate();
+            }
+            // Dropdown
             if (dropdown.style.display === "none" || !dropdown.style.display) {
                 dropdown.style.display = "flex";
                 let penButton = document
@@ -611,10 +609,17 @@ const setPenMode = (mode, accentTarget) => {
             }
             break;
         case "erase":
+            // Refactor to remove all in arr and then add just the one used
+            penDrop.classList.remove("fa-pen");
+            penDrop.classList.add("fa-eraser");
             eraseTool.activate();
+            mainSketch.penDropMode = "erase";
             break;
         case "pen":
+            penDrop.classList.remove("fa-eraser");
+            penDrop.classList.add("fa-pen");
             multiTool.activate();
+            "pen";
             break;
         case "select":
             dropdown.style.display = "none";
@@ -630,6 +635,7 @@ const setPenMode = (mode, accentTarget) => {
                 });
                 break;
             }
+            mainSketch.penDropMode = "lasso";
             break;
     }
 
