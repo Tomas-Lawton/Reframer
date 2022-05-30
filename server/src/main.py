@@ -34,7 +34,7 @@ app.add_middleware(
 
 try:
     cluster = MongoClient(
-        os.environ.get('key')
+        os.environ.get('MONGODB_URI')
     )
     db = cluster["vector_ai"]
     collection = db["interaction_events"]
