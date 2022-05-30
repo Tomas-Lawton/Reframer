@@ -102,5 +102,5 @@ timeKeeper.style.width = "0";
 multiTool.minDistance = 5;
 eraseTool.minDistance = 10;
 
-const maxPointSize = 79.99;
+const maxPointSize = 47.99;
 document.getElementById("width-slider").setAttribute("max", maxPointSize);

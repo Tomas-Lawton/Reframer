@@ -178,66 +178,58 @@
                     </div>
                 </div>
 
-                <div id="swatches">
-                    <div class="red swatch"></div>
-                    <div class="yellow swatch"></div>
-                    <div class="green swatch"></div>
-                    <div class="blue swatch"></div>
-                    <div class="pink swatch"></div>
-                    <div class="purple swatch"></div>
-                    <div class="off-black swatch"></div>
-                    <div class="white swatch"></div>
-                </div>
-                <div id="pen-styles">
+                <div id="picker-ui">
+                    <div id="swatches">
+                        <div class="red swatch"></div>
+                        <div class="yellow swatch"></div>
+                        <div class="green swatch"></div>
+                        <div class="blue swatch"></div>
+                        <div class="pink swatch"></div>
+                        <div class="purple swatch"></div>
+                        <div class="off-black swatch"></div>
+                        <div class="white swatch"></div>
+                    </div>
                     <div id="color-picker"></div>
-                    <div id="fine-control">
-                        <div id="art-sliders">
-                            <div>
-                                <p>Stroke Opacity</p>
-                                <input type="range" id="opacity-slider" value="75" min="0" max="100">
-                            </div>
-                            <div>
-                                <p>Line Width</p>
-                                <input type="range" id="width-slider" value="12" min="1" max="40">
-                            </div>
-                        </div>
-                        <div id="art-control-final">
-                            <div id="stroke-dot">
-                                <div id="point-size"></div>
-                            </div>
-                            <div id="pen-color" class="off-black"></div>
-                        </div>
-                        <div id="transform-ui">
-                            <div class="transformer">
-                                <div class="number-input">
-                                    <p>Rotate</p>
-                                    <input type="number" id="rotate-number" value="0" min="-180" max="180" step="1">
-                                </div>
-                                <div id="rotate-handler">
-                                    <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
-                                </div>
-                            </div>
-                            <div class="transformer">
-                                <div class="number-input">
-                                    <p>Scale</p>
-                                    <input type="number" id="scale-number" value="15" min="1" max="20">
-                                </div>
-                                <div id="scale-handler">
-                                    <input type="range" id="scale-slider" value="15" min="1" max="20">
-                                </div>
-                            </div>
-                        </div>
+                </div>
 
-
-
-
-                        <!-- <p id="set-background">Set background</p> -->
-
+                <div id="art-sliders">
+                    <div>
+                        <p>Stroke Opacity</p>
+                        <input type="range" id="opacity-slider" value="75" min="0" max="100">
+                    </div>
+                    <div>
+                        <p>Line Width</p>
+                        <input type="range" id="width-slider" value="12" min="1" max="48">
                     </div>
                 </div>
+
+                <div id="art-control-final">
+                    <div id="stroke-dot">
+                        <div id="point-size"></div>
+                    </div>
+                    <div id="pen-color" class="off-black"></div>
+                </div>
+
+                <!-- <div id="art-sliders">
+                    <div>
+                        <p>Stroke Opacity</p>
+                        <input type="range" id="opacity-slider" value="75" min="0" max="100">
+                    </div>
+                    <div>
+                        <p>Line Width</p>
+                        <input type="range" id="width-slider" value="12" min="1" max="40">
+                    </div>
+                </div> -->
+
+                <!-- <p id="set-background">Set background</p> -->
+
             </div>
         </div>
     </div>
+    </div>
+
+
+
 
 
     <div id="content">
@@ -255,6 +247,31 @@
                             <i class="basic-grey fa-solid fa-brain fa-fw"></i>
                         </div>
                     </div>
+
+
+
+
+                    <div id="transform-ui" style="display: none">
+                        <div class="transformer">
+                            <div class="number-input">
+                                <p>Rotate</p>
+                                <input type="number" id="rotate-number" value="0" min="-180" max="180" step="1">
+                            </div>
+                            <div id="rotate-handler">
+                                <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
+                            </div>
+                        </div>
+                        <div class="transformer">
+                            <div class="number-input">
+                                <p>Scale</p>
+                                <input type="number" id="scale-number" value="15" min="1" max="20">
+                            </div>
+                            <div id="scale-handler">
+                                <input type="range" id="scale-slider" value="15" min="1" max="20">
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="contain-dot">
                         <!-- <h3 class="sub-heading">Revise</h3> -->
                         <div id="refine-controls">
