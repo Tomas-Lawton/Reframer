@@ -1,8 +1,10 @@
-const http = "http://";
+// const http = "http://";
+const http = "https://";
+
 // const base = "0.0.0.0:8000";
 const base = "vector-logging-server.herokuapp.com";
 // const base = "localhost:8000";
-const ws = new WebSocket("ws://" + base + "/ws");
+const ws = new WebSocket("wss://" + base + "/ws");
 ws.onclose = (event) => {
     console.log("Closed socket... Running without AI\n" + event);
 };
