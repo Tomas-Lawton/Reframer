@@ -1,6 +1,5 @@
 from drawer import Drawer
 # from clip_instance import Clip_Instance
-
 import logging
 import os
 import uvicorn
@@ -13,6 +12,8 @@ logging.basicConfig(
     level=logging.DEBUG,
     format=f'APP LOGGING: %(levelname)s %(name)s %(threadName)s : %(message)s',
 )
+
+logging.info("App Started")
 
 app = FastAPI(title="Clip Algorithm API")
 origins = [
@@ -31,7 +32,7 @@ app.add_middleware(
 
 try:
     cluster = MongoClient(
-        f"mongodb+srv://{os.environ.get('DBCREDENTIAL')}@cluster0.x5opj.mongodb.net/?retryWrites=true&w=majority"
+        os.environ.get('key')
     )
     db = cluster["vector_ai"]
     collection = db["interaction_events"]
@@ -63,9 +64,7 @@ async def getInformation(info: Request):
 @app.get("/")
 async def home():
     return {"hello", "world"}
-
-
-
+    
 
 if os.environ.get('CONNECTAI') == "True":
     logging.info("Starting with AI Socket")
