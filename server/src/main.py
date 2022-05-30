@@ -21,7 +21,8 @@ origins = [
     "http://localhost",
     "http://127.0.0.1:8000",
     "http://127.0.0.1:5500",
-    "https://tomas-lawton.github.io/AIDraw"
+    "https://tomas-lawton.github.io/AIDraw",
+    "http://localhost:5500"
 ]
 
 app.add_middleware(
