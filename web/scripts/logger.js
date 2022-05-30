@@ -5,6 +5,7 @@ class UserData {
         self.eventLog = [];
     }
     event(eventType) {
+        console.log("Logging: ", eventType);
         logEventAPI({
             log_time: Date.now(),
             user_id: self.uuid,
