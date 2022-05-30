@@ -305,8 +305,10 @@ const getSelectedPaths = () =>
 const toggleArtControls = () => {
     if (artControls.style.display == "flex") {
         artControls.style.display = "none";
+        palette.classList.remove("panel-open");
     } else {
         artControls.style.display = "flex";
+        palette.classList.add("panel-open");
     }
 };
 

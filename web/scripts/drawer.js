@@ -186,7 +186,7 @@ multiTool.onMouseUp = function() {
         asString: true,
     });
 
-    logger.event(mainsketch.penMode + "-up");
+    logger.event(mainSketch.penMode + "-up");
 };
 
 eraseTool.onMouseDown = function(event) {
