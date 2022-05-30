@@ -13,7 +13,7 @@ logging.basicConfig(
     format=f'APP LOGGING: %(levelname)s %(name)s %(threadName)s : %(message)s',
 )
 
-logging.info("App Started")
+logging.info("Starting App")
 
 app = FastAPI(title="Clip Algorithm API")
 origins = [
@@ -64,7 +64,7 @@ async def getInformation(info: Request):
 @app.get("/")
 async def home():
     return {"hello", "world"}
-    
+
 
 if os.environ.get('CONNECTAI') == "True":
     logging.info("Starting with AI Socket")
