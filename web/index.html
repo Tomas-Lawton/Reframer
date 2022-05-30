@@ -192,10 +192,14 @@
                     <div id="color-picker"></div>
                     <div id="fine-control">
                         <div id="art-sliders">
-                            <p class="panel-subtitle">Stroke Opacity</p>
-                            <input type="range" id="opacity-slider" value="75" min="0" max="100">
-                            <p class="panel-subtitle">Line Width</p>
-                            <input type="range" id="width-slider" value="12" min="1" max="40">
+                            <div>
+                                <p>Stroke Opacity</p>
+                                <input type="range" id="opacity-slider" value="75" min="0" max="100">
+                            </div>
+                            <div>
+                                <p>Line Width</p>
+                                <input type="range" id="width-slider" value="12" min="1" max="40">
+                            </div>
                         </div>
                         <div id="art-control-final">
                             <div id="stroke-dot">
@@ -203,11 +207,10 @@
                             </div>
                             <div id="pen-color" class="off-black"></div>
                         </div>
-                        <!-- <p id="set-background">Set background</p> -->
                         <div id="transform-ui">
                             <div class="transformer">
                                 <div class="number-input">
-                                    <p class="panel-subtitle">Rotate</p>
+                                    <p>Rotate</p>
                                     <input type="number" id="rotate-number" value="0" min="-180" max="180" step="1">
                                 </div>
                                 <div id="rotate-handler">
@@ -216,16 +219,20 @@
                             </div>
                             <div class="transformer">
                                 <div class="number-input">
-                                    <p class="panel-subtitle">Scale</p>
+                                    <p>Scale</p>
                                     <input type="number" id="scale-number" value="15" min="1" max="20">
                                 </div>
                                 <div id="scale-handler">
                                     <input type="range" id="scale-slider" value="15" min="1" max="20">
                                 </div>
                             </div>
-
-
                         </div>
+
+
+
+
+                        <!-- <p id="set-background">Set background</p> -->
+
                     </div>
                 </div>
             </div>
