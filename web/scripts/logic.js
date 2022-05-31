@@ -2,7 +2,7 @@ class SimpleStack {
     constructor() {
         this.undoStack = [];
         this.redoStack = [];
-        this.historyHolder = [];
+        this.historyHolder = [""];
     }
 }
 
@@ -13,7 +13,9 @@ class SketchHandler {
 
         // Sketching Data
         this.prompt = null;
-        this.svg = null;
+        this.svg = paper.project.exportSVG({
+            asString: true,
+        }); //for svg parsing
         this.frameSize = canvas.getBoundingClientRect().width;
 
         // Defaults
@@ -23,7 +25,7 @@ class SketchHandler {
         this.penMode = "pen";
         this.clipDrawing = false;
         this.maximumTraces = 1; // todo change
-        this.step = 1;
+        this.step = 0;
         this.lastRollingLoss = 0;
         this.linesDisabled = false;
         this.activeStates = [
@@ -113,7 +115,7 @@ class SketchHandler {
                 this.numRandomCurves :
                 0,
         });
-        this.step = 1;
+        this.step = 0;
         this.clipDrawing = true;
         setActionUI(disableLines ? "refining" : "drawing");
     }
@@ -143,7 +145,7 @@ class SketchHandler {
         this.updateDrawer({
             status: "redraw",
         });
-        this.step = 1;
+        this.step = 0;
         this.clipDrawing = true;
         setActionUI("redrawing");
     }
@@ -189,7 +191,7 @@ class SketchHandler {
         // setActionUI("stop");
     }
     resetHistory() {
-        mainSketch.step = 1; // reset since not continuing
+        mainSketch.step = 0; // reset since not continuing
         mainSketch.stack.historyHolder = [{ svg: "" }];
         timeKeeper.style.width = "0";
         timeKeeper.setAttribute("max", "0");
@@ -235,8 +237,12 @@ const setActionUI = (state) => {
         // actionControls[0].classList.add("inactive-action");
         // actionControls[1].classList.add("inactive-action");
         // actionControls[2].classList.add("inactive-action");
+
+        // AI Active
         stopButton.classList.remove("inactive-action");
         stopButton.style.background = "#ff6060";
+        stopButton.style.color = "#ffffff";
+        stopButton.querySelector("i").style.color = "#ffffff";
 
         document.getElementById("spinner").style.display = "flex";
         if (state == "drawing") {
@@ -261,7 +267,12 @@ const setActionUI = (state) => {
             elem.classList.remove("inactive-action");
             elem.classList.remove("active");
         });
-        stopButton.style.background = "#e1e1e1";
+        stopButton.style.background = "#f3f1ff";
+        stopButton.style.color = "#7b66ff";
+        stopButton.querySelector("i").style.color = "#7b66ff";
+        document.getElementById("stop-icon").classList.toggle("fa-stop");
+        document.getElementById("stop-icon").classList.toggle("fa-repeat");
+        document.getElementById("stop-text").innerHTML = "Redraw";
 
         document.getElementById("spinner").style.display = "none";
 
@@ -425,7 +436,7 @@ const deletePath = () => {
 // switchControls();
 
 const parseFromSvg = (svg) => {
-    if (svg === "") return null;
+    if (svg === "" || svg === undefined) return null;
     let paperObject = userLayer.importSVG(svg);
     const numPaths = paperObject.children[0].children.length;
     for (const returnedIndex in paperObject.children[0].children) {
@@ -536,9 +547,9 @@ ws.onmessage = function(event) {
             }
             mainSketch.stack.historyHolder.push(result);
             timeKeeper.style.width = "100%";
-            timeKeeper.setAttribute("max", String(mainSketch.step));
-            timeKeeper.value = String(mainSketch.step);
-            setTraces.setAttribute("max", String(mainSketch.step));
+            timeKeeper.setAttribute("max", String(mainSketch.step + 1));
+            timeKeeper.value = String(mainSketch.step + 1);
+            setTraces.setAttribute("max", String(mainSketch.step + 1));
             mainSketch.step += 1; //avoid disconnected iteration after stopping
 
             // To do change this so it is just max num mainSketch.traces
@@ -556,11 +567,9 @@ ws.onmessage = function(event) {
             }
 
             calcRollingLoss();
-            lossText.innerHTML = `Step: ${mainSketch.step - 1}\nLoss: ${
-        mainSketch.lastRollingLoss > 0
-          ? mainSketch.lastRollingLoss.toPrecision(5)
-          : 0
-      }`;
+            lossText.innerHTML = `Step: ${
+        mainSketch.step
+      }\nLoss: ${mainSketch.lastRollingLoss.toPrecision(5)}`;
 
             console.log(
                 `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`

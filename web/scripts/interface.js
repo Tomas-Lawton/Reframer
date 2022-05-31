@@ -276,7 +276,7 @@ actionControls[0].addEventListener("click", () => {
     }
 });
 
-// Revise
+// Refine
 actionControls[1].addEventListener("click", () => {
     if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
         mainSketch.draw(null, null, true);
@@ -300,18 +300,18 @@ stopButton.addEventListener("click", () => {
 // AI Revise
 
 // // Continue
-// actionControls[4].addEventListener("click", () => {
-//     if (mainSketch.drawState === "stop") {
-//         mainSketch.goBack();
-//     }
-// });
+document.getElementById("go-back").addEventListener("click", () => {
+    if (mainSketch.drawState === "stop") {
+        mainSketch.goBack();
+    }
+});
 
-// // Redraw
-// actionControls[5].addEventListener("click", () => {
-//     if (mainSketch.drawState === "stop") {
-//         mainSketch.redraw();
-//     }
-// });
+// Redraw
+document.getElementById("redraw").addEventListener("click", () => {
+    if (mainSketch.drawState === "stop") {
+        mainSketch.redraw();
+    }
+});
 // // Contine
 // actionControls[6].addEventListener("click", () => {
 //     if (mainSketch.drawState === "stop") {

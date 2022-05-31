@@ -974,6 +974,10 @@ input[type="number"] {
     bottom: 1em;
 }
 
+#redraw {
+    display: none;
+}
+
 #refine-controls {
     display: flex;
     justify-content: space-between;
@@ -1329,7 +1333,7 @@ input[type="range"]::-webkit-slider-runnable-track {
     background: #ededed;
     border-radius: 50px;
     border: 0px solid #000000;
-    box-shadow: inset 2px 4px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 2px 4px 10px rgb(0 0 0 / 10%);
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -1460,7 +1464,7 @@ input[type="range"]::-moz-range-thumb {
         height: 13px;
         border-radius: 25px;
         border: 0px solid #000000;
-        box-shadow: inset 2px 4px 10px rgba(0, 0, 0, 0.05);
+        box-shadow: inset 2px 4px 10px rgb(0 0 0 / 10%);
     }
     input[type="range"]::-webkit-slider-thumb {
         box-shadow: 2px 2px 1px #d1d1d1;

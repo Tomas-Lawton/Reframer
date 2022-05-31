@@ -138,7 +138,7 @@
                             <i class="fa-solid fa-marker fa-fw"></i>
                             <p>Draw</p>
                         </div>
-                        <div class="ai-action" id="redraw">
+                        <div class="ai-action" id="refine">
                             <i class="fa-solid fa-down-left-and-up-right-to-center fa-fw"></i>
                             <p>Revise</p>
                         </div>
@@ -147,8 +147,13 @@
                             <p>Brainstorm</p>
                         </div>
                         <div class="ai-action inactive-action" id="stop">
-                            <i class="fa-solid fa-stop fa-fw"></i>
-                            <p>Stop</p>
+                            <i class="fa-solid fa-stop fa-fw" id="stop-icon"></i>
+                            <p id="stop-text">Stop</p>
+                        </div>
+
+                        <div class="ai-action inactive-action" id="redraw">
+                            <i class="fa-solid fa-repeat fa-fw"></i>
+                            <p>Try again</p>
                         </div>
                     </div>
 
@@ -225,7 +230,7 @@
         <div id="sketch-view">
             <div id="contain-canvas">
                 <div class="canvas-drop">
-                    <p id="rolling-loss"></p>
+                    <p id="rolling-loss">Step: 0 Loss: 0</p>
                     <div id="delete-handler" class="select-ui">
                         <div>
                             <i class="basic-grey fa-solid fa-trash fa-fw"></i>
@@ -261,12 +266,6 @@
                         </div>
                     </div>
 
-
-                    <!-- <div id="redraw">
-                                <i class="fa-solid fa-repeat fa-fw"></i>
-                                <p>Try again</p>
-                            </div> -->
-
                     <div id="contain-dot">
                         <!-- <h3 class="sub-heading">Revise</h3> -->
                         <div id="refine-controls">
@@ -277,10 +276,10 @@
                             <div>
                                 <input type="range" id="time-slider" value="0" min="0" max="0">
                             </div>
-                            <div id="continue">
+                            <!-- <div id="continue">
                                 <i class="fa-solid fa-arrow-right-long fa-fw"></i>
-                                <p>Draw</p>
-                            </div>
+                                <p>More</p>
+                            </div> -->
                         </div>
                     </div>
                     <canvas id="canvas"></canvas>
