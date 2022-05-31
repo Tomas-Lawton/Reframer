@@ -584,24 +584,21 @@ ws.onmessage = function(event) {
 
 const setPenMode = (mode, accentTarget) => {
     let lastPenMode = mainSketch.penMode;
-    mainSketch.penMode = mode;
-
     document.querySelectorAll(".pen-mode").forEach((mode) => {
         mode.classList.remove("selected-mode");
         mode.classList.add("simple-hover");
     });
-    accentTarget.classList.add("selected-mode");
-    accentTarget.classList.remove("simple-hover");
+
+    if (accentTarget) {
+        accentTarget.classList.add("selected-mode");
+        accentTarget.classList.remove("simple-hover");
+    }
 
     switch (mode) {
         case "pen-drop":
-            // Default click
-            mainSketch.penMode = mainSketch.penDropMode;
-            if ((mainSketch.penMode = "erase")) {
-                eraseTool.activate();
-            } else {
-                multiTool.activate();
-            }
+            console.log(mainSketch.penDropMode);
+
+            setPenMode(mainSketch.penDropMode, accentTarget);
             // Dropdown
             if (dropdown.style.display === "none" || !dropdown.style.display) {
                 dropdown.style.display = "flex";
@@ -616,21 +613,24 @@ const setPenMode = (mode, accentTarget) => {
             }
             break;
         case "erase":
-            // Refactor to remove all in arr and then add just the one used
             penDrop.classList.remove("fa-pen");
             penDrop.classList.add("fa-eraser");
             eraseTool.activate();
-            mainSketch.penDropMode = "erase";
+            mainSketch.penMode = mode;
+            mainSketch.penDropMode = mode;
             break;
         case "pen":
             penDrop.classList.remove("fa-eraser");
             penDrop.classList.add("fa-pen");
             multiTool.activate();
+            mainSketch.penMode = mode;
+            mainSketch.penDropMode = mode;
             "pen";
             break;
         case "select":
             dropdown.style.display = "none";
             multiTool.activate();
+            mainSketch.penMode = mode;
             break;
         case "lasso":
             multiTool.activate();
@@ -640,37 +640,24 @@ const setPenMode = (mode, accentTarget) => {
                     title: "Add a prompt first!",
                     message: "You need a prompt to generate sketches with the region tool.",
                 });
-                break;
+            } else {
+                mainSketch.penMode = mode;
             }
-            mainSketch.penDropMode = "lasso";
             break;
     }
 
-    // Not-pen mode
     if (mainSketch.penMode !== "select") {
         userLayer.getItems().forEach((path) => {
-            // console.log(path);
             path.selected = false;
         });
         hideSelectUI();
     }
-    // if (mainSketch.penMode !== "pen" && mainSketch.penMode !== "erase") {
-    //     palette.style.display = "none";
-    //     artControls.style.display = "none";
-    // } else {
-    //     palette.style.display = "block";
-    // }
-    // if (mainSketch.penMode !== "pen" && mainSketch.penMode !== "select") {
-    //     artControls.style.display = "none";
-    // }
     if (mainSketch.penMode !== "lasso" && mainSketch.penMode !== "select") {
         mainSketch.drawRegion = undefined;
         if (regionPath) regionPath.remove();
     }
-    if (mainSketch.penMode !== "lasso") {
-        // userLayer.activate();
-    }
-    // console.log(mainSketch.penMode);
+
+    console.log(mainSketch.penMode);
 };
 
 const getRGBA = () => {
