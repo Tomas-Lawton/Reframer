@@ -99,26 +99,3 @@ class Clip_Instance:
         with torch.no_grad():
             text_features = self.model.encode_text(tokens).float().cpu()  # normalise
             return text_features / text_features.norm(dim=-1, keepdim=True)
-
-    def calc_cosine_similarities_for_text(
-        self, text_features, image_features, apply_scaleing=False
-    ):
-        """Calculates the cosines for caption with every image (square of cosines)"""
-        if apply_scaleing:
-            self.similarity = (100.0 * image_features @ text_features.T).softmax(dim=-1)
-        else:
-            self.similarity = (
-                image_features.cpu().numpy() @ text_features.cpu().numpy().T
-            )
-
-    # how to refactor this? !!!UBIU!BGIOUBG:POUBG
-    def calc_cosine_similarities_for_image(
-        self, text_features, image_features, apply_scaleing=False
-    ):  # how to do this without flipping???
-        """Calculates the cosines for every image with every caption (square of cosines)"""
-        if apply_scaleing:
-            self.similarity = (100.0 * text_features @ image_features.T).softmax(dim=-1)
-        else:
-            self.similarity = (
-                text_features.cpu().numpy() @ image_features.cpu().numpy().T
-            )

@@ -6,4 +6,6 @@ server/tmp/
 server/logs.log
 server/.DS_Store
 server/src/diffvg
+server/src/env
+
 reactcanvas/node_modules
