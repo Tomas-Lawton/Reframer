@@ -6,23 +6,23 @@ class UserData {
     }
     event(eventType) {
         console.log("Logging: ", eventType);
-        logEventAPI({
-            log_time: Date.now(),
-            user_id: self.uuid,
-            recorded_data: {
-                event_type: eventType,
-                event_count: self.events,
-                data: {
-                    prompt: mainSketch.prompt,
-                    svg: mainSketch.svg,
-                    sketch_size: mainSketch.frameSize,
-                    exemplar_size: 0,
-                    mode: mainSketch.penMode,
-                    iteration_step: mainSketch.step,
-                    region: mainSketch.drawRegion,
-                },
-            },
-        });
+        // logEventAPI({
+        //     log_time: Date.now(),
+        //     user_id: self.uuid,
+        //     recorded_data: {
+        //         event_type: eventType,
+        //         event_count: self.events,
+        //         data: {
+        //             prompt: mainSketch.prompt,
+        //             svg: mainSketch.svg,
+        //             sketch_size: mainSketch.frameSize,
+        //             exemplar_size: 0,
+        //             mode: mainSketch.penMode,
+        //             iteration_step: mainSketch.step,
+        //             region: mainSketch.drawRegion,
+        //         },
+        //     },
+        // });
         self.events += 1;
     }
 }

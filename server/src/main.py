@@ -1,9 +1,9 @@
-# from drawer import Drawer
-# from clip_instance import Clip_Instance
+from drawer import Drawer
+from clip_instance import Clip_Instance
 import logging
 import os
 import uvicorn
-# from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient

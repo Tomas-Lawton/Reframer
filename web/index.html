@@ -93,21 +93,21 @@
     <!-- <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i> -->
 
     <div id="art-panel">
-        <!-- <div id="tabs">
+        <div id="tabs">
             <div class="tab-item active-tab" id="collab-tab">
                 <h2>Collab</h2>
             </div>
-            <div class="tab-item active-tab" id="style-tab">
+            <div class="tab-item" id="style-tab">
                 <h2>Style</h2>
             </div>
-        </div> -->
+        </div>
 
         <!-- <div id="contain-num-squiggles">
-                            <label>Max lines:</label>
-                            <input id="num-squiggles" type="number" min="1" value="32" max="100">
-                        </div> -->
+            <label>Max lines:</label>
+            <input id="num-squiggles" type="number" min="1" value="32" max="100">
+        </div> -->
 
-        <!-- <div class="content-margin">
+        <div class="content-margin">
             <div id="ai-content">
                 <div class="tab-info">
                     <div>
@@ -131,7 +131,7 @@
                         <h1 class="panel-title">
                             Mode
                         </h1>
-                        <h3 class="sub-heading">AI Controls</h3>
+                        <p class="pill">AI Controls</hp>
                     </div>
                     <div id="set-modes">
                         <div class="ai-action" id="draw">
@@ -154,7 +154,7 @@
 
                     <div>
                         <div class="flex">
-                            <h3 class="sub-heading">Moodboard</h3>
+                            <p class="pill">Moodboard</p>
                         </div>
                     </div>
 
@@ -167,7 +167,7 @@
 
                 </div>
             </div>
-        </div> -->
+        </div>
 
         <div class="content-margin">
             <div id="style-content">
@@ -194,11 +194,11 @@
 
                 <div id="art-sliders">
                     <div>
-                        <p>Stroke Opacity</p>
+                        <p class="pill">Stroke Opacity</p>
                         <input type="range" id="opacity-slider" value="75" min="0" max="100">
                     </div>
                     <div>
-                        <p>Line Width</p>
+                        <p class="pill">Line Width</p>
                         <input type="range" id="width-slider" value="12" min="1" max="48">
                     </div>
                 </div>
@@ -209,17 +209,6 @@
                     </div>
                     <div id="pen-color" class="off-black"></div>
                 </div>
-
-                <!-- <div id="art-sliders">
-                    <div>
-                        <p>Stroke Opacity</p>
-                        <input type="range" id="opacity-slider" value="75" min="0" max="100">
-                    </div>
-                    <div>
-                        <p>Line Width</p>
-                        <input type="range" id="width-slider" value="12" min="1" max="40">
-                    </div>
-                </div> -->
 
                 <!-- <p id="set-background">Set background</p> -->
 
@@ -279,10 +268,10 @@
                                 <i class="fa-solid fa-arrow-left-long fa-fw"></i>
                                 <p>Go back</p>
                             </div>
-                            <div id="redraw">
+                            <!-- <div id="redraw">
                                 <i class="fa-solid fa-repeat fa-fw"></i>
                                 <p>Try again</p>
-                            </div>
+                            </div> -->
                             <div id="continue">
                                 <i class="fa-solid fa-arrow-right-long fa-fw"></i>
                                 <p>Keep going</p>

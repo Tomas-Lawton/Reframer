@@ -51,17 +51,6 @@ deleteHandler.addEventListener("click", (e) => {
 
 initialiseHandler.addEventListener("click", (e) => {
     // need to unpack the group, but keep a ref to the selected/grouped paths
-
-    // Reference selected
-    // Unpack to SVG
-    // Save the unpakced SVG
-    // Clear the canvas
-    // Import the referenced paths
-    // Export full sketch
-    // Initialise using the resulting SVG
-    // DONE
-    // Don't need to import saved because overwritten by drawer.
-
     // let selectedItems = getSelectedPaths();
     const remove = userLayer.getItems().filter((path) => !path.selected);
     remove.forEach((item) => item.remove());
@@ -274,39 +263,39 @@ palette.addEventListener("click", () => {
     toggleArtControls();
 });
 
-// prompt.addEventListener("input", (e) => {
-//     mainSketch.prompt = e.target.value;
-// });
+prompt.addEventListener("input", (e) => {
+    mainSketch.prompt = e.target.value;
+});
 
 // TODO Refactor into the setActionUI switch statement using states
 
-// // Draw
-// actionControls[0].addEventListener("click", () => {
-//     if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
-//         mainSketch.draw();
-//     }
-// });
+// Draw
+actionControls[0].addEventListener("click", () => {
+    if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
+        mainSketch.draw();
+    }
+});
 
-// // Revise
-// actionControls[1].addEventListener("click", () => {
-//     if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
-//         mainSketch.draw(null, null, true);
-//     }
-// });
+// Revise
+actionControls[1].addEventListener("click", () => {
+    if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
+        mainSketch.draw(null, null, true);
+    }
+});
 
-// // Trial / Brainstorm
-// actionControls[2].addEventListener("click", () => {
-//     if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
-//         mainSketch.generate();
-//     }
-// });
+// Trial / Brainstorm
+actionControls[2].addEventListener("click", () => {
+    if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
+        mainSketch.generate();
+    }
+});
 
-// // Stop
-// stopButton.addEventListener("click", () => {
-//     if (mainSketch.activeStates.includes(mainSketch.drawState)) {
-//         mainSketch.stop();
-//     }
-// });
+// Stop
+stopButton.addEventListener("click", () => {
+    if (mainSketch.activeStates.includes(mainSketch.drawState)) {
+        mainSketch.stop();
+    }
+});
 
 // AI Revise
 
@@ -332,30 +321,32 @@ palette.addEventListener("click", () => {
 
 // Control panel
 artControls.onmousedown = (e) => {
-    let content;
-    // document.querySelectorAll(".tab-item").forEach((tab) => {
-    //     if (tab.classList.contains("active-tab")) {
-    //         if (tab.id === "collab-tab") {
-    //             content = document.getElementById("ai-content");
-    //         } else {
-    //             content = document.getElementById("style-content");
-    //         }
-    //     }
-    // });
-    content = document.getElementById("style-content");
+    if (window.innerWidth > 650) {
+        let content;
+        document.querySelectorAll(".tab-item").forEach((tab) => {
+            if (tab.classList.contains("active-tab")) {
+                if (tab.id === "collab-tab") {
+                    content = document.getElementById("ai-content");
+                } else {
+                    content = document.getElementById("style-content");
+                }
+            }
+        });
+        // content = document.getElementById("style-content");
 
-    let bounds = content.getBoundingClientRect();
-    e = e || window.event;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    if (
-        pos3 < bounds.left ||
-        pos3 > bounds.right ||
-        pos4 < bounds.top ||
-        pos4 > bounds.bottom
-    ) {
-        document.onmouseup = closeDragElement;
-        document.onmousemove = elementDrag;
+        let bounds = content.getBoundingClientRect();
+        e = e || window.event;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        if (
+            pos3 < bounds.left ||
+            pos3 > bounds.right ||
+            pos4 < bounds.top ||
+            pos4 > bounds.bottom
+        ) {
+            document.onmouseup = closeDragElement;
+            document.onmousemove = elementDrag;
+        }
     }
 };
 
@@ -468,8 +459,8 @@ addExemplarButtons.addEventListener("click", () => {
 
 // AI STUFF
 
-// document.getElementById("open-moodboard").addEventListener("click", () => {
-//     document.getElementById("moodboard-container").style.display = "flex";
-// });
+document.getElementById("open-moodboard").addEventListener("click", () => {
+    document.getElementById("moodboard-container").style.display = "flex";
+});
 
-// setActionUI("inactive");
+setActionUI("inactive");
