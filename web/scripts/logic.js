@@ -656,8 +656,6 @@ const setPenMode = (mode, accentTarget) => {
         mainSketch.drawRegion = undefined;
         if (regionPath) regionPath.remove();
     }
-
-    console.log(mainSketch.penMode);
 };
 
 const getRGBA = () => {
