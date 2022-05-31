@@ -81,7 +81,7 @@ class Clip_Instance:
         image_input = torch.tensor(img_tensor)
         with torch.no_grad():
             image_features = (
-                self.model.encode_image(image_input).float().cpu()
+                self.model.encode_image(image_input)
             )  # normalise add to device
             return image_features / image_features.norm(dim=-1, keepdim=True)
 
@@ -97,5 +97,5 @@ class Clip_Instance:
             return tokens
 
         with torch.no_grad():
-            text_features = self.model.encode_text(tokens).float().cpu()  # normalise
+            text_features = self.model.encode_text(tokens) # normalise
             return text_features / text_features.norm(dim=-1, keepdim=True)

@@ -394,8 +394,7 @@ const updateSelectPosition = () => {
 const updateSelectUI = () => {
     if (mainSketch.boundingBox) {
         deleteHandler.style.display = "block";
-        // initialiseHandler.style.display = "block";
-
+        initialiseHandler.style.display = "block";
         transformControl.style.display = "flex";
         updateSelectPosition();
     }

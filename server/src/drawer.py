@@ -1,6 +1,6 @@
 import torch
 import pydiffvg
-
+import time
 from util.processing import get_augment_trans
 
 # from util.loss import CLIPConvLoss2
@@ -159,7 +159,7 @@ class Drawer:
             else torch.tensor(0, device=self.device)
         )
 
-        self.img = img.cpu().permute(0, 2, 3, 1).squeeze(0)
+        self.img = img.permute(0, 2, 3, 1).squeeze(0)
 
         loss = 0
 
@@ -332,6 +332,7 @@ class Drawer:
         logging.info("Running iteration...")
         svg = ''
         i, loss = self.run_epoch()
+        time.sleep(.5)
         async with aiofiles.open(
             f"results/output-{str(self.exemplar_count)}.svg", "r"
         ) as f:
@@ -340,8 +341,12 @@ class Drawer:
         if isinstance(self.exemplar_count, int):
             logging.info(f"Sending exemplar {self.exemplar_count}")
             status = str(self.exemplar_count)
-        result = {"status": status, "svg": svg, "iterations": i, "loss": loss}
-        await self.socket.send_json(result)
+        
+        try: 
+            result = {"status": status, "svg": svg, "iterations": i, "loss": loss}
+            await self.socket.send_json(result)
+        except Exception as e:
+            logging.error(e)
         logging.info(f"Completed run {i} in drawer {str(self.exemplar_count)}")
 
         self.last_result = result  # won't go to client unless continued is used

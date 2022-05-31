@@ -536,13 +536,14 @@ hr {
     align-items: center;
     justify-content: center;
     box-shadow: none;
-    background: #f5f5f5;
     color: #696969;
     cursor: pointer;
     border-radius: 0.5em;
     font-size: 0.8em;
     height: 5em;
     height: 100%;
+    background: #f3f1ff;
+    color: #7b66ff;
 }
 
 .ai-action i {
@@ -888,12 +889,12 @@ input[type="number"] {
     justify-content: center;
     display: none;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     bottom: 1em;
 }
 
 .transformer {
-    width: 48%;
+    width: 46%;
 }
 
 #set-background {
@@ -1388,7 +1389,7 @@ input[type="range"]::-moz-range-thumb {
 
 #initialise-handler i {
     color: #a091ff;
-    visibility: hidden;
+    /* visibility: hidden; */
 }
 
 @media screen and (min-width: 650px) {

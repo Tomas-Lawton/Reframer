@@ -80,11 +80,9 @@ if os.environ.get('CONNECTAI') == "True":
         exemplar_drawers = [Drawer(clip_class, websocket, i) for i in range(4)]
         logging.info("Connecting...")
         await websocket.accept()
-        logging.info("Websocket Client Connected")
         try:
             while True:
                 data = await websocket.receive_json()
-
                 if data["status"] == "draw":
                     try:
                         await artefact_drawer.draw_update(data)
