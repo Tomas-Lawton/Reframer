@@ -266,9 +266,11 @@ class Drawer:
         if svg_string is not None:
             async with aiofiles.open('data/interface_paths.svg', 'w') as f:
                 await f.write(svg_string)
-        else:
-            async with aiofiles.open('data/interface_paths.svg', 'w') as f:
-                await f.write("")
+        # write svg even if no paths so other stuff can be parsed
+        # Can't remeber why added empty svg
+        # else:
+        #     async with aiofiles.open('data/interface_paths.svg', 'w') as f:
+        #         await f.write("")
         try:
             self.reset()
             logging.info("Starting clip drawer")
