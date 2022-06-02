@@ -7,6 +7,11 @@
     outline: none !important;
 }
 
+#upload {
+    font-size: 4em;
+    display: none;
+}
+
 span {
     font-weight: 300;
     color: #363636;
@@ -24,6 +29,21 @@ input:-webkit-autofill:active {
 input:-webkit-autofill {
     -webkit-text-fill-color: #7b66ff !important;
 }
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+    display: none;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #f5f5f5;
+}
+
+
+/* ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+} */
 
 button {
     font-weight: 400;
@@ -73,7 +93,8 @@ body {
     justify-content: center;
     /* padding-left: 2em; */
     padding-left: 0;
-    /* padding: 1em; */
+    /* Dont touch */
+    padding: 3em;
 }
 
 #canvas {
@@ -360,10 +381,20 @@ hr {
     display: flex;
     z-index: 10;
     border-radius: 3em;
-    margin: 0.3em;
+    margin: 0.2em;
     /* flex-direction: column; */
     box-shadow: 10px 9px 27px rgb(48 48 48 / 18%);
-    padding: 0 1.8em;
+    /* padding: 0 1.8em; */
+    /* padding: 0 0.6em; */
+    overflow: hidden;
+}
+
+.top-action :first-child {
+    margin-left: 1em;
+}
+
+.top-action :last-child {
+    margin-right: 1em;
 }
 
 .top-action .fa-solid {
@@ -422,8 +453,9 @@ hr {
     z-index: 10;
     top: 0.5em;
     color: #707070;
-    width: 100%;
     text-align: center;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 #settings i {
@@ -617,6 +649,7 @@ hr {
     background: #f5f5f5;
     /* background: #f3f1ff; */
     font-weight: 500;
+    pointer-events: all;
 }
 
 
@@ -716,27 +749,25 @@ hr {
 
 #exemplar-grid {
     display: flex;
-    overflow: overlay;
-    /* scroll-padding-right: 0; */
-    padding: 2em 0;
-}
-
-#exemplar-grid>div {
-    margin: 1em 1em 1em 0;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+    padding-top: 0.5em;
 }
 
 .exemplar-card {
-    border-radius: 1em;
-    /* filter: drop-shadow(10px 9px 27px rgba(48, 48, 48, 0.12)); */
     box-shadow: 10px 9px 27px rgb(48 48 48 / 12%);
-    padding: 1em;
     position: relative;
     display: flex;
     flex-direction: column;
-    flex: 1;
+    /* flex: 1; */
     justify-content: space-around;
-    /* background: white; */
-    /* background: #e5e2ff; */
+    background: white;
+    border-radius: 0.5em;
+    /* margin: 1em; */
+    /* width: 45%; */
+    width: 40%;
+    margin-bottom: 0.4em;
+    /* padding: 0.4em; */
 }
 
 .exemplar {
@@ -749,7 +780,6 @@ hr {
 }
 
 .exemplar canvas {
-    /* ?????????? NOT SURE */
     width: 100%;
     height: auto;
     /* background-color: #0095ff; */
@@ -767,8 +797,12 @@ hr {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 1em;
-    flex-direction: column;
+    /* margin: 1em; */
+    /* flex-direction: column; */
+    background: #f5f5f5;
+    /* border-radius: 0.5em; */
+    border-radius: 5px;
+    margin: 0.4em;
 }
 
 .card-info div {
@@ -780,6 +814,7 @@ hr {
     color: #7b66ff;
     font-weight: 500;
     font-size: 0.9em;
+    padding: 0.1em 0.6em;
 }
 
 .card-info p {
@@ -787,12 +822,9 @@ hr {
 }
 
 .card-info i {
-    background: #ffffff;
-    box-shadow: 2px 3px 9px rgba(48, 48, 48, 0.17);
-    border-radius: 0.3em;
-    font-size: 2.4em;
-    padding: 0.1em;
-    color: #7b66ff;
+    background: #7b66ff;
+    color: white;
+    border-radius: 0 5px 5px 0;
 }
 
 #pen-styles {
@@ -810,6 +842,7 @@ hr {
     /* width: 7em; */
     background-color: #000000d6;
     margin-left: 1em;
+    overflow: hidden;
     display: none;
 }
 
@@ -821,7 +854,9 @@ hr {
     color: white;
     font-weight: 500;
     /* padding: 1.8em 1.8em 1.8em 1.3em; */
-    padding: 1.8em;
+    /* padding: 1.8em; */
+    padding: 0.8em;
+    font-size: 0.7em;
 }
 
 .simple-drop>div {
@@ -839,6 +874,10 @@ hr {
 
 .selected-mode:hover {
     background-color: #7b66ff;
+}
+
+#save-sketch {
+    width: auto;
 }
 
 
@@ -880,7 +919,7 @@ input[type="number"] {
     display: none;
     display: flex;
     justify-content: space-evenly;
-    bottom: 1em;
+    top: 1em;
 }
 
 .transformer {
@@ -923,6 +962,12 @@ input[type="number"] {
     color: #363636;
 }
 
+#autonomy-labels {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
 
 /* Art Controls / Pallete */
 
@@ -938,11 +983,33 @@ input[type="number"] {
     display: flex;
     width: 85%;
     max-width: initial;
-    /* display: none; */
     left: 50%;
     transform: translateX(-50%);
     top: 3em;
     border-radius: 1em;
+    /* display: none; */
+}
+
+#sketchbook-panel {
+    position: absolute;
+    z-index: 11;
+    flex-direction: column;
+    box-shadow: 10px 5px 15px rgb(28 28 28 / 20%);
+    border-radius: 2em;
+    background-color: #000000d6;
+    display: flex;
+    width: 85%;
+    max-width: initial;
+    transform: translateX(-50%);
+    border-radius: 1em;
+    left: 70%;
+    transform: initial;
+    top: 8%;
+    /* display: none; */
+}
+
+#sketchbook-panel .panel-title {
+    color: white;
 }
 
 .content-margin {
@@ -954,12 +1021,22 @@ input[type="number"] {
     display: none;
 }
 
+
+/* 
 #style-content {
     width: 100%;
 }
 
 #ai-content {
     width: 100%;
+} */
+
+#sketchbook-content {
+    overflow: scroll;
+    height: 70vh;
+    overflow-y: overlay;
+    background-color: #343434d6;
+    border-radius: 0.5em;
 }
 
 #contain-dot {
@@ -968,9 +1045,10 @@ input[type="number"] {
     /* display: flex; */
     flex-direction: column;
     position: absolute;
-    width: 30%;
+    /* width: 30%; */
     transform: translateX(-50%);
     left: 50%;
+    width: 45%;
     bottom: 1em;
 }
 
@@ -982,7 +1060,8 @@ input[type="number"] {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 5em;
+    /* height: 5em; */
+    height: 3em;
     /* box-shadow: 3px 3px 6px rgba(28, 28, 28, 0.223); */
 }
 
@@ -1061,6 +1140,10 @@ input[type="number"] {
     flex-direction: column;
 }
 
+.tab-info .panel-title {
+    font-size: 1.4em;
+}
+
 .tab-info {
     width: 100%;
 }
@@ -1110,7 +1193,7 @@ input[type="number"] {
 }
 
 .tab-item {
-    border-bottom: 3px solid #d8d8d8;
+    border-bottom: 2px solid #d8d8d8;
     width: 100%;
     text-align: center;
     /* color: white; */
@@ -1119,7 +1202,7 @@ input[type="number"] {
 }
 
 .active-tab {
-    border-bottom: 3px solid #7b66ff;
+    border-bottom: 2px solid #7b66ff;
 }
 
 .active-tab h2 {
@@ -1130,9 +1213,11 @@ input[type="number"] {
     width: 100%;
     display: grid;
     grid-row: auto auto;
-    grid-template-columns: repeat(2, minmax(10px, 1fr));
-    grid-template-rows: repeat(2, minmax(6em, 2fr));
+    /* grid-template-columns: repeat(2, minmax(10px, 1fr));
+    grid-template-rows: repeat(2, minmax(6em, 2fr)); */
     grid-gap: 0.5em;
+    grid-template-columns: repeat(3, minmax(10px, 1fr));
+    grid-template-rows: repeat(1, minmax(6em, 2fr));
 }
 
 
@@ -1199,6 +1284,23 @@ input[type="number"] {
     background: #f3f1ff;
     width: fit-content;
     font-size: 0.8em;
+}
+
+.slider-label {
+    color: #7b66ff;
+    font-weight: 400;
+    /* margin: 0.4em 0; */
+    /* padding: 0.4em 1em; */
+    border-radius: 2em;
+    /* background: #f3f1ff; */
+    width: fit-content;
+    font-size: 0.8em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.panel-section {
+    margin: 1em 0 0.5em 0;
 }
 
 #art-control-final {
@@ -1403,8 +1505,29 @@ input[type="range"]::-moz-range-thumb {
 
 /* REMOVE FOR AI MODE */
 
-#lasso {
+
+/* #lasso {
     display: none;
+} */
+
+#brainstorm {
+    /* background: #343434d6; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5em;
+    background: #7b66ff;
+    padding: 0.4em;
+}
+
+#brainstorm i {
+    color: white;
+}
+
+#brainstorm:after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
 }
 
 #initialise-handler i {
@@ -1420,7 +1543,8 @@ input[type="range"]::-moz-range-thumb {
         right: 0;
     }
     .top-action .fa-solid {
-        padding: 0.6em;
+        padding: 0.4em;
+        font-size: 1em;
     }
     .top-action {
         transform: none;
@@ -1435,6 +1559,12 @@ input[type="range"]::-moz-range-thumb {
         left: 10%;
         transform: initial;
         top: 20%;
+    }
+    #sketchbook-panel {
+        width: 18em;
+        left: 70%;
+        transform: initial;
+        top: 8%;
     }
     .tab-info {
         margin: 0.5em 0;
@@ -1492,8 +1622,4 @@ input[type="range"]::-moz-range-thumb {
     /* .content-margin {
         padding: 1em;
     } */
-}
-
-#exemplar-grid {
-    display: flex;
 }

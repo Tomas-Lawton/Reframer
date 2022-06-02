@@ -81,6 +81,21 @@ class Drawer:
             logging.error(e)
             logging.error("SVG Parsing failed")
 
+    def initialise_without_treebranch(self):
+        user_sketch = UserSketch(self.path_list, self.canvas_w, self.canvas_h)
+        self.shapes = user_sketch.shapes
+        self.shape_groups = user_sketch.shape_groups
+        self.num_sketch_paths = len(user_sketch.shapes)
+        self.augment_trans = get_augment_trans(self.canvas_w, self.normalize_clip)
+        self.user_sketch = user_sketch
+        logging.info("Initialised shapes")      
+
+    def activate_without_curves(self):
+        self.is_active = True
+        self.initialise_without_treebranch()
+        self.initialize_variables()
+        self.initialize_optimizer()
+        
     def activate(self):
         self.is_active = True
         self.initialize_shapes()
@@ -314,6 +329,7 @@ class Drawer:
             logging.error("Failed to encode features in clip")
 
     async def continue_update_sketch(self, data):
+        # fix initialise
         """Keep the last drawer running"""
         logging.info("Continuing with new sketch...")
 
@@ -324,7 +340,9 @@ class Drawer:
                 await f.write(svg_string)
         try:
             self.parse_svg(self.last_region)
-            return self.activate()
+
+            # activate without reinitialise
+            return self.activate_without_curves()
         except Exception as e:
             logging.error(e)
             logging.error("Failed to parse the new sketch")
@@ -345,7 +363,8 @@ class Drawer:
             status = str(self.exemplar_count)
         
         try: 
-            result = {"status": status, "svg": svg, "iterations": i, "loss": loss}
+            # logging.info(svg)
+            result = {"status": status, "svg": svg, "iterations": i, "loss": loss, "exemplar_index": self.exemplar_count}
             await self.socket.send_json(result)
         except Exception as e:
             logging.error(e)

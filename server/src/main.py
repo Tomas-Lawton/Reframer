@@ -77,7 +77,9 @@ if os.environ.get('CONNECTAI') == "True":
     @app.websocket("/ws")
     async def websocket_endpoint(websocket: WebSocket):
         artefact_drawer = Drawer(clip_class, websocket)
-        exemplar_drawers = [Drawer(clip_class, websocket, i) for i in range(4)]
+        # exemplar_drawers = [Drawer(clip_class, websocket, i) for i in range(4)]
+        exemplar_drawers = []
+
         logging.info("Connecting...")
         await websocket.accept()
         try:
@@ -99,6 +101,18 @@ if os.environ.get('CONNECTAI') == "True":
                         logging.error("Failed to update drawer")
                     artefact_drawer.run_loop()
 
+                if data["status"] == "add_new_exemplar":
+                    try:
+                        new_exemplar = Drawer(clip_class, websocket, data["data"]["exemplar_index"])
+                        new_exemplar.frame_size = data["data"]['frame_size']
+                        await new_exemplar.draw_update(data)
+                        new_exemplar.run_loop()
+                        exemplar_drawers.append(new_exemplar)
+                    except Exception as e:
+                        logging.error(e)
+                        logging.error("Failed to create a new exemplar")
+                    artefact_drawer.run_loop()
+
                 if data["status"] == "continue":
                     try:
                         await artefact_drawer.continue_update(data)
@@ -115,11 +129,11 @@ if os.environ.get('CONNECTAI') == "True":
                         logging.error("Failed to update drawer for new sketch")
                     artefact_drawer.run_loop()
 
-                if data["status"] == "sketch_exemplars":
-                    for drawer in exemplar_drawers:
-                        drawer.frame_size = data["data"]['frame_size']
-                        await drawer.draw_update(data)
-                        drawer.run_loop()
+                # if data["status"] == "sketch_exemplars":
+                #     for drawer in exemplar_drawers:
+                #         drawer.frame_size = data["data"]['frame_size']
+                #         await drawer.draw_update(data)
+                #         drawer.run_loop()
 
                 if data["status"] == "stop":
                     await artefact_drawer.stop()

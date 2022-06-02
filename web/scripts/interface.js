@@ -27,12 +27,15 @@ document.getElementById("delete").addEventListener("click", () =>
             });
             logger.event("clear-sketch");
 
-            mainSketch.lastPrompt = null; //clear for draw (not redraw)
-            // drawButton.innerHTML = "Draw";
+            mainSketch.lastPrompt = null;
             userLayer.clear();
-            // prompt.value = "";
             modal.style.display = "none";
             updateSelectUI();
+
+            // Save again for redraws
+            mainSketch.svg = paper.project.exportSVG({
+                asString: true,
+            });
         },
     })
 );
@@ -54,7 +57,6 @@ initialiseHandler.addEventListener("click", (e) => {
     // let selectedItems = getSelectedPaths();
     const remove = userLayer.getItems().filter((path) => !path.selected);
     remove.forEach((item) => item.remove());
-    unpackGroup();
     const svg = paper.project.exportSVG({
         asString: true,
     });
@@ -238,6 +240,22 @@ opacitySlider.oninput = function() {
     getSelectedPaths().forEach((item) => (item.opacity = mainSketch.opacity));
 };
 
+document.getElementById("autonomy-slider").oninput = function() {
+    let val = 11 - this.value;
+    // 0-10
+    mainSketch.randomRange = val; //used for adding
+};
+
+document.getElementById("enthusiasm-slider").oninput = function() {
+    let val = 11 - this.value;
+    if (val === 10) {
+        //max time
+        mainSketch.doneSketching = null; // never add
+    } else {
+        mainSketch.doneSketching = val * 1.3 * 1000 + 2000;
+    }
+};
+
 document.getElementById("settings").addEventListener("click", () => {
     openModal({
         title: "Advanced",
@@ -255,7 +273,10 @@ timeKeeper.oninput = function() {
     } else {
         userLayer.clear();
         let svg = mainSketch.stack.historyHolder[historyIndex].svg;
-        parseFromSvg(svg);
+        parseFromSvg(svg, userLayer);
+        mainSketch.svg = paper.project.exportSVG({
+            asString: true,
+        });
     }
 };
 
@@ -263,37 +284,44 @@ palette.addEventListener("click", () => {
     toggleArtControls();
 });
 
+// let typingTimer;
+// let doneTypingInterval = 1000;
 prompt.addEventListener("input", (e) => {
     mainSketch.prompt = e.target.value;
+    aiMessage.innerHTML = `Sure! I can draw ${mainSketch.prompt}...`;
+    // clearTimeout(typingTimer);
+    // typingTimer = setTimeout(doneTypingPrompt, doneTypingInterval);
 });
+
+// function doneTypingPrompt() {
+//     aiMessage.innerHTML = `Sure! I can draw ${mainSketch.prompt}...`;
+// }
 
 // TODO Refactor into the setActionUI switch statement using states
 
 // Draw
-actionControls[0].addEventListener("click", () => {
+document.getElementById("draw").addEventListener("click", () => {
     if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
         mainSketch.draw();
     }
 });
 
 // Refine
-actionControls[1].addEventListener("click", () => {
+document.getElementById("refine").addEventListener("click", () => {
     if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
-        mainSketch.draw(null, null, true);
+        mainSketch.draw(false, null, true);
     }
 });
 
-// Trial / Brainstorm
-actionControls[2].addEventListener("click", () => {
-    if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
-        mainSketch.generate();
-    }
-});
+// // Trial / Brainstorm
 
 // Stop
 stopButton.addEventListener("click", () => {
     if (mainSketch.activeStates.includes(mainSketch.drawState)) {
+        //active
         mainSketch.stop();
+    } else {
+        mainSketch.redraw();
     }
 });
 
@@ -318,6 +346,40 @@ document.getElementById("redraw").addEventListener("click", () => {
 //         mainSketch.continue();
 //     }
 // });
+
+// Old generate
+// document.getElementById("brainstorm").addEventListener("click", () => {
+//     if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
+//         mainSketch.generate();
+//     }
+// });
+
+document.getElementById("brainstorm").addEventListener("click", () => {
+    if (noPrompt()) {
+        openModal({
+            title: "Type a prompt first!",
+            message: "You need a target for AI exemplars.",
+        });
+        return;
+    } else {
+        // Set up the ui
+        let creationIndex = mainSketch.exemplarCount;
+        let newElem = createExemplar(creationIndex);
+        let thisCanvas = exemplarScope.projects[creationIndex];
+        document.getElementById("exemplar-grid").appendChild(newElem);
+        mainSketch.exemplarCount += 1;
+
+        // // draw into the new canvas
+
+        console.log(creationIndex);
+        mainSketch.drawExemplar(creationIndex);
+
+        // tell backend which exemplar it is, if it doesn't exist then create it.
+        // then draw into this exemplar when the data is received.
+
+        // if an AI exemplar is deleted -> this will remove it from backend drawers !!!!!! add to creating exemplar function !!!
+    }
+});
 
 // Control panel
 artControls.onmousedown = (e) => {
@@ -345,20 +407,40 @@ artControls.onmousedown = (e) => {
             pos4 > bounds.bottom
         ) {
             document.onmouseup = closeDragElement;
-            document.onmousemove = elementDrag;
+            document.onmousemove = (e) => elementDrag(e, artControls);
         }
     }
 };
 
-function elementDrag(e) {
+document.getElementById("sketchbook-panel").onmousedown = (e) => {
+    if (window.innerWidth > 650) {
+        let content = document.getElementById("sketchbook-content");
+        let bounds = content.getBoundingClientRect();
+        e = e || window.event;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        if (
+            pos3 < bounds.left ||
+            pos3 > bounds.right ||
+            pos4 < bounds.top ||
+            pos4 > bounds.bottom
+        ) {
+            document.onmouseup = closeDragElement;
+            document.onmousemove = (e) =>
+                elementDrag(e, document.getElementById("sketchbook-panel"));
+        }
+    }
+};
+
+function elementDrag(e, item) {
     e = e || window.event;
-    e.preventDefault();
+    // e.preventDefault();
     pos1 = pos3 - e.clientX;
     pos2 = pos4 - e.clientY;
     pos3 = e.clientX;
     pos4 = e.clientY;
-    artControls.style.top = artControls.offsetTop - pos2 + "px";
-    artControls.style.left = artControls.offsetLeft - pos1 + "px";
+    item.style.top = item.offsetTop - pos2 + "px";
+    item.style.left = item.offsetLeft - pos1 + "px";
 }
 
 function closeDragElement() {
@@ -388,6 +470,24 @@ document.querySelectorAll(".tab-item").forEach((tab) => {
     });
 });
 
+// document.querySelectorAll(".card-icon-background").forEach((elem) => {
+//     elem.addEventListener("click", () => {
+//         console.log("test");
+//         elem.parentElement.parentElement.remove();
+//     });
+// });
+
+document.getElementById("save-sketch").addEventListener("click", () => {
+    let jsonGroup = exportToExemplar();
+    let creationIndex = mainSketch.exemplarCount;
+    let newElem = createExemplar(creationIndex);
+    let thisCanvas = exemplarScope.projects[creationIndex];
+    let imported = thisCanvas.activeLayer.importJSON(jsonGroup);
+    imported.position = new Point(exemplarSize / 2, exemplarSize / 2);
+    document.getElementById("exemplar-grid").appendChild(newElem);
+    mainSketch.exemplarCount += 1;
+});
+
 // document.getElementById("use-squiggles").addEventListener("change", (event) => {
 //     mainSketch.initRandomCurves = !mainSketch.initRandomCurves;
 //     let container = document.getElementById("contain-num-squiggles");
@@ -410,13 +510,13 @@ document.getElementById("num-traces").oninput = function() {
 //     canvas.style.backgroundColor = mainSketch.strokeColor;
 // };
 
-document.getElementById("moodboard-cross").addEventListener("click", () => {
-    if (!moodboard.style.display || moodboard.style.display === "none") {
-        moodboard.style.display = "block";
-    } else {
-        moodboard.style.display = "none";
-    }
-});
+// document.getElementById("moodboard-cross").addEventListener("click", () => {
+//     if (!moodboard.style.display || moodboard.style.display === "none") {
+//         moodboard.style.display = "block";
+//     } else {
+//         moodboard.style.display = "none";
+//     }
+// });
 
 // LOAD UI
 
@@ -453,14 +553,11 @@ picker.onChange = (color) => {
     // setPenMode("pen", document.getElementById("pen"));
 };
 
-addExemplarButtons.addEventListener("click", () => {
-    importToSketch();
-});
-
 // AI STUFF
 
-document.getElementById("open-moodboard").addEventListener("click", () => {
-    document.getElementById("moodboard-container").style.display = "flex";
-});
+// document.getElementById("open-moodboard").addEventListener("click", () => {
+//     // document.getElementById("moodboard-container").style.display = "flex";
+//     document.getElementById("sketchbook-panel").style.display = "flex";
+// });
 
 setActionUI("inactive");

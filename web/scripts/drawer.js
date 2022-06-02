@@ -1,5 +1,10 @@
+let sketchTimer;
+
 multiTool.onMouseDown = function(event) {
     // refactor for multitouch
+    clearTimeout(sketchTimer);
+    // hide time slider
+    document.getElementById("contain-dot").style.display = "none";
 
     if (mainSketch.activeStates.includes(mainSketch.drawState)) {
         liveCollab = true;
@@ -134,6 +139,7 @@ multiTool.onMouseUp = function() {
     mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
+
     switch (mainSketch.penMode) {
         case "select":
             if (selectBox) {
@@ -163,11 +169,24 @@ multiTool.onMouseUp = function() {
                 type: "draw-event",
                 data: myPath,
             });
+            mainSketch.svg = paper.project.exportSVG({
+                asString: true,
+            });
+
             if (liveCollab) {
                 mainSketch.continueSketch();
                 liveCollab = false;
-            }
+            } else {
+                //just drawing
+                if (!noPrompt() && mainSketch.doneSketching !== null) {
+                    clearTimeout(sketchTimer);
+                    sketchTimer = setTimeout(userStuck, mainSketch.doneSketching);
 
+                    function userStuck() {
+                        mainSketch.draw();
+                    }
+                }
+            }
             break;
         case "lasso":
             mainSketch.resetHistory(); //reset since not continuing
@@ -253,7 +272,7 @@ eraseTool.onMouseUp = function(event) {
     });
     console.log(erasorItems);
     erasorItems.forEach(function(erasorItem) {
-        // subtract is not a function ? no erasor item?? or empty arr
+        // breaks with groups because groups can't do boolean ops
         const result = erasorItem.subtract(deleteShape, {
             trace: false,
             insert: false,

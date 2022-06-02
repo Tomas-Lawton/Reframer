@@ -57,26 +57,32 @@ const aiMessage = document.querySelector("#ai-content .panel-subtitle");
 let liveCollab = false;
 let myPath, erasePath, regionPath, tmpGroup, mask, selectBox;
 
+// const exemplarSize = document
+//     .querySelector(".exemplar-canvas")
+//     .getBoundingClientRect().width;
+
+const exemplarTemplate = document.getElementById("exemplar-template");
+
 const padding = parseInt(
     window
     .getComputedStyle(document.getElementById("contain-canvas"), null)
-    .getPropertyValue("padding-left")
+    .getPropertyValue("padding")
 );
-const exemplarSize = document
-    .querySelector(".exemplar-canvas")
-    .getBoundingClientRect().width;
+
 const containerRect = document
     .getElementById("contain-canvas")
     .getBoundingClientRect();
 
-const addExemplarButtons = document.querySelector(".add-exemplar");
+const exemplarSize = exemplarTemplate.getBoundingClientRect().width;
+const reusableExemplar = exemplarTemplate.cloneNode(true); //clone to use
+exemplarTemplate.remove();
 
 if (containerRect.width > window.innerHeight) {
-    canvas.width = window.innerHeight;
-    canvas.height = window.innerHeight;
+    canvas.width = window.innerHeight - padding * 2;
+    canvas.height = window.innerHeight - padding * 2;
 } else {
-    canvas.height = containerRect.width;
-    canvas.width = containerRect.width;
+    canvas.height = containerRect.width - padding * 2;
+    canvas.width = containerRect.width - padding * 2;
 }
 
 const scaleRatio = canvas.width / exemplarSize;
@@ -86,11 +92,11 @@ paper.install(window);
 const scope = new PaperScope();
 const exemplarScope = new PaperScope();
 
-exemplars.forEach((exemplar) => {
-    exemplar.width = exemplarSize;
-    exemplar.height = exemplarSize;
-    exemplarScope.setup(exemplar);
-});
+// exemplars.forEach((exemplar) => {
+//     exemplar.width = exemplarSize;
+//     exemplar.height = exemplarSize;
+//     exemplarScope.setup(exemplar);
+// });
 exemplarScope.activate();
 // exemplarScope.projects.forEach((project) => project.activate());
 scope.setup(canvas);

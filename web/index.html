@@ -18,6 +18,8 @@
     <script type="text/javascript" src="scripts/api.js" defer></script>
     <script type="text/javascript" src="scripts/drawer.js" defer></script>
     <script type="text/javascript" src="scripts/logic.js" defer></script>
+    <script type="text/javascript" src="scripts/sketch.js" defer></script>
+
     <script type="text/javascript" src="scripts/logger.js" defer></script>
 
     <script type="text/javascript" src="scripts/interface.js" defer></script>
@@ -86,6 +88,7 @@
     </div>
 
     <div class="top-action" id="top-action-right">
+        <i class="fa-solid fa-book  fa-fw" id="scrapbook"></i>
         <i class="trash fa-solid fa-trash fa-fw" id="delete"></i>
         <i class="save fa-solid fa-save fa-fw" id="save"></i>
         <i class="fa-solid fa-cog fa-fw" id="settings"></i>
@@ -126,13 +129,15 @@
                     <i class="fas fa-robot"></i>
                 </div>
 
-                <div>
+                <div class="panel-section">
                     <div class="flex">
                         <h1 class="panel-title">
-                            Mode
+                            Action
                         </h1>
                         <p class="pill">AI Controls</hp>
+
                     </div>
+                    <hr />
                     <div id="set-modes">
                         <div class="ai-action" id="draw">
                             <i class="fa-solid fa-marker fa-fw"></i>
@@ -140,12 +145,14 @@
                         </div>
                         <div class="ai-action" id="refine">
                             <i class="fa-solid fa-down-left-and-up-right-to-center fa-fw"></i>
-                            <p>Revise</p>
+                            <p>Refine</p>
                         </div>
-                        <div class="ai-action" id="generate">
+                        <!-- <div class="ai-action" id="generate">
                             <i class="fa-solid fa-lightbulb fa-fw"></i>
                             <p>Brainstorm</p>
                         </div>
+ -->
+
                         <div class="ai-action inactive-action" id="stop">
                             <i class="fa-solid fa-stop fa-fw" id="stop-icon"></i>
                             <p id="stop-text">Stop</p>
@@ -157,20 +164,48 @@
                         </div>
                     </div>
 
+                </div>
+
+
+                <div class="panel-section">
+                    <div class="flex">
+                        <h1 class="panel-title">
+                            Behaviour
+                        </h1>
+                        <p class="pill">Auto</hp>
+                    </div>
+                    <h2 class="panel-subtitle">I'll hop in!</h2>
+
+                    <hr />
                     <div>
+                        <!-- <p class="pill">Automatic</p> -->
+
+                        <p class="slider-label">Enthusiasm</p>
+
+                        <input type="range" id="enthusiasm-slider" value="1" min="1" max="11">
+
+                        <div id="autonomy-labels">
+                            <p class="slider-label">Adding</p>
+                            <p class="slider-label">Refining</p>
+                        </div>
+                        <input type="range" id="autonomy-slider" value="6" min="1" max="11">
+                    </div>
+
+                    <!-- <div>
                         <div class="flex">
-                            <p class="pill">Moodboard</p>
+                            <p class="pill">Scrapbook</p>
                         </div>
                     </div>
 
                     <div class="flex">
-                        <h2 class="panel-subtitle" id="moodboard-section">Help me learn by adding to the moodboard!</h2>
+                        <h2 class="panel-subtitle" id="moodboard-section">Save sketches for later!</h2>
                         <button id="open-moodboard">
                             <i class="fas fa-image"></i>
                         </button>
-                    </div>
+                    </div> -->
 
                 </div>
+
             </div>
         </div>
 
@@ -220,9 +255,105 @@
             </div>
         </div>
     </div>
+
+
+
+    <div id="sketchbook-panel">
+        <!-- <div id="tabs">
+
+            <div class="tab-item" id="sketch-tab">
+                <h2>Sketchbook</h2>
+            </div>
+        </div> -->
+        <div class="content-margin">
+            <div class="flex">
+                <div class="tab-info">
+                    <div>
+                        <h1 class="panel-title">
+                            Scrapbook
+                        </h1>
+                        <h2 class="panel-subtitle">Save sketches for later!</h2>
+                    </div>
+                </div>
+
+                <div id="brainstorm">
+                    <i class="fa-solid fa-plus fa-fw add-exemplar"></i>
+                </div>
+
+                <!-- How to save a sketch to sketchbook -->
+                <!-- <div id="brainstorm">
+                    <i class="fa-solid fa-plus fa-fw add-exemplar"></i>
+                </div> -->
+            </div>
+
+
+            <div id="sketchbook-content">
+                <div id="exemplar-grid">
+                    <div class="exemplar-card" id="exemplar-template" draggable="true">
+                        <div class="card-info">
+                            <h3>Temp</h3>
+                            <div class="card-icon-background">
+                                <i class="fa-solid fa-minus fa-fw"></i>
+                            </div>
+                        </div>
+                        <div class="exemplar">
+                            <canvas id="template-exemplar" class="exemplar-canvas"></canvas>
+                        </div>
+                    </div>
+
+
+                    <!-- <div class="exemplar-card">
+                        <div class="card-info">
+                            <h3>AI 1</h3>
+                            <div class="card-icon-background">
+                                <i class="fa-solid fa-minus fa-fw"></i>
+                            </div>
+                        </div>
+                        <div class="exemplar">
+                            <canvas id="canvas1" class="exemplar-canvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="exemplar-card">
+                        <div class="card-info">
+                            <h3>AI 2</h3>
+                            <div class="card-icon-background">
+                                <i class="fa-solid fa-minus fa-fw"></i>
+                            </div>
+                        </div>
+                        <div class="exemplar">
+                            <canvas id="canvas2" class="exemplar-canvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="exemplar-card">
+                        <div class="card-info">
+                            <h3>AI 3</h3>
+                            <div class="card-icon-background">
+                                <i class="fa-solid fa-minus fa-fw"></i>
+                            </div>
+                        </div>
+                        <div class="exemplar">
+                            <canvas id="canvas3" class="exemplar-canvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="exemplar-card">
+                        <div class="card-info">
+                            <h3>AI 4</h3>
+                            <div class="card-icon-background">
+                                <i class="fa-solid fa-minus fa-fw"></i>
+                            </div>
+                        </div>
+                        <div class="exemplar">
+                            <canvas id="canvas4" class="exemplar-canvas"></canvas>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+            <p class="pill" id="save-sketch">Add Sketch</hp>
+
+        </div>
     </div>
 
-
+    <p id="rolling-loss">Step: 0 Loss: 0</p>
 
 
 
@@ -230,7 +361,6 @@
         <div id="sketch-view">
             <div id="contain-canvas">
                 <div class="canvas-drop">
-                    <p id="rolling-loss">Step: 0 Loss: 0</p>
                     <div id="delete-handler" class="select-ui">
                         <div>
                             <i class="basic-grey fa-solid fa-trash fa-fw"></i>
@@ -241,9 +371,6 @@
                             <i class="basic-grey fa-solid fa-brain fa-fw"></i>
                         </div>
                     </div>
-
-
-
 
                     <div id="transform-ui" style="display: none">
                         <div class="transformer">
@@ -290,11 +417,11 @@
     </div>
 
 
-    <div id="moodboard-container">
+    <!-- <div id="moodboard-container">
         <div id="moodboard">
             <div class="modal-status">
                 <div id="moodboard-header">
-                    <h1 class="panel-title">Moodboard...</h1>
+                    <h1 class="panel-title">Scrapbook...</h1>
                     <h2>Add and import sketches to quickly explore ideas. Over time, sketch-bot will learn and adapt!
                     </h2>
                 </div>
@@ -355,8 +482,10 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
+
+    <!-- <i class="fa-solid fa-download" id="upload"></i> -->
 </body>
 
 </html>

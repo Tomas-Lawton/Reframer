@@ -1,228 +1,44 @@
-class SimpleStack {
-    constructor() {
-        this.undoStack = [];
-        this.redoStack = [];
-        this.historyHolder = [""];
-    }
-}
-
-class SketchHandler {
-    // Maintains a logical state for sending over WS
-    constructor() {
-        this.drawState = null;
-
-        // Sketching Data
-        this.prompt = null;
-        this.svg = paper.project.exportSVG({
-            asString: true,
-        }); //for svg parsing
-        this.frameSize = canvas.getBoundingClientRect().width;
-
-        // Defaults
-        this.strokeColor = "rgb(24,24,24)";
-        this.strokeWidth = 8;
-        this.opacity = 1;
-        this.penMode = "pen";
-        this.clipDrawing = false;
-        this.maximumTraces = 1; // todo change
-        this.step = 0;
-        this.lastRollingLoss = 0;
-        this.linesDisabled = false;
-        this.activeStates = [
-            "drawing",
-            "generating",
-            "refining",
-            "redrawing",
-            "continuing",
-        ];
-        this.lastHistoryIndex = 0;
-        this.penDropMode = "pen";
-
-        // TODO Refactor
-        this.buttonControlLeft = true;
-
-        // User Initialised
-        this.drawRegion = null;
-        this.selectionBox = null;
-        this.lastRender = null;
-        this.lastPrompt = null;
-        this.isFirstIteration = null;
-        this.lastRollingLoss = null;
-        this.traces = null;
-        this.boundingBox = null;
-        this.transformGroup = null;
-
-        // Settings panel
-        this.useAdvanced = false;
-        this.initRandomCurves = true;
-        this.numRandomCurves = 32;
-        this.showAICurves = 3;
-        this.numTraces = 1;
-
-        // Undo/redo stack
-        this.stack = new SimpleStack();
-    }
-    updateDrawer({ status, svg, hasRegion, frameSize, prompt, lines }) {
-        mainSketch.isFirstIteration = true; //reset canvas
-        const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
-        mainSketch.lastPrompt = prompt;
-        const res = {
-            status: status,
-            data: {
-                prompt: prompt,
-                svg: svg,
-                random_curves: lines,
-                frame_size: frameSize,
-                region: {
-                    activate: hasRegion,
-                    x1: mainSketch.drawRegion ? mainSketch.drawRegion.x : 0,
-                    y1: mainSketch.drawRegion ?
-                        canvasBounds.height - mainSketch.drawRegion.y :
-                        0,
-                    x2: mainSketch.drawRegion ?
-                        mainSketch.drawRegion.x + mainSketch.drawRegion.width :
-                        canvasBounds.width,
-                    y2: mainSketch.drawRegion ?
-                        canvasBounds.height -
-                        mainSketch.drawRegion.y -
-                        mainSketch.drawRegion.height // use non-web y coords
-                        :
-                        canvasBounds.height, // same as width
-                },
-            },
-        };
-        ws.send(JSON.stringify(res));
-        console.log(res);
-    }
-    draw(withRegion = false, svg = null, disableLines = false) {
-        if (noPrompt()) {
-            openModal({
-                title: "Type a prompt first!",
-                message: "You need a target for AI sketching.",
-            });
-            return;
-        }
-        mainSketch.linesDisabled = disableLines;
-        this.updateDrawer({
-            status: "draw",
-            svg: svg || this.svg,
-            hasRegion: withRegion,
-            frameSize: this.frameSize,
-            prompt: this.prompt,
-            lines: disableLines ?
-                0 :
-                this.initRandomCurves ?
-                this.numRandomCurves :
-                0,
-        });
-        this.step = 0;
-        this.clipDrawing = true;
-        setActionUI(disableLines ? "refining" : "drawing");
-    }
-    generate() {
-        if (!exemplarSize) {
-            console.error("exemplars not found");
-        }
-        if (noPrompt()) {
-            openModal({
-                title: "Type a prompt first!",
-                message: "You need a target for AI exemplars.",
-            });
-            return;
-        }
-        this.updateDrawer({
-            status: "sketch_exemplars",
-            svg: this.svg,
-            hasRegion: false,
-            frameSize: exemplarSize,
-            prompt: this.prompt,
-            lines: this.initRandomCurves ? this.numRandomCurves : 0,
-        });
-        this.clipDrawing = true;
-        setActionUI("generating");
-    }
-    redraw() {
-        this.updateDrawer({
-            status: "redraw",
-        });
-        this.step = 0;
-        this.clipDrawing = true;
-        setActionUI("redrawing");
-    }
-    continue () {
-        // need to change this so it supports updating the prompt or using a new svg
-        this.updateDrawer({
-            status: "continue",
-            prompt: this.prompt,
-            frameSize: this.frameSize, //can remove?
-        });
-        this.clipDrawing = true;
-        console.log("continuing with potential updated prompt");
-        setActionUI("continuing");
-    }
-    continueSketch() {
-        // need to change this so it supports updating the prompt or using a new svg
-        console.log(this.svg);
-        this.updateDrawer({
-            status: "continue_sketch",
-            svg: this.svg,
-            frameSize: this.frameSize, //can remove?
-        });
-        this.clipDrawing = true;
-        console.log("continuing with updated sketch");
-        setActionUI("continuing");
-    }
-    stop() {
-        if (this.drawState === "active") {
-            timeKeeper.style.visibility = "visible";
-        }
-
-        this.updateDrawer({ status: "stop" });
-        this.clipDrawing = false;
-        setActionUI("stop");
-    }
-    pause() {
-        // if (this.drawState === "active") {
-        //     timeKeeper.style.visibility = "visible";
-        // }
-
-        this.updateDrawer({ status: "stop" });
-        this.clipDrawing = false;
-        // setActionUI("stop");
-    }
-    resetHistory() {
-        mainSketch.step = 0; // reset since not continuing
-        mainSketch.stack.historyHolder = [{ svg: "" }];
-        timeKeeper.style.width = "0";
-        timeKeeper.setAttribute("max", "0");
-        timeKeeper.value = "0";
-    }
-}
-
-mainSketch = new SketchHandler();
-
-const importToSketch = () => {
+const importToSketch = (exemplarIndex) => {
     console.log("IMPORTING");
-    // Clear the sketch
-    // scale the whole exemplar
-    console.log(exemplarScope.projects[0]);
-    let expandedExemplar = exemplarScope.projects[0].activeLayer
-        .scale(scaleRatio)
-        .exportJSON();
-    let reducedSketch = userLayer.scale(1 / scaleRatio).exportJSON();
+    // idd index
+    // let expandedExemplar = exemplarScope.projects[0].activeLayer
+    //     .scale(scaleRatio)
+    //     .exportJSON();
+    console.log(exemplarIndex);
+    let copy = exemplarScope.projects[exemplarIndex].activeLayer.clone();
+    let expandedExemplar = copy.scale(scaleRatio).exportJSON(); // group containing paths not group containing group
+    copy.remove();
 
-    exemplarScope.projects[0].activeLayer.clear();
+    // exemplarScope.projects[0].activeLayer.clear();
     userLayer.clear();
-
     let newSketch = userLayer.importJSON(expandedExemplar);
-    let newExemplar =
-        exemplarScope.projects[0].activeLayer.importJSON(reducedSketch);
-    newSketch.position = new Point(canvas.width / 2, canvas.width / 2);
-    newExemplar.position = new Point(
-        exemplarSize.width / 2,
-        exemplarSize.width / 2
+    newSketch.getItems((path) => (path.strokeWidth *= scaleRatio));
+    // rescale
+    newSketch.position = new Point(
+        mainSketch.frameSize / 2,
+        mainSketch.frameSize / 2
     );
-    // import each path individually.
+
+    mainSketch.svg = paper.project.exportSVG({
+        asString: true,
+    });
+};
+
+const exportToExemplar = () => {
+    console.log("EXPORTING");
+    // let saveSketch = userLayer.clone({ insert: false });'
+    let saveSketch = userLayer.clone({ insert: true });
+    // saveSketch.applyMatrix = true;
+    let scaledSketch = saveSketch.scale(1 / scaleRatio);
+    // deselect all
+    saveSketch.getItems().forEach((path) => {
+        path.selected = false;
+    });
+    // REMOVE RECT
+    scaledSketch.getItems((item) => (item.strokeWidth /= scaleRatio));
+    let save = scaledSketch.exportJSON();
+    scaledSketch.remove();
+    return save;
 };
 
 const setActionUI = (state) => {
@@ -243,26 +59,29 @@ const setActionUI = (state) => {
         stopButton.style.background = "#ff6060";
         stopButton.style.color = "#ffffff";
         stopButton.querySelector("i").style.color = "#ffffff";
+        stopButton.querySelector("p").innerHTML = "Stop";
+
+        prompt.style.display = "none";
 
         document.getElementById("spinner").style.display = "flex";
         if (state == "drawing") {
-            aiMessage.innerHTML = `Got it! I'm drawing a ${mainSketch.prompt}!`;
-            actionControls[0].classList.add("active");
+            aiMessage.innerHTML = `Got it! Drawing ${mainSketch.prompt}!`;
+            document.getElementById("draw").classList.add("active");
         } else if (state == "refining") {
-            aiMessage.innerHTML = `Okay, refining the lines for a ${mainSketch.prompt}...`;
-            actionControls[1].classList.add("active");
+            aiMessage.innerHTML = `Okay, refining the lines for ${mainSketch.prompt}...`;
+            document.getElementById("refine").classList.add("active");
         } else if (state == "redrawing") {
             aiMessage.innerHTML = `No worries, how about this instead?`;
-            actionControls[2].classList.add("active");
+            document.getElementById("redraw").classList.add("active");
         } else if (state == "generating") {
-            aiMessage.innerHTML = `Sure! Adding a ${mainSketch.prompt} to the moodboard!`;
+            aiMessage.innerHTML = `Sure! Adding ${mainSketch.prompt} to the moodboard!`;
             actionControls[3].classList.add("active");
         } else if (state == "continuing") {
-            aiMessage.innerHTML = `Cool idea, I'll make it a ${mainSketch.prompt}.`;
+            aiMessage.innerHTML = `Nice, I'll make that it into ${mainSketch.prompt}.`;
         }
         aiMessage.classList.add("typed-out");
     } else if (state === "stop") {
-        // AI is waiting
+        // AI is stopped
         actionControls.forEach((elem) => {
             elem.classList.remove("inactive-action");
             elem.classList.remove("active");
@@ -275,7 +94,7 @@ const setActionUI = (state) => {
         document.getElementById("stop-text").innerHTML = "Redraw";
 
         document.getElementById("spinner").style.display = "none";
-
+        prompt.style.display = "flex";
         aiMessage.innerHTML = "I'm stopping! What can we draw next?";
         aiMessage.classList.add("typed-out");
 
@@ -435,9 +254,9 @@ const deletePath = () => {
 
 // switchControls();
 
-const parseFromSvg = (svg) => {
+const parseFromSvg = (svg, layer, showAllPaths = false) => {
     if (svg === "" || svg === undefined) return null;
-    let paperObject = userLayer.importSVG(svg);
+    let paperObject = layer.importSVG(svg);
     const numPaths = paperObject.children[0].children.length;
     for (const returnedIndex in paperObject.children[0].children) {
         const child = paperObject.children[0].children[returnedIndex];
@@ -452,17 +271,19 @@ const parseFromSvg = (svg) => {
         }
 
         const pathEffect = child.clone({ insert: false });
-        if (returnedIndex < mainSketch.showAICurves) {
-            //only add a certain count of paths
-            userLayer.addChild(pathEffect);
+
+        if (!showAllPaths) {
+            if (returnedIndex < mainSketch.showAICurves) {
+                //only add a certain count of paths
+                layer.addChild(pathEffect);
+            }
+        } else {
+            layer.addChild(pathEffect);
         }
         // const pathEffect = child.clone({ insert: false });
-        // userLayer.addChild(pathEffect);
+        // layer.addChild(pathEffect);
     }
     paperObject.remove();
-    mainSketch.svg = paper.project.exportSVG({
-        asString: true,
-    });
     return paperObject;
 };
 
@@ -507,7 +328,7 @@ const showTraceHistoryFrom = (fromIndex) => {
         let refList = [];
         for (let pastGen of items) {
             userLayer.importSVG(pastGen.svg);
-            refList.push(parseFromSvg(pastGen.svg));
+            refList.push(parseFromSvg(pastGen.svg, userLayer));
         }
         mainSketch.traces = refList;
     }
@@ -561,9 +382,14 @@ ws.onmessage = function(event) {
             } else {
                 userLayer.clear();
                 if (mainSketch.showAICurves < mainSketch.numRandomCurves) {
-                    mainSketch.showAICurves += Math.floor(Math.random() * 4);
+                    mainSketch.showAICurves += Math.floor(
+                        Math.random() * mainSketch.randomRange
+                    );
                 }
-                mainSketch.lastRender = parseFromSvg(result.svg);
+                mainSketch.lastRender = parseFromSvg(result.svg, userLayer);
+                mainSketch.svg = paper.project.exportSVG({
+                    asString: true,
+                });
             }
 
             calcRollingLoss();
@@ -575,19 +401,63 @@ ws.onmessage = function(event) {
                 `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`
             );
         }
+
+        // EXEMPLARS
+        // status may clash exemplars
         var matches = result.status.match(/\d+/g); //if status contains a number
         if (matches != null) {
             if (result.svg === "") return null;
             let thisCanvas = exemplarScope.projects[parseInt(result.status)];
-            // exemplar_canvas.activate();
             thisCanvas.clear();
-            let imported = thisCanvas.importSVG(result.svg);
+            // let imported = thisCanvas.importSVG(result.svg);
+
+            // let imported = parseFromSvg(result.svg, thisCanvas);
+            console.log(result.svg);
+            let imported = parseFromSvg(result.svg, thisCanvas.activeLayer, true);
+
+            // change group>group into group>paths
             console.log(imported);
-            document.querySelectorAll(".card-info div p")[
-                parseInt(result.status)
-            ].innerHTML = `Loss: ${result.loss.toPrecision(5)}`;
         }
     }
+};
+
+const createExemplar = (creationIndex) => {
+    let newElem = exemplarTemplate.cloneNode(reusableExemplar);
+    newElem.style.visibility = "initial";
+    let exemplarCanvas = newElem.querySelector("canvas");
+    exemplarCanvas.width = exemplarSize;
+    exemplarCanvas.height = exemplarSize;
+    exemplarScope.setup(exemplarCanvas);
+
+    newElem.querySelector("h3").innerHTML = `U${creationIndex}`;
+    newElem
+        .querySelector(".card-icon-background")
+        .addEventListener("click", () => {
+            newElem.remove();
+        });
+
+    exemplarCanvas.addEventListener("click", () => {
+        importToSketch(creationIndex);
+    });
+
+    newElem.addEventListener("click", () => {
+        document.getElementById("contain-dot").style.display = "none";
+    });
+
+    // Make draggable
+    // newElem.addEventListener(
+    //     "dragstart",
+    //     function(e) {
+    //         let icon = document.getElementById("upload");
+    //         icon.style.display = "block";
+    //         e.dataTransfer.setDragImage(icon, 0, 0);
+    //     },
+    //     false
+    // );
+    // document.addEventListener("dragend", function(e) {
+    //     icon.style.display = "none";
+    // });
+    return newElem;
 };
 
 const setPenMode = (mode, accentTarget) => {
