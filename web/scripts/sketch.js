@@ -42,6 +42,7 @@ class SketchHandler {
         // TODO Refactor
         this.buttonControlLeft = true;
         this.doneSketching = null;
+        this.numAddedPaths = 0;
 
         // User Initialised
         this.drawRegion = null;
@@ -60,6 +61,7 @@ class SketchHandler {
         this.numRandomCurves = 32;
         this.showAICurves = 3;
         this.numTraces = 1;
+        this.pathsOnCanvas = 0;
 
         // Undo/redo stack
         this.stack = new SimpleStack();
@@ -73,9 +75,10 @@ class SketchHandler {
         lines,
         exemplarCount,
     }) {
-        mainSketch.isFirstIteration = true; //reset canvas
+        this.isFirstIteration = true; //reset canvas
         const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
-        mainSketch.lastPrompt = prompt;
+        this.lastPrompt = prompt;
+
         const res = {
             status: status,
             data: {
@@ -106,6 +109,8 @@ class SketchHandler {
         console.log(res);
     }
     draw(withRegion = false, svg = null, disableLines = false) {
+        this.pathsOnCanvas = userLayer.getItems().length;
+
         if (noPrompt()) {
             openModal({
                 title: "Type a prompt first!",

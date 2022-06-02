@@ -257,15 +257,18 @@ const deletePath = () => {
 const parseFromSvg = (svg, layer, showAllPaths = false) => {
     if (svg === "" || svg === undefined) return null;
     let paperObject = layer.importSVG(svg);
-    const numPaths = paperObject.children[0].children.length;
+    const numPaths = paperObject.children[0].children.length; // drawn on the canvas right now
+
     for (const returnedIndex in paperObject.children[0].children) {
+        console.log(returnedIndex);
         const child = paperObject.children[0].children[returnedIndex];
         child.smooth();
 
-        // AI Stroke Effects
         if (mainSketch.initRandomCurves && !mainSketch.linesDisabled) {
-            if (returnedIndex >= numPaths - mainSketch.numRandomCurves) {
-                // ai paths
+            if (
+                returnedIndex >= mainSketch.pathsOnCanvas &&
+                returnedIndex < numPaths - mainSketch.numAddedPaths
+            ) {
                 child.opacity = 0.5;
             }
         }
@@ -274,13 +277,12 @@ const parseFromSvg = (svg, layer, showAllPaths = false) => {
 
         if (!showAllPaths) {
             if (returnedIndex < mainSketch.showAICurves) {
-                //only add a certain count of paths
                 layer.addChild(pathEffect);
             }
         } else {
             layer.addChild(pathEffect);
         }
-        // const pathEffect = child.clone({ insert: false });
+
         // layer.addChild(pathEffect);
     }
     paperObject.remove();
@@ -352,6 +354,7 @@ ws.onmessage = function(event) {
 
         if (result.status === "draw") {
             //sketch
+
             if (mainSketch.isFirstIteration) {
                 userLayer.clear();
                 mainSketch.isFirstIteration = false;
@@ -366,6 +369,7 @@ ws.onmessage = function(event) {
                     }
                 }
             }
+
             mainSketch.stack.historyHolder.push(result);
             timeKeeper.style.width = "100%";
             timeKeeper.setAttribute("max", String(mainSketch.step + 1));
@@ -375,8 +379,6 @@ ws.onmessage = function(event) {
 
             // To do change this so it is just max num mainSketch.traces
             if (mainSketch.numTraces > 1) {
-                // setTraces.value = String(step);
-                // getHistoryBatch
                 userLayer.clear();
                 showTraceHistoryFrom(mainSketch.stack.historyHolder.length - 1);
             } else {

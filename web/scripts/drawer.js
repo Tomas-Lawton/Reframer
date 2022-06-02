@@ -174,6 +174,7 @@ multiTool.onMouseUp = function() {
             });
 
             if (liveCollab) {
+                mainSketch.numAddedPaths += 1;
                 mainSketch.continueSketch();
                 liveCollab = false;
             } else {

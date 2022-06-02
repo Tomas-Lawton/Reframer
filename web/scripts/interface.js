@@ -236,6 +236,7 @@ scaleNumber.oninput = function() {
 
 opacitySlider.oninput = function() {
     mainSketch.opacity = this.value / 100;
+    console.log(mainSketch.opacity);
     getRGBA();
     getSelectedPaths().forEach((item) => (item.opacity = mainSketch.opacity));
 };
