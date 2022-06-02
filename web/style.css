@@ -1310,6 +1310,11 @@ input[type="number"] {
     margin: 1em 0 0.5em 0;
 }
 
+.inactive-section {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 #art-control-final {
     width: 100%;
     display: flex;

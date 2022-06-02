@@ -84,11 +84,11 @@
         <i class="brush fa-solid fa-pen fa-fw pen-mode selected-mode" id="pen-drop"></i>
         <i class="undo fa-solid fa-rotate-left fa-fw simple-hover" id="undo"></i>
         <i class="redo fa-solid fa-rotate-right fa-fw simple-hover" id="redo"></i>
-        <i class="fa-solid fa-sliders fa-fw" id="palette"></i>
+        <i class="fa-solid fa-sliders fa-fw panel-open" id="palette"></i>
     </div>
 
     <div class="top-action" id="top-action-right">
-        <i class="fa-solid fa-book  fa-fw" id="scrapbook"></i>
+        <i class="fa-solid fa-book fa-fw panel-open" id="scrapbook"></i>
         <i class="trash fa-solid fa-trash fa-fw" id="delete"></i>
         <i class="save fa-solid fa-save fa-fw" id="save"></i>
         <i class="fa-solid fa-cog fa-fw" id="settings"></i>
@@ -138,7 +138,7 @@
 
                     </div>
                     <hr />
-                    <div id="set-modes">
+                    <div class="inactive-section" id="set-modes">
                         <div class="ai-action" id="draw">
                             <i class="fa-solid fa-marker fa-fw"></i>
                             <p>Draw</p>
@@ -174,13 +174,13 @@
                         </h1>
                         <p class="pill">Auto</hp>
                     </div>
-                    <h2 class="panel-subtitle">I'll hop in!</h2>
+                    <!-- <h2 class="panel-subtitle">I'll hop in!</h2> -->
 
                     <hr />
-                    <div>
+                    <div id="behaviour-controls" class="inactive-section">
                         <!-- <p class="pill">Automatic</p> -->
 
-                        <p class="slider-label">I'll leave it to you...</p>
+                        <p class="slider-label" id="speed-text">I'll leave it to you...</p>
 
                         <input type="range" id="enthusiasm-slider" value="1" min="1" max="11">
 

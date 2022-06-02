@@ -266,11 +266,15 @@ document.getElementById("autonomy-slider").oninput = function() {
 
 document.getElementById("enthusiasm-slider").oninput = function() {
     let val = 11 - this.value;
+    let label = document.getElementById("speed-text");
     if (val === 10) {
         //max time
         mainSketch.doneSketching = null; // never add
+        label.innerHTML = "I'll leave it to you...";
     } else {
         mainSketch.doneSketching = val * 1.3 * 1000 + 2000;
+        if (val < 7) label.innerHTML = "I'll help if you're stuck...";
+        if (val < 4) label.innerHTML = "Let's draw together!";
     }
 };
 
@@ -299,7 +303,8 @@ timeKeeper.oninput = function() {
 };
 
 palette.addEventListener("click", () => {
-    toggleArtControls();
+    showHide(artControls);
+    palette.classList.toggle("panel-open");
 });
 
 // let typingTimer;
@@ -307,6 +312,12 @@ palette.addEventListener("click", () => {
 prompt.addEventListener("input", (e) => {
     mainSketch.prompt = e.target.value;
     aiMessage.innerHTML = `Sure! I can draw ${mainSketch.prompt}...`;
+
+    document
+        .getElementById("behaviour-controls")
+        .classList.remove("inactive-section");
+    document.getElementById("set-modes").classList.remove("inactive-section");
+
     // clearTimeout(typingTimer);
     // typingTimer = setTimeout(doneTypingPrompt, doneTypingInterval);
 });
@@ -430,7 +441,7 @@ artControls.onmousedown = (e) => {
     }
 };
 
-document.getElementById("sketchbook-panel").onmousedown = (e) => {
+sketchBook.onmousedown = (e) => {
     if (window.innerWidth > 650) {
         let content = document.getElementById("sketchbook-content");
         let bounds = content.getBoundingClientRect();
@@ -444,8 +455,7 @@ document.getElementById("sketchbook-panel").onmousedown = (e) => {
             pos4 > bounds.bottom
         ) {
             document.onmouseup = closeDragElement;
-            document.onmousemove = (e) =>
-                elementDrag(e, document.getElementById("sketchbook-panel"));
+            document.onmousemove = (e) => elementDrag(e, sketchBook);
         }
     }
 };
@@ -486,6 +496,11 @@ document.querySelectorAll(".tab-item").forEach((tab) => {
             }
         }
     });
+});
+
+document.getElementById("scrapbook").addEventListener("click", () => {
+    showHide(sketchBook);
+    document.getElementById("scrapbook").classList.toggle("panel-open");
 });
 
 // document.querySelectorAll(".card-icon-background").forEach((elem) => {
@@ -570,12 +585,5 @@ picker.onChange = (color) => {
     );
     // setPenMode("pen", document.getElementById("pen"));
 };
-
-// AI STUFF
-
-// document.getElementById("open-moodboard").addEventListener("click", () => {
-//     // document.getElementById("moodboard-container").style.display = "flex";
-//     document.getElementById("sketchbook-panel").style.display = "flex";
-// });
 
 setActionUI("inactive");

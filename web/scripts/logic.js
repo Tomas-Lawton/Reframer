@@ -50,15 +50,14 @@ const setActionUI = (state) => {
             elem.classList.add("inactive-action");
             elem.classList.remove("active");
         });
-        // actionControls[0].classList.add("inactive-action");
-        // actionControls[1].classList.add("inactive-action");
-        // actionControls[2].classList.add("inactive-action");
 
         // AI Active
         stopButton.classList.remove("inactive-action");
         stopButton.style.background = "#ff6060";
         stopButton.style.color = "#ffffff";
-        stopButton.querySelector("i").style.color = "#ffffff";
+        document.getElementById("stop-icon").classList.add("fa-stop");
+        document.getElementById("stop-icon").classList.remove("fa-repeat");
+        document.getElementById("stop-icon").style.color = "#ffffff";
         stopButton.querySelector("p").innerHTML = "Stop";
 
         prompt.style.display = "none";
@@ -88,9 +87,9 @@ const setActionUI = (state) => {
         });
         stopButton.style.background = "#f3f1ff";
         stopButton.style.color = "#7b66ff";
-        stopButton.querySelector("i").style.color = "#7b66ff";
-        document.getElementById("stop-icon").classList.toggle("fa-stop");
-        document.getElementById("stop-icon").classList.toggle("fa-repeat");
+        document.getElementById("stop-icon").classList.remove("fa-stop");
+        document.getElementById("stop-icon").classList.add("fa-repeat");
+        document.getElementById("stop-icon").style.color = "#7b66ff";
         document.getElementById("stop-text").innerHTML = "Redraw";
 
         document.getElementById("spinner").style.display = "none";
@@ -131,16 +130,6 @@ const fitToSelection = (items, state) => {
 
 const getSelectedPaths = () =>
     userLayer.getItems().filter((path) => path.selected);
-
-const toggleArtControls = () => {
-    if (artControls.style.display == "flex") {
-        artControls.style.display = "none";
-        palette.classList.remove("panel-open");
-    } else {
-        artControls.style.display = "flex";
-        palette.classList.add("panel-open");
-    }
-};
 
 const noPrompt = () =>
     mainSketch.prompt === "" ||
@@ -250,6 +239,14 @@ const deletePath = () => {
         asString: true,
     });
     logger.event("deleted-path");
+};
+
+const showHide = (item) => {
+    if (item.style.display == undefined || item.style.display == "none") {
+        item.style.display = "flex";
+    } else {
+        item.style.display = "none";
+    }
 };
 
 // switchControls();

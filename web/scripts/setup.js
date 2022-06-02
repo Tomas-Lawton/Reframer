@@ -38,6 +38,7 @@ const prompt = document.getElementById("messageText");
 const modal = document.getElementById("modal");
 const controlPanel = document.getElementById("control-panel");
 const artControls = document.getElementById("art-panel");
+const sketchBook = document.getElementById("sketchbook-panel");
 const penControls = document.getElementById("pen-controls");
 const message = document.getElementById("message");
 const palette = document.getElementById("palette");
