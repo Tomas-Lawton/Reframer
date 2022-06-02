@@ -17,6 +17,7 @@ const exemplars = [
     document.getElementById("canvas3"),
     document.getElementById("canvas4"),
 ];
+const sketchContainer = document.getElementById("canvas-drop");
 
 // Actions
 const actionControls = document.querySelectorAll(".ai-action");

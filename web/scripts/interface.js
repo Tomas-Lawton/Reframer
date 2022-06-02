@@ -1,3 +1,20 @@
+function dragover(e) {
+    e.preventDefault();
+}
+
+function dragenter(e) {
+    e.preventDefault();
+}
+
+function drop(e) {
+    const creationIndex = e.dataTransfer.getData("text/plain");
+    importToSketch(creationIndex);
+}
+
+sketchContainer.addEventListener("dragover", dragover);
+sketchContainer.addEventListener("dragenter", dragenter);
+sketchContainer.addEventListener("drop", drop);
+
 // Drawing Controls
 document.querySelectorAll(".pen-mode").forEach((elem) => {
     elem.addEventListener("click", () => {

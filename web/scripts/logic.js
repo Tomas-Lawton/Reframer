@@ -431,6 +431,7 @@ const createExemplar = (creationIndex) => {
     exemplarCanvas.height = exemplarSize;
     exemplarScope.setup(exemplarCanvas);
 
+    newElem.id = `exemplar-item-${creationIndex}`;
     newElem.querySelector("h3").innerHTML = `U${creationIndex}`;
     newElem
         .querySelector(".card-icon-background")
@@ -447,18 +448,26 @@ const createExemplar = (creationIndex) => {
     });
 
     // Make draggable
-    // newElem.addEventListener(
-    //     "dragstart",
-    //     function(e) {
-    //         let icon = document.getElementById("upload");
-    //         icon.style.display = "block";
-    //         e.dataTransfer.setDragImage(icon, 0, 0);
-    //     },
-    //     false
-    // );
-    // document.addEventListener("dragend", function(e) {
-    //     icon.style.display = "none";
-    // });
+    newElem.addEventListener(
+        "dragstart",
+        function(e) {
+            e.dataTransfer.setData("text/plain", creationIndex);
+
+            sketchContainer.classList.remove("canvas-standard-drop");
+            sketchContainer.classList.add("canvas-hover-light");
+
+            // let icon = document.getElementById("upload");
+            // icon.style.display = "block";
+            // e.dataTransfer.setDragImage(icon, 0, 0);
+        },
+        false
+    );
+
+    newElem.addEventListener("dragend", function(e) {
+        // icon.style.display = "none";
+        sketchContainer.classList.add("canvas-standard-drop");
+        sketchContainer.classList.remove("canvas-hover-light");
+    });
     return newElem;
 };
 

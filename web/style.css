@@ -102,8 +102,15 @@ body {
     /* border-radius: 2em; */
 }
 
-.canvas-drop {
+.canvas-hover-light {
+    box-shadow: 10px 9px 27px #8c7aff57;
+}
+
+.canvas-standard-drop {
     box-shadow: 10px 9px 27px rgb(48 48 48 / 18%);
+}
+
+#canvas-drop {
     /* padding: 1em; */
     position: relative;
     /* border-radius: 2em; */
