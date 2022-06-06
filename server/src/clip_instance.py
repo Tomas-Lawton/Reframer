@@ -3,8 +3,8 @@ from PIL import Image
 import clip
 import torch
 import logging
-from util.clip_utility import run_preprocess, load_model_defaults
 from util.clip_utility import get_noun_data
+import numpy as np
 
 class Clip_Instance:
     """Init clip, then configure the classifier type, then set the required img/class/prompt parameters"""
@@ -17,8 +17,29 @@ class Clip_Instance:
         ):  # Should this all be refactored to not be a "class instance" since it is only used once?
             raise Exception("Clip is already instantiated.")
 
-        self.device, self.model, self.preprocess = load_model_defaults()
-        run_preprocess(self.preprocess)
+        logging.info(f"Torch version: {torch.__version__}")
+        assert torch.__version__.split(".") >= [
+            "1",
+            "7",
+            "1",
+        ], "PyTorch 1.7.1 or later is required"
+
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        logging.info(f"These clip models are available: \n{clip.available_models()}")
+        self.model, self.preprocess = clip.load('ViT-B/32', self.device, jit=False)
+        input_resolution = self.model.visual.input_resolution
+        context_length = self.model.context_length
+        vocab_size = self.model.vocab_size
+
+        logging.info(
+            f"Model parameters: {np.sum([int(np.prod(p.shape)) for p in self.model.parameters()]):,}"
+        )
+        logging.info(f"Input resolution: {input_resolution}")
+        logging.info(f"Context length: {context_length}")
+        logging.info(f"Vocab size: {vocab_size}")
+
+        self.preprocess
+        logging.info("Preprocess complete")
         logging.info("Model ready")
         Clip_Instance.__instance == self
 
@@ -95,7 +116,8 @@ class Clip_Instance:
                 logging.error(f"Failed to tokenize: {token_list}")
         if tokens == []:
             return tokens
-
+        if self.device == 'cuda:0':
+            tokens = tokens.to('cuda:0')
         with torch.no_grad():
             text_features = self.model.encode_text(tokens) # normalise
             return text_features / text_features.norm(dim=-1, keepdim=True)

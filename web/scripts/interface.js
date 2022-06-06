@@ -300,6 +300,10 @@ timeKeeper.oninput = function() {
             asString: true,
         });
     }
+
+    mainSketch.svg = paper.project.exportSVG({
+        asString: true,
+    });
 };
 
 palette.addEventListener("click", () => {
@@ -551,27 +555,27 @@ document.getElementById("num-traces").oninput = function() {
 // LOAD UI
 
 // Random partial sketch
-const partial = userLayer.importSVG(sketches[Math.floor(Math.random() * 3)]);
-partial.scale(1000);
-// TO DO: Scale to canvas size
-partial.set({
-    position: new Point(540, 540),
-    strokeWidth: mainSketch.strokeWidth,
-    opacity: mainSketch.opacity,
-    strokeCap: "round",
-    strokeJoin: "round",
-});
+// const partial = userLayer.importSVG(sketches[Math.floor(Math.random() * 3)]);
+// partial.scale(1000);
+// // TO DO: Scale to canvas size
+// partial.set({
+//     position: new Point(540, 540),
+//     strokeWidth: mainSketch.strokeWidth,
+//     opacity: mainSketch.opacity,
+//     strokeCap: "round",
+//     strokeJoin: "round",
+// });
 
-partial.getItems().forEach((item) => userLayer.addChild(item.clone()));
-userLayer.firstChild.remove();
-partial.remove();
-console.log(userLayer.firstChild.remove());
-console.log(userLayer.firstChild.remove());
-console.log(userLayer);
+// partial.getItems().forEach((item) => userLayer.addChild(item.clone()));
+// userLayer.firstChild.remove();
+// partial.remove();
+// console.log(userLayer.firstChild.remove());
+// console.log(userLayer.firstChild.remove());
+// console.log(userLayer);
 
-mainSketch.svg = paper.project.exportSVG({
-    asString: true,
-});
+// mainSketch.svg = paper.project.exportSVG({
+//     asString: true,
+// });
 
 // /////////
 

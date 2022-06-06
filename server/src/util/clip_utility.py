@@ -4,7 +4,6 @@ from svgpathtools import svg2paths
 from svgelements import *
 from PIL import ImageColor
 import logging
-import numpy as np
 
 
 class DrawingPath:
@@ -13,37 +12,6 @@ class DrawingPath:
         self.color = color
         self.width = width
         self.num_segments = num_segments
-
-
-def load_model_defaults():
-    logging.info(f"Torch version: {torch.__version__}")
-    assert torch.__version__.split(".") >= [
-        "1",
-        "7",
-        "1",
-    ], "PyTorch 1.7.1 or later is required"
-
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    logging.info(f"These clip models are available: \n{clip.available_models()}")
-    model, preprocess = clip.load('ViT-B/32', device, jit=False)
-    input_resolution = model.visual.input_resolution
-    context_length = model.context_length
-    vocab_size = model.vocab_size
-
-    logging.info(
-        f"Model parameters: {np.sum([int(np.prod(p.shape)) for p in model.parameters()]):,}"
-    )
-    logging.info(f"Input resolution: {input_resolution}")
-    logging.info(f"Context length: {context_length}")
-    logging.info(f"Vocab size: {vocab_size}")
-    return device, model, preprocess
-
-
-def run_preprocess(preprocess):
-    preprocess
-    logging.info("Preprocess complete")
-    return
-
 
 def get_noun_data():
     with open('data/noun_list.txt', 'r') as f:

@@ -42,8 +42,9 @@ class Drawer:
         self.drawing_area = {'x0': 0.0, 'x1': 1.0, 'y0': 0.0, 'y1': 1.0}
         self.iteration = 0
         self.num_augs = 4
-        self.update_frequency = 1
+        self.update_frequency = 1 # remove?
         self.frame_size = None
+        self.refresh_rate = 15
         # Configure rasterisor
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         pydiffvg.set_print_timing(False)
@@ -64,7 +65,6 @@ class Drawer:
         return
 
     def parse_svg(self, region=None):
-        print("here")
         use_region = region['activate']
         try:
             (
@@ -158,7 +158,7 @@ class Drawer:
         img = img[:, :, :3].unsqueeze(0).permute(0, 3, 1, 2)  # NHWC -> NCHW
         return img
 
-    def run_epoch(self):
+    async def run_epoch(self):
         t = self.iteration
         logging.info(f"Starting run {t} in drawer {str(self.exemplar_count)}")
 
@@ -246,28 +246,40 @@ class Drawer:
         }
 
         # Update sketch
-        if self.exemplar_count is not None:
-            self.resizeScaleFactor = 224 / self.frame_size
+        if t % self.refresh_rate == 0:
+            if self.exemplar_count is not None:
+                self.resizeScaleFactor = 224 / self.frame_size
 
-        render_shapes, render_shape_groups = rescale_constants(
-            self.shapes, self.shape_groups, self.resizeScaleFactor
-        )
-        pydiffvg.save_svg(
-            f"results/img-{str(self.exemplar_count)}.png",
-            224,
-            224,
-            self.shapes,
-            self.shape_groups,
-        )
-        pydiffvg.save_svg(
-            f"results/output-{str(self.exemplar_count)}.svg",
-            self.user_canvas_w,
-            self.user_canvas_h,
-            render_shapes,
-            render_shape_groups,
-        )
+            render_shapes, render_shape_groups = rescale_constants(
+                self.shapes, self.shape_groups, self.resizeScaleFactor
+            )
+            pydiffvg.save_svg(
+                f"results/output-{str(self.exemplar_count)}.svg",
+                self.user_canvas_w,
+                self.user_canvas_h,
+                render_shapes,
+                render_shape_groups,
+            )
+            try: 
+                logging.info("Sending...")
+                svg = ''
+                async with aiofiles.open(
+                    f"results/output-{str(self.exemplar_count)}.svg", "r"
+                    ) as f:
+                    svg = await f.read()
+                status = "draw"
+                if isinstance(self.exemplar_count, int):
+                    logging.info(f"Sending exemplar {self.exemplar_count}")
+                    status = str(self.exemplar_count)
+                result = {"status": status, "svg": svg, "iterations": t, "loss": loss.item(), "exemplar_index": self.exemplar_count}
+                self.last_result = result  # won't go to client unless continued is used
+                await self.socket.send_json(result)
+                logging.info("Sent update")
+            except Exception as e:
+                logging.error("WS Response Failed")
+
+        logging.info(f"Completed run {t} in drawer {str(self.exemplar_count)}")
         self.iteration += 1
-        return self.iteration, loss.item()
 
     # RUN STUFF
     async def draw_update(self, data):
@@ -347,41 +359,17 @@ class Drawer:
             logging.error(e)
             logging.error("Failed to parse the new sketch")
 
-    async def run(self):
-        # Refactor so that the code is a thin layer of the looper
-        logging.info("Running iteration...")
-        svg = ''
-        i, loss = self.run_epoch()
-        time.sleep(.5)
-        async with aiofiles.open(
-            f"results/output-{str(self.exemplar_count)}.svg", "r"
-        ) as f:
-            svg = await f.read()
-        status = "draw"
-        if isinstance(self.exemplar_count, int):
-            logging.info(f"Sending exemplar {self.exemplar_count}")
-            status = str(self.exemplar_count)
-        
-        try: 
-            # logging.info(svg)
-            result = {"status": status, "svg": svg, "iterations": i, "loss": loss, "exemplar_index": self.exemplar_count}
-            await self.socket.send_json(result)
-        except Exception as e:
-            logging.error(e)
-        logging.info(f"Completed run {i} in drawer {str(self.exemplar_count)}")
-
-        self.last_result = result  # won't go to client unless continued is used
-
     async def stop(self):
         logging.info("Stopping...")
         self.is_running = False
         await self.socket.send_json({"status": "stop"})
 
-    def run_loop(self):
+    def run_async(self):
         self.is_running = True  # for loop to continue
         loop = asyncio.get_running_loop()
-        loop.run_in_executor(None, lambda: asyncio.run(self.loop_optimisation()))
+        loop.run_in_executor(None, lambda: asyncio.run(self.loop()))
 
-    async def loop_optimisation(self):
+    async def loop(self):
         while self.is_running:
-            await self.run()
+            logging.info(f"Running iteration {self.iteration}...")
+            await self.run_epoch()
