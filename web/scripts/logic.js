@@ -257,30 +257,29 @@ const parseFromSvg = (svg, layer, showAllPaths = false) => {
     const numPaths = paperObject.children[0].children.length; // drawn on the canvas right now
 
     for (const returnedIndex in paperObject.children[0].children) {
-        console.log(returnedIndex);
         const child = paperObject.children[0].children[returnedIndex];
         child.smooth();
 
-        // if (mainSketch.initRandomCurves && !mainSketch.linesDisabled) {
-        //     if (
-        //         returnedIndex >= mainSketch.pathsOnCanvas &&
-        //         returnedIndex < numPaths - mainSketch.numAddedPaths
-        //     ) {
-        //         child.opacity = 0.5;
-        //     }
-        // }
+        if (mainSketch.initRandomCurves && !mainSketch.linesDisabled) {
+            if (
+                returnedIndex >= mainSketch.pathsOnCanvas &&
+                returnedIndex < numPaths - mainSketch.numAddedPaths
+            ) {
+                child.opacity *= 0.7;
+            }
+        }
 
         const pathEffect = child.clone({ insert: false });
 
-        // if (!showAllPaths) {
-        //     if (returnedIndex < mainSketch.showAICurves) {
-        //         layer.addChild(pathEffect);
-        //     }
-        // } else {
-        //     layer.addChild(pathEffect);
-        // }
+        if (!showAllPaths) {
+            if (returnedIndex < mainSketch.showAICurves) {
+                layer.addChild(pathEffect);
+            }
+        } else {
+            layer.addChild(pathEffect);
+        }
 
-        layer.addChild(pathEffect);
+        // layer.addChild(pathEffect);
     }
     paperObject.remove();
     return paperObject;
