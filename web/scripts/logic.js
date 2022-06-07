@@ -473,68 +473,6 @@ const createExemplar = (isUserSketch, creationIndex = null) => {
     return newElem;
 };
 
-// const createExemplar = (isUserSketch, creationIndex = null) => {
-//     let type = isUserSketch ? "U" : "AI";
-
-//     let newElem = exemplarTemplate.cloneNode(reusableExemplar);
-//     newElem.style.visibility = "initial";
-
-//     let exemplarCanvas = newElem.querySelector("canvas");
-//     let removeButton = newElem.querySelector(".card-icon-background");
-//     let stopButton = newElem.querySelector(".fa-stop");
-
-//     exemplarCanvas.width = exemplarSize;
-//     exemplarCanvas.height = exemplarSize;
-//     exemplarScope.setup(exemplarCanvas);
-
-//     newElem.id = `${type}-sketch-item-${creationIndex}`;
-//     exemplarCanvas.id = `${type}-sketch-canvas-${creationIndex}`;
-//     newElem.querySelector("h3").innerHTML = `${type}${creationIndex}`;
-
-//     if (isUserSketch) {
-//         // index can be anything, exemplar count increases
-//         stopButton.style.display = "none";
-//         removeButton.addEventListener("click", () => {
-//             newElem.remove();
-//         });
-//     } else {
-//         // drawing index should be 0-3.
-
-//         stopButton.addEventListener("click", () => {
-//             // stop specific exemplar index
-//         });
-//         removeButton.addEventListener("click", () => {
-//             // AND ALSO // stop specific exemplar index
-//             // if an AI exemplar is deleted -> this will remove it from backend drawers !!!!!! add to creating exemplar function !!!
-
-//             newElem.classList.add("inactive-exemplar");
-//         });
-//     }
-
-//     exemplarCanvas.addEventListener("click", () => {
-//         // open dialog for clone vs copy?
-//         importToSketch(creationIndex);
-//         // make a copy of the current canvas
-//         document.getElementById("contain-dot").style.display = "none";
-//     });
-
-//     // Make draggable
-//     newElem.addEventListener(
-//         "dragstart",
-//         function(e) {
-//             e.dataTransfer.setData("text/plain", creationIndex);
-//             sketchContainer.classList.remove("canvas-standard-drop");
-//             sketchContainer.classList.add("canvas-hover-light");
-//         },
-//         false
-//     );
-//     newElem.addEventListener("dragend", function(e) {
-//         sketchContainer.classList.add("canvas-standard-drop");
-//         sketchContainer.classList.remove("canvas-hover-light");
-//     });
-//     return newElem;
-// };
-
 const setPenMode = (mode, accentTarget) => {
     let lastPenMode = mainSketch.penMode;
     document.querySelectorAll(".pen-mode").forEach((mode) => {

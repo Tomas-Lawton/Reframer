@@ -397,15 +397,16 @@ document.getElementById("brainstorm").addEventListener("click", () => {
         // TO DO: Clean up old scopes (now unused)
         for (let i = 0; i < 4; i++) {
             myNode.removeChild(myNode.firstChild);
-            console.log(mainSketch.staticSketch);
-            let newElem = createExemplar(false, mainSketch.staticSketch);
-            myNode.appendChild(newElem);
             if (mainSketch.staticSketch > total) {
+                let newElem = createExemplar(false); //don't increase the number of scopes
+                myNode.appendChild(newElem);
                 newElem.classList.add("inactive-exemplar");
             } else {
+                let newElem = createExemplar(false, mainSketch.staticSketch);
+                myNode.appendChild(newElem);
                 mainSketch.drawExemplar(mainSketch.staticSketch); // No, allow the index to create so the listener can stop it.
+                mainSketch.staticSketch += 1;
             }
-            mainSketch.staticSketch += 1;
         }
     }
 });
