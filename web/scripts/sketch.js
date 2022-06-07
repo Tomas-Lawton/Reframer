@@ -193,15 +193,16 @@ class SketchHandler {
         setActionUI("continuing");
     }
     continueSketch() {
-        // need to change this so it supports updating the prompt or using a new svg
-        console.log(this.svg);
-        this.updateDrawer({
-            status: "continue_sketch",
-            svg: this.svg,
-            frameSize: this.frameSize, //can remove?
-        });
         this.clipDrawing = true;
-        console.log("continuing with updated sketch");
+        try {
+            this.updateDrawer({
+                status: "continue_sketch",
+                svg: this.svg,
+                frameSize: this.frameSize, //can remove?
+            });
+        } catch (e) {
+            console.log("Problem with update");
+        }
         setActionUI("continuing");
     }
     stop() {

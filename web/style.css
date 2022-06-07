@@ -1056,6 +1056,10 @@ input[type="number"] {
     width: 100%;
 } */
 
+#ai-content>div {
+    margin: 1.5em 0;
+}
+
 #sketchbook-content {
     overflow: scroll;
     height: 70vh;
@@ -1337,31 +1341,42 @@ input[type="number"] {
 }
 
 .pill {
-    color: #7b66ff;
+    /* color: #7b66ff;
+    background: #f3f1ff; */
     font-weight: 400;
     margin: 0.4em 0;
     padding: 0.4em 1em;
     border-radius: 2em;
-    background: #f3f1ff;
     width: fit-content;
     font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    background: #7b66ff;
+    color: white;
 }
 
 .slider-label {
-    color: #7b66ff;
-    font-weight: 400;
-    /* margin: 0.4em 0; */
-    /* padding: 0.4em 1em; */
+    font-weight: 500;
     border-radius: 2em;
-    /* background: #f3f1ff; */
     width: fit-content;
     font-size: 0.8em;
     margin-bottom: 0;
     padding-bottom: 0;
 }
 
+#add-refine {
+    background: #f3f1ff;
+    color: #7b66ff;
+    padding: 0.8em;
+    border-radius: 0.5em;
+}
+
 .panel-section {
     margin: 1em 0 0.5em 0;
+}
+
+.panel-section>div:first-child {
+    margin-bottom: 0.5em;
 }
 
 .inactive-section {
@@ -1373,6 +1388,21 @@ input[type="number"] {
     width: 100%;
     display: flex;
     justify-content: space-between;
+}
+
+#auto-checkbox {
+    margin-left: 0.5em;
+    background-color: #7b66ff;
+}
+
+#autodraw-button {
+    cursor: pointer;
+}
+
+.inactive-pill {
+    background: #f5f5f5;
+    color: rgb(117, 117, 117);
+    box-shadow: inset 2px 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 #stroke-dot {

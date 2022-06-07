@@ -246,7 +246,9 @@ class Drawer:
         }
 
         # Update sketch
-        if t % self.refresh_rate == 0:
+        if t % 1 == 0:
+        # if t % self.refresh_rate == 0:
+
             if self.exemplar_count is not None:
                 self.resizeScaleFactor = 224 / self.frame_size
 
@@ -267,6 +269,7 @@ class Drawer:
                     f"results/output-{str(self.exemplar_count)}.svg", "r"
                     ) as f:
                     svg = await f.read()
+                    
                 status = "draw"
                 if isinstance(self.exemplar_count, int):
                     logging.info(f"Sending exemplar {self.exemplar_count}")

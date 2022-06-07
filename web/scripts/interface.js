@@ -258,25 +258,25 @@ opacitySlider.oninput = function() {
     getSelectedPaths().forEach((item) => (item.opacity = mainSketch.opacity));
 };
 
-document.getElementById("autonomy-slider").oninput = function() {
-    let val = 11 - this.value;
-    // 0-10
-    mainSketch.randomRange = val; //used for adding
-};
+// document.getElementById("autonomy-slider").oninput = function() {
+//     let val = 11 - this.value;
+//     // 0-10
+//     mainSketch.randomRange = val; //used for adding
+// };
 
-document.getElementById("enthusiasm-slider").oninput = function() {
-    let val = 11 - this.value;
-    let label = document.getElementById("speed-text");
-    if (val === 10) {
-        //max time
-        mainSketch.doneSketching = null; // never add
-        label.innerHTML = "I'll leave it to you...";
-    } else {
-        mainSketch.doneSketching = val * 1.3 * 1000 + 2000;
-        if (val < 7) label.innerHTML = "I'll help if you're stuck...";
-        if (val < 4) label.innerHTML = "Let's draw together!";
-    }
-};
+// document.getElementById("enthusiasm-slider").oninput = function() {
+//     let val = 11 - this.value;
+//     let label = document.getElementById("speed-text");
+//     if (val === 10) {
+//         //max time
+//         mainSketch.doneSketching = null; // never add
+//         label.innerHTML = "I'll leave it to you...";
+//     } else {
+//         mainSketch.doneSketching = val * 1.3 * 1000 + 2000;
+//         if (val < 7) label.innerHTML = "I'll help if you're stuck...";
+//         if (val < 4) label.innerHTML = "Let's draw together!";
+//     }
+// };
 
 document.getElementById("settings").addEventListener("click", () => {
     openModal({
@@ -318,20 +318,11 @@ prompt.addEventListener("input", (e) => {
     aiMessage.innerHTML = `Sure! I can draw ${mainSketch.prompt}...`;
 
     document
-        .getElementById("behaviour-controls")
-        .classList.remove("inactive-section");
-    document.getElementById("set-modes").classList.remove("inactive-section");
-
-    // clearTimeout(typingTimer);
-    // typingTimer = setTimeout(doneTypingPrompt, doneTypingInterval);
+        .querySelectorAll(".inactive-section")
+        .forEach((elem) => elem.classList.remove("inactive-section"));
 });
 
-// function doneTypingPrompt() {
-//     aiMessage.innerHTML = `Sure! I can draw ${mainSketch.prompt}...`;
-// }
-
 // TODO Refactor into the setActionUI switch statement using states
-
 // Draw
 document.getElementById("draw").addEventListener("click", () => {
     if (mainSketch.drawState === "inactive" || mainSketch.drawState === "stop") {
@@ -521,6 +512,18 @@ document.getElementById("save-sketch").addEventListener("click", () => {
     imported.position = new Point(exemplarSize / 2, exemplarSize / 2);
     document.getElementById("exemplar-grid").appendChild(newElem);
     mainSketch.staticSketch += 1;
+});
+
+const autoButton = document.getElementById("autodraw-button");
+autoButton.addEventListener("click", () => {
+    if (mainSketch.doneSketching !== null) {
+        mainSketch.doneSketching = null; // never add
+        autoButton.innerHTML = "I'll leave it to you...";
+    } else {
+        autoButton.innerHTML = "Collab draw!";
+        mainSketch.doneSketching = 500;
+    }
+    autoButton.classList.toggle("inactive-pill");
 });
 
 // document.getElementById("use-squiggles").addEventListener("change", (event) => {

@@ -134,10 +134,9 @@
                         <h1 class="panel-title">
                             Action
                         </h1>
-                        <p class="pill">AI Controls</hp>
-
+                        <p class="pill inactive-pill">Draw All</hp>
                     </div>
-                    <hr />
+                    <!-- <hr /> -->
                     <div class="inactive-section" id="set-modes">
                         <div class="ai-action" id="draw">
                             <i class="fa-solid fa-marker fa-fw"></i>
@@ -163,7 +162,6 @@
                             <p>Try again</p>
                         </div>
                     </div>
-
                 </div>
 
 
@@ -172,38 +170,29 @@
                         <h1 class="panel-title">
                             Behaviour
                         </h1>
-                        <p class="pill">Auto</hp>
+                        <!-- <p class="pill inactive-pill" id="autodraw-button">Allow Auto <input id="auto-checkbox" type="checkbox">
+                        </p> -->
+                        <p class="pill inactive-pill" id="autodraw-button">Allow Auto</p>
                     </div>
-                    <!-- <h2 class="panel-subtitle">I'll hop in!</h2> -->
+                    <div class="inactive-section" id="add-refine">
+                        <div class="flex">
+                            <p class="slider-label">Maintain</p>
+                            <p class="slider-label">Change</p>
+                        </div>
+                        <input type="range" id="respect-slider" value="1" min="1" max="11">
+                    </div>
 
-                    <hr />
-                    <div id="behaviour-controls" class="inactive-section">
-                        <!-- <p class="pill">Automatic</p> -->
+                    <!-- <p class="slider-label" id="speed-text">Change User Strokes</p>
+                    <input type="range" id="respect-slider" value="1" min="1" max="11"> -->
 
-                        <p class="slider-label" id="speed-text">I'll leave it to you...</p>
-
-                        <input type="range" id="enthusiasm-slider" value="1" min="1" max="11">
-
-                        <div id="autonomy-labels">
+                    <!-- <hr /> -->
+                    <!-- <div id="add-refine">
+                        <div class="flex">
                             <p class="slider-label">Adding</p>
                             <p class="slider-label">Refining</p>
                         </div>
                         <input type="range" id="autonomy-slider" value="6" min="1" max="11">
-                    </div>
-
-                    <!-- <div>
-                        <div class="flex">
-                            <p class="pill">Scrapbook</p>
-                        </div>
-                    </div>
-
-                    <div class="flex">
-                        <h2 class="panel-subtitle" id="moodboard-section">Save sketches for later!</h2>
-                        <button id="open-moodboard">
-                            <i class="fas fa-image"></i>
-                        </button>
                     </div> -->
-
                 </div>
 
             </div>
@@ -373,81 +362,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    </div>
-
-    <!-- <div id="continue">
-                                <i class="fa-solid fa-arrow-right-long fa-fw"></i>
-                                <p>More</p>
-                            </div> -->
-
-
-    <!-- <div id="moodboard-container">
-        <div id="moodboard">
-            <div class="modal-status">
-                <div id="moodboard-header">
-                    <h1 class="panel-title">Scrapbook...</h1>
-                    <h2>Add and import sketches to quickly explore ideas. Over time, sketch-bot will learn and adapt!
-                    </h2>
-                </div>
-                <i id="moodboard-cross" class="fa-solid fa-xmark"></i>
-
-            </div>
-            <div id="exemplar-grid">
-
-                <div class="exemplar-card">
-                    <div class="exemplar">
-                        <canvas id="canvas1" class="exemplar-canvas"></canvas>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                            <h3>Exemplar 1</h3>
-                            <p>Loss: 0</p>
-                        </div>
-                        <i class="fa-solid fa-plus fa-fw add-exemplar"></i>
-                    </div>
-                </div>
-
-                <div class="exemplar-card">
-                    <div class="exemplar">
-                        <canvas id="canvas2" class="exemplar-canvas"></canvas>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                            <h3>Exemplar 2</h3>
-                            <p>Loss: 0</p>
-                        </div>
-                        <i class="fa-solid fa-plus fa-fw add-exemplar"></i>
-                    </div>
-                </div>
-
-                <div class="exemplar-card">
-                    <div class="exemplar">
-                        <canvas id="canvas3" class="exemplar-canvas"></canvas>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                            <h3>Exemplar 3</h3>
-                            <p>Loss: 0</p>
-                        </div>
-                        <i class="fa-solid fa-plus fa-fw add-exemplar"></i>
-                    </div>
-                </div>
-
-                <div class="exemplar-card">
-                    <div class="exemplar">
-                        <canvas id="canvas4" class="exemplar-canvas"></canvas>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                            <h3>Exemplar 4</h3>
-                            <p>Loss: 0</p>
-                        </div>
-                        <i class="fa-solid fa-plus fa-fw add-exemplar"></i>
-                    </div>
-                </div>
-            </div>
-        </div> -->
     </div>
 
     <!-- <i class="fa-solid fa-download" id="upload"></i> -->

@@ -1,11 +1,6 @@
 let sketchTimer;
 
-multiTool.onMouseDown = function(event) {
-    // refactor for multitouch
-    clearTimeout(sketchTimer);
-    // hide time slider
-    document.getElementById("contain-dot").style.display = "none";
-
+const pauseActiveDrawer = () => {
     if (mainSketch.activeStates.includes(mainSketch.drawState)) {
         liveCollab = true;
         mainSketch.pause(); //continue on pen up
@@ -13,6 +8,13 @@ multiTool.onMouseDown = function(event) {
         aiMessage.innerHTML = `All right, I'mma let you finish...`;
         aiMessage.classList.add("typed-out");
     }
+};
+
+multiTool.onMouseDown = function(event) {
+    // refactor for multitouch
+    clearTimeout(sketchTimer);
+    // hide time slider
+    document.getElementById("contain-dot").style.display = "none";
 
     switch (mainSketch.penMode) {
         case "select":
@@ -34,7 +36,6 @@ multiTool.onMouseDown = function(event) {
                     event.point.y < mainSketch.boundingBox.bounds.bottom;
             }
 
-            // Deselect all and create select region
             if ((!hitResult && !isInBounds) || (!hitResult && isInBounds == null)) {
                 unpackGroup();
                 userLayer.getItems().forEach((path) => {
@@ -45,11 +46,22 @@ multiTool.onMouseDown = function(event) {
                     hideSelectUI();
                 }
 
-                // Select box
+                if (liveCollab) {
+                    mainSketch.svg = paper.project.exportSVG({
+                        asString: true,
+                    }); //grab latest changes during the selection
+                    // mainSketch.numAddedPaths += 1; //is substract change this
+                    mainSketch.continueSketch();
+                    liveCollab = false;
+                }
+
+                // Create a new selection in case drag is starting
                 mainSketch.selectBox = new Rectangle(event.point);
             }
 
             if (hitResult) {
+                pauseActiveDrawer();
+
                 // got path
                 if (mainSketch.boundingBox) {
                     hideSelectUI();
@@ -69,6 +81,8 @@ multiTool.onMouseDown = function(event) {
             }
             break;
         case "pen":
+            pauseActiveDrawer();
+
             myPath = new Path({
                 strokeColor: mainSketch.strokeColor,
                 strokeWidth: mainSketch.strokeWidth,
@@ -161,6 +175,7 @@ multiTool.onMouseUp = function() {
                 transformGroup.transformContent = false;
                 mainSketch.transformGroup = transformGroup;
             }
+
             break;
         case "pen":
             myPath.simplify();
@@ -210,6 +225,8 @@ multiTool.onMouseUp = function() {
 };
 
 eraseTool.onMouseDown = function(event) {
+    pauseActiveDrawer();
+
     mainSketch.stack.undoStack.push({
         type: "erase-event",
         data: userLayer.exportJSON(),
@@ -271,7 +288,6 @@ eraseTool.onMouseUp = function(event) {
     const erasorItems = tmpGroup.getItems({
         overlapping: deleteShape.bounds,
     });
-    console.log(erasorItems);
     erasorItems.forEach(function(erasorItem) {
         // breaks with groups because groups can't do boolean ops
         const result = erasorItem.subtract(deleteShape, {
@@ -284,6 +300,7 @@ eraseTool.onMouseUp = function(event) {
                 result.removeChildren()
             );
             erasorItem.remove();
+            result.remove(); //remove the compound paths
         } else {
             if (result.length === 0) {
                 erasorItem.remove();
@@ -300,4 +317,10 @@ eraseTool.onMouseUp = function(event) {
     });
 
     logger.event("erase-up");
+
+    if (liveCollab) {
+        mainSketch.numAddedPaths += 1;
+        mainSketch.continueSketch();
+        liveCollab = false;
+    }
 };

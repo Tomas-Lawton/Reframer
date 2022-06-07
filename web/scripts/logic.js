@@ -329,19 +329,18 @@ const showTraceHistoryFrom = (fromIndex) => {
 };
 
 ws.onmessage = function(event) {
+    try {
+        var result = JSON.parse(event.data);
+    } catch (e) {
+        console.log("Unexpected JSON event\n", e);
+        mainSketch.clipDrawing = false;
+    }
+
     if (mainSketch.clipDrawing) {
-        //only react if active
-
-        try {
-            result = JSON.parse(event.data);
-        } catch (e) {
-            console.log("Unexpected JSON event\n", e);
-        }
-
         if (result.status === "stop") {
+            console.log("WHYYYYYY");
             console.log("Stopped drawer");
             mainSketch.clipDrawing = false;
-            // stop exemplars also?
         }
 
         if (result.status === "draw") {
