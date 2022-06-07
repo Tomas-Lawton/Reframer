@@ -26,15 +26,11 @@ const importToSketch = (exemplarIndex) => {
 
 const exportToExemplar = () => {
     console.log("EXPORTING");
-    // let saveSketch = userLayer.clone({ insert: false });'
     let saveSketch = userLayer.clone({ insert: true });
-    // saveSketch.applyMatrix = true;
     let scaledSketch = saveSketch.scale(1 / scaleRatio);
-    // deselect all
     saveSketch.getItems().forEach((path) => {
         path.selected = false;
     });
-    // REMOVE RECT
     scaledSketch.getItems((item) => (item.strokeWidth /= scaleRatio));
     let save = scaledSketch.exportJSON();
     scaledSketch.remove();
@@ -400,85 +396,144 @@ ws.onmessage = function(event) {
             );
         }
 
-        // EXEMPLARS
-        // status may clash exemplars
-        var matches = result.status.match(/\d+/g); //if status contains a number
+        var matches = result.status.match(/\d+/g); //if status is a num
         if (matches != null) {
             if (result.svg === "") return null;
-            let thisCanvas = exemplarScope.projects[parseInt(result.status)];
+
+            let thisCanvas = exemplarScope.projects[result.exemplar_index];
+            console.log(result.exemplar_index);
+            console.log(result);
             thisCanvas.clear();
-            // let imported = thisCanvas.importSVG(result.svg);
-
-            // let imported = parseFromSvg(result.svg, thisCanvas);
-            console.log(result.svg);
             let imported = parseFromSvg(result.svg, thisCanvas.activeLayer, true);
-
-            // change group>group into group>paths
-            console.log(imported);
         }
     }
 };
 
-const createExemplar = (isUserSketch, creationIndex) => {
-    let type = isUserSketch ? "user" : "ai";
+const createExemplar = (isUserSketch, creationIndex = null) => {
+    let type = isUserSketch ? "U" : "AI";
 
     let newElem = exemplarTemplate.cloneNode(reusableExemplar);
     newElem.style.visibility = "initial";
+
     let exemplarCanvas = newElem.querySelector("canvas");
     exemplarCanvas.width = exemplarSize;
     exemplarCanvas.height = exemplarSize;
-    exemplarScope.setup(exemplarCanvas);
 
-    newElem.id = `${type}-sketch-item-${creationIndex}`;
-    newElem.querySelector("h3").innerHTML = `U${creationIndex}`;
+    if (creationIndex !== null) {
+        let removeButton = newElem.querySelector(".card-icon-background");
+        let stopButton = newElem.querySelector(".fa-stop");
 
-    let removeButton = newElem.querySelector(".card-icon-background");
+        exemplarScope.setup(exemplarCanvas);
+        newElem.id = `${type}-sketch-item-${creationIndex}`;
+        exemplarCanvas.id = `${type}-sketch-canvas-${creationIndex}`;
+        newElem.querySelector("h3").innerHTML = `${type}${creationIndex}`;
 
-    if (isUserSketch) {
-        removeButton.addEventListener("click", () => {
-            newElem.remove();
+        if (isUserSketch) {
+            stopButton.style.display = "none";
+            removeButton.addEventListener("click", () => {
+                newElem.remove();
+            });
+        } else {
+            stopButton.addEventListener("click", () => {
+                // stop specific exemplar index
+            });
+            removeButton.addEventListener("click", () => {
+                // if an AI exemplar is deleted -> this will remove it from backend drawers !!!!!! add to creating exemplar function !!!
+                newElem.classList.add("inactive-exemplar");
+            });
+        }
+
+        exemplarCanvas.addEventListener("click", () => {
+            // open dialog for clone vs copy?
+            importToSketch(creationIndex);
+            // make a copy to the current canvas
+            document.getElementById("contain-dot").style.display = "none";
+        });
+
+        // Make draggable
+        newElem.addEventListener(
+            "dragstart",
+            function(e) {
+                e.dataTransfer.setData("text/plain", creationIndex);
+                sketchContainer.classList.remove("canvas-standard-drop");
+                sketchContainer.classList.add("canvas-hover-light");
+            },
+            false
+        );
+        newElem.addEventListener("dragend", function(e) {
+            sketchContainer.classList.add("canvas-standard-drop");
+            sketchContainer.classList.remove("canvas-hover-light");
         });
     } else {
-        // add the inactive class.
-        removeButton.addEventListener("click", () => {
-            // AND ALSO STOP
-            newElem.classList.add("inactive-exemplar");
-        });
+        // is default ui
+        newElem.id = `default-sketch-item`;
+        exemplarCanvas.id = `default-canvas`;
     }
 
-    exemplarCanvas.addEventListener("click", () => {
-        importToSketch(creationIndex);
-    });
-
-    exemplarCanvas.id = `${type}-sketch-canvas-${creationIndex}`;
-
-    newElem.addEventListener("click", () => {
-        document.getElementById("contain-dot").style.display = "none";
-    });
-
-    // Make draggable
-    newElem.addEventListener(
-        "dragstart",
-        function(e) {
-            e.dataTransfer.setData("text/plain", creationIndex);
-
-            sketchContainer.classList.remove("canvas-standard-drop");
-            sketchContainer.classList.add("canvas-hover-light");
-
-            // let icon = document.getElementById("upload");
-            // icon.style.display = "block";
-            // e.dataTransfer.setDragImage(icon, 0, 0);
-        },
-        false
-    );
-
-    newElem.addEventListener("dragend", function(e) {
-        // icon.style.display = "none";
-        sketchContainer.classList.add("canvas-standard-drop");
-        sketchContainer.classList.remove("canvas-hover-light");
-    });
     return newElem;
 };
+
+// const createExemplar = (isUserSketch, creationIndex = null) => {
+//     let type = isUserSketch ? "U" : "AI";
+
+//     let newElem = exemplarTemplate.cloneNode(reusableExemplar);
+//     newElem.style.visibility = "initial";
+
+//     let exemplarCanvas = newElem.querySelector("canvas");
+//     let removeButton = newElem.querySelector(".card-icon-background");
+//     let stopButton = newElem.querySelector(".fa-stop");
+
+//     exemplarCanvas.width = exemplarSize;
+//     exemplarCanvas.height = exemplarSize;
+//     exemplarScope.setup(exemplarCanvas);
+
+//     newElem.id = `${type}-sketch-item-${creationIndex}`;
+//     exemplarCanvas.id = `${type}-sketch-canvas-${creationIndex}`;
+//     newElem.querySelector("h3").innerHTML = `${type}${creationIndex}`;
+
+//     if (isUserSketch) {
+//         // index can be anything, exemplar count increases
+//         stopButton.style.display = "none";
+//         removeButton.addEventListener("click", () => {
+//             newElem.remove();
+//         });
+//     } else {
+//         // drawing index should be 0-3.
+
+//         stopButton.addEventListener("click", () => {
+//             // stop specific exemplar index
+//         });
+//         removeButton.addEventListener("click", () => {
+//             // AND ALSO // stop specific exemplar index
+//             // if an AI exemplar is deleted -> this will remove it from backend drawers !!!!!! add to creating exemplar function !!!
+
+//             newElem.classList.add("inactive-exemplar");
+//         });
+//     }
+
+//     exemplarCanvas.addEventListener("click", () => {
+//         // open dialog for clone vs copy?
+//         importToSketch(creationIndex);
+//         // make a copy of the current canvas
+//         document.getElementById("contain-dot").style.display = "none";
+//     });
+
+//     // Make draggable
+//     newElem.addEventListener(
+//         "dragstart",
+//         function(e) {
+//             e.dataTransfer.setData("text/plain", creationIndex);
+//             sketchContainer.classList.remove("canvas-standard-drop");
+//             sketchContainer.classList.add("canvas-hover-light");
+//         },
+//         false
+//     );
+//     newElem.addEventListener("dragend", function(e) {
+//         sketchContainer.classList.add("canvas-standard-drop");
+//         sketchContainer.classList.remove("canvas-hover-light");
+//     });
+//     return newElem;
+// };
 
 const setPenMode = (mode, accentTarget) => {
     let lastPenMode = mainSketch.penMode;

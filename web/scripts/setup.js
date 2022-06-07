@@ -77,7 +77,7 @@ const containerRect = document
 
 const exemplarSize = exemplarTemplate.getBoundingClientRect().width;
 const reusableExemplar = exemplarTemplate.cloneNode(true); //clone to use
-// exemplarTemplate.remove();
+exemplarTemplate.remove();
 
 if (containerRect.width > window.innerHeight) {
     canvas.width = window.innerHeight - padding * 2;

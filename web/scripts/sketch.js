@@ -37,7 +37,7 @@ class SketchHandler {
         ];
         this.lastHistoryIndex = 0;
         this.penDropMode = "pen";
-        this.exemplarCount = 0;
+        this.staticSketch = 0;
         this.randomRange = 4;
         // TODO Refactor
         this.buttonControlLeft = true;
@@ -73,7 +73,7 @@ class SketchHandler {
         frameSize,
         prompt,
         lines,
-        exemplarCount,
+        staticSketch,
     }) {
         this.isFirstIteration = true; //reset canvas
         const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
@@ -102,7 +102,7 @@ class SketchHandler {
                         :
                         canvasBounds.height, // same as width
                 },
-                exemplar_index: exemplarCount,
+                exemplar_index: staticSketch,
             },
         };
         ws.send(JSON.stringify(res));
@@ -168,7 +168,7 @@ class SketchHandler {
             frameSize: exemplarSize,
             prompt: this.prompt,
             lines: this.numRandomCurves,
-            exemplarCount: creationIndex,
+            staticSketch: creationIndex,
         });
         this.clipDrawing = true;
         setActionUI("drawing");

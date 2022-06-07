@@ -822,7 +822,7 @@ hr {
 
 .card-info div {
     display: flex;
-    flex-direction: column;
+    /* flex-direction: column; */
 }
 
 .card-info h3 {
@@ -839,7 +839,14 @@ hr {
 .card-info i {
     background: #7b66ff;
     color: white;
-    border-radius: 0 5px 5px 0;
+    /* border-radius: 0 5px 5px 0; */
+    border-radius: 0.2em;
+    padding: 0.2em;
+    font-size: 1em;
+}
+
+.card-info i:first-child {
+    background: rgb(255, 96, 96);
 }
 
 #pen-styles {
@@ -1071,8 +1078,7 @@ input[type="number"] {
 }
 
 #static-sketches {
-    /* padding: 2em 1.5em 1em 1.5em; */
-    padding: 2.5em 2.5em 1em 2.5em;
+    padding: 2.5em 1.5em 1em 1.5em;
     display: flex;
     flex-direction: column;
     justify-content: inherit;
@@ -1083,6 +1089,7 @@ input[type="number"] {
     background: #5e5e5e !important;
     border: 1px dashed #a6a6a6;
     pointer-events: none;
+    visibility: initial;
 }
 
 .inactive-exemplar>div {
@@ -1090,7 +1097,7 @@ input[type="number"] {
 }
 
 #title-block {
-    margin-bottom: 1.5em;
+    margin-bottom: 1em;
 }
 
 #contain-dot {

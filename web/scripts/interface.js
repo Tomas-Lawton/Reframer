@@ -392,22 +392,21 @@ document.getElementById("brainstorm").addEventListener("click", () => {
         });
         return;
     } else {
-        // Set up the ui
-        let creationIndex = mainSketch.exemplarCount;
-        let newElem = createExemplar(false, creationIndex);
-        let thisCanvas = exemplarScope.projects[creationIndex];
-        document.getElementById("exemplar-grid").appendChild(newElem);
-        mainSketch.exemplarCount += 1;
-
-        // // draw into the new canvas
-
-        console.log(creationIndex);
-        mainSketch.drawExemplar(creationIndex);
-
-        // tell backend which exemplar it is, if it doesn't exist then create it.
-        // then draw into this exemplar when the data is received.
-
-        // if an AI exemplar is deleted -> this will remove it from backend drawers !!!!!! add to creating exemplar function !!!
+        const myNode = document.getElementById("explore-sketches");
+        const total = mainSketch.staticSketch + Math.floor(Math.random() * 5);
+        // TO DO: Clean up old scopes (now unused)
+        for (let i = 0; i < 4; i++) {
+            myNode.removeChild(myNode.firstChild);
+            console.log(mainSketch.staticSketch);
+            let newElem = createExemplar(false, mainSketch.staticSketch);
+            myNode.appendChild(newElem);
+            if (mainSketch.staticSketch > total) {
+                newElem.classList.add("inactive-exemplar");
+            } else {
+                mainSketch.drawExemplar(mainSketch.staticSketch); // No, allow the index to create so the listener can stop it.
+            }
+            mainSketch.staticSketch += 1;
+        }
     }
 });
 
@@ -513,13 +512,14 @@ document.getElementById("scrapbook").addEventListener("click", () => {
 
 document.getElementById("save-sketch").addEventListener("click", () => {
     let jsonGroup = exportToExemplar();
-    let creationIndex = mainSketch.exemplarCount;
+    let creationIndex = mainSketch.staticSketch;
+    console.log(creationIndex);
     let newElem = createExemplar(true, creationIndex);
-    let thisCanvas = exemplarScope.projects[creationIndex];
-    let imported = thisCanvas.activeLayer.importJSON(jsonGroup);
+    let toCanvas = exemplarScope.projects[creationIndex];
+    let imported = toCanvas.activeLayer.importJSON(jsonGroup);
     imported.position = new Point(exemplarSize / 2, exemplarSize / 2);
     document.getElementById("exemplar-grid").appendChild(newElem);
-    mainSketch.exemplarCount += 1;
+    mainSketch.staticSketch += 1;
 });
 
 // document.getElementById("use-squiggles").addEventListener("change", (event) => {
@@ -601,9 +601,13 @@ picker.onChange = (color) => {
 setActionUI("inactive");
 
 for (let i = 0; i < 4; i++) {
-    let newElem = createExemplar(false, i);
-    let thisCanvas = exemplarScope.projects[i];
+    let newElem = createExemplar(false);
+    //creates unneeded exemplarScope
+    // let newElem = exemplarTemplate.cloneNode(reusableExemplar);
+    // let exemplarCanvas = newElem.querySelector("canvas");
+    // exemplarCanvas.width = exemplarSize;
+    // exemplarCanvas.height = exemplarSize;
+    // newElem.id = `default-sketch-item-${i}`;
     newElem.classList.add("inactive-exemplar");
     document.getElementById("explore-sketches").appendChild(newElem);
-    mainSketch.exemplarCount += 1;
 }
