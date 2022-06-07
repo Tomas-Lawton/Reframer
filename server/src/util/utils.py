@@ -14,6 +14,9 @@ def save_data(save_path, name, params):
         f.write('w_img: ' + str(params.w_img) + '\n')
         f.close()
 
+logList = [[0.0001, 0.0001, 0.0001], [0.00032, 0.0032, 0.00032], [0.001, 0.01, 0.001], [0.0032, 0.032, 0.0032], [0.01, 0.1, 0.01]]
+def use_penalisation(i):
+    return logList[i][0], logList[i][1], logList[i][2]
 
 def area_mask(width, height, drawing_area):
     j0 = round(drawing_area['x0'] * width)

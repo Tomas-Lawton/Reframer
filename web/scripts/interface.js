@@ -7,8 +7,8 @@ function dragenter(e) {
 }
 
 function drop(e) {
-    const creationIndex = e.dataTransfer.getData("text/plain");
-    importToSketch(creationIndex);
+    const sketchCountIndex = e.dataTransfer.getData("text/plain");
+    importToSketch(sketchCountIndex);
 }
 
 sketchContainer.addEventListener("dragover", dragover);
@@ -384,19 +384,19 @@ document.getElementById("brainstorm").addEventListener("click", () => {
         return;
     } else {
         const myNode = document.getElementById("explore-sketches");
-        const total = mainSketch.staticSketch + Math.floor(Math.random() * 5);
+        const total = mainSketch.sketchScopeIndex + Math.floor(Math.random() * 5);
         // TO DO: Clean up old scopes (now unused)
         for (let i = 0; i < 4; i++) {
             myNode.removeChild(myNode.firstChild);
-            if (mainSketch.staticSketch > total) {
+            if (mainSketch.sketchScopeIndex > total) {
                 let newElem = createExemplar(false); //don't increase the number of scopes
                 myNode.appendChild(newElem);
                 newElem.classList.add("inactive-exemplar");
             } else {
-                let newElem = createExemplar(false, mainSketch.staticSketch);
+                let newElem = createExemplar(false, mainSketch.sketchScopeIndex);
                 myNode.appendChild(newElem);
-                mainSketch.drawExemplar(mainSketch.staticSketch); // No, allow the index to create so the listener can stop it.
-                mainSketch.staticSketch += 1;
+                mainSketch.drawExemplar(mainSketch.sketchScopeIndex); // No, allow the index to create so the listener can stop it.
+                mainSketch.sketchScopeIndex += 1;
             }
         }
     }
@@ -504,14 +504,14 @@ document.getElementById("scrapbook").addEventListener("click", () => {
 
 document.getElementById("save-sketch").addEventListener("click", () => {
     let jsonGroup = exportToExemplar();
-    let creationIndex = mainSketch.staticSketch;
-    console.log(creationIndex);
-    let newElem = createExemplar(true, creationIndex);
-    let toCanvas = exemplarScope.projects[creationIndex];
+    let sketchCountIndex = mainSketch.sketchScopeIndex;
+    console.log(sketchCountIndex);
+    let newElem = createExemplar(true, sketchCountIndex);
+    let toCanvas = exemplarScope.projects[sketchCountIndex];
     let imported = toCanvas.activeLayer.importJSON(jsonGroup);
     imported.position = new Point(exemplarSize / 2, exemplarSize / 2);
     document.getElementById("exemplar-grid").appendChild(newElem);
-    mainSketch.staticSketch += 1;
+    mainSketch.sketchScopeIndex += 1;
 });
 
 const autoButton = document.getElementById("autodraw-button");
@@ -542,6 +542,23 @@ autoButton.addEventListener("click", () => {
 
 document.getElementById("num-traces").oninput = function() {
     mainSketch.numTraces = parseInt(this.value);
+};
+
+const respectSlider = document.getElementById("respect-slider");
+let lastFixation = mainSketch.useFixation;
+
+respectSlider.oninput = function() {
+    mainSketch.useFixation = parseInt(this.value);
+};
+
+respectSlider.onmousedown = () => {
+    lastFixation = mainSketch.useFixation;
+};
+
+respectSlider.onmouseup = () => {
+    if (mainSketch.useFixation !== lastFixation) {
+        mainSketch.continueSketch();
+    }
 };
 
 // document.getElementById("set-background").onclick = function() {

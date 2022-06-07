@@ -37,7 +37,7 @@ class SketchHandler {
         ];
         this.lastHistoryIndex = 0;
         this.penDropMode = "pen";
-        this.staticSketch = 0;
+        this.sketchScopeIndex = 0;
         this.randomRange = 4;
         // TODO Refactor
         this.buttonControlLeft = true;
@@ -54,6 +54,7 @@ class SketchHandler {
         this.traces = null;
         this.boundingBox = null;
         this.transformGroup = null;
+        this.useFixation = 2;
 
         // Settings panel
         this.useAdvanced = false;
@@ -73,7 +74,8 @@ class SketchHandler {
         frameSize,
         prompt,
         lines,
-        staticSketch,
+        sketchScopeIndex,
+        fixation,
     }) {
         this.isFirstIteration = true; //reset canvas
         const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
@@ -86,6 +88,7 @@ class SketchHandler {
                 svg: svg,
                 random_curves: lines,
                 frame_size: frameSize,
+                fixation: fixation,
                 region: {
                     activate: hasRegion,
                     x1: mainSketch.drawRegion ? mainSketch.drawRegion.x : 0,
@@ -102,62 +105,62 @@ class SketchHandler {
                         :
                         canvasBounds.height, // same as width
                 },
-                exemplar_index: staticSketch,
+                sketch_index: sketchScopeIndex,
             },
         };
         ws.send(JSON.stringify(res));
         console.log(res);
     }
     draw(withRegion = false, svg = null, disableLines = false) {
-        this.pathsOnCanvas = userLayer.getItems().length;
+            this.pathsOnCanvas = userLayer.getItems().length;
 
-        if (noPrompt()) {
-            openModal({
-                title: "Type a prompt first!",
-                message: "You need a target for AI sketching.",
+            if (noPrompt()) {
+                openModal({
+                    title: "Type a prompt first!",
+                    message: "You need a target for AI sketching.",
+                });
+                return;
+            }
+            mainSketch.linesDisabled = disableLines;
+            this.updateDrawer({
+                status: "draw",
+                svg: svg || this.svg,
+                hasRegion: withRegion,
+                frameSize: this.frameSize,
+                prompt: this.prompt,
+                lines: disableLines ?
+                    0 :
+                    this.initRandomCurves ?
+                    this.numRandomCurves :
+                    0,
             });
-            return;
+            this.step = 0;
+            this.clipDrawing = true;
+            setActionUI(disableLines ? "refining" : "drawing");
         }
-        mainSketch.linesDisabled = disableLines;
-        this.updateDrawer({
-            status: "draw",
-            svg: svg || this.svg,
-            hasRegion: withRegion,
-            frameSize: this.frameSize,
-            prompt: this.prompt,
-            lines: disableLines ?
-                0 :
-                this.initRandomCurves ?
-                this.numRandomCurves :
-                0,
-        });
-        this.step = 0;
-        this.clipDrawing = true;
-        setActionUI(disableLines ? "refining" : "drawing");
-    }
-    generate() {
-        if (!exemplarSize) {
-            console.error("exemplars not found");
-        }
-        if (noPrompt()) {
-            openModal({
-                title: "Type a prompt first!",
-                message: "You need a target for AI exemplars.",
-            });
-            return;
-        }
-        this.updateDrawer({
-            status: "sketch_exemplars",
-            svg: this.svg,
-            hasRegion: false,
-            frameSize: exemplarSize,
-            prompt: this.prompt,
-            lines: this.initRandomCurves ? this.numRandomCurves : 0,
-        });
-        this.clipDrawing = true;
-        setActionUI("generating");
-    }
-    drawExemplar(creationIndex) {
+        // generate() {
+        //     if (!exemplarSize) {
+        //         console.error("exemplars not found");
+        //     }
+        //     if (noPrompt()) {
+        //         openModal({
+        //             title: "Type a prompt first!",
+        //             message: "You need a target for AI exemplars.",
+        //         });
+        //         return;
+        //     }
+        //     this.updateDrawer({
+        //         status: "sketch_exemplars",
+        //         svg: this.svg,
+        //         hasRegion: false,
+        //         frameSize: exemplarSize,
+        //         prompt: this.prompt,
+        //         lines: this.initRandomCurves ? this.numRandomCurves : 0,
+        //     });
+        //     this.clipDrawing = true;
+        //     setActionUI("generating");
+        // }
+    drawExemplar(sketchCountIndex) {
         if (!exemplarSize) {
             console.error("exemplars not found");
         }
@@ -168,30 +171,31 @@ class SketchHandler {
             frameSize: exemplarSize,
             prompt: this.prompt,
             lines: this.numRandomCurves,
-            staticSketch: creationIndex,
+            sketchScopeIndex: sketchCountIndex,
+            fixation: this.useFixation,
         });
         this.clipDrawing = true;
         setActionUI("drawing");
     }
     redraw() {
-        this.updateDrawer({
-            status: "redraw",
-        });
-        this.step = 0;
-        this.clipDrawing = true;
-        setActionUI("redrawing");
-    }
-    continue () {
-        // need to change this so it supports updating the prompt or using a new svg
-        this.updateDrawer({
-            status: "continue",
-            prompt: this.prompt,
-            frameSize: this.frameSize, //can remove?
-        });
-        this.clipDrawing = true;
-        console.log("continuing with potential updated prompt");
-        setActionUI("continuing");
-    }
+            this.updateDrawer({
+                status: "redraw",
+            });
+            this.step = 0;
+            this.clipDrawing = true;
+            setActionUI("redrawing");
+        }
+        // continue () {
+        //     // need to change this so it supports updating the prompt or using a new svg
+        //     this.updateDrawer({
+        //         status: "continue",
+        //         prompt: this.prompt,
+        //         frameSize: this.frameSize, //can remove?
+        //     });
+        //     this.clipDrawing = true;
+        //     console.log("continuing with potential updated prompt");
+        //     setActionUI("continuing");
+        // }
     continueSketch() {
         this.clipDrawing = true;
         try {
@@ -199,11 +203,18 @@ class SketchHandler {
                 status: "continue_sketch",
                 svg: this.svg,
                 frameSize: this.frameSize, //can remove?
+                fixation: this.useFixation,
             });
         } catch (e) {
             console.log("Problem with update");
         }
         setActionUI("continuing");
+    }
+    stopSingle(i) {
+        this.updateDrawer({
+            status: "stop_single_sketch",
+            sketchScopeIndex: i,
+        });
     }
     stop() {
         if (this.drawState === "active") {
@@ -215,12 +226,9 @@ class SketchHandler {
         setActionUI("stop");
     }
     pause() {
-        // if (this.drawState === "active") {
-        //     timeKeeper.style.visibility = "visible";
-        // }
-
         this.updateDrawer({ status: "stop" });
         this.clipDrawing = false;
+        // Set ui to something else?
         // setActionUI("stop");
     }
     resetHistory() {

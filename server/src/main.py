@@ -103,7 +103,7 @@ if os.environ.get('CONNECTAI') == "True":
 
                 if data["status"] == "add_new_exemplar":
                     try:
-                        new_exemplar = Drawer(clip_class, websocket, data["data"]["exemplar_index"])
+                        new_exemplar = Drawer(clip_class, websocket, data["data"]["sketch_index"])
                         new_exemplar.frame_size = data["data"]['frame_size']
                         await new_exemplar.draw_update(data)
                         new_exemplar.run_async()
@@ -113,13 +113,6 @@ if os.environ.get('CONNECTAI') == "True":
                         logging.error("Failed to create a new exemplar")
                     artefact_drawer.run_async()
 
-                if data["status"] == "continue":
-                    try:
-                        await artefact_drawer.continue_update(data)
-                    except Exception as e:
-                        logging.error(e)
-                        logging.error("Failed to update drawer for continue (prompt)")
-                    artefact_drawer.run_async()
 
                 if data["status"] == "continue_sketch":
                     try:
@@ -129,16 +122,34 @@ if os.environ.get('CONNECTAI') == "True":
                         logging.error("Failed to update drawer for new sketch")
                     artefact_drawer.run_async()
 
-                # if data["status"] == "sketch_exemplars":
-                #     for drawer in exemplar_drawers:
-                #         drawer.frame_size = data["data"]['frame_size']
-                #         await drawer.draw_update(data)
-                #         drawer.run_async()
+                # to do: add in FE
+                if data["status"] == "stop_single_sketch":
+                    await artefact_drawer.stop()
+                    for drawer in exemplar_drawers:
+                        if drawer.sketch_reference_index == data["data"]['sketch_index']:
+                            await drawer.stop()
+                            del drawer
+                            break
 
                 if data["status"] == "stop":
                     await artefact_drawer.stop()
                     for drawer in exemplar_drawers:
                         await drawer.stop()
+                        # Also remove them 
+
+                # if data["status"] == "continue":
+                #     try:
+                #         await artefact_drawer.continue_update(data)
+                #     except Exception as e:
+                #         logging.error(e)
+                #         logging.error("Failed to update drawer for continue (prompt)")
+                #     artefact_drawer.run_async()
+
+                # if data["status"] == "sketch_exemplars":
+                #     for drawer in exemplar_drawers:
+                #         drawer.frame_size = data["data"]['frame_size']
+                #         await drawer.draw_update(data)
+                #         drawer.run_async()
 
         except WebSocketDisconnect:
             await artefact_drawer.stop()

@@ -4,7 +4,7 @@ import time
 from util.processing import get_augment_trans
 
 # from util.loss import CLIPConvLoss2
-from util.utils import area_mask
+from util.utils import area_mask, use_penalisation
 from util.render_design import rescale_constants, calculate_draw_region, UserSketch
 from util.render_design import add_shape_groups, treebranch_initialization
 from util.clip_utility import get_noun_data, parse_svg
@@ -14,12 +14,12 @@ import aiofiles
 
 
 class Drawer:
-    def __init__(self, clip, websocket, exemplar_count=None):
+    def __init__(self, clip, websocket, sketch_reference_index=None):
         """These inputs are defaults and can have methods for setting them after the inital start up"""
 
         self.clip_interface = clip
         self.model = clip.model
-        self.exemplar_count = exemplar_count
+        self.sketch_reference_index = sketch_reference_index
         # self.nouns_features = noun_features
         self.socket = websocket
         self.is_running = False
@@ -160,7 +160,7 @@ class Drawer:
 
     async def run_epoch(self):
         t = self.iteration
-        logging.info(f"Starting run {t} in drawer {str(self.exemplar_count)}")
+        logging.info(f"Starting run {t} in drawer {str(self.sketch_reference_index)}")
 
         self.points_optim.zero_grad()
         self.width_optim.zero_grad()
@@ -249,14 +249,14 @@ class Drawer:
         if t % 1 == 0:
         # if t % self.refresh_rate == 0:
 
-            if self.exemplar_count is not None:
+            if self.sketch_reference_index is not None:
                 self.resizeScaleFactor = 224 / self.frame_size
 
             render_shapes, render_shape_groups = rescale_constants(
                 self.shapes, self.shape_groups, self.resizeScaleFactor
             )
             pydiffvg.save_svg(
-                f"results/output-{str(self.exemplar_count)}.svg",
+                f"results/output-{str(self.sketch_reference_index)}.svg",
                 self.user_canvas_w,
                 self.user_canvas_h,
                 render_shapes,
@@ -266,22 +266,22 @@ class Drawer:
                 logging.info("Sending...")
                 svg = ''
                 async with aiofiles.open(
-                    f"results/output-{str(self.exemplar_count)}.svg", "r"
+                    f"results/output-{str(self.sketch_reference_index)}.svg", "r"
                     ) as f:
                     svg = await f.read()
                     
                 status = "draw"
-                if isinstance(self.exemplar_count, int):
-                    logging.info(f"Sending exemplar {self.exemplar_count}")
-                    status = str(self.exemplar_count)
-                result = {"status": status, "svg": svg, "iterations": t, "loss": loss.item(), "exemplar_index": self.exemplar_count}
+                if isinstance(self.sketch_reference_index, int):
+                    logging.info(f"Sending exemplar {self.sketch_reference_index}")
+                    status = str(self.sketch_reference_index)
+                result = {"status": status, "svg": svg, "iterations": t, "loss": loss.item(), "sketch_index": self.sketch_reference_index}
                 self.last_result = result  # won't go to client unless continued is used
                 await self.socket.send_json(result)
                 logging.info("Sent update")
             except Exception as e:
                 logging.error("WS Response Failed")
 
-        logging.info(f"Completed run {t} in drawer {str(self.exemplar_count)}")
+        logging.info(f"Completed run {t} in drawer {str(self.sketch_reference_index)}")
         self.iteration += 1
 
     # RUN STUFF
@@ -292,29 +292,26 @@ class Drawer:
         neg_prompt = []
         svg_string = data["data"]["svg"]
         region = data["data"]["region"]
+        self.points, self.colors, self.widths = use_penalisation(data["data"]["fixation"])
         self.clip_interface.positive = prompt
         if svg_string is not None:
             async with aiofiles.open('data/interface_paths.svg', 'w') as f:
                 await f.write(svg_string)
-        # write svg even if no paths so other stuff can be parsed
-        # Can't remeber why added empty svg
-        # else:
-        #     async with aiofiles.open('data/interface_paths.svg', 'w') as f:
-        #         await f.write("")
         try:
             self.reset()
             logging.info("Starting clip drawer")
             prompt_features = self.clip_interface.encode_text_classes([prompt])
             neg_prompt_features = self.clip_interface.encode_text_classes(neg_prompt)
             self.set_text_features(prompt_features, neg_prompt_features)
-            self.last_region = region
-            self.num_paths = data["data"]["random_curves"]
-            self.parse_svg(region)
-            logging.info("Got features")
-            return self.activate()
         except Exception as e:
             logging.error(e)
             logging.error("Failed to encode features in clip")
+
+        self.last_region = region
+        self.num_paths = data["data"]["random_curves"]
+        self.parse_svg(region)
+        logging.info("Got features")
+        return self.activate()
 
     async def redraw_update(self):
         """Use original paths with origional prompt to try new options from same settings"""
@@ -323,25 +320,25 @@ class Drawer:
         self.iteration = 0
         return self.activate()
 
-    async def continue_update(self, data):
-        """Keep the last drawer running"""
-        logging.info("Continuing...")
-        prompt = data["data"]["prompt"]
-        neg_prompt = []
-        try:
-            if prompt == self.clip_interface.positive:
-                await self.socket.send_json(self.last_result)
-            else:
-                self.clip_interface.positive = prompt
-                prompt_features = self.clip_interface.encode_text_classes([prompt])
-                neg_prompt_features = self.clip_interface.encode_text_classes(
-                    neg_prompt
-                )
-                self.set_text_features(prompt_features, neg_prompt_features)
-                logging.info("Continuing with new prompt")
-        except Exception as e:
-            logging.error(e)
-            logging.error("Failed to encode features in clip")
+    # async def continue_update(self, data):
+    #     """Keep the last drawer running"""
+    #     logging.info("Continuing...")
+    #     prompt = data["data"]["prompt"]
+    #     neg_prompt = []
+    #     try:
+    #         if prompt == self.clip_interface.positive:
+    #             await self.socket.send_json(self.last_result)
+    #         else:
+    #             self.clip_interface.positive = prompt
+    #             prompt_features = self.clip_interface.encode_text_classes([prompt])
+    #             neg_prompt_features = self.clip_interface.encode_text_classes(
+    #                 neg_prompt
+    #             )
+    #             self.set_text_features(prompt_features, neg_prompt_features)
+    #             logging.info("Continuing with new prompt")
+    #     except Exception as e:
+    #         logging.error(e)
+    #         logging.error("Failed to encode features in clip")
 
     async def continue_update_sketch(self, data):
         # fix initialise
@@ -349,18 +346,17 @@ class Drawer:
         logging.info("Continuing with new sketch...")
 
         svg_string = data["data"]["svg"]
-        print(svg_string)
+
         if svg_string is not None:
             async with aiofiles.open('data/interface_paths.svg', 'w') as f:
                 await f.write(svg_string)
         try:
             self.parse_svg(self.last_region)
-
-            # activate without reinitialise
-            return self.activate_without_curves()
         except Exception as e:
-            logging.error(e)
             logging.error("Failed to parse the new sketch")
+        
+        self.points, self.colors, self.widths = use_penalisation(data["data"]["fixation"])
+        return self.activate_without_curves()
 
     async def stop(self):
         logging.info("Stopping...")

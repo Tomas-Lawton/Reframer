@@ -399,8 +399,8 @@ ws.onmessage = function(event) {
         if (matches != null) {
             if (result.svg === "") return null;
 
-            let thisCanvas = exemplarScope.projects[result.exemplar_index];
-            console.log(result.exemplar_index);
+            let thisCanvas = exemplarScope.projects[result.sketch_index];
+            console.log(result.sketch_index);
             console.log(result);
             thisCanvas.clear();
             let imported = parseFromSvg(result.svg, thisCanvas.activeLayer, true);
@@ -408,7 +408,7 @@ ws.onmessage = function(event) {
     }
 };
 
-const createExemplar = (isUserSketch, creationIndex = null) => {
+const createExemplar = (isUserSketch, sketchCountIndex = null) => {
     let type = isUserSketch ? "U" : "AI";
 
     let newElem = exemplarTemplate.cloneNode(reusableExemplar);
@@ -418,14 +418,14 @@ const createExemplar = (isUserSketch, creationIndex = null) => {
     exemplarCanvas.width = exemplarSize;
     exemplarCanvas.height = exemplarSize;
 
-    if (creationIndex !== null) {
+    if (sketchCountIndex !== null) {
         let removeButton = newElem.querySelector(".card-icon-background");
         let stopButton = newElem.querySelector(".fa-stop");
 
         exemplarScope.setup(exemplarCanvas);
-        newElem.id = `${type}-sketch-item-${creationIndex}`;
-        exemplarCanvas.id = `${type}-sketch-canvas-${creationIndex}`;
-        newElem.querySelector("h3").innerHTML = `${type}${creationIndex}`;
+        newElem.id = `${type}-sketch-item-${sketchCountIndex}`;
+        exemplarCanvas.id = `${type}-sketch-canvas-${sketchCountIndex}`;
+        newElem.querySelector("h3").innerHTML = `${type}${sketchCountIndex}`;
 
         if (isUserSketch) {
             stopButton.style.display = "none";
@@ -434,17 +434,17 @@ const createExemplar = (isUserSketch, creationIndex = null) => {
             });
         } else {
             stopButton.addEventListener("click", () => {
-                // stop specific exemplar index
+                mainSketch.stopSingle(sketchCountIndex);
             });
             removeButton.addEventListener("click", () => {
-                // if an AI exemplar is deleted -> this will remove it from backend drawers !!!!!! add to creating exemplar function !!!
                 newElem.classList.add("inactive-exemplar");
+                mainSketch.stopSingle(sketchCountIndex);
             });
         }
 
         exemplarCanvas.addEventListener("click", () => {
             // open dialog for clone vs copy?
-            importToSketch(creationIndex);
+            importToSketch(sketchCountIndex);
             // make a copy to the current canvas
             document.getElementById("contain-dot").style.display = "none";
         });
@@ -453,7 +453,7 @@ const createExemplar = (isUserSketch, creationIndex = null) => {
         newElem.addEventListener(
             "dragstart",
             function(e) {
-                e.dataTransfer.setData("text/plain", creationIndex);
+                e.dataTransfer.setData("text/plain", sketchCountIndex);
                 sketchContainer.classList.remove("canvas-standard-drop");
                 sketchContainer.classList.add("canvas-hover-light");
             },
