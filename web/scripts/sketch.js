@@ -55,6 +55,7 @@ class SketchHandler {
         this.boundingBox = null;
         this.transformGroup = null;
         this.useFixation = 2;
+        this.showAllLines = false;
 
         // Settings panel
         this.useAdvanced = false;
@@ -91,17 +92,17 @@ class SketchHandler {
                 fixation: fixation,
                 region: {
                     activate: hasRegion,
-                    x1: mainSketch.drawRegion ? mainSketch.drawRegion.x : 0,
-                    y1: mainSketch.drawRegion ?
-                        canvasBounds.height - mainSketch.drawRegion.y :
+                    x1: sketchController.drawRegion ? sketchController.drawRegion.x : 0,
+                    y1: sketchController.drawRegion ?
+                        canvasBounds.height - sketchController.drawRegion.y :
                         0,
-                    x2: mainSketch.drawRegion ?
-                        mainSketch.drawRegion.x + mainSketch.drawRegion.width :
+                    x2: sketchController.drawRegion ?
+                        sketchController.drawRegion.x + sketchController.drawRegion.width :
                         canvasBounds.width,
-                    y2: mainSketch.drawRegion ?
+                    y2: sketchController.drawRegion ?
                         canvasBounds.height -
-                        mainSketch.drawRegion.y -
-                        mainSketch.drawRegion.height // use non-web y coords
+                        sketchController.drawRegion.y -
+                        sketchController.drawRegion.height // use non-web y coords
                         :
                         canvasBounds.height, // same as width
                 },
@@ -121,7 +122,7 @@ class SketchHandler {
                 });
                 return;
             }
-            mainSketch.linesDisabled = disableLines;
+            sketchController.linesDisabled = disableLines;
             this.updateDrawer({
                 status: "draw",
                 svg: svg || this.svg,
@@ -235,12 +236,12 @@ class SketchHandler {
         // setActionUI("stop");
     }
     resetHistory() {
-        mainSketch.step = 0; // reset since not continuing
-        mainSketch.stack.historyHolder = [{ svg: "" }];
+        sketchController.step = 0; // reset since not continuing
+        sketchController.stack.historyHolder = [{ svg: "" }];
         timeKeeper.style.width = "0";
         timeKeeper.setAttribute("max", "0");
         timeKeeper.value = "0";
     }
 }
 
-mainSketch = new SketchHandler();
+sketchController = new SketchHandler();

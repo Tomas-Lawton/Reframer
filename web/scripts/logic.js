@@ -15,11 +15,11 @@ const importToSketch = (exemplarIndex) => {
     newSketch.getItems((path) => (path.strokeWidth *= scaleRatio));
     // rescale
     newSketch.position = new Point(
-        mainSketch.frameSize / 2,
-        mainSketch.frameSize / 2
+        sketchController.frameSize / 2,
+        sketchController.frameSize / 2
     );
 
-    mainSketch.svg = paper.project.exportSVG({
+    sketchController.svg = paper.project.exportSVG({
         asString: true,
     });
 };
@@ -40,7 +40,7 @@ const exportToExemplar = () => {
 const setActionUI = (state) => {
     aiMessage.classList.remove("typed-out");
 
-    if (mainSketch.activeStates.includes(state)) {
+    if (sketchController.activeStates.includes(state)) {
         // AI is "thinking"
         actionControls.forEach((elem) => {
             elem.classList.add("inactive-action");
@@ -60,19 +60,19 @@ const setActionUI = (state) => {
 
         document.getElementById("spinner").style.display = "flex";
         if (state == "drawing") {
-            aiMessage.innerHTML = `Got it! Drawing ${mainSketch.prompt}!`;
+            aiMessage.innerHTML = `Got it! Drawing ${sketchController.prompt}!`;
             document.getElementById("draw").classList.add("active");
         } else if (state == "refining") {
-            aiMessage.innerHTML = `Okay, refining the lines for ${mainSketch.prompt}...`;
+            aiMessage.innerHTML = `Okay, refining the lines for ${sketchController.prompt}...`;
             document.getElementById("refine").classList.add("active");
         } else if (state == "redrawing") {
             aiMessage.innerHTML = `No worries, how about this instead?`;
             document.getElementById("redraw").classList.add("active");
         } else if (state == "generating") {
-            aiMessage.innerHTML = `Sure! Adding ${mainSketch.prompt} to the moodboard!`;
+            aiMessage.innerHTML = `Sure! Adding ${sketchController.prompt} to the moodboard!`;
             actionControls[3].classList.add("active");
         } else if (state == "continuing") {
-            aiMessage.innerHTML = `Nice, I'll make that it into ${mainSketch.prompt}.`;
+            aiMessage.innerHTML = `Nice, I'll make that it into ${sketchController.prompt}.`;
         }
         aiMessage.classList.add("typed-out");
     } else if (state === "stop") {
@@ -96,20 +96,20 @@ const setActionUI = (state) => {
         // timeKeeper
         document.getElementById("contain-dot").style.display = "flex";
     }
-    mainSketch.drawState = state;
+    sketchController.drawState = state;
 };
 
 const unpackGroup = () => {
-    if (mainSketch.transformGroup !== null) {
+    if (sketchController.transformGroup !== null) {
         // Need to apply the group scale to the paths within the group
-        mainSketch.transformGroup.applyMatrix = true;
+        sketchController.transformGroup.applyMatrix = true;
         // how does scaling the group change the path children?
         userLayer.insertChildren(
-            mainSketch.transformGroup.index,
-            mainSketch.transformGroup.removeChildren()
+            sketchController.transformGroup.index,
+            sketchController.transformGroup.removeChildren()
         );
-        mainSketch.transformGroup.remove();
-        mainSketch.transformGroup = null;
+        sketchController.transformGroup.remove();
+        sketchController.transformGroup = null;
     }
 };
 
@@ -118,19 +118,19 @@ const fitToSelection = (items, state) => {
         return !bbox ? item.bounds : bbox.unite(item.bounds);
     }, null);
     // Add stroke width so no overflow over bounds?
-    mainSketch.boundingBox = new Path.Rectangle(bbox);
-    mainSketch.boundingBox.strokeColor = "#D2D2D2";
-    mainSketch.boundingBox.strokeWidth = 2;
-    mainSketch.boundingBox.data.state = state;
+    sketchController.boundingBox = new Path.Rectangle(bbox);
+    sketchController.boundingBox.strokeColor = "#D2D2D2";
+    sketchController.boundingBox.strokeWidth = 2;
+    sketchController.boundingBox.data.state = state;
 };
 
 const getSelectedPaths = () =>
     userLayer.getItems().filter((path) => path.selected);
 
 const noPrompt = () =>
-    mainSketch.prompt === "" ||
-    mainSketch.prompt === null ||
-    mainSketch.prompt === prompt.getAttribute("placeholder");
+    sketchController.prompt === "" ||
+    sketchController.prompt === null ||
+    sketchController.prompt === prompt.getAttribute("placeholder");
 
 const openModal = (data) => {
     if (data.hasOwnProperty("ui")) {
@@ -165,21 +165,21 @@ const openModal = (data) => {
 };
 
 // const switchControls = () => {
-//     if (mainSketch.buttonControlLeft) {
+//     if (sketchController.buttonControlLeft) {
 //         console.log(window.innerWidth);
 //         buttonPanel.style.left = `${window.innerWidth - buttonPanel.offsetWidth}px`;
 //     } else {
 //         buttonPanel.style.left = 0;
 //     }
-//     mainSketch.buttonControlLeft = !mainSketch.buttonControlLeft;
+//     sketchController.buttonControlLeft = !sketchController.buttonControlLeft;
 // };
 
 // dragging moves select elements + ui
 const hideSelectUI = (includeTransform = true) => {
     // remove rect
-    if (mainSketch.boundingBox) {
-        mainSketch.boundingBox.remove();
-        mainSketch.boundingBox = null;
+    if (sketchController.boundingBox) {
+        sketchController.boundingBox.remove();
+        sketchController.boundingBox = null;
     }
     // hide ui
     if (includeTransform) {
@@ -190,24 +190,27 @@ const hideSelectUI = (includeTransform = true) => {
 };
 
 const updateRectBounds = (from, to) => {
-    mainSketch.boundingBox.bounds = new Rectangle(from, to);
-    mainSketch.boundingBox.strokeColor = "#D2D2D2";
-    mainSketch.boundingBox.strokeWidth = 2;
-    mainSketch.boundingBox.data.state = "resizing";
+    sketchController.boundingBox.bounds = new Rectangle(from, to);
+    sketchController.boundingBox.strokeColor = "#D2D2D2";
+    sketchController.boundingBox.strokeWidth = 2;
+    sketchController.boundingBox.data.state = "resizing";
     updateSelectPosition();
 };
 
 const updateSelectPosition = () => {
     let uiOffset = deleteHandler.getBoundingClientRect().height / 2;
-    deleteHandler.style.left = mainSketch.boundingBox.bounds.topRight.x + "px";
-    initialiseHandler.style.left = mainSketch.boundingBox.bounds.topLeft.x + "px";
-    deleteHandler.style.top = mainSketch.boundingBox.bounds.top - uiOffset + "px";
+    deleteHandler.style.left =
+        sketchController.boundingBox.bounds.topRight.x + "px";
+    initialiseHandler.style.left =
+        sketchController.boundingBox.bounds.topLeft.x + "px";
+    deleteHandler.style.top =
+        sketchController.boundingBox.bounds.top - uiOffset + "px";
     initialiseHandler.style.top =
-        mainSketch.boundingBox.bounds.top - uiOffset + "px";
+        sketchController.boundingBox.bounds.top - uiOffset + "px";
 };
 
 const updateSelectUI = () => {
-    if (mainSketch.boundingBox) {
+    if (sketchController.boundingBox) {
         deleteHandler.style.display = "block";
         initialiseHandler.style.display = "block";
         transformControl.style.display = "flex";
@@ -220,18 +223,18 @@ const deletePath = () => {
     if (selected.length > 0) {
         pathList = selected.map((path) => path.exportJSON()); //dont use paper ref
         console.log(pathList);
-        mainSketch.stack.undoStack.push({
+        sketchController.stack.undoStack.push({
             type: "delete-event",
             data: pathList,
         });
         selected.map((path) => path.remove());
     }
-    if (mainSketch.boundingBox) {
+    if (sketchController.boundingBox) {
         hideSelectUI();
     }
-    mainSketch.transformGroup = null;
+    sketchController.transformGroup = null;
 
-    mainSketch.svg = paper.project.exportSVG({
+    sketchController.svg = paper.project.exportSVG({
         asString: true,
     });
     logger.event("deleted-path");
@@ -247,7 +250,7 @@ const showHide = (item) => {
 
 // switchControls();
 
-const parseFromSvg = (svg, layer, showAllPaths = false) => {
+const parseFromSvg = (svg, layer, showAllPaths = true) => {
     if (svg === "" || svg === undefined) return null;
     let paperObject = layer.importSVG(svg);
     const numPaths = paperObject.children[0].children.length; // drawn on the canvas right now
@@ -256,10 +259,10 @@ const parseFromSvg = (svg, layer, showAllPaths = false) => {
         const child = paperObject.children[0].children[returnedIndex];
         child.smooth();
 
-        if (mainSketch.initRandomCurves && !mainSketch.linesDisabled) {
+        if (sketchController.initRandomCurves && !sketchController.linesDisabled) {
             if (
-                returnedIndex >= mainSketch.pathsOnCanvas &&
-                returnedIndex < numPaths - mainSketch.numAddedPaths
+                returnedIndex >= sketchController.pathsOnCanvas &&
+                returnedIndex < numPaths - sketchController.numAddedPaths
             ) {
                 child.opacity *= 0.7;
             }
@@ -267,28 +270,28 @@ const parseFromSvg = (svg, layer, showAllPaths = false) => {
 
         const pathEffect = child.clone({ insert: false });
 
-        // if (!showAllPaths) {
-        //     if (returnedIndex < mainSketch.showAICurves) {
-        //         layer.addChild(pathEffect);
-        //     }
-        // } else {
-        //     layer.addChild(pathEffect);
-        // }
+        if (!showAllPaths) {
+            if (returnedIndex < sketchController.showAICurves) {
+                layer.addChild(pathEffect);
+            }
+        } else {
+            layer.addChild(pathEffect);
+        }
 
-        layer.addChild(pathEffect);
+        // layer.addChild(pathEffect);
     }
     paperObject.remove();
     return paperObject;
 };
 
 const getHistoryBatch = (maxSize, startIdx) => {
-    let len = mainSketch.stack.historyHolder.length;
+    let len = sketchController.stack.historyHolder.length;
     if (len <= 1) return null;
     let traceList = [];
     let batchSize = Math.min(maxSize, startIdx); // not first item
     // num traces
     for (let i = 0; i < batchSize; i++) {
-        traceList.push(mainSketch.stack.historyHolder[startIdx - i - 1]);
+        traceList.push(sketchController.stack.historyHolder[startIdx - i - 1]);
     }
     return traceList;
 };
@@ -297,7 +300,7 @@ const getHistoryBatch = (maxSize, startIdx) => {
 const calcRollingLoss = () => {
     const items = getHistoryBatch(
         setTraces.value,
-        mainSketch.stack.historyHolder.length - 1
+        sketchController.stack.historyHolder.length - 1
     );
     if (items) {
         const sum = items.reduce(
@@ -305,26 +308,26 @@ const calcRollingLoss = () => {
             0
         );
         const newRollingLoss = sum / items.length;
-        // if (mainSketch.lastRollingLoss !== undefined) {
-        //     if (Math.abs(mainSketch.lastRollingLoss - newRollingLoss) < 0.0001) {
+        // if (sketchController.lastRollingLoss !== undefined) {
+        //     if (Math.abs(sketchController.lastRollingLoss - newRollingLoss) < 0.0001) {
         //         lossText.innerHTML = `Converged at: ${newRollingLoss}`;
         //         stopClip();
         //     }
         // }
-        mainSketch.lastRollingLoss = newRollingLoss;
+        sketchController.lastRollingLoss = newRollingLoss;
     }
 };
 
 const showTraceHistoryFrom = (fromIndex) => {
-    const items = getHistoryBatch(mainSketch.numTraces, fromIndex);
+    const items = getHistoryBatch(sketchController.numTraces, fromIndex);
     if (items) {
-        mainSketch.traces = null;
+        sketchController.traces = null;
         let refList = [];
         for (let pastGen of items) {
             userLayer.importSVG(pastGen.svg);
             refList.push(parseFromSvg(pastGen.svg, userLayer));
         }
-        mainSketch.traces = refList;
+        sketchController.traces = refList;
     }
 };
 
@@ -333,62 +336,66 @@ ws.onmessage = function(event) {
         var result = JSON.parse(event.data);
     } catch (e) {
         console.log("Unexpected JSON event\n", e);
-        mainSketch.clipDrawing = false;
+        sketchController.clipDrawing = false;
     }
 
-    if (mainSketch.clipDrawing) {
+    if (sketchController.clipDrawing) {
         if (result.status === "stop") {
             console.log("WHYYYYYY");
             console.log("Stopped drawer");
-            mainSketch.clipDrawing = false;
+            sketchController.clipDrawing = false;
         }
 
         if (result.status === "draw") {
             //sketch
 
-            if (mainSketch.isFirstIteration) {
+            if (sketchController.isFirstIteration) {
                 userLayer.clear();
-                mainSketch.isFirstIteration = false;
+                sketchController.isFirstIteration = false;
             } else {
-                // Delete ref to last gen and old mainSketch.traces
-                if (mainSketch.lastRender) {
-                    mainSketch.lastRender.remove();
+                // Delete ref to last gen and old sketchController.traces
+                if (sketchController.lastRender) {
+                    sketchController.lastRender.remove();
                 }
-                if (mainSketch.traces) {
-                    for (const trace of mainSketch.traces) {
+                if (sketchController.traces) {
+                    for (const trace of sketchController.traces) {
                         trace.remove();
                     }
                 }
             }
 
-            mainSketch.stack.historyHolder.push(result);
+            sketchController.stack.historyHolder.push(result);
             timeKeeper.style.width = "100%";
-            timeKeeper.setAttribute("max", String(mainSketch.step + 1));
-            timeKeeper.value = String(mainSketch.step + 1);
-            setTraces.setAttribute("max", String(mainSketch.step + 1));
-            mainSketch.step += 1; //avoid disconnected iteration after stopping
+            timeKeeper.setAttribute("max", String(sketchController.step + 1));
+            timeKeeper.value = String(sketchController.step + 1);
+            setTraces.setAttribute("max", String(sketchController.step + 1));
+            sketchController.step += 1; //avoid disconnected iteration after stopping
 
-            // To do change this so it is just max num mainSketch.traces
-            if (mainSketch.numTraces > 1) {
+            // To do change this so it is just max num sketchController.traces
+            if (sketchController.numTraces > 1) {
                 userLayer.clear();
-                showTraceHistoryFrom(mainSketch.stack.historyHolder.length - 1);
+                showTraceHistoryFrom(sketchController.stack.historyHolder.length - 1);
             } else {
                 userLayer.clear();
-                if (mainSketch.showAICurves < mainSketch.numRandomCurves) {
-                    mainSketch.showAICurves += Math.floor(
-                        Math.random() * mainSketch.randomRange
+                if (sketchController.showAICurves < sketchController.numRandomCurves) {
+                    sketchController.showAICurves += Math.floor(
+                        Math.random() * sketchController.randomRange
                     );
                 }
-                mainSketch.lastRender = parseFromSvg(result.svg, userLayer);
-                mainSketch.svg = paper.project.exportSVG({
+                sketchController.lastRender = parseFromSvg(
+                    result.svg,
+                    userLayer,
+                    sketchController.showAllLines
+                );
+                sketchController.svg = paper.project.exportSVG({
                     asString: true,
                 });
             }
 
             calcRollingLoss();
             lossText.innerHTML = `Step: ${
-        mainSketch.step
-      }\nLoss: ${mainSketch.lastRollingLoss.toPrecision(5)}`;
+        sketchController.step
+      }\nLoss: ${sketchController.lastRollingLoss.toPrecision(5)}`;
 
             console.log(
                 `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`
@@ -403,7 +410,11 @@ ws.onmessage = function(event) {
             console.log(result.sketch_index);
             console.log(result);
             thisCanvas.clear();
-            let imported = parseFromSvg(result.svg, thisCanvas.activeLayer, true);
+            let imported = parseFromSvg(
+                result.svg,
+                thisCanvas.activeLayer,
+                sketchController.showAllLines
+            );
         }
     }
 };
@@ -434,11 +445,11 @@ const createExemplar = (isUserSketch, sketchCountIndex = null) => {
             });
         } else {
             stopButton.addEventListener("click", () => {
-                mainSketch.stopSingle(sketchCountIndex);
+                sketchController.stopSingle(sketchCountIndex);
             });
             removeButton.addEventListener("click", () => {
                 newElem.classList.add("inactive-exemplar");
-                mainSketch.stopSingle(sketchCountIndex);
+                sketchController.stopSingle(sketchCountIndex);
             });
         }
 
@@ -479,7 +490,7 @@ const createExemplar = (isUserSketch, sketchCountIndex = null) => {
 };
 
 const setPenMode = (mode, accentTarget) => {
-    let lastPenMode = mainSketch.penMode;
+    let lastPenMode = sketchController.penMode;
     document.querySelectorAll(".pen-mode").forEach((mode) => {
         mode.classList.remove("selected-mode");
         mode.classList.add("simple-hover");
@@ -492,9 +503,9 @@ const setPenMode = (mode, accentTarget) => {
 
     switch (mode) {
         case "pen-drop":
-            console.log(mainSketch.penDropMode);
+            console.log(sketchController.penDropMode);
 
-            setPenMode(mainSketch.penDropMode, accentTarget);
+            setPenMode(sketchController.penDropMode, accentTarget);
             // Dropdown
             if (dropdown.style.display === "none" || !dropdown.style.display) {
                 dropdown.style.display = "flex";
@@ -512,51 +523,54 @@ const setPenMode = (mode, accentTarget) => {
             penDrop.classList.remove("fa-pen");
             penDrop.classList.add("fa-eraser");
             eraseTool.activate();
-            mainSketch.penMode = mode;
-            mainSketch.penDropMode = mode;
+            sketchController.penMode = mode;
+            sketchController.penDropMode = mode;
             break;
         case "pen":
             penDrop.classList.remove("fa-eraser");
             penDrop.classList.add("fa-pen");
             multiTool.activate();
-            mainSketch.penMode = mode;
-            mainSketch.penDropMode = mode;
+            sketchController.penMode = mode;
+            sketchController.penDropMode = mode;
             "pen";
             break;
         case "select":
             dropdown.style.display = "none";
             multiTool.activate();
-            mainSketch.penMode = mode;
+            sketchController.penMode = mode;
             break;
         case "lasso":
             multiTool.activate();
             if (noPrompt()) {
-                mainSketch.penMode = lastPenMode;
+                sketchController.penMode = lastPenMode;
                 openModal({
                     title: "Add a prompt first!",
                     message: "You need a prompt to generate sketches with the region tool.",
                 });
             } else {
-                mainSketch.penMode = mode;
+                sketchController.penMode = mode;
             }
             break;
     }
 
-    if (mainSketch.penMode !== "select") {
+    if (sketchController.penMode !== "select") {
         userLayer.getItems().forEach((path) => {
             path.selected = false;
         });
         hideSelectUI();
     }
-    if (mainSketch.penMode !== "lasso" && mainSketch.penMode !== "select") {
-        mainSketch.drawRegion = undefined;
+    if (
+        sketchController.penMode !== "lasso" &&
+        sketchController.penMode !== "select"
+    ) {
+        sketchController.drawRegion = undefined;
         if (regionPath) regionPath.remove();
     }
 };
 
 const getRGBA = () => {
-    let rgba = mainSketch.strokeColor.replace(/[^\d,]/g, "").split(",");
-    rgba[3] = mainSketch.opacity;
+    let rgba = sketchController.strokeColor.replace(/[^\d,]/g, "").split(",");
+    rgba[3] = sketchController.opacity;
     let col = `rgba(${rgba.join()})`;
     console.log(col);
     document.getElementById("pen-color").style.background = col;

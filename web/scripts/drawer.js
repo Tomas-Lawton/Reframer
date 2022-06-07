@@ -1,9 +1,10 @@
 let sketchTimer;
 
 const pauseActiveDrawer = () => {
-    if (mainSketch.activeStates.includes(mainSketch.drawState)) {
+    if (sketchController.activeStates.includes(sketchController.drawState)) {
+        // TO DO: check if can just check if clip is drawing.. should work?
         liveCollab = true;
-        mainSketch.pause(); //continue on pen up
+        sketchController.pause(); //continue on pen up
         aiMessage.classList.remove("typed-out");
         aiMessage.innerHTML = `All right, I'mma let you finish...`;
         aiMessage.classList.add("typed-out");
@@ -16,7 +17,7 @@ multiTool.onMouseDown = function(event) {
     // hide time slider
     document.getElementById("contain-dot").style.display = "none";
 
-    switch (mainSketch.penMode) {
+    switch (sketchController.penMode) {
         case "select":
             path = null;
             let hitResult = paper.project.hitTest(event.point, {
@@ -28,12 +29,12 @@ multiTool.onMouseDown = function(event) {
 
             // TO change to simple hit test
             let isInBounds = null;
-            if (mainSketch.boundingBox) {
+            if (sketchController.boundingBox) {
                 isInBounds =
-                    event.point.x > mainSketch.boundingBox.bounds.left &&
-                    event.point.x < mainSketch.boundingBox.bounds.right &&
-                    event.point.y > mainSketch.boundingBox.bounds.top &&
-                    event.point.y < mainSketch.boundingBox.bounds.bottom;
+                    event.point.x > sketchController.boundingBox.bounds.left &&
+                    event.point.x < sketchController.boundingBox.bounds.right &&
+                    event.point.y > sketchController.boundingBox.bounds.top &&
+                    event.point.y < sketchController.boundingBox.bounds.bottom;
             }
 
             if ((!hitResult && !isInBounds) || (!hitResult && isInBounds == null)) {
@@ -41,29 +42,29 @@ multiTool.onMouseDown = function(event) {
                 userLayer.getItems().forEach((path) => {
                     path.selected = false;
                 });
-                mainSketch.transformGroup = null;
-                if (mainSketch.boundingBox) {
+                sketchController.transformGroup = null;
+                if (sketchController.boundingBox) {
                     hideSelectUI();
                 }
 
                 if (liveCollab) {
-                    mainSketch.svg = paper.project.exportSVG({
+                    sketchController.svg = paper.project.exportSVG({
                         asString: true,
                     }); //grab latest changes during the selection
-                    // mainSketch.numAddedPaths += 1; //is substract change this
-                    mainSketch.continueSketch();
+                    // sketchController.numAddedPaths += 1; //is substract change this
+                    sketchController.continueSketch();
                     liveCollab = false;
                 }
 
                 // Create a new selection in case drag is starting
-                mainSketch.selectBox = new Rectangle(event.point);
+                sketchController.selectBox = new Rectangle(event.point);
             }
 
             if (hitResult) {
                 pauseActiveDrawer();
 
                 // got path
-                if (mainSketch.boundingBox) {
+                if (sketchController.boundingBox) {
                     hideSelectUI();
                 }
                 unpackGroup();
@@ -77,16 +78,16 @@ multiTool.onMouseDown = function(event) {
                 rotateNumber.value = 0;
                 let transformGroup = new Group({ children: items });
                 transformGroup.transformContent = false;
-                mainSketch.transformGroup = transformGroup;
+                sketchController.transformGroup = transformGroup;
             }
             break;
         case "pen":
             pauseActiveDrawer();
 
             myPath = new Path({
-                strokeColor: mainSketch.strokeColor,
-                strokeWidth: mainSketch.strokeWidth,
-                opacity: mainSketch.opacity,
+                strokeColor: sketchController.strokeColor,
+                strokeWidth: sketchController.strokeWidth,
+                opacity: sketchController.opacity,
                 strokeCap: "round",
                 strokeJoin: "round",
             });
@@ -97,36 +98,36 @@ multiTool.onMouseDown = function(event) {
             }); //make a segment on touch down (one point)
             break;
         case "lasso":
-            mainSketch.drawRegion = new Rectangle(event.point);
+            sketchController.drawRegion = new Rectangle(event.point);
             break;
     }
 };
 
 multiTool.onMouseDrag = function(event) {
-    switch (mainSketch.penMode) {
+    switch (sketchController.penMode) {
         case "pen":
             myPath.add(event.point);
             myPath.smooth();
             break;
         case "select":
-            if (mainSketch.boundingBox) {
-                if (mainSketch.boundingBox.data.state === "moving") {
+            if (sketchController.boundingBox) {
+                if (sketchController.boundingBox.data.state === "moving") {
                     const selectedPaths = getSelectedPaths(); // all selected
                     selectedPaths.forEach((path) => {
                         path.position.x += event.delta.x;
                         path.position.y += event.delta.y;
                     });
-                    mainSketch.boundingBox.position.x += event.delta.x;
-                    mainSketch.boundingBox.position.y += event.delta.y;
+                    sketchController.boundingBox.position.x += event.delta.x;
+                    sketchController.boundingBox.position.y += event.delta.y;
                     updateSelectUI();
                 }
-            } else if (mainSketch.selectBox != undefined) {
-                mainSketch.selectBox.width += event.delta.x;
-                mainSketch.selectBox.height += event.delta.y;
+            } else if (sketchController.selectBox != undefined) {
+                sketchController.selectBox.width += event.delta.x;
+                sketchController.selectBox.height += event.delta.y;
                 if (selectBox) {
                     selectBox.remove();
                 } // redraw //REFACTOR
-                selectBox = new Path.Rectangle(mainSketch.selectBox);
+                selectBox = new Path.Rectangle(sketchController.selectBox);
                 selectBox.set({
                     fillColor: "#e9e9ff",
                     opacity: 0.4,
@@ -135,10 +136,10 @@ multiTool.onMouseDrag = function(event) {
             }
             break;
         case "lasso":
-            mainSketch.drawRegion.width += event.delta.x;
-            mainSketch.drawRegion.height += event.delta.y;
+            sketchController.drawRegion.width += event.delta.x;
+            sketchController.drawRegion.height += event.delta.y;
             if (regionPath !== undefined) regionPath.remove(); // redraw //REFACTOR
-            regionPath = new Path.Rectangle(mainSketch.drawRegion);
+            regionPath = new Path.Rectangle(sketchController.drawRegion);
             regionPath.set({
                 fillColor: "#e9e9ff",
                 opacity: 0.4,
@@ -150,19 +151,19 @@ multiTool.onMouseDrag = function(event) {
 };
 multiTool.onMouseUp = function() {
     // so the latest sketch is available to the drawer
-    mainSketch.svg = paper.project.exportSVG({
+    sketchController.svg = paper.project.exportSVG({
         asString: true,
     });
 
-    switch (mainSketch.penMode) {
+    switch (sketchController.penMode) {
         case "select":
             if (selectBox) {
                 let items = userLayer.getItems({ inside: selectBox.bounds });
                 items.forEach((item) => (item.selected = true));
                 items.pop();
-                // mainSketch.selectBox.remove();
-                if (mainSketch.selectBox) {
-                    mainSketch.selectBox = null;
+                // sketchController.selectBox.remove();
+                if (sketchController.selectBox) {
+                    sketchController.selectBox = null;
                 }
                 selectBox.remove();
                 selectBox = null;
@@ -173,66 +174,66 @@ multiTool.onMouseUp = function() {
                 rotateNumber.value = 0;
                 let transformGroup = new Group({ children: items });
                 transformGroup.transformContent = false;
-                mainSketch.transformGroup = transformGroup;
+                sketchController.transformGroup = transformGroup;
             }
 
             break;
         case "pen":
             myPath.simplify();
             // sendPaths();
-            mainSketch.stack.undoStack.push({
+            sketchController.stack.undoStack.push({
                 type: "draw-event",
                 data: myPath,
             });
-            mainSketch.svg = paper.project.exportSVG({
+            sketchController.svg = paper.project.exportSVG({
                 asString: true,
             });
 
             if (liveCollab) {
-                mainSketch.numAddedPaths += 1;
-                mainSketch.continueSketch();
+                sketchController.numAddedPaths += 1;
+                sketchController.continueSketch();
                 liveCollab = false;
             } else {
                 //just drawing
-                if (!noPrompt() && mainSketch.doneSketching !== null) {
+                if (!noPrompt() && sketchController.doneSketching !== null) {
                     clearTimeout(sketchTimer);
-                    sketchTimer = setTimeout(userStuck, mainSketch.doneSketching);
+                    sketchTimer = setTimeout(userStuck, sketchController.doneSketching);
 
                     function userStuck() {
-                        mainSketch.draw();
+                        sketchController.draw();
                     }
                 }
             }
             break;
         case "lasso":
-            mainSketch.resetHistory(); //reset since not continuing
-            mainSketch.draw(true);
-            mainSketch.clipDrawing = true;
+            sketchController.resetHistory(); //reset since not continuing
+            sketchController.draw(true);
+            sketchController.clipDrawing = true;
             regionPath.remove();
             break;
     }
     // remove??
-    if (mainSketch.boundingBox) {
-        mainSketch.boundingBox.data.state = "moving";
+    if (sketchController.boundingBox) {
+        sketchController.boundingBox.data.state = "moving";
     }
 
     // use updates
-    mainSketch.svg = paper.project.exportSVG({
+    sketchController.svg = paper.project.exportSVG({
         asString: true,
     });
 
-    logger.event(mainSketch.penMode + "-up");
+    logger.event(sketchController.penMode + "-up");
 };
 
 eraseTool.onMouseDown = function(event) {
     pauseActiveDrawer();
 
-    mainSketch.stack.undoStack.push({
+    sketchController.stack.undoStack.push({
         type: "erase-event",
         data: userLayer.exportJSON(),
     });
     erasorPath = new Path({
-        strokeWidth: mainSketch.strokeWidth * 2,
+        strokeWidth: sketchController.strokeWidth * 2,
         strokeCap: "round",
         strokeJoin: "round",
         // strokeColor: "white",
@@ -256,7 +257,7 @@ eraseTool.onMouseDrag = function(event) {
 
 eraseTool.onMouseUp = function(event) {
     erasorPath.simplify();
-    const eraseRadius = (mainSketch.strokeWidth * 2) / 2;
+    const eraseRadius = (sketchController.strokeWidth * 2) / 2;
     const outerPath = OffsetUtils.offsetPath(erasorPath, eraseRadius);
     const innerPath = OffsetUtils.offsetPath(erasorPath, -eraseRadius);
     erasorPath.remove();
@@ -312,15 +313,15 @@ eraseTool.onMouseUp = function(event) {
     userLayer.addChildren(tmpGroup.removeChildren());
     mask.remove();
 
-    mainSketch.svg = paper.project.exportSVG({
+    sketchController.svg = paper.project.exportSVG({
         asString: true,
     });
 
     logger.event("erase-up");
 
     if (liveCollab) {
-        mainSketch.numAddedPaths += 1;
-        mainSketch.continueSketch();
+        sketchController.numAddedPaths += 1;
+        sketchController.continueSketch();
         liveCollab = false;
     }
 };
