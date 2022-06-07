@@ -394,7 +394,7 @@ document.getElementById("brainstorm").addEventListener("click", () => {
     } else {
         // Set up the ui
         let creationIndex = mainSketch.exemplarCount;
-        let newElem = createExemplar(creationIndex);
+        let newElem = createExemplar(false, creationIndex);
         let thisCanvas = exemplarScope.projects[creationIndex];
         document.getElementById("exemplar-grid").appendChild(newElem);
         mainSketch.exemplarCount += 1;
@@ -514,7 +514,7 @@ document.getElementById("scrapbook").addEventListener("click", () => {
 document.getElementById("save-sketch").addEventListener("click", () => {
     let jsonGroup = exportToExemplar();
     let creationIndex = mainSketch.exemplarCount;
-    let newElem = createExemplar(creationIndex);
+    let newElem = createExemplar(true, creationIndex);
     let thisCanvas = exemplarScope.projects[creationIndex];
     let imported = thisCanvas.activeLayer.importJSON(jsonGroup);
     imported.position = new Point(exemplarSize / 2, exemplarSize / 2);
@@ -599,3 +599,11 @@ picker.onChange = (color) => {
 };
 
 setActionUI("inactive");
+
+for (let i = 0; i < 4; i++) {
+    let newElem = createExemplar(false, i);
+    let thisCanvas = exemplarScope.projects[i];
+    newElem.classList.add("inactive-exemplar");
+    document.getElementById("explore-sketches").appendChild(newElem);
+    mainSketch.exemplarCount += 1;
+}

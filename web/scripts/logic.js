@@ -419,7 +419,9 @@ ws.onmessage = function(event) {
     }
 };
 
-const createExemplar = (creationIndex) => {
+const createExemplar = (isUserSketch, creationIndex) => {
+    let type = isUserSketch ? "user" : "ai";
+
     let newElem = exemplarTemplate.cloneNode(reusableExemplar);
     newElem.style.visibility = "initial";
     let exemplarCanvas = newElem.querySelector("canvas");
@@ -427,17 +429,28 @@ const createExemplar = (creationIndex) => {
     exemplarCanvas.height = exemplarSize;
     exemplarScope.setup(exemplarCanvas);
 
-    newElem.id = `exemplar-item-${creationIndex}`;
+    newElem.id = `${type}-sketch-item-${creationIndex}`;
     newElem.querySelector("h3").innerHTML = `U${creationIndex}`;
-    newElem
-        .querySelector(".card-icon-background")
-        .addEventListener("click", () => {
+
+    let removeButton = newElem.querySelector(".card-icon-background");
+
+    if (isUserSketch) {
+        removeButton.addEventListener("click", () => {
             newElem.remove();
         });
+    } else {
+        // add the inactive class.
+        removeButton.addEventListener("click", () => {
+            // AND ALSO STOP
+            newElem.classList.add("inactive-exemplar");
+        });
+    }
 
     exemplarCanvas.addEventListener("click", () => {
         importToSketch(creationIndex);
     });
+
+    exemplarCanvas.id = `${type}-sketch-canvas-${creationIndex}`;
 
     newElem.addEventListener("click", () => {
         document.getElementById("contain-dot").style.display = "none";
