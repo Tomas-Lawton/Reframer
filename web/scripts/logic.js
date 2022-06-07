@@ -271,15 +271,15 @@ const parseFromSvg = (svg, layer, showAllPaths = false) => {
 
         const pathEffect = child.clone({ insert: false });
 
-        if (!showAllPaths) {
-            if (returnedIndex < mainSketch.showAICurves) {
-                layer.addChild(pathEffect);
-            }
-        } else {
-            layer.addChild(pathEffect);
-        }
+        // if (!showAllPaths) {
+        //     if (returnedIndex < mainSketch.showAICurves) {
+        //         layer.addChild(pathEffect);
+        //     }
+        // } else {
+        //     layer.addChild(pathEffect);
+        // }
 
-        // layer.addChild(pathEffect);
+        layer.addChild(pathEffect);
     }
     paperObject.remove();
     return paperObject;
