@@ -17,7 +17,6 @@ const exemplars = [
     document.getElementById("canvas3"),
     document.getElementById("canvas4"),
 ];
-const sketchContainer = document.getElementById("canvas-drop");
 
 // Actions
 const actionControls = document.querySelectorAll(".ai-action");
@@ -30,6 +29,7 @@ const rotateNumber = document.getElementById("rotate-number");
 const scaleSlider = document.getElementById("scale-slider");
 const scaleNumber = document.getElementById("scale-number");
 
+// Change to revise
 const initialiseHandler = document.getElementById("initialise-handler");
 const transformControl = document.getElementById("transform-ui");
 
@@ -48,12 +48,12 @@ const setTraces = document.getElementById("num-traces");
 const selectDot = document.getElementById("contain-pen-dot");
 const opacitySlider = document.getElementById("opacity-slider");
 const stopButton = document.getElementById("stop");
-
-const moodboard = document.getElementById("moodboard-container");
 const buttonPanel = document.querySelector(".top-action");
 const dropdown = document.getElementById("pen-dropdown");
 const penDrop = document.getElementById("pen-drop");
 const aiMessage = document.querySelector("#ai-content .panel-subtitle");
+const sketchContainer = document.getElementById("canvas-drop");
+const staticSketches = document.getElementById("static-sketches");
 
 // Utility
 let liveCollab = false;

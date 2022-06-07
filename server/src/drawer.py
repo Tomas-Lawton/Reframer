@@ -292,7 +292,7 @@ class Drawer:
         neg_prompt = []
         svg_string = data["data"]["svg"]
         region = data["data"]["region"]
-        self.points, self.colors, self.widths = use_penalisation(data["data"]["fixation"])
+        self.w_points, self.w_colors, self.w_widths = use_penalisation(data["data"]["fixation"])
         self.clip_interface.positive = prompt
         if svg_string is not None:
             async with aiofiles.open('data/interface_paths.svg', 'w') as f:
@@ -341,7 +341,6 @@ class Drawer:
     #         logging.error("Failed to encode features in clip")
 
     async def continue_update_sketch(self, data):
-        # fix initialise
         """Keep the last drawer running"""
         logging.info("Continuing with new sketch...")
 
@@ -355,7 +354,7 @@ class Drawer:
         except Exception as e:
             logging.error("Failed to parse the new sketch")
         
-        self.points, self.colors, self.widths = use_penalisation(data["data"]["fixation"])
+        self.w_points, self.w_colors, self.w_widths = use_penalisation(data["data"]["fixation"])
         return self.activate_without_curves()
 
     async def stop(self):

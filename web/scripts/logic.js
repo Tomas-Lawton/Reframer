@@ -419,7 +419,7 @@ const createExemplar = (isUserSketch, sketchCountIndex = null) => {
     exemplarCanvas.height = exemplarSize;
 
     if (sketchCountIndex !== null) {
-        let removeButton = newElem.querySelector(".card-icon-background");
+        let removeButton = newElem.querySelector(".fa-minus");
         let stopButton = newElem.querySelector(".fa-stop");
 
         exemplarScope.setup(exemplarCanvas);
@@ -456,12 +456,18 @@ const createExemplar = (isUserSketch, sketchCountIndex = null) => {
                 e.dataTransfer.setData("text/plain", sketchCountIndex);
                 sketchContainer.classList.remove("canvas-standard-drop");
                 sketchContainer.classList.add("canvas-hover-light");
+                if (!isUserSketch) {
+                    staticSketches.classList.add("canvas-hover-light");
+                }
             },
             false
         );
         newElem.addEventListener("dragend", function(e) {
             sketchContainer.classList.add("canvas-standard-drop");
             sketchContainer.classList.remove("canvas-hover-light");
+            if (!isUserSketch) {
+                staticSketches.classList.remove("canvas-hover-light");
+            }
         });
     } else {
         // is default ui

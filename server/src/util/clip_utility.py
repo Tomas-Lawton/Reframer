@@ -105,7 +105,6 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
             pass
 
     try:
-        print(parent_svg['attributes'])
         width = float(parent_svg['attributes']['width'])
         height = float(parent_svg['attributes']['height'])
         frame_size = max(width, height)
@@ -148,18 +147,14 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
             # opacity = float(att['stroke-opacity'])
 
         try:
-            if 'opacity' in att:
-                opacity = float(att['opacity'])
-                print(1)
-            elif 'stroke-opacity' in att:
+            if 'stroke-opacity' in att:
                 opacity = float(att['stroke-opacity'])
-                print(2)
+            elif 'opacity' in att:
+                opacity = float(att['opacity'])
             elif 'opacity' in path_group['attributes']:
                 opacity = str(path_group['attributes']['stroke-opacity'])
-                print(3)
             elif 'stroke-opacity' in path_group['attributes']:
                 opacity = str(path_group['attributes']['stroke-opacity'])
-                print(4)
             else:
                 opacity = 1
 

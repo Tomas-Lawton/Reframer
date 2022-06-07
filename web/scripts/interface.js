@@ -1,19 +1,34 @@
-function dragover(e) {
+function dragEnter(e) {
     e.preventDefault();
+    // staticSketches.classList.add("drop-ready");
+    // canvas.classList.add("drop-ready");
 }
 
-function dragenter(e) {
+function dragLeave(e) {
     e.preventDefault();
+    staticSketches.classList.remove("drop-ready");
+    canvas.classList.remove("drop-ready");
 }
 
-function drop(e) {
+function toMainSketch(e) {
     const sketchCountIndex = e.dataTransfer.getData("text/plain");
     importToSketch(sketchCountIndex);
 }
 
-sketchContainer.addEventListener("dragover", dragover);
-sketchContainer.addEventListener("dragenter", dragenter);
-sketchContainer.addEventListener("drop", drop);
+function toStaticSketches(e) {
+    console.log("dropped");
+
+    const sketchCountIndex = e.dataTransfer.getData("text/plain");
+    exportToStatic(sketchCountIndex);
+}
+
+sketchContainer.addEventListener("dragenter", dragEnter);
+sketchContainer.addEventListener("dragleave", dragLeave);
+sketchContainer.addEventListener("drop", toMainSketch);
+
+staticSketches.addEventListener("dragenter", dragEnter);
+staticSketches.addEventListener("dragleave", dragLeave);
+staticSketches.addEventListener("drop", toStaticSketches);
 
 // Drawing Controls
 document.querySelectorAll(".pen-mode").forEach((elem) => {

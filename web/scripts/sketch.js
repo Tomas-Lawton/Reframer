@@ -133,6 +133,7 @@ class SketchHandler {
                     this.initRandomCurves ?
                     this.numRandomCurves :
                     0,
+                fixation: this.useFixation,
             });
             this.step = 0;
             this.clipDrawing = true;
@@ -175,7 +176,7 @@ class SketchHandler {
             fixation: this.useFixation,
         });
         this.clipDrawing = true;
-        setActionUI("drawing");
+        // setActionUI("drawing");
     }
     redraw() {
             this.updateDrawer({
@@ -215,6 +216,8 @@ class SketchHandler {
             status: "stop_single_sketch",
             sketchScopeIndex: i,
         });
+        this.clipDrawing = false;
+        // setActionUI("stop");
     }
     stop() {
         if (this.drawState === "active") {
