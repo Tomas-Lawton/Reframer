@@ -280,6 +280,7 @@ class Drawer:
                 logging.info("Sent update")
             except Exception as e:
                 logging.error("WS Response Failed")
+                self.stop()
 
         logging.info(f"Completed run {t} in drawer {str(self.sketch_reference_index)}")
         self.iteration += 1

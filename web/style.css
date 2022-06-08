@@ -468,6 +468,7 @@ hr {
     text-align: center;
     left: 50%;
     transform: translateX(-50%);
+    display: none;
 }
 
 #settings i {
@@ -822,11 +823,14 @@ hr {
     background: #f5f5f5;
     /* border-radius: 0.5em; */
     border-radius: 5px;
-    margin: 0.4em;
+    /* margin: 0.4em; */
+    /* padding: 0.4em; */
+    padding: 0.4em 0.6em;
 }
 
 .card-info div {
     display: flex;
+    align-items: center;
     /* flex-direction: column; */
 }
 
@@ -834,14 +838,20 @@ hr {
     color: #7b66ff;
     font-weight: 500;
     font-size: 0.9em;
-    padding: 0.1em 0.6em;
+    /* padding: 0.1em 0.6em; */
 }
 
 .card-info p {
     color: #7b7b7b;
 }
 
-.card-info i {
+.card-loading {
+    color: #00e900;
+    font-size: 1.1em;
+    margin-right: 0.2em;
+}
+
+.card-icon-background i {
     background: #7b66ff;
     color: white;
     /* border-radius: 0 5px 5px 0; */
@@ -850,7 +860,7 @@ hr {
     font-size: 1em;
 }
 
-.card-info i:first-child {
+.card-info .fa-stop {
     background: rgb(255, 96, 96);
 }
 
@@ -985,11 +995,13 @@ input[type="number"] {
 }
 
 .select-ui i {
-    box-shadow: 2px 3px 9px rgba(48, 48, 48, 0.17);
+    /* box-shadow: 2px 3px 9px rgba(48, 48, 48, 0.17); */
     border-radius: 50%;
-    font-size: 2em;
-    padding: 0.1em;
-    color: #363636;
+    font-size: 1.1em;
+    padding: 0.6em;
+    /* color: #363636; */
+    background: #f3f1ff;
+    color: #7b66ff;
 }
 
 #autonomy-labels {
@@ -1017,7 +1029,7 @@ input[type="number"] {
     transform: translateX(-50%);
     top: 3em;
     border-radius: 1em;
-    /* display: none; */
+    display: none;
 }
 
 #sketchbook-panel {
@@ -1035,7 +1047,7 @@ input[type="number"] {
     left: 70%;
     transform: initial;
     top: 8%;
-    /* display: none; */
+    display: none;
 }
 
 #sketchbook-panel .panel-title {
@@ -1346,8 +1358,8 @@ input[type="number"] {
 }
 
 .pill {
-    /* color: #7b66ff;
-    background: #f3f1ff; */
+    color: #7b66ff;
+    background: #f3f1ff;
     font-weight: 400;
     margin: 0.4em 0;
     padding: 0.4em 1em;
@@ -1356,8 +1368,8 @@ input[type="number"] {
     font-size: 0.8em;
     display: flex;
     align-items: center;
-    background: #7b66ff;
-    color: white;
+    /* background: #7b66ff;
+    color: white; */
 }
 
 .slider-label {
@@ -1408,6 +1420,11 @@ input[type="number"] {
     background: #f5f5f5;
     color: rgb(117, 117, 117);
     box-shadow: inset 2px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.inactive-top-action {
+    pointer-events: none;
+    color: #414141;
 }
 
 #stroke-dot {
@@ -1603,14 +1620,6 @@ input[type="range"]::-moz-range-thumb {
     display: none;
 }
 
-
-/* REMOVE FOR AI MODE */
-
-
-/* #lasso {
-    display: none;
-} */
-
 #brainstorm {
     /* background: #343434d6; */
     display: flex;
@@ -1631,12 +1640,13 @@ input[type="range"]::-moz-range-thumb {
     padding-bottom: 100%;
 }
 
-#initialise-handler i {
-    color: #a091ff;
-    /* visibility: hidden; */
-}
-
 @media screen and (min-width: 650px) {
+    #rolling-loss {
+        display: initial;
+    }
+    #sketchbook-panel {
+        display: flex;
+    }
     body {
         overflow: hidden;
     }
@@ -1660,6 +1670,7 @@ input[type="range"]::-moz-range-thumb {
         left: 10%;
         transform: initial;
         top: 20%;
+        display: flex;
     }
     #sketchbook-panel {
         /* width: 26em; */

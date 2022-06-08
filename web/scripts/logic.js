@@ -37,6 +37,34 @@ const exportToExemplar = () => {
     return save;
 };
 
+const exploreToStatic = (i) => {
+    console.log("EXPORTING");
+    console.log(exemplarScope.projects[i]);
+    let saveSketch = exemplarScope.projects[i].activeLayer.clone({
+        insert: false,
+    });
+    saveSketch.getItems().forEach((path) => {
+        path.selected = false;
+    });
+    return saveSketch.exportJSON();
+};
+
+const saveSketch = (fromSketch = null) => {
+    let jsonGroup;
+    if (fromSketch !== null) {
+        jsonGroup = exploreToStatic(fromSketch);
+    } else {
+        jsonGroup = exportToExemplar();
+    }
+    let sketchCountIndex = sketchController.sketchScopeIndex;
+    let newElem = createExemplar(true, sketchCountIndex);
+    let toCanvas = exemplarScope.projects[sketchCountIndex];
+    let imported = toCanvas.activeLayer.importJSON(jsonGroup);
+    imported.position = new Point(exemplarSize / 2, exemplarSize / 2);
+    document.getElementById("exemplar-grid").appendChild(newElem);
+    sketchController.sketchScopeIndex += 1;
+};
+
 const setActionUI = (state) => {
     aiMessage.classList.remove("typed-out");
 
@@ -55,6 +83,9 @@ const setActionUI = (state) => {
         document.getElementById("stop-icon").classList.remove("fa-repeat");
         document.getElementById("stop-icon").style.color = "#ffffff";
         stopButton.querySelector("p").innerHTML = "Stop";
+
+        document.getElementById("undo").classList.add("inactive-top-action");
+        document.getElementById("redo").classList.add("inactive-top-action");
 
         prompt.style.display = "none";
 
@@ -93,6 +124,9 @@ const setActionUI = (state) => {
         aiMessage.innerHTML = "I'm stopping! What can we draw next?";
         aiMessage.classList.add("typed-out");
 
+        document.getElementById("undo").classList.remove("inactive-top-action");
+        document.getElementById("redo").classList.remove("inactive-top-action");
+
         // timeKeeper
         document.getElementById("contain-dot").style.display = "flex";
     }
@@ -119,8 +153,12 @@ const fitToSelection = (items, state) => {
     }, null);
     // Add stroke width so no overflow over bounds?
     sketchController.boundingBox = new Path.Rectangle(bbox);
-    sketchController.boundingBox.strokeColor = "#D2D2D2";
-    sketchController.boundingBox.strokeWidth = 2;
+    sketchController.boundingBox.set({
+        fillColor: "#f5f5f5",
+        opacity: 0.4,
+        strokeColor: "#7b66ff",
+        strokeWidth: 2,
+    });
     sketchController.boundingBox.data.state = state;
 };
 
@@ -191,14 +229,18 @@ const hideSelectUI = (includeTransform = true) => {
 
 const updateRectBounds = (from, to) => {
     sketchController.boundingBox.bounds = new Rectangle(from, to);
-    sketchController.boundingBox.strokeColor = "#D2D2D2";
-    sketchController.boundingBox.strokeWidth = 2;
+    sketchController.boundingBox.bounds.set({
+        fillColor: "#f5f5f5",
+        opacity: 0.4,
+        strokeColor: "#7b66ff",
+        strokeWidth: 2,
+    });
     sketchController.boundingBox.data.state = "resizing";
     updateSelectPosition();
 };
 
 const updateSelectPosition = () => {
-    let uiOffset = deleteHandler.getBoundingClientRect().height / 2;
+    let uiOffset = deleteHandler.getBoundingClientRect().height / 2 + 5;
     deleteHandler.style.left =
         sketchController.boundingBox.bounds.topRight.x + "px";
     initialiseHandler.style.left =
@@ -253,6 +295,7 @@ const showHide = (item) => {
 const parseFromSvg = (svg, layer, showAllPaths = true) => {
     if (svg === "" || svg === undefined) return null;
     let paperObject = layer.importSVG(svg);
+    // to do check children exist
     const numPaths = paperObject.children[0].children.length; // drawn on the canvas right now
 
     for (const returnedIndex in paperObject.children[0].children) {
@@ -415,8 +458,8 @@ ws.onmessage = function(event) {
             thisCanvas.clear();
             let imported = parseFromSvg(
                 result.svg,
-                thisCanvas.activeLayer,
-                sketchController.showAllLines
+                thisCanvas.activeLayer
+                // sketchController.showAllLines
             );
         }
     }
@@ -435,6 +478,7 @@ const createExemplar = (isUserSketch, sketchCountIndex = null) => {
     if (sketchCountIndex !== null) {
         let removeButton = newElem.querySelector(".fa-minus");
         let stopButton = newElem.querySelector(".fa-stop");
+        let loader = newElem.querySelector(".card-loading");
 
         exemplarScope.setup(exemplarCanvas);
         newElem.id = `${type}-sketch-item-${sketchCountIndex}`;
@@ -443,11 +487,18 @@ const createExemplar = (isUserSketch, sketchCountIndex = null) => {
 
         if (isUserSketch) {
             stopButton.style.display = "none";
+            loader.style.display = "none";
             removeButton.addEventListener("click", () => {
                 newElem.remove();
             });
         } else {
             stopButton.addEventListener("click", () => {
+                loader.classList.remove("button-animation");
+                loader.classList.remove("fa-spinner");
+                loader.classList.add("fa-check");
+                stopButton.style.background = "#f5f5f5";
+                stopButton.style.background = "#d2d2d2";
+
                 sketchController.stopSingle(sketchCountIndex);
             });
             removeButton.addEventListener("click", () => {

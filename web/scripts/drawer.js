@@ -129,8 +129,9 @@ multiTool.onMouseDrag = function(event) {
                 } // redraw //REFACTOR
                 selectBox = new Path.Rectangle(sketchController.selectBox);
                 selectBox.set({
-                    fillColor: "#e9e9ff",
+                    fillColor: "#f5f5f5",
                     opacity: 0.4,
+                    strokeColor: "#7b66ff",
                     selected: true,
                 });
             }
@@ -141,8 +142,10 @@ multiTool.onMouseDrag = function(event) {
             if (regionPath !== undefined) regionPath.remove(); // redraw //REFACTOR
             regionPath = new Path.Rectangle(sketchController.drawRegion);
             regionPath.set({
-                fillColor: "#e9e9ff",
+                // fillColor: "#e9e9ff",
+                fillColor: "#f5f5f5",
                 opacity: 0.4,
+                strokeColor: "#7b66ff",
                 selected: true,
             });
             // Start draw

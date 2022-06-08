@@ -1,35 +1,51 @@
-function dragEnter(e) {
+function dragover(e) {
     e.preventDefault();
-    // staticSketches.classList.add("drop-ready");
-    // canvas.classList.add("drop-ready");
 }
 
-function dragLeave(e) {
+function dragentercanvas(e) {
     e.preventDefault();
-    staticSketches.classList.remove("drop-ready");
-    canvas.classList.remove("drop-ready");
+    canvas.classList.add("drop-ready");
 }
 
 function dropCanvas(e) {
-    exportToExemplar(); //backup current
+    // dialog for copy or import??
+    saveSketch(); //backup current
     const sketchCountIndex = e.dataTransfer.getData("text/plain");
     importToSketch(sketchCountIndex);
 }
 
-function toStaticSketches(e) {
-    console.log("dropped");
-
-    const sketchCountIndex = e.dataTransfer.getData("text/plain");
-    exportToStatic(sketchCountIndex);
+function dragleavecanvas(e) {
+    e.preventDefault();
+    canvas.classList.remove("drop-ready");
 }
 
-sketchContainer.addEventListener("dragenter", dragEnter);
-sketchContainer.addEventListener("dragleave", dragLeave);
+sketchContainer.addEventListener("dragover", dragover);
+sketchContainer.addEventListener("dragenter", dragentercanvas);
+staticSketches.addEventListener("dragleave", dragleavecanvas);
 sketchContainer.addEventListener("drop", dropCanvas);
 
-staticSketches.addEventListener("dragenter", dragEnter);
-staticSketches.addEventListener("dragleave", dragLeave);
-staticSketches.addEventListener("drop", toStaticSketches);
+function dragentersketches(e) {
+    e.preventDefault();
+    staticSketches.classList.add("drop-ready");
+}
+
+function dragleavesketch(e) {
+    e.preventDefault();
+    staticSketches.classList.remove("drop-ready");
+}
+
+function dropSketch(e) {
+    const sketchCountIndex = e.dataTransfer.getData("text/plain");
+    let dragItem = document.querySelector(`#AI-sketch-item-${sketchCountIndex}`);
+    if (dragItem) {
+        saveSketch(sketchCountIndex); //backup current
+    }
+}
+
+staticSketches.addEventListener("dragover", dragover);
+staticSketches.addEventListener("dragenter", dragentersketches);
+staticSketches.addEventListener("dragleave", dragleavesketch);
+staticSketches.addEventListener("drop", dropSketch);
 
 // Drawing Controls
 document.querySelectorAll(".pen-mode").forEach((elem) => {
@@ -86,19 +102,12 @@ deleteHandler.addEventListener("click", (e) => {
 });
 
 initialiseHandler.addEventListener("click", (e) => {
-    // need to unpack the group, but keep a ref to the selected/grouped paths
-    // let selectedItems = getSelectedPaths();
     const remove = userLayer.getItems().filter((path) => !path.selected);
     remove.forEach((item) => item.remove());
-    const svg = paper.project.exportSVG({
-        asString: true,
-    });
-    console.log(svg);
-    // userLayer.clear();
-    sketchController.draw(false, svg); //breaks with group
-
-    // Special case
-    // unpackGroup();
+    // const svg = paper.project.exportSVG({
+    //     asString: true,
+    // });
+    // sketchController.draw(false, svg); //breaks with group
 });
 
 document.getElementById("begin").addEventListener("click", () => {
@@ -269,7 +278,6 @@ scaleNumber.oninput = function() {
 
 opacitySlider.oninput = function() {
     sketchController.opacity = this.value / 100;
-    console.log(sketchController.opacity);
     getRGBA();
     getSelectedPaths().forEach(
         (item) => (item.opacity = sketchController.opacity)
@@ -522,21 +530,12 @@ document.getElementById("scrapbook").addEventListener("click", () => {
 
 // document.querySelectorAll(".card-icon-background").forEach((elem) => {
 //     elem.addEventListener("click", () => {
-//         console.log("test");
 //         elem.parentElement.parentElement.remove();
 //     });
 // });
 
 document.getElementById("save-sketch").addEventListener("click", () => {
-    let jsonGroup = exportToExemplar();
-    let sketchCountIndex = sketchController.sketchScopeIndex;
-    console.log(sketchCountIndex);
-    let newElem = createExemplar(true, sketchCountIndex);
-    let toCanvas = exemplarScope.projects[sketchCountIndex];
-    let imported = toCanvas.activeLayer.importJSON(jsonGroup);
-    imported.position = new Point(exemplarSize / 2, exemplarSize / 2);
-    document.getElementById("exemplar-grid").appendChild(newElem);
-    sketchController.sketchScopeIndex += 1;
+    saveSketch();
 });
 
 const autoButton = document.getElementById("autodraw-button");
@@ -610,27 +609,41 @@ respectSlider.onmouseup = () => {
 // LOAD UI
 
 // Random partial sketch
-// const partial = userLayer.importSVG(sketches[Math.floor(Math.random() * 3)]);
-// partial.scale(1000);
-// // TO DO: Scale to canvas size
-// partial.set({
-//     position: new Point(540, 540),
-//     strokeWidth: sketchController.strokeWidth,
-//     opacity: sketchController.opacity,
-//     strokeCap: "round",
-//     strokeJoin: "round",
-// });
+let idx = Math.floor(Math.random() * partialSketches.length);
+let partial = partialSketches[idx];
+const loadedPartial = userLayer.importSVG(partial);
+loadedPartial.scale(userLayer.view.viewSize.width);
 
-// partial.getItems().forEach((item) => userLayer.addChild(item.clone()));
-// userLayer.firstChild.remove();
-// partial.remove();
-// console.log(userLayer.firstChild.remove());
-// console.log(userLayer.firstChild.remove());
-// console.log(userLayer);
+// TO DO: Scale to canvas size
+loadedPartial.set({
+    position: new Point(
+        userLayer.view.viewSize.width / 2,
+        userLayer.view.viewSize.width / 2
+    ),
+    strokeWidth: sketchController.strokeWidth,
+    opacity: sketchController.opacity,
+    strokeCap: "round",
+    strokeJoin: "round",
+});
 
-// sketchController.svg = paper.project.exportSVG({
-//     asString: true,
-// });
+loadedPartial.getItems().forEach((item) => {
+    if (item instanceof Group) {
+        item.children.forEach((child) => {
+            userLayer.addChild(child.clone());
+        });
+    } else if (item instanceof Shape) {
+        item.remove(); // rectangles are banned
+    } else {
+        if (item instanceof Path) {
+            userLayer.addChild(item.clone());
+        }
+    }
+});
+loadedPartial.remove();
+
+sketchController.svg = paper.project.exportSVG({
+    asString: true,
+});
 
 // /////////
 
