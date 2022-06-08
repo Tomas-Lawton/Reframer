@@ -94,7 +94,7 @@
     </div>
     <!-- <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i> -->
 
-    <div id="art-panel">
+    <div id="control-panel">
         <div id="tabs">
             <div class="tab-item active-tab" id="collab-tab">
                 <h2>Collab</h2>
@@ -128,6 +128,14 @@
                     <i class="fas fa-robot"></i>
                 </div>
 
+                <div class="inactive-section slider-block" id="add-refine">
+                    <div class="flex">
+                        <p class="slider-label">Adding</p>
+                        <p class="slider-label">Refining</p>
+                    </div>
+                    <input type="range" id="autonomy-slider" value="6" min="1" max="11">
+                </div>
+
                 <div class="panel-section">
                     <div class="flex">
                         <h1 class="panel-title">
@@ -137,6 +145,7 @@
                         <p class="pill inactive-pill" id="show-all-paths">Draw all</p>
                     </div>
                     <!-- <hr /> -->
+
                     <div class="inactive-section" id="set-modes">
                         <div class="ai-action" id="draw">
                             <i class="fa-solid fa-marker fa-fw"></i>
@@ -146,6 +155,11 @@
                             <i class="fa-solid fa-down-left-and-up-right-to-center fa-fw"></i>
                             <p>Refine</p>
                         </div>
+                        <div class="ai-action" id="brainstorm">
+                            <i class="fa-solid fa-lightbulb fa-fw"></i>
+                            <p>Suggest</p>
+                        </div>
+
                         <!-- <div class="ai-action" id="generate">
                             <i class="fa-solid fa-lightbulb fa-fw"></i>
                             <p>Brainstorm</p>
@@ -162,6 +176,7 @@
                             <p>Try again</p>
                         </div>
                     </div>
+
                 </div>
 
 
@@ -172,10 +187,10 @@
                         </h1>
                         <p class="pill inactive-pill" id="autodraw-button">Solo draw</p>
                     </div>
-                    <div class="inactive-section" id="add-refine">
+                    <div class="inactive-section slider-block">
                         <div class="flex">
-                            <p class="slider-label">Maintain</p>
-                            <p class="slider-label">Change</p>
+                            <p class="slider-label">Respect User Input</p>
+                            <p class="slider-label" id="fix-label">1</p>
                         </div>
                         <input type="range" id="respect-slider" value="1" min="0" max="4">
                     </div>
@@ -269,14 +284,15 @@
                             </div>
                         </div>
 
-                        <div id="brainstorm">
-                            <i class="fa-solid fa-lightbulb fa-fw add-exemplar"></i>
-                        </div>
-
-                        <!-- How to save a sketch to sketchbook -->
                         <!-- <div id="brainstorm">
-                        <i class="fa-solid fa-plus fa-fw add-exemplar"></i>
-                    </div> -->
+                            <i class="fa-solid fa-lightbulb fa-fw add-exemplar"></i>
+                        </div> -->
+
+                        <!-- <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider round"></span>
+                        </label> -->
+
                     </div>
                     <div id="grid-container">
                         <div id="exemplar-grid">

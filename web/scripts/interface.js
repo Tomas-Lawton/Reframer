@@ -289,11 +289,11 @@ opacitySlider.oninput = function() {
     );
 };
 
-// document.getElementById("autonomy-slider").oninput = function() {
-//     let val = 11 - this.value;
-//     // 0-10
-//     sketchController.randomRange = val; //used for adding
-// };
+document.getElementById("autonomy-slider").oninput = function() {
+    let val = 11 - this.value;
+    // 0-10
+    sketchController.randomRange = val; //used for adding
+};
 
 // document.getElementById("enthusiasm-slider").oninput = function() {
 //     let val = 11 - this.value;
@@ -338,7 +338,7 @@ timeKeeper.oninput = function() {
 };
 
 palette.addEventListener("click", () => {
-    showHide(artControls);
+    showHide(controlPanel);
     palette.classList.toggle("panel-open");
 });
 
@@ -447,7 +447,7 @@ document.getElementById("brainstorm").addEventListener("click", () => {
 });
 
 // Control panel
-artControls.onmousedown = (e) => {
+controlPanel.onmousedown = (e) => {
     if (window.innerWidth > 650) {
         let content;
         document.querySelectorAll(".tab-item").forEach((tab) => {
@@ -472,7 +472,7 @@ artControls.onmousedown = (e) => {
             pos4 > bounds.bottom
         ) {
             document.onmouseup = closeDragElement;
-            document.onmousemove = (e) => elementDrag(e, artControls);
+            document.onmousemove = (e) => elementDrag(e, controlPanel);
         }
     }
 };
@@ -589,6 +589,7 @@ let lastFixation = sketchController.useFixation;
 
 respectSlider.oninput = function() {
     sketchController.useFixation = parseInt(this.value);
+    document.getElementById("fix-label").innerHTML = sketchController.useFixation;
 };
 
 respectSlider.onmousedown = () => {

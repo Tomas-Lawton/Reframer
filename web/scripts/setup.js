@@ -35,9 +35,9 @@ const transformControl = document.getElementById("transform-ui");
 
 // General UI
 const prompt = document.getElementById("messageText");
+const promptInput = document.getElementById("prompt-input");
 const modal = document.getElementById("modal");
 const controlPanel = document.getElementById("control-panel");
-const artControls = document.getElementById("art-panel");
 const sketchBook = document.getElementById("sketchbook-panel");
 const penControls = document.getElementById("pen-controls");
 const message = document.getElementById("message");

@@ -218,7 +218,7 @@ class SketchHandler {
             sketchScopeIndex: i,
         });
         this.clipDrawing = false;
-        // setActionUI("stop");
+        setActionUI("stop");
     }
     stop() {
         if (this.drawState === "active") {
@@ -232,8 +232,7 @@ class SketchHandler {
     pause() {
         this.updateDrawer({ status: "stop" });
         this.clipDrawing = false;
-        // Set ui to something else?
-        // setActionUI("stop");
+        setActionUI("stop");
     }
     resetHistory() {
         sketchController.step = 0; // reset since not continuing

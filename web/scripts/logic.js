@@ -26,6 +26,15 @@ const importToSketch = (exemplarIndex) => {
 
 const exportToExemplar = () => {
     console.log("EXPORTING");
+    unpackGroup();
+    userLayer.getItems().forEach((path) => {
+        path.selected = false;
+    });
+    sketchController.transformGroup = null;
+    if (sketchController.boundingBox) {
+        hideSelectUI();
+    }
+
     let saveSketch = userLayer.clone({ insert: true });
     let scaledSketch = saveSketch.scale(1 / scaleRatio);
     saveSketch.getItems().forEach((path) => {
@@ -61,7 +70,7 @@ const saveSketch = (fromSketch = null) => {
     let toCanvas = exemplarScope.projects[sketchCountIndex];
     let imported = toCanvas.activeLayer.importJSON(jsonGroup);
     imported.position = new Point(exemplarSize / 2, exemplarSize / 2);
-    document.getElementById("exemplar-grid").appendChild(newElem);
+    document.getElementById("exemplar-grid").prepend(newElem);
     sketchController.sketchScopeIndex += 1;
 };
 
@@ -87,9 +96,10 @@ const setActionUI = (state) => {
         document.getElementById("undo").classList.add("inactive-top-action");
         document.getElementById("redo").classList.add("inactive-top-action");
 
-        prompt.style.display = "none";
-
+        promptInput.style.display = "none";
+        document.getElementById("add-refine").style.display = "block";
         document.getElementById("spinner").style.display = "flex";
+
         if (state == "drawing") {
             aiMessage.innerHTML = `Got it! Drawing ${sketchController.prompt}!`;
             document.getElementById("draw").classList.add("active");
@@ -99,9 +109,9 @@ const setActionUI = (state) => {
         } else if (state == "redrawing") {
             aiMessage.innerHTML = `No worries, how about this instead?`;
             document.getElementById("redraw").classList.add("active");
-        } else if (state == "generating") {
-            aiMessage.innerHTML = `Sure! Adding ${sketchController.prompt} to the moodboard!`;
-            actionControls[3].classList.add("active");
+            // } else if (state == "generating") {
+            //     aiMessage.innerHTML = `Sure! Adding ${sketchController.prompt} to the moodboard!`;
+            //     actionControls[3].classList.add("active");
         } else if (state == "continuing") {
             aiMessage.innerHTML = `Nice, I'll make that it into ${sketchController.prompt}.`;
         }
@@ -120,7 +130,8 @@ const setActionUI = (state) => {
         document.getElementById("stop-text").innerHTML = "Redraw";
 
         document.getElementById("spinner").style.display = "none";
-        prompt.style.display = "flex";
+        promptInput.style.display = "flex";
+        document.getElementById("add-refine").style.display = "none";
         aiMessage.innerHTML = "I'm stopping! What can we draw next?";
         aiMessage.classList.add("typed-out");
 
@@ -279,6 +290,13 @@ const deletePath = () => {
     sketchController.svg = paper.project.exportSVG({
         asString: true,
     });
+
+    if (liveCollab) {
+        sketchController.numAddedPaths += 1;
+        sketchController.continueSketch();
+        liveCollab = false;
+    }
+
     logger.event("deleted-path");
 };
 
@@ -423,11 +441,13 @@ ws.onmessage = function(event) {
                 showTraceHistoryFrom(sketchController.stack.historyHolder.length - 1);
             } else {
                 userLayer.clear();
-                if (sketchController.showAICurves < sketchController.numRandomCurves) {
-                    sketchController.showAICurves += Math.floor(
-                        Math.random() * sketchController.randomRange
-                    );
-                }
+                // if (sketchController.showAICurves < sketchController.numRandomCurves) {
+                //     sketchController.showAICurves += Math.floor(
+                //         Math.random() * sketchController.randomRange
+                //     );
+                // }
+                sketchController.showAICurves += sketchController.randomRange; //increase max range each step
+
                 sketchController.lastRender = parseFromSvg(
                     result.svg,
                     userLayer,
