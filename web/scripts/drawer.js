@@ -236,12 +236,11 @@ eraseTool.onMouseDown = function(event) {
         data: userLayer.exportJSON(),
     });
     erasorPath = new Path({
-        strokeWidth: sketchController.strokeWidth * 2,
+        strokeWidth: sketchController.strokeWidth * 5,
         strokeCap: "round",
         strokeJoin: "round",
-        // strokeColor: "white",
-        opacity: 0.9,
-        strokeColor: "rgb(255, 0, 0)",
+        opacity: 0.85,
+        strokeColor: "rgb(255,0, 0)",
     });
     tmpGroup = new Group({
         children: userLayer.removeChildren(),
@@ -260,7 +259,7 @@ eraseTool.onMouseDrag = function(event) {
 
 eraseTool.onMouseUp = function(event) {
     erasorPath.simplify();
-    const eraseRadius = (sketchController.strokeWidth * 2) / 2;
+    const eraseRadius = (sketchController.strokeWidth * 5) / 2;
     const outerPath = OffsetUtils.offsetPath(erasorPath, eraseRadius);
     const innerPath = OffsetUtils.offsetPath(erasorPath, -eraseRadius);
     erasorPath.remove();

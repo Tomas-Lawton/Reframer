@@ -197,6 +197,11 @@ document.getElementById("redo").addEventListener("click", () => {
     }
 });
 document.getElementById("save").addEventListener("click", () => {
+    // REMOVE REFs to select box
+    userLayer.getItems().forEach((path) => {
+        path.selected = false;
+    });
+    // Remove the select box
     sketchController.svg = paper.project.exportSVG({
         asString: true,
     });
@@ -403,7 +408,12 @@ document.getElementById("redraw").addEventListener("click", () => {
 
 document.getElementById("go-back").addEventListener("click", () => {
     if (sketchController.drawState === "stop") {
-        sketchController.goBack();
+        userLayer.clear();
+        let svg = sketchController.stack.historyHolder[1].svg;
+        parseFromSvg(svg, userLayer, true);
+        sketchController.svg = paper.project.exportSVG({
+            asString: true,
+        });
     }
 });
 
