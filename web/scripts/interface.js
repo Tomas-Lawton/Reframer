@@ -10,7 +10,7 @@ function dragLeave(e) {
     canvas.classList.remove("drop-ready");
 }
 
-function tosketchController(e) {
+function dropCanvas(e) {
     exportToExemplar(); //backup current
     const sketchCountIndex = e.dataTransfer.getData("text/plain");
     importToSketch(sketchCountIndex);
@@ -25,7 +25,7 @@ function toStaticSketches(e) {
 
 sketchContainer.addEventListener("dragenter", dragEnter);
 sketchContainer.addEventListener("dragleave", dragLeave);
-sketchContainer.addEventListener("drop", tosketchController);
+sketchContainer.addEventListener("drop", dropCanvas);
 
 staticSketches.addEventListener("dragenter", dragEnter);
 staticSketches.addEventListener("dragleave", dragLeave);
