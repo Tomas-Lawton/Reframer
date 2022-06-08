@@ -410,6 +410,7 @@ document.getElementById("go-back").addEventListener("click", () => {
     if (sketchController.drawState === "stop") {
         userLayer.clear();
         let svg = sketchController.stack.historyHolder[1].svg;
+        timeKeeper.value = 1;
         parseFromSvg(svg, userLayer, true);
         sketchController.svg = paper.project.exportSVG({
             asString: true,
@@ -552,7 +553,7 @@ const autoButton = document.getElementById("autodraw-button");
 autoButton.addEventListener("click", () => {
     if (sketchController.doneSketching !== null) {
         sketchController.doneSketching = null; // never add
-        autoButton.innerHTML = "I'll leave it to you...";
+        autoButton.innerHTML = "Solo draw";
     } else {
         autoButton.innerHTML = "Collab draw!";
         sketchController.doneSketching = 500;
