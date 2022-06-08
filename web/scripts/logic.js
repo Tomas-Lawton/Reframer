@@ -364,7 +364,10 @@ ws.onmessage = function(event) {
                 }
             }
 
-            sketchController.stack.historyHolder.push(result);
+            sketchController.stack.historyHolder.push({
+                ...result,
+                svg: sketchController.svg, //only use canvas paths at that point
+            });
             timeKeeper.style.width = "100%";
             timeKeeper.setAttribute("max", String(sketchController.step + 1));
             timeKeeper.value = String(sketchController.step + 1);

@@ -119,6 +119,13 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
     for att in attributes:
         if skip_box_select and count == num_paths - 1:
             continue
+
+        num_segments = len(att['d'].split(',')) // 3
+        
+        if num_segments == 0:
+            continue
+
+
         # could refactor now local file is seperate function
         stroke_width = 15
         color_code = '#000000'
@@ -163,8 +170,7 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
             logging.error("Couldn't parse stroke opacity")
 
         color = get_color(color_code, opacity)
-        num_segments = len(att['d'].split(',')) // 3
-
+        
         try:
             path = []
             spaced_data = att['d'].split('c')

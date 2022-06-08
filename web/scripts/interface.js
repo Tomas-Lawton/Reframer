@@ -11,6 +11,7 @@ function dragLeave(e) {
 }
 
 function tosketchController(e) {
+    exportToExemplar(); //backup current
     const sketchCountIndex = e.dataTransfer.getData("text/plain");
     importToSketch(sketchCountIndex);
 }

@@ -368,6 +368,8 @@ class Drawer:
         loop.run_in_executor(None, lambda: asyncio.run(self.loop()))
 
     async def loop(self):
-        while self.is_running:
+        while self.is_running and self.iteration < self.num_iter:
             logging.info(f"Running iteration {self.iteration}...")
             await self.run_epoch()
+        await self.stop()
+        
