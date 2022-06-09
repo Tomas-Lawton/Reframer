@@ -777,15 +777,13 @@ input:focus {
 }
 
 #exemplar-grid {
-    display: flex;
-    /* flex-flow: row wrap; */
+    /* display: flex;
     flex-flow: wrap-reverse;
     justify-content: space-between;
-    padding-top: 0.5em;
-    /* display: grid;
-    grid-template-columns: repeat(2, minmax(10px, 1fr)); */
-    /* grid-gap: 0.5em; */
-    /* grid-gap: 10px; */
+    padding-top: 0.5em; */
+    display: grid;
+    grid-template-columns: repeat(2, minmax(10px, 1fr));
+    grid-gap: 15px;
 }
 
 #exemplar-grid div:first-child {
@@ -1114,7 +1112,7 @@ input[type="number"] {
 #sketchbook-content {
     /* overflow: scroll; */
     height: 80vh;
-    width: 40vw;
+    /* width: 40vw; */
     /* overflow-y: overlay; */
     background-color: #343434d6;
     overflow: hidden;
@@ -1136,7 +1134,7 @@ input[type="number"] {
 }
 
 #explore-margin {
-    padding: 20px;
+    padding: 30px;
     background: #474747;
     border-radius: 1em 0px 0px 1em;
     /* border-right: 1px solid #5a5a5a; */
@@ -1144,17 +1142,19 @@ input[type="number"] {
 }
 
 #static-margin {
-    padding: 50px 20px 20px 20px;
+    padding: 60px 30px 30px 30px;
     /* display: flex; */
-    /* width: 100%; */
+    width: 100%;
+    /* height: 100%; */
+    width: 20vw;
 }
 
 #static-sketches {
-    /* display: flex; */
-    /* flex-direction: column; */
+    display: flex;
+    flex-direction: column;
     /* justify-content: inherit; */
-    /* width: 100%; */
-    /* height: 100%; */
+    width: 100%;
+    height: 100%;
 }
 
 .left-container {

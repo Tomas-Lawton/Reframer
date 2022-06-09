@@ -81,7 +81,10 @@ const containerRect = document
 // console.log(parent);
 // const exemplarSize = 168;
 
-const exemplarSize = exemplarTemplate.getBoundingClientRect().width;
+// const exemplarSize = exemplarTemplate.getBoundingClientRect().width;
+// console.log(document.querySelectorAll("div#exemplar-grid"))[0].offsetWidth;
+const exemplarSize =
+    document.querySelectorAll("div#exemplar-grid")[0].offsetWidth / 2 - 15;
 console.log(exemplarSize);
 const reusableExemplar = exemplarTemplate.cloneNode(true); //clone to use
 exemplarTemplate.remove();
