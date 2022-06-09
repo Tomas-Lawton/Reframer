@@ -1,27 +1,44 @@
-const importToSketch = (exemplarIndex) => {
-    console.log("IMPORTING");
-    // idd index
-    // let expandedExemplar = exemplarScope.projects[0].activeLayer
-    //     .scale(scaleRatio)
-    //     .exportJSON();
-    console.log(exemplarIndex);
-    let copy = exemplarScope.projects[exemplarIndex].activeLayer.clone();
-    let expandedExemplar = copy.scale(scaleRatio).exportJSON(); // group containing paths not group containing group
-    copy.remove();
+const importStaticSketch = (i) => {
+    if (allowOverwrite) {
+        openModal({
+            title: "Overwriting Canvas",
+            message: "Import into the main canvas? Contents will be saved.",
+            confirmAction: () => {
+                pauseActiveDrawer();
+                saveSketch(); //make copy
+                importToSketch(i, true);
+            },
+        });
+    } else {
+        pauseActiveDrawer();
+        saveSketch(); //make copy
+        importToSketch(i, false);
+    }
+};
 
-    // exemplarScope.projects[0].activeLayer.clear();
-    userLayer.clear();
-    let newSketch = userLayer.importJSON(expandedExemplar);
-    newSketch.getItems((path) => (path.strokeWidth *= scaleRatio));
-    // rescale
+const importToSketch = (exemplarIndex, clear) => {
+    console.log("IMPORTING");
+    let copy = exemplarScope.projects[exemplarIndex].activeLayer.clone();
+    let expandedExemplar = copy.scale(scaleRatio);
+    if (clear) {
+        userLayer.clear();
+        var newSketch = userLayer.addChild(expandedExemplar);
+        newSketch.getItems((path) => (path.strokeWidth *= scaleRatio));
+    } else {
+        var newSketch = userLayer.addChild(expandedExemplar);
+        newSketch.getItems((path) => {
+            path.strokeWidth *= scaleRatio;
+            path.opacity *= 0.5;
+        });
+    }
     newSketch.position = new Point(
         sketchController.frameSize / 2,
         sketchController.frameSize / 2
     );
-
-    sketchController.svg = paper.project.exportSVG({
-        asString: true,
-    });
+    newSketch.getItems((path) =>
+        userLayer.addChild(path.clone({ insert: true }))
+    );
+    newSketch.remove();
 };
 
 const exportToExemplar = () => {
@@ -35,15 +52,12 @@ const exportToExemplar = () => {
         hideSelectUI();
     }
 
-    let saveSketch = userLayer.clone({ insert: true });
-    let scaledSketch = saveSketch.scale(1 / scaleRatio);
-    saveSketch.getItems().forEach((path) => {
-        path.selected = false;
-    });
+    let scaledSketch = userLayer.clone({ insert: false });
+    scaledSketch.scale(1 / scaleRatio);
     scaledSketch.getItems((item) => (item.strokeWidth /= scaleRatio));
-    let save = scaledSketch.exportJSON();
+    let result = scaledSketch.exportJSON();
     scaledSketch.remove();
-    return save;
+    return result;
 };
 
 const exploreToStatic = (i) => {
@@ -66,15 +80,18 @@ const saveSketch = (fromSketch = null) => {
         jsonGroup = exportToExemplar();
     }
     let sketchCountIndex = sketchController.sketchScopeIndex;
-    let newElem = createExemplar(true, sketchCountIndex);
+    let newElem = createExemplar(exemplarScope, true, sketchCountIndex);
     let toCanvas = exemplarScope.projects[sketchCountIndex];
     let imported = toCanvas.activeLayer.importJSON(jsonGroup);
     imported.position = new Point(exemplarSize / 2, exemplarSize / 2);
+
+    newElem.classList.add("bounce");
     document.getElementById("exemplar-grid").prepend(newElem);
     sketchController.sketchScopeIndex += 1;
 };
 
 const setActionUI = (state) => {
+    let lastDrawState = sketchController.drawState;
     aiMessage.classList.remove("typed-out");
 
     if (sketchController.activeStates.includes(state)) {
@@ -103,6 +120,9 @@ const setActionUI = (state) => {
         if (state == "drawing") {
             aiMessage.innerHTML = `Got it! Drawing ${sketchController.prompt}!`;
             document.getElementById("draw").classList.add("active");
+        } else if (state == "brainstorming-exemplars") {
+            aiMessage.innerHTML = `I've got some ideas for ${sketchController.prompt}!`;
+            document.getElementById("draw").classList.add("active");
         } else if (state == "refining") {
             aiMessage.innerHTML = `Okay, refining the lines for ${sketchController.prompt}...`;
             document.getElementById("refine").classList.add("active");
@@ -117,6 +137,20 @@ const setActionUI = (state) => {
         }
         aiMessage.classList.add("typed-out");
     } else if (state === "stop") {
+        // Loop through brainstorm and stop each of them
+
+        explorer.childNodes.forEach((child, i) => {
+            let stopButton = child.querySelector(".fa-stop");
+            let loader = child.querySelector(".card-loading");
+
+            loader.classList.remove("button-animation");
+            loader.classList.remove("fa-spinner");
+            loader.classList.add("fa-check");
+            stopButton.style.background = "#f5f5f5";
+            stopButton.style.background = "#d2d2d2";
+            sketchController.stopSingle(sketchController.scopeRef[i]);
+        });
+
         // AI is stopped
         actionControls.forEach((elem) => {
             elem.classList.remove("inactive-action");
@@ -139,7 +173,12 @@ const setActionUI = (state) => {
         document.getElementById("redo").classList.remove("inactive-top-action");
 
         // timeKeeper
-        document.getElementById("contain-dot").style.display = "flex";
+        if (lastDrawState !== "brainstorming-exemplars") {
+            document.getElementById("contain-dot").style.display = "flex";
+        }
+    } else if (state === "stopSingle") {
+        aiMessage.innerHTML = `Stopped a single sketch!`;
+        aiMessage.classList.add("typed-out");
     }
     sketchController.drawState = state;
 };
@@ -209,7 +248,10 @@ const openModal = (data) => {
 
     document.getElementById("cancel-modal").onclick = () => cancel();
     document.getElementById("modal-cross").onclick = () => close();
-    document.getElementById("confirm-modal").onclick = () => confirm();
+    document.getElementById("confirm-modal").onclick = () => {
+        confirm();
+        close();
+    };
     modal.style.display = "block";
 };
 
@@ -322,7 +364,7 @@ const parseFromSvg = (svg, layer, showAllPaths = true) => {
 
         if (sketchController.initRandomCurves && !sketchController.linesDisabled) {
             if (
-                returnedIndex >= sketchController.pathsOnCanvas &&
+                returnedIndex >= sketchController.inputLines &&
                 returnedIndex < numPaths - sketchController.numAddedPaths
             ) {
                 child.opacity *= 0.7;
@@ -332,7 +374,7 @@ const parseFromSvg = (svg, layer, showAllPaths = true) => {
         const pathEffect = child.clone({ insert: false });
 
         if (!showAllPaths) {
-            if (returnedIndex < sketchController.showAICurves) {
+            if (returnedIndex < sketchController.inputLines) {
                 layer.addChild(pathEffect);
             }
         } else {
@@ -401,6 +443,7 @@ ws.onmessage = function(event) {
     }
 
     if (sketchController.clipDrawing) {
+        console.log(result);
         if (result.status === "stop") {
             console.log("WHYYYYYY");
             console.log("Stopped drawer");
@@ -441,12 +484,7 @@ ws.onmessage = function(event) {
                 showTraceHistoryFrom(sketchController.stack.historyHolder.length - 1);
             } else {
                 userLayer.clear();
-                // if (sketchController.showAICurves < sketchController.numRandomCurves) {
-                //     sketchController.showAICurves += Math.floor(
-                //         Math.random() * sketchController.randomRange
-                //     );
-                // }
-                sketchController.showAICurves += sketchController.randomRange; //increase max range each step
+                sketchController.inputLines += sketchController.addPaths;
 
                 sketchController.lastRender = parseFromSvg(
                     result.svg,
@@ -473,8 +511,8 @@ ws.onmessage = function(event) {
             if (result.svg === "") return null;
 
             let thisCanvas = exemplarScope.projects[result.sketch_index];
+
             console.log(result.sketch_index);
-            console.log(result);
             thisCanvas.clear();
             let imported = parseFromSvg(
                 result.svg,
@@ -485,7 +523,7 @@ ws.onmessage = function(event) {
     }
 };
 
-const createExemplar = (isUserSketch, sketchCountIndex = null) => {
+const createExemplar = (scope, isUserSketch, sketchCountIndex = null) => {
     let type = isUserSketch ? "U" : "AI";
 
     let newElem = exemplarTemplate.cloneNode(reusableExemplar);
@@ -494,16 +532,18 @@ const createExemplar = (isUserSketch, sketchCountIndex = null) => {
     let exemplarCanvas = newElem.querySelector("canvas");
     exemplarCanvas.width = exemplarSize;
     exemplarCanvas.height = exemplarSize;
+    scope.setup(exemplarCanvas);
 
     if (sketchCountIndex !== null) {
         let removeButton = newElem.querySelector(".fa-minus");
         let stopButton = newElem.querySelector(".fa-stop");
         let loader = newElem.querySelector(".card-loading");
 
-        exemplarScope.setup(exemplarCanvas);
         newElem.id = `${type}-sketch-item-${sketchCountIndex}`;
         exemplarCanvas.id = `${type}-sketch-canvas-${sketchCountIndex}`;
         newElem.querySelector("h3").innerHTML = `${type}${sketchCountIndex}`;
+
+        // scope.setup(exemplarCanvas);
 
         if (isUserSketch) {
             stopButton.style.display = "none";
@@ -528,9 +568,7 @@ const createExemplar = (isUserSketch, sketchCountIndex = null) => {
         }
 
         exemplarCanvas.addEventListener("click", () => {
-            // open dialog for clone vs copy?
-            importToSketch(sketchCountIndex);
-            // make a copy to the current canvas
+            importStaticSketch(sketchCountIndex);
             document.getElementById("contain-dot").style.display = "none";
         });
 

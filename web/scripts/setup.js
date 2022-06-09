@@ -54,9 +54,11 @@ const penDrop = document.getElementById("pen-drop");
 const aiMessage = document.querySelector("#ai-content .panel-subtitle");
 const sketchContainer = document.getElementById("canvas-drop");
 const staticSketches = document.getElementById("static-sketches");
+const explorer = document.getElementById("explore-sketches");
 
 // Utility
 let liveCollab = false;
+let allowOverwrite = true;
 let myPath, erasePath, regionPath, tmpGroup, mask, selectBox;
 
 // const exemplarSize = document
@@ -75,7 +77,12 @@ const containerRect = document
     .getElementById("contain-canvas")
     .getBoundingClientRect();
 
+// let parent = document.getElementById("sketchbook-content").offsetWidth * 0.7;
+// console.log(parent);
+// const exemplarSize = 168;
+
 const exemplarSize = exemplarTemplate.getBoundingClientRect().width;
+console.log(exemplarSize);
 const reusableExemplar = exemplarTemplate.cloneNode(true); //clone to use
 exemplarTemplate.remove();
 

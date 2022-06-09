@@ -9,7 +9,7 @@ class SimpleStack {
 class SketchHandler {
     // Maintains a logical state for sending over WS
     constructor() {
-        this.drawState = null;
+        this.drawState;
 
         // Sketching Data
         this.prompt = null;
@@ -17,6 +17,7 @@ class SketchHandler {
             asString: true,
         }); //for svg parsing
         this.frameSize = canvas.getBoundingClientRect().width;
+        this.scopeRef = [];
 
         // Defaults
         this.strokeColor = "rgb(24,24,24)";
@@ -32,13 +33,14 @@ class SketchHandler {
             "drawing",
             "generating",
             "refining",
+            "brainstorming-exemplars",
             "redrawing",
             "continuing",
         ];
         this.lastHistoryIndex = 0;
         this.penDropMode = "pen";
         this.sketchScopeIndex = 0;
-        this.randomRange = 4;
+        this.addPaths = 4;
         // TODO Refactor
         this.buttonControlLeft = true;
         this.doneSketching = null;
@@ -61,9 +63,8 @@ class SketchHandler {
         this.useAdvanced = false;
         this.initRandomCurves = true;
         this.numRandomCurves = 32;
-        this.showAICurves = 3;
         this.numTraces = 1;
-        this.pathsOnCanvas = 0;
+        this.inputLines = 0;
 
         // Undo/redo stack
         this.stack = new SimpleStack();
@@ -81,6 +82,7 @@ class SketchHandler {
         this.isFirstIteration = true; //reset canvas
         const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
         this.lastPrompt = prompt;
+        this.inputLines = userLayer.getItems().length;
 
         const res = {
             status: status,
@@ -109,12 +111,11 @@ class SketchHandler {
                 sketch_index: sketchScopeIndex,
             },
         };
-        ws.send(JSON.stringify(res));
+        console.log("SENDING TO SOCKET");
         console.log(res);
+        ws.send(JSON.stringify(res));
     }
     draw(withRegion = false, svg = null, disableLines = false) {
-            this.pathsOnCanvas = userLayer.getItems().length;
-
             if (noPrompt()) {
                 openModal({
                     title: "Type a prompt first!",
@@ -122,23 +123,29 @@ class SketchHandler {
                 });
                 return;
             }
-            sketchController.linesDisabled = disableLines;
-            this.updateDrawer({
-                status: "draw",
-                svg: svg || this.svg,
-                hasRegion: withRegion,
-                frameSize: this.frameSize,
-                prompt: this.prompt,
-                lines: disableLines ?
-                    0 :
-                    this.initRandomCurves ?
-                    this.numRandomCurves :
-                    0,
-                fixation: this.useFixation,
-            });
-            this.step = 0;
-            this.clipDrawing = true;
-            setActionUI(disableLines ? "refining" : "drawing");
+            if (!this.clipDrawing) {
+                this.clipDrawing = true;
+
+                sketchController.linesDisabled = disableLines;
+                this.updateDrawer({
+                    status: "draw",
+                    svg: svg || this.svg,
+                    hasRegion: withRegion,
+                    frameSize: this.frameSize,
+                    prompt: this.prompt,
+                    lines: disableLines ?
+                        0 :
+                        this.initRandomCurves ?
+                        this.numRandomCurves :
+                        0,
+                    fixation: this.useFixation,
+                });
+                this.step = 0;
+                this.clipDrawing = true;
+                setActionUI(disableLines ? "refining" : "drawing");
+            } else {
+                throw new Error("Can't continue if already running");
+            }
         }
         // generate() {
         //     if (!exemplarSize) {
@@ -166,6 +173,9 @@ class SketchHandler {
         if (!exemplarSize) {
             console.error("exemplars not found");
         }
+        console.log("Starting exemplar: ", sketchCountIndex);
+        this.clipDrawing = true;
+
         this.updateDrawer({
             status: "add_new_exemplar",
             svg: this.svg,
@@ -177,15 +187,19 @@ class SketchHandler {
             fixation: this.useFixation,
         });
         this.clipDrawing = true;
-        // setActionUI("drawing");
     }
     redraw() {
-            this.updateDrawer({
-                status: "redraw",
-            });
-            this.step = 0;
-            this.clipDrawing = true;
-            setActionUI("redrawing");
+            if (!this.clipDrawing) {
+                this.clipDrawing = true;
+                this.updateDrawer({
+                    status: "redraw",
+                });
+                this.step = 0;
+                this.clipDrawing = true;
+                setActionUI("redrawing");
+            } else {
+                throw new Error("Can't continue if already running");
+            }
         }
         // continue () {
         //     // need to change this so it supports updating the prompt or using a new svg
@@ -199,18 +213,23 @@ class SketchHandler {
         //     setActionUI("continuing");
         // }
     continueSketch() {
-        this.clipDrawing = true;
-        try {
-            this.updateDrawer({
-                status: "continue_sketch",
-                svg: this.svg,
-                frameSize: this.frameSize, //can remove?
-                fixation: this.useFixation,
-            });
-        } catch (e) {
-            console.log("Problem with update");
+        // check the drawing mode. if it's brainstorming with add_new_exemplar then each of the drawers should be continued. continue all brainstorms.
+        if (!this.clipDrawing) {
+            this.clipDrawing = true;
+            try {
+                this.updateDrawer({
+                    status: "continue_sketch",
+                    svg: this.svg,
+                    frameSize: this.frameSize, //can remove?
+                    fixation: this.useFixation,
+                });
+            } catch (e) {
+                console.log("Problem with update");
+            }
+            setActionUI("continuing");
+        } else {
+            throw new Error("Can't continue if already running");
         }
-        setActionUI("continuing");
     }
     stopSingle(i) {
         this.updateDrawer({
@@ -218,7 +237,7 @@ class SketchHandler {
             sketchScopeIndex: i,
         });
         this.clipDrawing = false;
-        setActionUI("stop");
+        setActionUI("stopSingle");
     }
     stop() {
         if (this.drawState === "active") {

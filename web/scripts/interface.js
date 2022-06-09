@@ -8,10 +8,7 @@ function dragentercanvas(e) {
 }
 
 function dropCanvas(e) {
-    // dialog for copy or import??
-    saveSketch(); //backup current
-    const sketchCountIndex = e.dataTransfer.getData("text/plain");
-    importToSketch(sketchCountIndex);
+    importStaticSketch(e.dataTransfer.getData("text/plain"));
 }
 
 function dragleavecanvas(e) {
@@ -292,7 +289,7 @@ opacitySlider.oninput = function() {
 document.getElementById("autonomy-slider").oninput = function() {
     let val = 11 - this.value;
     // 0-10
-    sketchController.randomRange = val; //used for adding
+    sketchController.addPaths = val; //used for adding
 };
 
 // document.getElementById("enthusiasm-slider").oninput = function() {
@@ -365,14 +362,14 @@ document.getElementById("draw").addEventListener("click", () => {
 });
 
 // Refine
-document.getElementById("refine").addEventListener("click", () => {
-    if (
-        sketchController.drawState === "inactive" ||
-        sketchController.drawState === "stop"
-    ) {
-        sketchController.draw(false, null, true);
-    }
-});
+// document.getElementById("refine").addEventListener("click", () => {
+//     if (
+//         sketchController.drawState === "inactive" ||
+//         sketchController.drawState === "stop"
+//     ) {
+//         sketchController.draw(false, null, true);
+//     }
+// });
 
 // // Trial / Brainstorm
 
@@ -426,23 +423,48 @@ document.getElementById("brainstorm").addEventListener("click", () => {
         });
         return;
     } else {
-        const myNode = document.getElementById("explore-sketches");
+        // TO DO: Clean up old scopes (now unused)
+        //loop through old refs
+
+        // console.log(sketchController.scopeRef);
+        // for (let oldScope of sketchController.scopeRef) {
+        //     oldScope.remove();
+        // }
+        // console.log(sketchController.scopeRef);
+
         const total =
             sketchController.sketchScopeIndex + Math.floor(Math.random() * 5);
-        // TO DO: Clean up old scopes (now unused)
         for (let i = 0; i < 4; i++) {
-            myNode.removeChild(myNode.firstChild);
+            explorer.removeChild(explorer.firstChild);
             if (sketchController.sketchScopeIndex > total) {
-                let newElem = createExemplar(false); //don't increase the number of scopes
-                myNode.appendChild(newElem);
+                let newElem = createExemplar(
+                    exemplarScope,
+                    false
+                    // sketchController.sketchScopeIndex
+                ); //don't increase the number of scopes
+                // sketchController.scopeRef.push(
+                //     exemplarScope.projects[sketchController.sketchScopeIndex]
+                // );
+                sketchController.scopeRef.push(sketchController.sketchScopeIndex);
+                explorer.appendChild(newElem);
                 newElem.classList.add("inactive-exemplar");
+                // sketchController.sketchScopeIndex += 1;
             } else {
-                let newElem = createExemplar(false, sketchController.sketchScopeIndex);
-                myNode.appendChild(newElem);
-                sketchController.drawExemplar(sketchController.sketchScopeIndex); // No, allow the index to create so the listener can stop it.
+                let newElem = createExemplar(
+                    exemplarScope,
+                    false,
+                    sketchController.sketchScopeIndex
+                );
+                // sketchController.scopeRef.push(
+                //     exemplarScope.projects[sketchController.sketchScopeIndex]
+                // );
+                sketchController.scopeRef.push(sketchController.sketchScopeIndex);
+                explorer.appendChild(newElem);
+                sketchController.drawExemplar(sketchController.sketchScopeIndex);
                 sketchController.sketchScopeIndex += 1;
             }
         }
+        setActionUI("brainstorming-exemplars");
     }
 });
 
@@ -477,9 +499,28 @@ controlPanel.onmousedown = (e) => {
     }
 };
 
-sketchBook.onmousedown = (e) => {
+document.getElementById("explore-margin").onmousedown = (e) => {
     if (window.innerWidth > 650) {
-        let content = document.getElementById("sketchbook-content");
+        let content = document.getElementById("explore-sketches");
+        let bounds = content.getBoundingClientRect();
+        e = e || window.event;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        if (
+            pos3 < bounds.left ||
+            pos3 > bounds.right ||
+            pos4 < bounds.top ||
+            pos4 > bounds.bottom
+        ) {
+            document.onmouseup = closeDragElement;
+            document.onmousemove = (e) => elementDrag(e, sketchBook);
+        }
+    }
+};
+
+document.getElementById("static-margin").onmousedown = (e) => {
+    if (window.innerWidth > 650) {
+        let content = document.getElementById("static-sketches");
         let bounds = content.getBoundingClientRect();
         e = e || window.event;
         pos3 = e.clientX;
@@ -584,6 +625,16 @@ document.getElementById("num-traces").oninput = function() {
     sketchController.numTraces = parseInt(this.value);
 };
 
+document.getElementById("overwrite").addEventListener("click", () => {
+    if (allowOverwrite) {
+        document.getElementById("overwrite").innerHTML = "Copy";
+    } else {
+        document.getElementById("overwrite").innerHTML = "Overwrite";
+    }
+    document.getElementById("overwrite").classList.toggle("inactive-pill");
+    allowOverwrite = !allowOverwrite;
+});
+
 const respectSlider = document.getElementById("respect-slider");
 let lastFixation = sketchController.useFixation;
 
@@ -622,11 +673,11 @@ respectSlider.onmouseup = () => {
 
 // Random partial sketch
 let idx = Math.floor(Math.random() * partialSketches.length);
+console.log(idx);
 let partial = partialSketches[idx];
 const loadedPartial = userLayer.importSVG(partial);
 loadedPartial.scale(userLayer.view.viewSize.width);
 
-// TO DO: Scale to canvas size
 loadedPartial.set({
     position: new Point(
         userLayer.view.viewSize.width / 2,
@@ -638,21 +689,25 @@ loadedPartial.set({
     strokeJoin: "round",
 });
 
+// let importCount = 0;
 loadedPartial.getItems().forEach((item) => {
     if (item instanceof Group) {
         item.children.forEach((child) => {
             userLayer.addChild(child.clone());
+            // importCount++;
         });
     } else if (item instanceof Shape) {
         item.remove(); // rectangles are banned
     } else {
         if (item instanceof Path) {
             userLayer.addChild(item.clone());
+            // importCount++;
         }
     }
 });
 loadedPartial.remove();
 
+// sketchController.numAddedPaths = importCount;
 sketchController.svg = paper.project.exportSVG({
     asString: true,
 });
@@ -680,14 +735,11 @@ picker.onChange = (color) => {
 
 setActionUI("inactive");
 
+const defaults = new PaperScope();
+defaults.activate();
 for (let i = 0; i < 4; i++) {
-    let newElem = createExemplar(false);
-    //creates unneeded exemplarScope
-    // let newElem = exemplarTemplate.cloneNode(reusableExemplar);
-    // let exemplarCanvas = newElem.querySelector("canvas");
-    // exemplarCanvas.width = exemplarSize;
-    // exemplarCanvas.height = exemplarSize;
-    // newElem.id = `default-sketch-item-${i}`;
+    let newElem = createExemplar(defaults, false);
+    // sketchController.sketchScopeIndex += 1; //remove later
     newElem.classList.add("inactive-exemplar");
     document.getElementById("explore-sketches").appendChild(newElem);
 }

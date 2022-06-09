@@ -74,17 +74,27 @@ if os.environ.get('CONNECTAI') == "True":
     logging.info("Starting with AI Socket")
     clip_class = Clip_Instance()
     logging.info("Loaded Clip...")
-    @app.websocket("/ws")
+    @app.websocket_route("/ws")
     async def websocket_endpoint(websocket: WebSocket):
         artefact_drawer = Drawer(clip_class, websocket)
         # exemplar_drawers = [Drawer(clip_class, websocket, i) for i in range(4)]
         exemplar_drawers = []
 
         logging.info("Connecting...")
-        await websocket.accept()
+        try:
+            await websocket.accept()
+        except Exception as e:
+            logging.error("Bad socket")
+
         try:
             while True:
-                data = await websocket.receive_json()
+                try:
+                    data = await websocket.receive_json()
+                    logging.info(data)
+                except Exception as e:
+                    logging.warning("Unexpected json received by socket")
+                    break
+
                 if data["status"] == "draw":
                     try:
                         await artefact_drawer.draw_update(data)
@@ -111,8 +121,6 @@ if os.environ.get('CONNECTAI') == "True":
                     except Exception as e:
                         logging.error(e)
                         logging.error("Failed to create a new exemplar")
-                    artefact_drawer.run_async()
-
 
                 if data["status"] == "continue_sketch":
                     try:
@@ -122,9 +130,17 @@ if os.environ.get('CONNECTAI') == "True":
                         logging.error("Failed to update drawer for new sketch")
                     artefact_drawer.run_async()
 
-                # to do: add in FE
+                # TO DO: Add to FE
+                if data["status"] == "continue_brainstorming":
+                    try:
+                        for drawer in exemplar_drawers:
+                            await drawer.continue_update_sketch(data)
+                            drawer.run_async()
+                    except Exception as e:
+                        logging.error(e)
+                        logging.error("Failed to update drawer for new sketch")
+
                 if data["status"] == "stop_single_sketch":
-                    await artefact_drawer.stop()
                     for drawer in exemplar_drawers:
                         if drawer.sketch_reference_index == data["data"]['sketch_index']:
                             await drawer.stop()
@@ -133,9 +149,11 @@ if os.environ.get('CONNECTAI') == "True":
 
                 if data["status"] == "stop":
                     await artefact_drawer.stop()
+                    print(exemplar_drawers)
                     for drawer in exemplar_drawers:
+                        logging.info("Suspend Brainstorm")
                         await drawer.stop()
-                        # Also remove them 
+                        del drawer
 
                 # if data["status"] == "continue":
                 #     try:

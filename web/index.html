@@ -97,10 +97,12 @@
     <div id="control-panel">
         <div id="tabs">
             <div class="tab-item active-tab" id="collab-tab">
-                <h2>Collab</h2>
+                <!-- <h2>Collab</h2> -->
+                <i class="fa-solid fa-robot fa-fw"></i>
             </div>
             <div class="tab-item" id="style-tab">
-                <h2>Style</h2>
+                <!-- <h2>Style</h2> -->
+                <i class="fa-solid fa-brush fa-fw"></i>
             </div>
         </div>
 
@@ -111,7 +113,7 @@
 
         <div class="content-margin">
             <div id="ai-content">
-                <div class="tab-info">
+                <div class="tab-info flex">
                     <div>
                         <h1 class="panel-title">
                             Sketch-bot
@@ -128,13 +130,16 @@
                     <i class="fas fa-robot"></i>
                 </div>
 
-                <div class="inactive-section slider-block" id="add-refine">
-                    <div class="flex">
-                        <p class="slider-label">Adding</p>
-                        <p class="slider-label">Refining</p>
+                <div class="panel-section">
+                    <div class="inactive-section slider-block" id="add-refine">
+                        <div class="flex">
+                            <p class="slider-label">Adding</p>
+                            <p class="slider-label">Refining</p>
+                        </div>
+                        <input type="range" id="autonomy-slider" value="6" min="1" max="11">
                     </div>
-                    <input type="range" id="autonomy-slider" value="6" min="1" max="11">
                 </div>
+
 
                 <div class="panel-section">
                     <div class="flex">
@@ -149,15 +154,15 @@
                     <div class="inactive-section" id="set-modes">
                         <div class="ai-action" id="draw">
                             <i class="fa-solid fa-marker fa-fw"></i>
-                            <p>Draw</p>
+                            <p>Draw!</p>
                         </div>
-                        <div class="ai-action" id="refine">
+                        <!-- <div class="ai-action" id="refine">
                             <i class="fa-solid fa-down-left-and-up-right-to-center fa-fw"></i>
                             <p>Refine</p>
-                        </div>
+                        </div> -->
                         <div class="ai-action" id="brainstorm">
                             <i class="fa-solid fa-lightbulb fa-fw"></i>
-                            <p>Suggest</p>
+                            <p>Inspire</p>
                         </div>
 
                         <!-- <div class="ai-action" id="generate">
@@ -234,7 +239,7 @@
                     <div id="color-picker"></div>
                 </div>
 
-                <div id="art-sliders">
+                <!-- <div id="art-sliders">
                     <div>
                         <p class="pill">Stroke Opacity</p>
                         <input type="range" id="opacity-slider" value="75" min="0" max="100">
@@ -243,13 +248,25 @@
                         <p class="pill">Line Width</p>
                         <input type="range" id="width-slider" value="12" min="1" max="48">
                     </div>
-                </div>
+                </div> -->
 
                 <div id="art-control-final">
                     <div id="stroke-dot">
                         <div id="point-size"></div>
                     </div>
                     <div id="pen-color" class="off-black"></div>
+                </div>
+
+                <div class="slider-block">
+                    <div class="flex">
+                        <p class="slider-label">Opacity</p>
+                    </div>
+                    <input type="range" id="opacity-slider" value="75" min="0" max="100">
+
+                    <div class="flex">
+                        <p class="slider-label">Line Width</p>
+                    </div>
+                    <input type="range" id="width-slider" value="12" min="1" max="48">
                 </div>
 
                 <!-- <p id="set-background">Set background</p> -->
@@ -261,18 +278,12 @@
 
 
     <div id="sketchbook-panel">
-        <!-- <div id="tabs">
-
-            <div class="tab-item" id="sketch-tab">
-                <h2>Sketchbook</h2>
-            </div>
-        </div> -->
-        <div class="content-margin">
-
-
-            <div id="sketchbook-content">
+        <div id="sketchbook-content">
+            <div id="explore-margin">
                 <div id="explore-sketches"></div>
+            </div>
 
+            <div id="static-margin">
                 <div id="static-sketches">
                     <div class="flex" id="title-block">
                         <div class="tab-info">
@@ -292,6 +303,8 @@
                             <input type="checkbox">
                             <span class="slider round"></span>
                         </label> -->
+
+                        <p class="pill" id="overwrite">Overwrite</p>
 
                     </div>
                     <div id="grid-container">
@@ -315,10 +328,7 @@
                     </div>
                     <p class="pill" id="save-sketch">Add Sketch</hp>
                 </div>
-
-
             </div>
-
         </div>
     </div>
 

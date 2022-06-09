@@ -246,8 +246,8 @@ class Drawer:
         }
 
         # Update sketch
-        if t % 1 == 0:
-        # if t % self.refresh_rate == 0:
+        # if t % 1 == 0:
+        if t % self.refresh_rate == 0:
 
             if self.sketch_reference_index is not None:
                 self.resizeScaleFactor = 224 / self.frame_size
@@ -255,6 +255,12 @@ class Drawer:
             render_shapes, render_shape_groups = rescale_constants(
                 self.shapes, self.shape_groups, self.resizeScaleFactor
             )
+
+            # # REMOVE
+            # render_shapes =  self.shapes
+            # render_shape_groups =  self.shape_groups
+
+
             pydiffvg.save_svg(
                 f"results/output-{str(self.sketch_reference_index)}.svg",
                 self.user_canvas_w,
@@ -275,12 +281,17 @@ class Drawer:
                     logging.info(f"Sending exemplar {self.sketch_reference_index}")
                     status = str(self.sketch_reference_index)
                 result = {"status": status, "svg": svg, "iterations": t, "loss": loss.item(), "sketch_index": self.sketch_reference_index}
+                logging.info(result)
                 self.last_result = result  # won't go to client unless continued is used
-                await self.socket.send_json(result)
-                logging.info("Sent update")
+                try:
+                    await self.socket.send_json(result)
+                    logging.info("Sent update")
+                except Exception as e:
+                    logging.error("Failed sending WS response")
+
             except Exception as e:
                 logging.error("WS Response Failed")
-                self.stop()
+                await self.stop()
 
         logging.info(f"Completed run {t} in drawer {str(self.sketch_reference_index)}")
         self.iteration += 1
@@ -359,7 +370,7 @@ class Drawer:
         return self.activate_without_curves()
 
     async def stop(self):
-        logging.info("Stopping...")
+        logging.info(f"Stopping... {self.sketch_reference_index}")
         self.is_running = False
         await self.socket.send_json({"status": "stop"})
 
@@ -371,6 +382,10 @@ class Drawer:
     async def loop(self):
         while self.is_running and self.iteration < self.num_iter:
             logging.info(f"Running iteration {self.iteration}...")
-            await self.run_epoch()
+            try:
+                await self.run_epoch()
+            except Exception as e:
+                await self.stop()
+                logging.info("Iteration failed on: ", self.sketch_reference_index)
         await self.stop()
         
