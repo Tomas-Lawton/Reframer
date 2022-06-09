@@ -203,6 +203,7 @@ const fitToSelection = (items, state) => {
     }, null);
     // Add stroke width so no overflow over bounds?
     sketchController.boundingBox = new Path.Rectangle(bbox);
+    sketchController.boundingBox.sendToBack();
     sketchController.boundingBox.set({
         fillColor: "#f5f5f5",
         opacity: 0.4,

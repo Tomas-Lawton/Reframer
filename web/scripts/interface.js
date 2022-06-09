@@ -101,6 +101,10 @@ deleteHandler.addEventListener("click", (e) => {
 initialiseHandler.addEventListener("click", (e) => {
     const remove = userLayer.getItems().filter((path) => !path.selected);
     remove.forEach((item) => item.remove());
+    let items = getSelectedPaths();
+    fitToSelection(items, "moving");
+    updateSelectUI();
+
     // const svg = paper.project.exportSVG({
     //     asString: true,
     // });

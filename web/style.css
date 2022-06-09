@@ -783,7 +783,7 @@ input:focus {
     padding-top: 0.5em; */
     display: grid;
     grid-template-columns: repeat(2, minmax(10px, 1fr));
-    grid-gap: 15px;
+    grid-gap: 5px;
 }
 
 #exemplar-grid div:first-child {
@@ -809,7 +809,7 @@ input:focus {
     /* padding: 0.4em; */
     /* outline: solid 1px transparent; */
     cursor: pointer;
-    margin-bottom: 4%;
+    /* margin-bottom: 4%; */
 }
 
 
@@ -1134,7 +1134,8 @@ input[type="number"] {
 }
 
 #explore-margin {
-    padding: 30px;
+    /* padding: 30px; */
+    padding: 20px 15px 20px 15px;
     background: #474747;
     border-radius: 1em 0px 0px 1em;
     /* border-right: 1px solid #5a5a5a; */
@@ -1142,11 +1143,13 @@ input[type="number"] {
 }
 
 #static-margin {
-    padding: 60px 30px 30px 30px;
+    /* padding: 60px 20px 30px 20px; */
+    padding: 60px 15px 20px 15px;
     /* display: flex; */
     width: 100%;
     /* height: 100%; */
-    width: 20vw;
+    /* width: 20vw; */
+    width: 15vw;
 }
 
 #static-sketches {
