@@ -113,7 +113,7 @@ multiTool.onMouseDrag = function(event) {
             if (sketchController.boundingBox) {
                 if (sketchController.boundingBox.data.state === "moving") {
                     const selectedPaths = getSelectedPaths(); // all selected
-                    selectedPaths.forEach((path) => {
+                    selectedPaths[0].children.forEach((path) => {
                         path.position.x += event.delta.x;
                         path.position.y += event.delta.y;
                         if (!sketchController.userPaths.includes(path)) {
