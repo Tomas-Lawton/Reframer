@@ -7,11 +7,22 @@ import logging
 
 
 class DrawingPath:
-    def __init__(self, path, color, width, num_segments):
+    def __init__(self, path, color, width, num_segments, is_tied):
         self.path = path
         self.color = color
         self.width = width
         self.num_segments = num_segments
+        self.is_tied = is_tied
+
+def shapes2paths(shapes, shape_groups, tie):
+    path_list = []
+    for k in range(len(shapes)):
+        path = shapes[k].points / torch.tensor([224, 224])
+        num_segments = len(path) // 3
+        width = shapes[k].stroke_width / 100
+        color = shape_groups[k].stroke_color
+        path_list.append(DrawingPath(path, color, width, num_segments, tie))
+    return path_list
 
 def get_noun_data():
     with open('data/noun_list.txt', 'r') as f:
@@ -40,7 +51,7 @@ def data_to_tensor(color, stroke_width, path, num_segments):
         path[k, :] += v0
         if k % 3 == 0:
             v0 = path[k, :]
-    return DrawingPath(path, color, stroke_width, num_segments)
+    return DrawingPath(path, color, stroke_width, num_segments, True)
 
 
 def parse_local_svg(path_to_svg_file):

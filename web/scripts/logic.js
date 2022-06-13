@@ -110,12 +110,15 @@ const setActionUI = (state) => {
         document.getElementById("stop-icon").style.color = "#ffffff";
         stopButton.querySelector("p").innerHTML = "Stop";
 
+        document.getElementById("lasso").classList.add("inactive-top-action");
         document.getElementById("undo").classList.add("inactive-top-action");
         document.getElementById("redo").classList.add("inactive-top-action");
 
         promptInput.style.display = "none";
         document.getElementById("add-refine").style.display = "block";
         document.getElementById("spinner").style.display = "flex";
+
+        // document.getElementById("respect-block").classList.add("inactive-section");
 
         if (state == "drawing") {
             aiMessage.innerHTML = `Got it! Drawing ${sketchController.prompt}!`;
@@ -169,6 +172,10 @@ const setActionUI = (state) => {
         aiMessage.innerHTML = "I'm stopping! What can we draw next?";
         aiMessage.classList.add("typed-out");
 
+        // document
+        //     .getElementById("respect-block")
+        //     .classList.remove("inactive-section");
+        document.getElementById("lasso").classList.remove("inactive-top-action");
         document.getElementById("undo").classList.remove("inactive-top-action");
         document.getElementById("redo").classList.remove("inactive-top-action");
 
@@ -279,6 +286,8 @@ const hideSelectUI = (includeTransform = true) => {
     }
     deleteHandler.style.display = "none";
     initialiseHandler.style.display = "none";
+    reviseHandler.style.display = "none";
+    copyHandler.style.display = "none";
 };
 
 const updateRectBounds = (from, to) => {
@@ -297,18 +306,28 @@ const updateSelectPosition = () => {
     let uiOffset = deleteHandler.getBoundingClientRect().height / 2 + 5;
     deleteHandler.style.left =
         sketchController.boundingBox.bounds.topRight.x + "px";
-    initialiseHandler.style.left =
+    reviseHandler.style.left =
         sketchController.boundingBox.bounds.topLeft.x + "px";
     deleteHandler.style.top =
         sketchController.boundingBox.bounds.top - uiOffset + "px";
-    initialiseHandler.style.top =
+    reviseHandler.style.top =
         sketchController.boundingBox.bounds.top - uiOffset + "px";
+
+    initialiseHandler.style.left =
+        sketchController.boundingBox.bounds.topRight.x + "px";
+    copyHandler.style.left = sketchController.boundingBox.bounds.topLeft.x + "px";
+    initialiseHandler.style.top =
+        sketchController.boundingBox.bounds.bottom + uiOffset + "px";
+    copyHandler.style.top =
+        sketchController.boundingBox.bounds.bottom + uiOffset + "px";
 };
 
 const updateSelectUI = () => {
     if (sketchController.boundingBox) {
         deleteHandler.style.display = "block";
         initialiseHandler.style.display = "block";
+        reviseHandler.style.display = "block";
+        copyHandler.style.display = "block";
         transformControl.style.display = "flex";
         updateSelectPosition();
     }
@@ -440,86 +459,91 @@ ws.onmessage = function(event) {
         var result = JSON.parse(event.data);
     } catch (e) {
         console.log("Unexpected JSON event\n", e);
+        console.log(event);
         sketchController.clipDrawing = false;
-    }
-
-    if (sketchController.clipDrawing) {
-        console.log(result);
-        if (result.status === "stop") {
-            console.log("WHYYYYYY");
-            console.log("Stopped drawer");
-            sketchController.clipDrawing = false;
-        }
-
-        if (result.status === "draw") {
-            //sketch
-
-            if (sketchController.isFirstIteration) {
-                userLayer.clear();
-                sketchController.isFirstIteration = false;
-            } else {
-                // Delete ref to last gen and old sketchController.traces
-                if (sketchController.lastRender) {
-                    sketchController.lastRender.remove();
+    } finally {
+        if (sketchController.clipDrawing) {
+            if (event.data !== "") {
+                console.log(result);
+                if (result.status === "stop") {
+                    console.log("WHYYYYYY");
+                    console.log("Stopped drawer");
+                    sketchController.clipDrawing = false;
                 }
-                if (sketchController.traces) {
-                    for (const trace of sketchController.traces) {
-                        trace.remove();
+
+                if (result.status === "draw") {
+                    //sketch
+
+                    if (sketchController.isFirstIteration) {
+                        userLayer.clear();
+                        sketchController.isFirstIteration = false;
+                    } else {
+                        // Delete ref to last gen and old sketchController.traces
+                        if (sketchController.lastRender) {
+                            sketchController.lastRender.remove();
+                        }
+                        if (sketchController.traces) {
+                            for (const trace of sketchController.traces) {
+                                trace.remove();
+                            }
+                        }
                     }
+
+                    sketchController.stack.historyHolder.push({
+                        ...result,
+                        svg: sketchController.svg, //only use canvas paths at that point
+                    });
+                    timeKeeper.style.width = "100%";
+                    timeKeeper.setAttribute("max", String(sketchController.step + 1));
+                    timeKeeper.value = String(sketchController.step + 1);
+                    setTraces.setAttribute("max", String(sketchController.step + 1));
+                    sketchController.step += 1; //avoid disconnected iteration after stopping
+
+                    // To do change this so it is just max num sketchController.traces
+                    if (sketchController.numTraces > 1) {
+                        userLayer.clear();
+                        showTraceHistoryFrom(
+                            sketchController.stack.historyHolder.length - 1
+                        );
+                    } else {
+                        userLayer.clear();
+                        sketchController.inputLines += sketchController.addPaths;
+
+                        sketchController.lastRender = parseFromSvg(
+                            result.svg,
+                            userLayer,
+                            sketchController.showAllLines
+                        );
+                        sketchController.svg = paper.project.exportSVG({
+                            asString: true,
+                        });
+                    }
+
+                    calcRollingLoss();
+                    lossText.innerHTML = `Step: ${
+            sketchController.step
+          }\nLoss: ${sketchController.lastRollingLoss.toPrecision(5)}`;
+
+                    console.log(
+                        `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`
+                    );
+                }
+
+                var matches = result.status.match(/\d+/g); //if status is a num
+                if (matches != null) {
+                    if (result.svg === "") return null;
+
+                    let thisCanvas = exemplarScope.projects[result.sketch_index];
+
+                    console.log(result.sketch_index);
+                    thisCanvas.clear();
+                    let imported = parseFromSvg(
+                        result.svg,
+                        thisCanvas.activeLayer
+                        // sketchController.showAllLines
+                    );
                 }
             }
-
-            sketchController.stack.historyHolder.push({
-                ...result,
-                svg: sketchController.svg, //only use canvas paths at that point
-            });
-            timeKeeper.style.width = "100%";
-            timeKeeper.setAttribute("max", String(sketchController.step + 1));
-            timeKeeper.value = String(sketchController.step + 1);
-            setTraces.setAttribute("max", String(sketchController.step + 1));
-            sketchController.step += 1; //avoid disconnected iteration after stopping
-
-            // To do change this so it is just max num sketchController.traces
-            if (sketchController.numTraces > 1) {
-                userLayer.clear();
-                showTraceHistoryFrom(sketchController.stack.historyHolder.length - 1);
-            } else {
-                userLayer.clear();
-                sketchController.inputLines += sketchController.addPaths;
-
-                sketchController.lastRender = parseFromSvg(
-                    result.svg,
-                    userLayer,
-                    sketchController.showAllLines
-                );
-                sketchController.svg = paper.project.exportSVG({
-                    asString: true,
-                });
-            }
-
-            calcRollingLoss();
-            lossText.innerHTML = `Step: ${
-        sketchController.step
-      }\nLoss: ${sketchController.lastRollingLoss.toPrecision(5)}`;
-
-            console.log(
-                `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`
-            );
-        }
-
-        var matches = result.status.match(/\d+/g); //if status is a num
-        if (matches != null) {
-            if (result.svg === "") return null;
-
-            let thisCanvas = exemplarScope.projects[result.sketch_index];
-
-            console.log(result.sketch_index);
-            thisCanvas.clear();
-            let imported = parseFromSvg(
-                result.svg,
-                thisCanvas.activeLayer
-                // sketchController.showAllLines
-            );
         }
     }
 };
@@ -578,20 +602,20 @@ const createExemplar = (scope, isUserSketch, sketchCountIndex = null) => {
             "dragstart",
             function(e) {
                 e.dataTransfer.setData("text/plain", sketchCountIndex);
-                sketchContainer.classList.remove("canvas-standard-drop");
-                sketchContainer.classList.add("canvas-hover-light");
-                if (!isUserSketch) {
-                    staticSketches.classList.add("canvas-hover-light");
-                }
+                // sketchContainer.classList.remove("canvas-standard-drop");
+                // sketchContainer.classList.add("canvas-hover-light");
+                // if (!isUserSketch) {
+                //     staticSketches.classList.add("canvas-hover-light");
+                // }
             },
             false
         );
         newElem.addEventListener("dragend", function(e) {
-            sketchContainer.classList.add("canvas-standard-drop");
-            sketchContainer.classList.remove("canvas-hover-light");
-            if (!isUserSketch) {
-                staticSketches.classList.remove("canvas-hover-light");
-            }
+            // sketchContainer.classList.add("canvas-standard-drop");
+            // sketchContainer.classList.remove("canvas-hover-light");
+            // if (!isUserSketch) {
+            //     staticSketches.classList.remove("canvas-hover-light");
+            // }
         });
     } else {
         // is default ui

@@ -802,7 +802,7 @@ input:focus {
     flex-direction: column;
     justify-content: space-around;
     background: white;
-    border-radius: 0.5em;
+    border-radius: 20px;
     /* width: 40%; */
     width: auto;
     /* margin-bottom: 0.4em; */
@@ -810,6 +810,7 @@ input:focus {
     /* outline: solid 1px transparent; */
     cursor: pointer;
     /* margin-bottom: 4%; */
+    overflow: hidden;
 }
 
 
@@ -856,7 +857,8 @@ input:focus {
     border-radius: 5px;
     /* margin: 0.4em; */
     /* padding: 0.4em; */
-    padding: 0.4em 0.6em;
+    /* padding: 0.4em 0.6em; */
+    padding: 0.6em 1em;
 }
 
 .card-info div {
@@ -1051,7 +1053,7 @@ input[type="number"] {
     flex-direction: column;
     box-shadow: 10px 5px 15px rgb(28 28 28 / 20%);
     border-radius: 2em;
-    background: white;
+    /* background: white; */
     top: 5em;
     left: 2em;
     display: flex;
@@ -1069,16 +1071,14 @@ input[type="number"] {
     position: absolute;
     z-index: 11;
     flex-direction: column;
-    box-shadow: 10px 5px 15px rgb(28 28 28 / 20%);
     /* border-radius: 2em; */
-    background-color: #000000d6;
+    /* background-color: #000000d6; */
     transform: translateX(-50%);
-    border-radius: 2em;
     left: 70%;
     transform: initial;
     top: 8%;
     display: none;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 #sketchbook-panel .panel-title {
@@ -1087,7 +1087,9 @@ input[type="number"] {
 
 .content-margin {
     width: auto;
-    padding: 2em;
+    /* padding: 2em; */
+    padding: 20px;
+    background: white;
 }
 
 .content-margin:nth-child(3) {
@@ -1112,16 +1114,18 @@ input[type="number"] {
 #sketchbook-content {
     /* overflow: scroll; */
     height: 80vh;
-    /* width: 40vw; */
-    /* overflow-y: overlay; */
-    background-color: #343434d6;
+    /* background-color: #000000d6; */
+    background: #14112afa;
+    box-shadow: 10px 5px 15px rgb(28 28 28 / 20%);
     overflow: hidden;
     display: flex;
+    border-radius: 2em;
 }
 
 #explore-sketches {
     /* width: 30%; */
-    background: #474747;
+    /* background: #474747; */
+    background: #110f18;
     border-radius: 1em 0px 0px 1em;
     /* border-right: 1px solid #5a5a5a; */
     display: flex;
@@ -1135,21 +1139,22 @@ input[type="number"] {
 
 #explore-margin {
     /* padding: 30px; */
-    padding: 20px 15px 20px 15px;
-    background: #474747;
-    border-radius: 1em 0px 0px 1em;
+    padding: 20px;
+    /* background: #474747; */
+    background: #110f18;
+    /* border-radius: 1em 0px 0px 1em; */
     /* border-right: 1px solid #5a5a5a; */
     display: flex;
 }
 
 #static-margin {
     /* padding: 60px 20px 30px 20px; */
-    padding: 60px 15px 20px 15px;
+    padding: 60px 30px 20px 30px;
     /* display: flex; */
     width: 100%;
     /* height: 100%; */
     /* width: 20vw; */
-    width: 15vw;
+    width: 19vw;
 }
 
 #static-sketches {
@@ -1169,8 +1174,8 @@ input[type="number"] {
 }
 
 .inactive-exemplar {
-    background: #5e5e5e !important;
-    outline: 1px dashed #a6a6a6;
+    background: #30303075 !important;
+    outline: 1.5px dashed #a6a6a6;
     pointer-events: none;
     visibility: initial;
 }
@@ -1269,7 +1274,8 @@ input[type="number"] {
 #tabs {
     display: flex;
     width: 100%;
-    background-color: #000000d6;
+    border-radius: 2em 2em 0 0;
+    overflow: hidden;
 }
 
 #tabs>div>h2 {
@@ -1329,7 +1335,8 @@ input[type="number"] {
     font-size: 3em;
     /* color: white; */
     /* color: #7b66ff; */
-    color: #00e900;
+    /* color: #00e900; */
+    color: #cccccc;
 }
 
 #spinner {

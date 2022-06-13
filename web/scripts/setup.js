@@ -25,6 +25,8 @@ const aiCard = document.getElementById("describe-card");
 // Select UI
 const deleteHandler = document.getElementById("delete-handler");
 const rotateSlider = document.getElementById("rotate-slider");
+const copyHandler = document.getElementById("duplicate-handler");
+const reviseHandler = document.getElementById("revise-handler");
 const rotateNumber = document.getElementById("rotate-number");
 const scaleSlider = document.getElementById("scale-slider");
 const scaleNumber = document.getElementById("scale-number");
@@ -55,6 +57,7 @@ const aiMessage = document.querySelector("#ai-content .panel-subtitle");
 const sketchContainer = document.getElementById("canvas-drop");
 const staticSketches = document.getElementById("static-sketches");
 const explorer = document.getElementById("explore-sketches");
+const sketchGrid = document.getElementById("grid-container");
 
 // Utility
 let liveCollab = false;

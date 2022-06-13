@@ -147,7 +147,7 @@
                             Action
                         </h1>
                         <!-- Change text to Draw some -->
-                        <p class="pill inactive-pill" id="show-all-paths">Draw all</p>
+                        <p class="pill" id="show-all-paths">Draw all</p>
                     </div>
                     <!-- <hr /> -->
 
@@ -192,7 +192,7 @@
                         </h1>
                         <p class="pill inactive-pill" id="autodraw-button">Solo draw</p>
                     </div>
-                    <div class="inactive-section slider-block">
+                    <div class="inactive-section slider-block" id="respect-block">
                         <div class="flex">
                             <p class="slider-label">Respect User Input</p>
                             <p class="slider-label" id="fix-label">1</p>
@@ -345,9 +345,19 @@
                             <i class="basic-grey fa-solid fa-trash fa-fw"></i>
                         </div>
                     </div>
+                    <div id="revise-handler" class="select-ui">
+                        <div>
+                            <i class="basic-grey fa-arrows-to-circle fa-fw"></i>
+                        </div>
+                    </div>
+                    <div id="duplicate-handler" class="select-ui">
+                        <div>
+                            <i class="basic-grey fa-solid fa-copy fa-fw"></i>
+                        </div>
+                    </div>
                     <div id="initialise-handler" class="select-ui">
                         <div>
-                            <i class="basic-grey fa-solid fa-arrows-to-circle fa-fw"></i>
+                            <i class="basic-grey fa-solid fa-user-minus fa-fw"></i>
                         </div>
                     </div>
 

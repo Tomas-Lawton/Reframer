@@ -6,7 +6,7 @@ const pauseActiveDrawer = () => {
         liveCollab = true;
         sketchController.pause(); //continue on pen up
         aiMessage.classList.remove("typed-out");
-        aiMessage.innerHTML = `All right, I'mma let you finish...`;
+        aiMessage.innerHTML = `I'mma let you finish...`;
         aiMessage.classList.add("typed-out");
     }
 };

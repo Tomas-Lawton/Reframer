@@ -4,10 +4,10 @@ import time
 from util.processing import get_augment_trans
 
 # from util.loss import CLIPConvLoss2
-from util.utils import area_mask, use_penalisation
+from util.utils import area_mask, use_penalisation, k_max_elements
 from util.render_design import rescale_constants, calculate_draw_region, UserSketch
 from util.render_design import add_shape_groups, treebranch_initialization
-from util.clip_utility import get_noun_data, parse_svg
+from util.clip_utility import get_noun_data, parse_svg, shapes2paths
 import logging
 import asyncio
 import aiofiles
@@ -40,6 +40,9 @@ class Drawer:
         self.w_img = 0.01
         self.w_full_img = 0.001
         self.drawing_area = {'x0': 0.0, 'x1': 1.0, 'y0': 0.0, 'y1': 1.0}
+        self.prune_places = [round(self.num_iter * (k + 1) * 0.8 / 1) for k in range(1)]
+        self.p0 = 0.4
+        self.prune_ratio = self.p0 / len(self.prune_places)
         self.iteration = 0
         self.num_augs = 4
         self.update_frequency = 1 # remove?
@@ -111,6 +114,9 @@ class Drawer:
             self.canvas_h,
             self.drawing_area,
         )
+        self.path_list += shapes2paths(
+            shapes_rnd, shape_groups_rnd, tie=False
+        )
         self.shapes = user_sketch.shapes + shapes_rnd
         self.shape_groups = add_shape_groups(user_sketch.shape_groups, shape_groups_rnd)
         self.num_sketch_paths = len(user_sketch.shapes)
@@ -157,6 +163,86 @@ class Drawer:
         ) * (1 - img[:, :, 3:4])
         img = img[:, :, :3].unsqueeze(0).permute(0, 3, 1, 2)  # NHWC -> NCHW
         return img
+
+    def prune(self, prune_ratio):
+        with torch.no_grad():
+
+            # Get points of tied traces
+            tied_points = []
+            for p, path in enumerate(self.path_list):
+                if path.is_tied:
+                    tied_points += [
+                        x.unsqueeze(0)
+                        for i, x in enumerate(self.shapes[p].points)
+                        if i % 3 == 0
+                    ]  # only points the path goes through
+
+            # Compute distances
+            dists = []
+            if tied_points:
+                tied_points = torch.cat(tied_points, 0)
+                for p, path in enumerate(self.path_list):
+                    if path.is_tied:
+                        dists.append(-1000)
+                    else:
+                        points = [
+                            x.unsqueeze(0)
+                            for i, x in enumerate(self.shapes[p].points)
+                            if i % 3 == 0
+                        ]  # only points the path goes through
+                        min_dists = []
+                        for point in points:
+                            d = torch.norm(point - tied_points, dim=1)
+                            d = min(d)
+                            min_dists.append(d.item())
+
+                        dists.append(min(min_dists))
+
+            # Compute losses
+            losses = []
+            for p, path in enumerate(self.path_list):
+                if path.is_tied:
+                    losses.append(1000)
+                else:
+                    # Compute the loss if we take out the k-th path
+                    shapes = self.shapes[:p] + self.shapes[p + 1 :]
+                    shape_groups = add_shape_groups(
+                        self.shape_groups[:p], self.shape_groups[p + 1 :]
+                    )
+                    img = self.build_img(shapes, shape_groups, 5)
+                    img_augs = []
+                    for n in range(self.num_augs):
+                        img_augs.append(self.augment_trans(img))
+                    im_batch = torch.cat(img_augs)
+                    img_features = self.model.encode_image(im_batch)
+                    loss = 0
+                    for n in range(self.num_augs):
+                        loss -= torch.cosine_similarity(
+                            self.text_features, img_features[n : n + 1], dim=1
+                        )
+                    losses.append(loss.cpu().item())
+
+            # Compute scores
+            scores = [-0.01 * dists[k] ** (0.5) + losses[k] for k in range(len(losses))]
+
+            # Actual pruning
+            inds = k_max_elements(scores, int((1 - prune_ratio) * self.num_paths))
+
+            # Define the lists like this because using "for p in inds"
+            # may (and often will) change the order of the traces
+            self.shapes = [
+                self.shapes[p] for p in range(len(self.path_list)) if p in inds
+            ]
+            self.shape_groups = add_shape_groups(
+                [self.shape_groups[p] for p in range(len(self.path_list)) if p in inds],
+                [],
+            )
+            self.path_list = [
+                self.path_list[p] for p in range(len(self.path_list)) if p in inds
+            ]
+
+        self.initialize_variables()
+
 
     async def run_epoch(self):
         t = self.iteration
@@ -206,12 +292,13 @@ class Drawer:
         widths_loss = 0
         colors_loss = 0
 
-        for k, points0 in enumerate(self.points_vars0):
-            points_loss += torch.norm(self.points_vars[k] - points0)
-            colors_loss += torch.norm(self.color_vars[k] - self.color_vars0[k])
-            widths_loss += torch.norm(
-                self.stroke_width_vars[k] - self.stroke_width_vars0[k]
-            )
+        for k in range(len(self.points_vars)):
+            if self.path_list[k].is_tied:
+                points_loss += torch.norm(self.points_vars[k] - self.points_vars0[k])
+                colors_loss += torch.norm(self.color_vars[k] - self.color_vars0[k])
+                widths_loss += torch.norm(
+                    self.stroke_width_vars[k] - self.stroke_width_vars0[k]
+                )
 
         loss += self.w_points * points_loss
         loss += self.w_colors * colors_loss
@@ -246,8 +333,8 @@ class Drawer:
         }
 
         # Update sketch
-        # if t % 1 == 0:
-        if t % self.refresh_rate == 0:
+        if t % 1 == 0:
+        # if t % self.refresh_rate == 0:
 
             if self.sketch_reference_index is not None:
                 self.resizeScaleFactor = 224 / self.frame_size
@@ -256,10 +343,9 @@ class Drawer:
                 self.shapes, self.shape_groups, self.resizeScaleFactor
             )
 
-            # # REMOVE
-            # render_shapes =  self.shapes
-            # render_shape_groups =  self.shape_groups
-
+            # render_shapes, render_shape_groups = self.shapes, self.shape_groups
+            print("RENDERED SIZE: ", self.user_canvas_w)
+            print("Scaled: ", 224 / self.resizeScaleFactor)
 
             pydiffvg.save_svg(
                 f"results/output-{str(self.sketch_reference_index)}.svg",
@@ -280,8 +366,18 @@ class Drawer:
                 if isinstance(self.sketch_reference_index, int):
                     logging.info(f"Sending exemplar {self.sketch_reference_index}")
                     status = str(self.sketch_reference_index)
-                result = {"status": status, "svg": svg, "iterations": t, "loss": loss.item(), "sketch_index": self.sketch_reference_index}
-                logging.info(result)
+
+                result = {
+                    "status": status, 
+                    "svg": svg, 
+                    "iterations": t, 
+                    "loss": loss.item(), 
+                    "sketch_index": self.sketch_reference_index,
+                    # "w": self.user_canvas_w,
+                    # "shapes": render_shapes,
+                    # "groups": render_shape_groups,
+                }
+                # logging.info(result)
                 self.last_result = result  # won't go to client unless continued is used
                 try:
                     await self.socket.send_json(result)
@@ -296,8 +392,7 @@ class Drawer:
         logging.info(f"Completed run {t} in drawer {str(self.sketch_reference_index)}")
         self.iteration += 1
 
-    # RUN STUFF
-    async def draw_update(self, data):
+    async def draw(self, data):
         """Use current paths with the given (possibly different) prompt to generate options"""
         logging.info("Updating...")
         prompt = data["data"]["prompt"]
@@ -325,7 +420,7 @@ class Drawer:
         logging.info("Got features")
         return self.activate()
 
-    async def redraw_update(self):
+    async def redraw(self):
         """Use original paths with origional prompt to try new options from same settings"""
         logging.info("Starting redraw")
         self.parse_svg(self.last_region)
@@ -352,7 +447,7 @@ class Drawer:
     #         logging.error(e)
     #         logging.error("Failed to encode features in clip")
 
-    async def continue_update_sketch(self, data):
+    async def continue_update_sketch(self, data, restart = False):
         """Keep the last drawer running"""
         logging.info("Continuing with new sketch...")
 
@@ -365,9 +460,13 @@ class Drawer:
             self.parse_svg(self.last_region)
         except Exception as e:
             logging.error("Failed to parse the new sketch")
-        
+
         self.w_points, self.w_colors, self.w_widths = use_penalisation(data["data"]["fixation"])
-        return self.activate_without_curves()
+        
+        if restart:
+            return self.activate()    
+        else:
+            return self.activate_without_curves()
 
     async def stop(self):
         logging.info(f"Stopping... {self.sketch_reference_index}")
@@ -384,6 +483,11 @@ class Drawer:
             logging.info(f"Running iteration {self.iteration}...")
             try:
                 await self.run_epoch()
+                if self.iteration in self.prune_places:
+                # if self.iteration % 5 == 0:
+                    self.prune(self.prune_ratio)
+                    self.prune_ratio += self.p0 / len(self.prune_places)
+
             except Exception as e:
                 await self.stop()
                 logging.info("Iteration failed on: ", self.sketch_reference_index)

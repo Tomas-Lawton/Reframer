@@ -57,7 +57,8 @@ class SketchHandler {
         this.boundingBox = null;
         this.transformGroup = null;
         this.useFixation = 2;
-        this.showAllLines = false;
+        this.showAllLines = true;
+        this.targetDrawing = false;
 
         // Settings panel
         this.useAdvanced = false;
@@ -125,6 +126,7 @@ class SketchHandler {
             }
             if (!this.clipDrawing) {
                 this.clipDrawing = true;
+                this.targetDrawing = false;
 
                 sketchController.linesDisabled = disableLines;
                 this.updateDrawer({
@@ -175,7 +177,7 @@ class SketchHandler {
         }
         console.log("Starting exemplar: ", sketchCountIndex);
         this.clipDrawing = true;
-
+        this.targetDrawing = true;
         this.updateDrawer({
             status: "add_new_exemplar",
             svg: this.svg,
@@ -189,6 +191,9 @@ class SketchHandler {
         this.clipDrawing = true;
     }
     redraw() {
+            // this.targetDrawing = false;
+
+            // Should redraw also draw exploratory sketches?
             if (!this.clipDrawing) {
                 this.clipDrawing = true;
                 this.updateDrawer({
@@ -216,15 +221,33 @@ class SketchHandler {
         // check the drawing mode. if it's brainstorming with add_new_exemplar then each of the drawers should be continued. continue all brainstorms.
         if (!this.clipDrawing) {
             this.clipDrawing = true;
-            try {
-                this.updateDrawer({
-                    status: "continue_sketch",
-                    svg: this.svg,
-                    frameSize: this.frameSize, //can remove?
-                    fixation: this.useFixation,
+
+            if (this.targetDrawing) {
+                //continue all the brain storm drawers
+                explorer.childNodes.forEach((child, i) => {
+                    try {
+                        this.updateDrawer({
+                            status: "continue_single_sketch",
+                            svg: this.svg,
+                            frameSize: this.frameSize, //can remove?
+                            fixation: this.useFixation,
+                            sketchScopeIndex: sketchController.scopeRef[i],
+                        });
+                    } catch (e) {
+                        console.log("Problem with update");
+                    }
                 });
-            } catch (e) {
-                console.log("Problem with update");
+            } else {
+                try {
+                    this.updateDrawer({
+                        status: "continue_sketch",
+                        svg: this.svg,
+                        frameSize: this.frameSize, //can remove?
+                        fixation: this.useFixation,
+                    });
+                } catch (e) {
+                    console.log("Problem with update");
+                }
             }
             setActionUI("continuing");
         } else {
@@ -251,7 +274,7 @@ class SketchHandler {
     pause() {
         this.updateDrawer({ status: "stop" });
         this.clipDrawing = false;
-        setActionUI("stop");
+        setActionUI("pause");
     }
     resetHistory() {
         sketchController.step = 0; // reset since not continuing

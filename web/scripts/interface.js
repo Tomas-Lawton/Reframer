@@ -8,6 +8,7 @@ function dragentercanvas(e) {
 }
 
 function dropCanvas(e) {
+    canvas.classList.remove("drop-ready");
     importStaticSketch(e.dataTransfer.getData("text/plain"));
 }
 
@@ -18,20 +19,25 @@ function dragleavecanvas(e) {
 
 sketchContainer.addEventListener("dragover", dragover);
 sketchContainer.addEventListener("dragenter", dragentercanvas);
-staticSketches.addEventListener("dragleave", dragleavecanvas);
+sketchContainer.addEventListener("dragleave", dragleavecanvas);
 sketchContainer.addEventListener("drop", dropCanvas);
 
 function dragentersketches(e) {
     e.preventDefault();
-    staticSketches.classList.add("drop-ready");
+    if (
+        sketchController.scopeRef.includes(e.dataTransfer.getData("text/plain"))
+    ) {
+        sketchGrid.classList.add("drop-ready");
+    }
 }
 
 function dragleavesketch(e) {
     e.preventDefault();
-    staticSketches.classList.remove("drop-ready");
+    sketchGrid.classList.remove("drop-ready");
 }
 
 function dropSketch(e) {
+    sketchGrid.classList.remove("drop-ready");
     const sketchCountIndex = e.dataTransfer.getData("text/plain");
     let dragItem = document.querySelector(`#AI-sketch-item-${sketchCountIndex}`);
     if (dragItem) {
@@ -39,10 +45,10 @@ function dropSketch(e) {
     }
 }
 
-staticSketches.addEventListener("dragover", dragover);
-staticSketches.addEventListener("dragenter", dragentersketches);
-staticSketches.addEventListener("dragleave", dragleavesketch);
-staticSketches.addEventListener("drop", dropSketch);
+sketchGrid.addEventListener("dragover", dragover);
+sketchGrid.addEventListener("dragenter", dragentersketches);
+sketchGrid.addEventListener("dragleave", dragleavesketch);
+sketchGrid.addEventListener("drop", dropSketch);
 
 // Drawing Controls
 document.querySelectorAll(".pen-mode").forEach((elem) => {
@@ -96,6 +102,19 @@ document.body.addEventListener("keydown", function(event) {
 
 deleteHandler.addEventListener("click", (e) => {
     deletePath();
+});
+
+copyHandler.addEventListener("click", (e) => {
+    // copy selection next to ???
+});
+
+reviseHandler.addEventListener("click", (e) => {
+    if (
+        sketchController.drawState === "inactive" ||
+        sketchController.drawState === "stop"
+    ) {
+        sketchController.draw(false, null, true);
+    }
 });
 
 initialiseHandler.addEventListener("click", (e) => {
@@ -364,17 +383,6 @@ document.getElementById("draw").addEventListener("click", () => {
         sketchController.draw();
     }
 });
-
-// Refine
-// document.getElementById("refine").addEventListener("click", () => {
-//     if (
-//         sketchController.drawState === "inactive" ||
-//         sketchController.drawState === "stop"
-//     ) {
-//         sketchController.draw(false, null, true);
-//     }
-// });
-
 // // Trial / Brainstorm
 
 // Stop
@@ -676,45 +684,47 @@ respectSlider.onmouseup = () => {
 // LOAD UI
 
 // Random partial sketch
-let idx = Math.floor(Math.random() * partialSketches.length);
-console.log(idx);
-let partial = partialSketches[idx];
-const loadedPartial = userLayer.importSVG(partial);
-loadedPartial.scale(userLayer.view.viewSize.width);
+(() => {
+    let idx = Math.floor(Math.random() * partialSketches.length);
+    console.log(idx);
+    let partial = partialSketches[idx];
+    const loadedPartial = userLayer.importSVG(partial);
+    loadedPartial.scale(userLayer.view.viewSize.width);
 
-loadedPartial.set({
-    position: new Point(
-        userLayer.view.viewSize.width / 2,
-        userLayer.view.viewSize.width / 2
-    ),
-    strokeWidth: sketchController.strokeWidth,
-    opacity: sketchController.opacity,
-    strokeCap: "round",
-    strokeJoin: "round",
-});
+    loadedPartial.set({
+        position: new Point(
+            userLayer.view.viewSize.width / 2,
+            userLayer.view.viewSize.width / 2
+        ),
+        strokeWidth: sketchController.strokeWidth,
+        opacity: sketchController.opacity,
+        strokeCap: "round",
+        strokeJoin: "round",
+    });
 
-// let importCount = 0;
-loadedPartial.getItems().forEach((item) => {
-    if (item instanceof Group) {
-        item.children.forEach((child) => {
-            userLayer.addChild(child.clone());
-            // importCount++;
-        });
-    } else if (item instanceof Shape) {
-        item.remove(); // rectangles are banned
-    } else {
-        if (item instanceof Path) {
-            userLayer.addChild(item.clone());
-            // importCount++;
+    // let importCount = 0;
+    loadedPartial.getItems().forEach((item) => {
+        if (item instanceof Group) {
+            item.children.forEach((child) => {
+                userLayer.addChild(child.clone());
+                // importCount++;
+            });
+        } else if (item instanceof Shape) {
+            item.remove(); // rectangles are banned
+        } else {
+            if (item instanceof Path) {
+                userLayer.addChild(item.clone());
+                // importCount++;
+            }
         }
-    }
-});
-loadedPartial.remove();
+    });
+    loadedPartial.remove();
 
-// sketchController.numAddedPaths = importCount;
-sketchController.svg = paper.project.exportSVG({
-    asString: true,
-});
+    // sketchController.numAddedPaths = importCount;
+    sketchController.svg = paper.project.exportSVG({
+        asString: true,
+    });
+})();
 
 // /////////
 
