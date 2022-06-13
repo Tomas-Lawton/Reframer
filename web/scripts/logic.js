@@ -342,7 +342,11 @@ const deletePath = () => {
             type: "delete-event",
             data: pathList,
         });
-        selected.map((path) => path.remove());
+
+        sketchController.userPaths = sketchController.userPaths.filter(
+            (ref) => ref !== path
+        ); //remove ref
+        selected.map((path) => path.remove()); // remove from sketch
     }
     if (sketchController.boundingBox) {
         hideSelectUI();
@@ -358,7 +362,7 @@ const deletePath = () => {
         sketchController.continueSketch();
         liveCollab = false;
     }
-
+    console.log(sketchController.userPaths);
     logger.event("deleted-path");
 };
 
@@ -384,8 +388,9 @@ const parseFromSvg = (svg, layer, showAllPaths = true) => {
 
         if (sketchController.initRandomCurves && !sketchController.linesDisabled) {
             if (
-                returnedIndex >= sketchController.inputLines &&
-                returnedIndex < numPaths - sketchController.numAddedPaths
+                returnedIndex >= sketchController.inputLines
+                // &&
+                // returnedIndex < numPaths - sketchController.numAddedPaths
             ) {
                 child.opacity *= 0.7;
             }

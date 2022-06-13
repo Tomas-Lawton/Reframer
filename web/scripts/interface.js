@@ -684,47 +684,47 @@ respectSlider.onmouseup = () => {
 // LOAD UI
 
 // Random partial sketch
-(() => {
-    let idx = Math.floor(Math.random() * partialSketches.length);
-    console.log(idx);
-    let partial = partialSketches[idx];
-    const loadedPartial = userLayer.importSVG(partial);
-    loadedPartial.scale(userLayer.view.viewSize.width);
+// (() => {
+//     let idx = Math.floor(Math.random() * partialSketches.length);
+//     console.log(idx);
+//     let partial = partialSketches[idx];
+//     const loadedPartial = userLayer.importSVG(partial);
+//     loadedPartial.scale(userLayer.view.viewSize.width);
 
-    loadedPartial.set({
-        position: new Point(
-            userLayer.view.viewSize.width / 2,
-            userLayer.view.viewSize.width / 2
-        ),
-        strokeWidth: sketchController.strokeWidth,
-        opacity: sketchController.opacity,
-        strokeCap: "round",
-        strokeJoin: "round",
-    });
+//     loadedPartial.set({
+//         position: new Point(
+//             userLayer.view.viewSize.width / 2,
+//             userLayer.view.viewSize.width / 2
+//         ),
+//         strokeWidth: sketchController.strokeWidth,
+//         opacity: sketchController.opacity,
+//         strokeCap: "round",
+//         strokeJoin: "round",
+//     });
 
-    // let importCount = 0;
-    loadedPartial.getItems().forEach((item) => {
-        if (item instanceof Group) {
-            item.children.forEach((child) => {
-                userLayer.addChild(child.clone());
-                // importCount++;
-            });
-        } else if (item instanceof Shape) {
-            item.remove(); // rectangles are banned
-        } else {
-            if (item instanceof Path) {
-                userLayer.addChild(item.clone());
-                // importCount++;
-            }
-        }
-    });
-    loadedPartial.remove();
+//     // let importCount = 0;
+//     loadedPartial.getItems().forEach((item) => {
+//         if (item instanceof Group) {
+//             item.children.forEach((child) => {
+//                 userLayer.addChild(child.clone());
+//                 // importCount++;
+//             });
+//         } else if (item instanceof Shape) {
+//             item.remove(); // rectangles are banned
+//         } else {
+//             if (item instanceof Path) {
+//                 userLayer.addChild(item.clone());
+//                 // importCount++;
+//             }
+//         }
+//     });
+//     loadedPartial.remove();
 
-    // sketchController.numAddedPaths = importCount;
-    sketchController.svg = paper.project.exportSVG({
-        asString: true,
-    });
-})();
+//     // sketchController.numAddedPaths = importCount;
+//     sketchController.svg = paper.project.exportSVG({
+//         asString: true,
+//     });
+// })();
 
 // /////////
 
@@ -757,3 +757,4 @@ for (let i = 0; i < 4; i++) {
     newElem.classList.add("inactive-exemplar");
     document.getElementById("explore-sketches").appendChild(newElem);
 }
+sketchBook.style.display = "none";

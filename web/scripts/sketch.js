@@ -59,6 +59,7 @@ class SketchHandler {
         this.useFixation = 2;
         this.showAllLines = true;
         this.targetDrawing = false;
+        this.userPaths = [];
 
         // Settings panel
         this.useAdvanced = false;

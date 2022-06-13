@@ -116,6 +116,9 @@ multiTool.onMouseDrag = function(event) {
                     selectedPaths.forEach((path) => {
                         path.position.x += event.delta.x;
                         path.position.y += event.delta.y;
+                        if (!sketchController.userPaths.includes(path)) {
+                            sketchController.userPaths.push(path);
+                        }
                     });
                     sketchController.boundingBox.position.x += event.delta.x;
                     sketchController.boundingBox.position.y += event.delta.y;
@@ -152,6 +155,7 @@ multiTool.onMouseDrag = function(event) {
             break;
     }
 };
+
 multiTool.onMouseUp = function() {
     // so the latest sketch is available to the drawer
     sketchController.svg = paper.project.exportSVG({
@@ -161,9 +165,11 @@ multiTool.onMouseUp = function() {
     switch (sketchController.penMode) {
         case "select":
             if (selectBox) {
+                //moving selection
                 let items = userLayer.getItems({ inside: selectBox.bounds });
-                items.forEach((item) => (item.selected = true));
                 items.pop();
+                items.forEach((item) => (item.selected = true));
+
                 // sketchController.selectBox.remove();
                 if (sketchController.selectBox) {
                     sketchController.selectBox = null;
@@ -188,6 +194,7 @@ multiTool.onMouseUp = function() {
                 type: "draw-event",
                 data: myPath,
             });
+
             sketchController.svg = paper.project.exportSVG({
                 asString: true,
             });
@@ -206,6 +213,7 @@ multiTool.onMouseUp = function() {
                         sketchController.draw();
                     }
                 }
+                sketchController.userPaths.push(myPath);
             }
             break;
         case "lasso":
@@ -226,6 +234,7 @@ multiTool.onMouseUp = function() {
     });
 
     logger.event(sketchController.penMode + "-up");
+    console.log(sketchController.userPaths);
 };
 
 eraseTool.onMouseDown = function(event) {
@@ -298,14 +307,38 @@ eraseTool.onMouseUp = function(event) {
             insert: false,
         });
         if (result.children) {
-            erasorItem.parent.insertChildren(
-                erasorItem.index,
-                result.removeChildren()
-            );
+            // multiple paths or multiple intersections?
+            splitPaths = result.removeChildren();
+            erasorItem.parent.insertChildren(erasorItem.index, splitPaths);
+
+            let newList = [];
+            let foundUserPath = false;
+            for (let i = 0; i < sketchController.userPaths.length; i++) {
+                if (sketchController.userPaths[i] === erasorItem) {
+                    splitPaths.forEach((newPath) => {
+                        // replace old ref with the new children
+                        newList.push(newPath);
+                    });
+                    foundUserPath = true;
+                } else {
+                    newList.push(sketchController.userPaths[i]);
+                }
+            }
+            if (!foundUserPath) {
+                // children should be added to the end, no need to delete old ref
+                splitPaths.forEach((newPath) => {
+                    newList.push(newPath);
+                });
+            }
+
+            sketchController.userPaths = newList;
             erasorItem.remove();
             result.remove(); //remove the compound paths
         } else {
             if (result.length === 0) {
+                sketchController.userPaths = sketchController.userPaths.filter(
+                    (ref) => ref !== erasorItem
+                ); //remove ref
                 erasorItem.remove();
             } else {
                 erasorItem.replaceWith(result);
@@ -319,6 +352,7 @@ eraseTool.onMouseUp = function(event) {
         asString: true,
     });
 
+    console.log(sketchController.userPaths);
     logger.event("erase-up");
 
     if (liveCollab) {
@@ -326,4 +360,5 @@ eraseTool.onMouseUp = function(event) {
         sketchController.continueSketch();
         liveCollab = false;
     }
+    console.log(sketchController.userPaths);
 };

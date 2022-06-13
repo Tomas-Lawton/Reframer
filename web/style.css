@@ -411,6 +411,7 @@ hr {
 .top-action .fa-solid {
     padding: 0.4em;
     transition: 0.5s;
+    font-size: 1em;
 }
 
 .top-action {
@@ -1077,7 +1078,7 @@ input[type="number"] {
     left: 70%;
     transform: initial;
     top: 8%;
-    display: none;
+    /* display: none; */
     /* overflow: hidden; */
 }
 
@@ -1811,7 +1812,7 @@ input:checked+.slider:before {
     }
     .top-action .fa-solid {
         padding: 0.4em;
-        font-size: 1em;
+        font-size: 1.5em;
     }
     .top-action {
         transform: none;

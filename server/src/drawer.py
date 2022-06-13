@@ -491,5 +491,5 @@ class Drawer:
             except Exception as e:
                 await self.stop()
                 logging.info("Iteration failed on: ", self.sketch_reference_index)
-        await self.stop()
+            await self.stop()
         
