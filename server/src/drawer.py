@@ -179,7 +179,8 @@ class Drawer:
         img = img[:, :, :3].unsqueeze(0).permute(0, 3, 1, 2)  # NHWC -> NCHW
         return img
 
-    def prune(self, prune_ratio):
+    async def prune(self):
+        prune_ratio = self.prune_ratio
         with torch.no_grad():
 
             # Get points of tied traces
@@ -257,6 +258,10 @@ class Drawer:
             ]
 
         self.initialize_variables()
+        self.prune_ratio += self.p0 / len(self.prune_places)
+        logging.info("Prune complete")
+        # Run single step
+        await self.run_epoch()
 
 
     async def run_epoch(self):
@@ -350,9 +355,13 @@ class Drawer:
         # Update sketch
         if t % 1 == 0:
         # if t % self.refresh_rate == 0:
+            await self.render_and_save(t, loss)
+        logging.info(f"Completed run {t} in drawer {str(self.sketch_reference_index)}")
+        self.iteration += 1
 
+    async def render_and_save(self, t, loss):
             if self.sketch_reference_index is not None:
-                self.resizeScaleFactor = 224 / self.frame_size
+                    self.resizeScaleFactor = 224 / self.frame_size
 
             render_shapes, render_shape_groups = rescale_constants(
                 self.shapes, self.shape_groups, self.resizeScaleFactor
@@ -361,6 +370,7 @@ class Drawer:
             # render_shapes, render_shape_groups = self.shapes, self.shape_groups
             print("RENDERED SIZE: ", self.user_canvas_w)
             print("Scaled: ", 224 / self.resizeScaleFactor)
+            # scale
 
             pydiffvg.save_svg(
                 f"results/output-{str(self.sketch_reference_index)}.svg",
@@ -399,13 +409,9 @@ class Drawer:
                     logging.info("Sent update")
                 except Exception as e:
                     logging.error("Failed sending WS response")
-
             except Exception as e:
                 logging.error("WS Response Failed")
                 await self.stop()
-
-        logging.info(f"Completed run {t} in drawer {str(self.sketch_reference_index)}")
-        self.iteration += 1
 
     async def draw(self, data):
         """Use current paths with the given (possibly different) prompt to generate options"""
@@ -504,10 +510,9 @@ class Drawer:
             logging.info(f"Running iteration {self.iteration}...")
             try:
                 await self.run_epoch()
-                if self.iteration in self.prune_places:
+                # if self.iteration in self.prune_places:
                 # if self.iteration % 5 == 0:
-                    self.prune(self.prune_ratio)
-                    self.prune_ratio += self.p0 / len(self.prune_places)
+                #     self.prune()
 
             except Exception as e:
                 logging.info("Iteration failed on: ", self.sketch_reference_index)

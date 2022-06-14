@@ -95,13 +95,13 @@ const setActionUI = (state) => {
     aiMessage.classList.remove("typed-out");
 
     if (sketchController.activeStates.includes(state)) {
-        // AI is "thinking"
+        // AI Active
+
         actionControls.forEach((elem) => {
             elem.classList.add("inactive-action");
             elem.classList.remove("active");
         });
 
-        // AI Active
         stopButton.classList.remove("inactive-action");
         stopButton.style.background = "#ff6060";
         stopButton.style.color = "#ffffff";
@@ -180,7 +180,10 @@ const setActionUI = (state) => {
         document.getElementById("redo").classList.remove("inactive-top-action");
 
         // timeKeeper
-        if (lastDrawState !== "brainstorming-exemplars") {
+        if (
+            lastDrawState !== "brainstorming-exemplars" &&
+            sketchController.stack.historyHolder.length > 1 //first elem empty
+        ) {
             document.getElementById("contain-dot").style.display = "flex";
         }
     } else if (state === "stopSingle") {
@@ -391,7 +394,7 @@ const parseFromSvg = (svg, layer, showAllPaths = true) => {
 
         if (sketchController.initRandomCurves && !sketchController.linesDisabled) {
             if (returnedIndex >= numUserPaths) {
-                child.opacity *= 0.7;
+                child.opacity *= 0.5;
             }
         }
 
@@ -404,9 +407,7 @@ const parseFromSvg = (svg, layer, showAllPaths = true) => {
         } else {
             // Add all
             let added = layer.addChild(pathEffect);
-
             if (returnedIndex < numUserPaths) {
-                console.log("adding");
                 sketchController.userPaths.push(added);
             }
         }
@@ -471,86 +472,87 @@ ws.onmessage = function(event) {
         console.log("Unexpected JSON event\n", e);
         console.log(event);
         sketchController.clipDrawing = false;
-    } finally {
-        if (sketchController.clipDrawing) {
-            if (event.data !== "") {
-                console.log(result);
-                if (result.status === "stop") {
-                    console.log("WHYYYYYY");
-                    console.log("Stopped drawer");
-                    sketchController.clipDrawing = false;
-                }
+    }
 
+    if (sketchController.clipDrawing) {
+        if (event.data !== "") {
+            if (result.status === "stop") {
+                console.log("WHYYYYYY");
+                sketchController.clipDrawing = false;
+            }
+
+            if (result.status === "draw") {
+                console.log("DRAWING: ", result);
                 userLayer.clear();
 
-                if (result.status === "draw") {
-                    //sketch
+                // if (sketchController.isFirstIteration) {
+                //     userLayer.clear();
+                //     sketchController.isFirstIteration = false;
+                // } else {
+                //     if (sketchController.lastRender) {
+                //         sketchController.lastRender.remove();
+                //     }
+                //     if (sketchController.traces) {
+                //         for (const trace of sketchController.traces) {
+                //             trace.remove();
+                //         }
+                //     }
+                // }
 
-                    if (sketchController.isFirstIteration) {
-                        userLayer.clear();
-                        sketchController.isFirstIteration = false;
-                    } else {
-                        if (sketchController.lastRender) {
-                            sketchController.lastRender.remove();
-                        }
-                        if (sketchController.traces) {
-                            for (const trace of sketchController.traces) {
-                                trace.remove();
-                            }
-                        }
-                    }
+                sketchController.stack.historyHolder.push({
+                    ...result,
+                    svg: sketchController.svg, //only use canvas paths at that point
+                });
 
-                    sketchController.stack.historyHolder.push({
-                        ...result,
-                        svg: sketchController.svg, //only use canvas paths at that point
-                    });
+                timeKeeper.style.width = "100%";
+                timeKeeper.setAttribute("max", String(sketchController.step + 1));
+                timeKeeper.value = String(sketchController.step + 1);
+                setTraces.setAttribute("max", String(sketchController.step + 1));
+                sketchController.step += 1; //avoid disconnected iteration after stopping
 
-                    timeKeeper.style.width = "100%";
-                    timeKeeper.setAttribute("max", String(sketchController.step + 1));
-                    timeKeeper.value = String(sketchController.step + 1);
-                    setTraces.setAttribute("max", String(sketchController.step + 1));
-                    sketchController.step += 1; //avoid disconnected iteration after stopping
-
-                    // To do change this so it is just max num sketchController.traces
-                    if (sketchController.numTraces > 1) {
-                        showTraceHistoryFrom(
-                            sketchController.stack.historyHolder.length - 1
-                        );
-                    } else {
-                        sketchController.lastRender = parseFromSvg(
-                            result.svg,
-                            userLayer,
-                            sketchController.showAllLines
-                        );
-                        sketchController.svg = paper.project.exportSVG({
-                            asString: true,
-                        });
-                    }
-
-                    calcRollingLoss();
-                    lossText.innerHTML = `Step: ${
-            sketchController.step
-          }\nLoss: ${sketchController.lastRollingLoss.toPrecision(5)}`;
-
-                    console.log(
-                        `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`
-                    );
-                }
-
-                var matches = result.status.match(/\d+/g); //if status is a num
-                if (matches != null) {
-                    if (result.svg === "") return null;
-
-                    let thisCanvas = exemplarScope.projects[result.sketch_index];
-
-                    console.log(result.sketch_index);
-                    thisCanvas.clear();
-                    let imported = parseFromSvg(
+                // To do change this so it is just max num sketchController.traces
+                if (sketchController.numTraces > 1) {
+                    showTraceHistoryFrom(sketchController.stack.historyHolder.length - 1);
+                } else {
+                    sketchController.lastRender = parseFromSvg(
                         result.svg,
-                        thisCanvas.activeLayer
-                        // sketchController.showAllLines
+                        userLayer,
+                        sketchController.showAllLines
                     );
+                    sketchController.svg = paper.project.exportSVG({
+                        asString: true,
+                    });
                 }
+
+                calcRollingLoss();
+
+                lossText.innerHTML = `Step: ${sketchController.step}\nLoss: 
+                ${sketchController.lastRollingLoss.toPrecision(5)}`;
+
+                console.log(
+                    `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`
+                );
+
+                if (sketchController.drawState == "pruning") {
+                    sketchController.clipDrawing = false;
+                    setActionUI("stop");
+                }
+            }
+
+            var matches = result.status.match(/\d+/g); //if status is a num
+            if (matches != null) {
+                if (result.svg === "") return null;
+                userLayer.clear();
+
+                let thisCanvas = exemplarScope.projects[result.sketch_index];
+
+                console.log(result.sketch_index);
+                thisCanvas.clear();
+                let imported = parseFromSvg(
+                    result.svg,
+                    thisCanvas.activeLayer
+                    // sketchController.showAllLines
+                );
             }
         }
     }

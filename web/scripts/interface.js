@@ -396,6 +396,10 @@ stopButton.addEventListener("click", () => {
     }
 });
 
+document.getElementById("prune").addEventListener("click", () => {
+    sketchController.prune();
+});
+
 // Redraw
 document.getElementById("redraw").addEventListener("click", () => {
     if (sketchController.drawState === "stop") {

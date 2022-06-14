@@ -114,28 +114,21 @@ class SketchHandler {
     }
     sortPaths() {
         let aiPaths = []; // update after
-        console.log("UNSORTED: ", userLayer.getItems().length);
         userLayer.getItems().forEach((item) => {
             if (!this.userPaths.includes(item)) {
                 aiPaths.push(item);
             }
             item.remove();
         });
-        console.log("USER: ", this.userPaths.length);
-
-        console.log("AI: ", aiPaths.length);
-
         let sorted = this.userPaths.concat(aiPaths);
-        console.log("SORTED: ", sorted);
         sorted.forEach((elem) => userLayer.addChild(elem)); //deleting doesn't destroy references
-
         this.svg = paper.project.exportSVG({
             asString: true,
         }); //for svg parsing
 
-        // console.log(this.svg);
-        console.log("ITEMS: ", userLayer.getItems().length);
-        console.log(this.userPaths);
+        console.log("USER: ", this.userPaths.length);
+        console.log("AI: ", aiPaths.length);
+        console.log("TOTAL: ", userLayer.getItems().length);
     }
 
     draw(withRegion = false, svg = null, disableLines = false) {
@@ -194,23 +187,25 @@ class SketchHandler {
         //     setActionUI("generating");
         // }
     drawExemplar(sketchCountIndex) {
-        if (!exemplarSize) {
-            console.error("exemplars not found");
+        if (!this.clipDrawing) {
+            if (!exemplarSize) {
+                console.error("exemplars not found");
+            }
+            console.log("Starting exemplar: ", sketchCountIndex);
+            this.clipDrawing = true;
+            this.targetDrawing = true;
+            this.updateDrawer({
+                status: "add_new_exemplar",
+                svg: this.svg,
+                hasRegion: false,
+                frameSize: exemplarSize,
+                prompt: this.prompt,
+                lines: this.numRandomCurves,
+                sketchScopeIndex: sketchCountIndex,
+                fixation: this.useFixation,
+            });
+            this.clipDrawing = true;
         }
-        console.log("Starting exemplar: ", sketchCountIndex);
-        this.clipDrawing = true;
-        this.targetDrawing = true;
-        this.updateDrawer({
-            status: "add_new_exemplar",
-            svg: this.svg,
-            hasRegion: false,
-            frameSize: exemplarSize,
-            prompt: this.prompt,
-            lines: this.numRandomCurves,
-            sketchScopeIndex: sketchCountIndex,
-            fixation: this.useFixation,
-        });
-        this.clipDrawing = true;
     }
     redraw() {
             // this.targetDrawing = false;
@@ -278,6 +273,15 @@ class SketchHandler {
             setActionUI("continuing");
         } else {
             throw new Error("Can't continue if already running");
+        }
+    }
+    prune() {
+        if (!this.clipDrawing) {
+            this.clipDrawing = true;
+            this.updateDrawer({
+                status: "prune",
+            });
+            setActionUI("pruning");
         }
     }
     stopSingle(i) {

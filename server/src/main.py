@@ -146,6 +146,12 @@ if os.environ.get('CONNECTAI') == "True":
                                 logging.error(e)
                                 logging.error("Failed to update drawer for new sketch")
 
+                if data["status"] == "prune":
+                    await artefact_drawer.prune()
+                    for drawer in exemplar_drawers:
+                        logging.info("Pruning all sketches")
+                        await drawer.prune()
+
                 if data["status"] == "stop_single_sketch":
                     for drawer in exemplar_drawers:
                         if drawer.sketch_reference_index == data["data"]['sketch_index']:

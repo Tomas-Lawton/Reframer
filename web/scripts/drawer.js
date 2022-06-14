@@ -117,6 +117,7 @@ multiTool.onMouseDrag = function(event) {
                         path.position.y += event.delta.y;
                         if (!sketchController.userPaths.includes(path)) {
                             sketchController.userPaths.push(path);
+                            path.opacity = 1;
                         }
                     });
                     sketchController.boundingBox.position.x += event.delta.x;
@@ -184,7 +185,6 @@ multiTool.onMouseUp = function() {
                 transformGroup.transformContent = false;
                 sketchController.transformGroup = transformGroup;
             }
-
             break;
         case "pen":
             myPath.simplify();
@@ -233,7 +233,6 @@ multiTool.onMouseUp = function() {
     });
 
     logger.event(sketchController.penMode + "-up");
-    console.log(sketchController.userPaths);
 };
 
 eraseTool.onMouseDown = function(event) {
@@ -326,6 +325,7 @@ eraseTool.onMouseUp = function(event) {
             if (!foundUserPath) {
                 // children should be added to the end, no need to delete old ref
                 splitPaths.forEach((newPath) => {
+                    newPath.opacity = 1;
                     newList.push(newPath);
                 });
             }
@@ -342,6 +342,7 @@ eraseTool.onMouseUp = function(event) {
                 erasorItem.remove();
             } else {
                 if (!sketchController.userPaths.includes(erasorItem)) {
+                    result.opacity = 1;
                     sketchController.userPaths.push(result);
                 }
                 erasorItem.replaceWith(result);
