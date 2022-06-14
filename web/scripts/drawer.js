@@ -51,7 +51,6 @@ multiTool.onMouseDown = function(event) {
                     sketchController.svg = paper.project.exportSVG({
                         asString: true,
                     }); //grab latest changes during the selection
-                    // sketchController.numAddedPaths += 1; //is substract change this
                     sketchController.continueSketch();
                     liveCollab = false;
                 }
@@ -199,8 +198,9 @@ multiTool.onMouseUp = function() {
                 asString: true,
             });
 
+            sketchController.userPaths.push(myPath);
+
             if (liveCollab) {
-                sketchController.numAddedPaths += 1;
                 sketchController.continueSketch();
                 liveCollab = false;
             } else {
@@ -213,7 +213,6 @@ multiTool.onMouseUp = function() {
                         sketchController.draw();
                     }
                 }
-                sketchController.userPaths.push(myPath);
             }
             break;
         case "lasso":
@@ -360,7 +359,6 @@ eraseTool.onMouseUp = function(event) {
     logger.event("erase-up");
 
     if (liveCollab) {
-        sketchController.numAddedPaths += 1;
         sketchController.continueSketch();
         liveCollab = false;
     }

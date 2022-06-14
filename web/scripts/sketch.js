@@ -44,7 +44,6 @@ class SketchHandler {
         // TODO Refactor
         this.buttonControlLeft = true;
         this.doneSketching = null;
-        this.numAddedPaths = 0;
 
         // User Initialised
         this.drawRegion = null;
@@ -79,35 +78,11 @@ class SketchHandler {
         lines,
         sketchScopeIndex,
         fixation,
+        userPaths,
     }) {
         this.isFirstIteration = true; //reset canvas
         const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
         this.lastPrompt = prompt;
-
-        // create AI arr.
-        // loop through all project items.
-        // if not in ref list. add to AI arr
-        // concat the arrs
-        // clear userLayer and then insert all arr elements
-        // save new this.svg
-
-        let aiPaths = []; // update after
-        userLayer.getItems().forEach((item) => {
-            if (!this.userPaths.includes(item)) {
-                aiPaths.push(item);
-            }
-        });
-        let sorted = this.userPaths.concat(aiPaths);
-        userLayer.clear();
-        sorted.forEach((elem) => userLayer.addChild(elem));
-
-        this.svg = paper.project.exportSVG({
-            asString: true,
-        }); //for svg parsing
-
-        console.log(this.svg);
-        console.log("ITEMS: ", userLayer.getItems().length);
-        console.log(userLayer.getItems());
 
         const res = {
             status: status,
@@ -117,20 +92,16 @@ class SketchHandler {
                 random_curves: lines,
                 frame_size: frameSize,
                 fixation: fixation,
-                num_user_paths: userLayer.getItems().length,
+                num_user_paths: userPaths,
                 region: {
                     activate: hasRegion,
-                    x1: sketchController.drawRegion ? sketchController.drawRegion.x : 0,
-                    y1: sketchController.drawRegion ?
-                        canvasBounds.height - sketchController.drawRegion.y :
-                        0,
-                    x2: sketchController.drawRegion ?
-                        sketchController.drawRegion.x + sketchController.drawRegion.width :
+                    x1: this.drawRegion ? this.drawRegion.x : 0,
+                    y1: this.drawRegion ? canvasBounds.height - this.drawRegion.y : 0,
+                    x2: this.drawRegion ?
+                        this.drawRegion.x + this.drawRegion.width :
                         canvasBounds.width,
-                    y2: sketchController.drawRegion ?
-                        canvasBounds.height -
-                        sketchController.drawRegion.y -
-                        sketchController.drawRegion.height // use non-web y coords
+                    y2: this.drawRegion ?
+                        canvasBounds.height - this.drawRegion.y - this.drawRegion.height // use non-web y coords
                         :
                         canvasBounds.height, // same as width
                 },
@@ -141,6 +112,32 @@ class SketchHandler {
         console.log(res);
         ws.send(JSON.stringify(res));
     }
+    sortPaths() {
+        let aiPaths = []; // update after
+        console.log("UNSORTED: ", userLayer.getItems().length);
+        userLayer.getItems().forEach((item) => {
+            if (!this.userPaths.includes(item)) {
+                aiPaths.push(item);
+            }
+            item.remove();
+        });
+        console.log("USER: ", this.userPaths.length);
+
+        console.log("AI: ", aiPaths.length);
+
+        let sorted = this.userPaths.concat(aiPaths);
+        console.log("SORTED: ", sorted);
+        sorted.forEach((elem) => userLayer.addChild(elem)); //deleting doesn't destroy references
+
+        this.svg = paper.project.exportSVG({
+            asString: true,
+        }); //for svg parsing
+
+        // console.log(this.svg);
+        console.log("ITEMS: ", userLayer.getItems().length);
+        console.log(this.userPaths);
+    }
+
     draw(withRegion = false, svg = null, disableLines = false) {
             if (noPrompt()) {
                 openModal({
@@ -249,6 +246,8 @@ class SketchHandler {
 
             if (this.targetDrawing) {
                 //continue all the brain storm drawers
+
+                // reorderPaths??
                 explorer.childNodes.forEach((child, i) => {
                     try {
                         this.updateDrawer({
@@ -264,11 +263,13 @@ class SketchHandler {
                 });
             } else {
                 try {
+                    this.sortPaths();
                     this.updateDrawer({
                         status: "continue_sketch",
                         svg: this.svg,
                         frameSize: this.frameSize, //can remove?
                         fixation: this.useFixation,
+                        userPaths: this.userPaths.length,
                     });
                 } catch (e) {
                     console.log("Problem with update");

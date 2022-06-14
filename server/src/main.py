@@ -141,7 +141,6 @@ if os.environ.get('CONNECTAI') == "True":
                         if drawer.sketch_reference_index == data["data"]['sketch_index']:
                             try:
                                 await drawer.continue_update_sketch(data, True)
-                                # await drawer.draw(data)
                                 drawer.run_async()
                             except Exception as e:
                                 logging.error(e)
@@ -156,7 +155,6 @@ if os.environ.get('CONNECTAI') == "True":
 
                 if data["status"] == "stop":
                     await artefact_drawer.stop()
-                    print(exemplar_drawers)
                     for drawer in exemplar_drawers:
                         logging.info("Pausing Brainstorm")
                         await drawer.stop() #don't del because may restart

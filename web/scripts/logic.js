@@ -358,7 +358,6 @@ const deletePath = () => {
     });
 
     if (liveCollab) {
-        sketchController.numAddedPaths += 1;
         sketchController.continueSketch();
         liveCollab = false;
     }
@@ -383,16 +382,15 @@ const parseFromSvg = (svg, layer, showAllPaths = true) => {
     const numPaths = paperObject.children[0].children.length; // drawn on the canvas right now
     const numUserPaths = sketchController.userPaths.length;
 
+    const sentUserPaths = sketchController.userPaths;
+    sketchController.userPaths = [];
+
     for (const returnedIndex in paperObject.children[0].children) {
         const child = paperObject.children[0].children[returnedIndex];
         child.smooth();
 
         if (sketchController.initRandomCurves && !sketchController.linesDisabled) {
-            if (
-                returnedIndex >= numUserPaths
-                // &&
-                // returnedIndex < numPaths - sketchController.numAddedPaths
-            ) {
+            if (returnedIndex >= numUserPaths) {
                 child.opacity *= 0.7;
             }
         }
@@ -404,7 +402,13 @@ const parseFromSvg = (svg, layer, showAllPaths = true) => {
                 layer.addChild(pathEffect);
             }
         } else {
-            layer.addChild(pathEffect);
+            // Add all
+            let added = layer.addChild(pathEffect);
+
+            if (returnedIndex < numUserPaths) {
+                console.log("adding");
+                sketchController.userPaths.push(added);
+            }
         }
 
         // layer.addChild(pathEffect);
@@ -486,7 +490,6 @@ ws.onmessage = function(event) {
                         userLayer.clear();
                         sketchController.isFirstIteration = false;
                     } else {
-                        // Delete ref to last gen and old sketchController.traces
                         if (sketchController.lastRender) {
                             sketchController.lastRender.remove();
                         }

@@ -61,6 +61,7 @@ class Drawer:
         self.text_features = []
         self.neg_text_features = []
         self.iteration = 0
+        self.num_user_paths = None
 
     def set_text_features(self, text_features, neg_text_features=[]):
         self.text_features = text_features
@@ -104,7 +105,7 @@ class Drawer:
 
     def activate_without_curves(self):
         self.is_active = True
-        # self.update_user_paths()
+        self.update_user_paths()
         self.initialise_without_treebranch()
         self.initialize_variables()
         self.initialize_optimizer()
@@ -130,7 +131,7 @@ class Drawer:
             )
         except Exception as e:
             logging.error("Problem adding to the path list")
-            
+
         self.shapes = user_sketch.shapes + shapes_rnd
         self.shape_groups = add_shape_groups(user_sketch.shape_groups, shape_groups_rnd)
         self.num_sketch_paths = len(user_sketch.shapes)
@@ -306,16 +307,14 @@ class Drawer:
         widths_loss = 0
         colors_loss = 0
 
-        count = 0
         for k in range(len(self.points_vars)):
             if self.path_list[k].is_tied:
-                count += 1
                 points_loss += torch.norm(self.points_vars[k] - self.points_vars0[k])
                 colors_loss += torch.norm(self.color_vars[k] - self.color_vars0[k])
                 widths_loss += torch.norm(
                     self.stroke_width_vars[k] - self.stroke_width_vars0[k]
                 )
-        print("TIED: ", count)
+
         loss += self.w_points * points_loss
         loss += self.w_colors * colors_loss
         loss += self.w_widths * widths_loss
@@ -477,7 +476,12 @@ class Drawer:
         except Exception as e:
             logging.error("Failed to parse the new sketch")
 
-        self.num_user_paths = data["data"]["num_user_paths"]
+        try:
+            self.num_user_paths = data["data"]["num_user_paths"]
+            logging.info("Number of user paths: ", self.num_user_paths)
+        except Exception as e:
+            logging.error("Must include number of user pathss")
+
         self.w_points, self.w_colors, self.w_widths = use_penalisation(data["data"]["fixation"])
 
         if restart:
@@ -506,7 +510,7 @@ class Drawer:
                     self.prune_ratio += self.p0 / len(self.prune_places)
 
             except Exception as e:
-                await self.stop()
                 logging.info("Iteration failed on: ", self.sketch_reference_index)
-            await self.stop()
+                await self.stop()
+        logging.info("Loop Stopped")
         
