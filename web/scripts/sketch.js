@@ -66,7 +66,6 @@ class SketchHandler {
         this.initRandomCurves = true;
         this.numRandomCurves = 32;
         this.numTraces = 1;
-        this.inputLines = 0;
 
         // Undo/redo stack
         this.stack = new SimpleStack();
@@ -84,7 +83,31 @@ class SketchHandler {
         this.isFirstIteration = true; //reset canvas
         const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
         this.lastPrompt = prompt;
-        this.inputLines = userLayer.getItems().length;
+
+        // create AI arr.
+        // loop through all project items.
+        // if not in ref list. add to AI arr
+        // concat the arrs
+        // clear userLayer and then insert all arr elements
+        // save new this.svg
+
+        let aiPaths = []; // update after
+        userLayer.getItems().forEach((item) => {
+            if (!this.userPaths.includes(item)) {
+                aiPaths.push(item);
+            }
+        });
+        let sorted = this.userPaths.concat(aiPaths);
+        userLayer.clear();
+        sorted.forEach((elem) => userLayer.addChild(elem));
+
+        this.svg = paper.project.exportSVG({
+            asString: true,
+        }); //for svg parsing
+
+        console.log(this.svg);
+        console.log("ITEMS: ", userLayer.getItems().length);
+        console.log(userLayer.getItems());
 
         const res = {
             status: status,
@@ -94,6 +117,7 @@ class SketchHandler {
                 random_curves: lines,
                 frame_size: frameSize,
                 fixation: fixation,
+                num_user_paths: userLayer.getItems().length,
                 region: {
                     activate: hasRegion,
                     x1: sketchController.drawRegion ? sketchController.drawRegion.x : 0,

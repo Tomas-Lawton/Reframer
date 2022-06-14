@@ -48,6 +48,7 @@ class Drawer:
         self.update_frequency = 1 # remove?
         self.frame_size = None
         self.refresh_rate = 15
+        self.num_user_paths = None # add AI paths
         # Configure rasterisor
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         pydiffvg.set_print_timing(False)
@@ -93,8 +94,17 @@ class Drawer:
         self.user_sketch = user_sketch
         logging.info("Initialised shapes")      
 
+    def update_user_paths(self):
+        for i, path in enumerate(self.path_list):
+            if i < self.num_user_paths:
+                path.is_tied = True
+            else:
+                path.is_tied = False
+
+
     def activate_without_curves(self):
         self.is_active = True
+        # self.update_user_paths()
         self.initialise_without_treebranch()
         self.initialize_variables()
         self.initialize_optimizer()
@@ -114,9 +124,13 @@ class Drawer:
             self.canvas_h,
             self.drawing_area,
         )
-        self.path_list += shapes2paths(
-            shapes_rnd, shape_groups_rnd, tie=False
-        )
+        try:
+            self.path_list += shapes2paths(
+                shapes_rnd, shape_groups_rnd, tie=False
+            )
+        except Exception as e:
+            logging.error("Problem adding to the path list")
+            
         self.shapes = user_sketch.shapes + shapes_rnd
         self.shape_groups = add_shape_groups(user_sketch.shape_groups, shape_groups_rnd)
         self.num_sketch_paths = len(user_sketch.shapes)
@@ -292,14 +306,16 @@ class Drawer:
         widths_loss = 0
         colors_loss = 0
 
+        count = 0
         for k in range(len(self.points_vars)):
             if self.path_list[k].is_tied:
+                count += 1
                 points_loss += torch.norm(self.points_vars[k] - self.points_vars0[k])
                 colors_loss += torch.norm(self.color_vars[k] - self.color_vars0[k])
                 widths_loss += torch.norm(
                     self.stroke_width_vars[k] - self.stroke_width_vars0[k]
                 )
-
+        print("TIED: ", count)
         loss += self.w_points * points_loss
         loss += self.w_colors * colors_loss
         loss += self.w_widths * widths_loss
@@ -461,8 +477,9 @@ class Drawer:
         except Exception as e:
             logging.error("Failed to parse the new sketch")
 
+        self.num_user_paths = data["data"]["num_user_paths"]
         self.w_points, self.w_colors, self.w_widths = use_penalisation(data["data"]["fixation"])
-        
+
         if restart:
             return self.activate()    
         else:

@@ -307,7 +307,7 @@ eraseTool.onMouseUp = function(event) {
             insert: false,
         });
         if (result.children) {
-            // multiple paths or multiple intersections?
+            //split path
             splitPaths = result.removeChildren();
             erasorItem.parent.insertChildren(erasorItem.index, splitPaths);
 
@@ -335,12 +335,16 @@ eraseTool.onMouseUp = function(event) {
             erasorItem.remove();
             result.remove(); //remove the compound paths
         } else {
+            // don't split
             if (result.length === 0) {
                 sketchController.userPaths = sketchController.userPaths.filter(
                     (ref) => ref !== erasorItem
                 ); //remove ref
                 erasorItem.remove();
             } else {
+                if (!sketchController.userPaths.includes(erasorItem)) {
+                    sketchController.userPaths.push(result);
+                }
                 erasorItem.replaceWith(result);
             }
         }

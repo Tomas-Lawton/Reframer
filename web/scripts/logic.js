@@ -381,6 +381,7 @@ const parseFromSvg = (svg, layer, showAllPaths = true) => {
     let paperObject = layer.importSVG(svg);
     // to do check children exist
     const numPaths = paperObject.children[0].children.length; // drawn on the canvas right now
+    const numUserPaths = sketchController.userPaths.length;
 
     for (const returnedIndex in paperObject.children[0].children) {
         const child = paperObject.children[0].children[returnedIndex];
@@ -388,7 +389,7 @@ const parseFromSvg = (svg, layer, showAllPaths = true) => {
 
         if (sketchController.initRandomCurves && !sketchController.linesDisabled) {
             if (
-                returnedIndex >= sketchController.inputLines
+                returnedIndex >= numUserPaths
                 // &&
                 // returnedIndex < numPaths - sketchController.numAddedPaths
             ) {
@@ -399,7 +400,7 @@ const parseFromSvg = (svg, layer, showAllPaths = true) => {
         const pathEffect = child.clone({ insert: false });
 
         if (!showAllPaths) {
-            if (returnedIndex < sketchController.inputLines) {
+            if (returnedIndex < numUserPaths) {
                 layer.addChild(pathEffect);
             }
         } else {
@@ -476,6 +477,8 @@ ws.onmessage = function(event) {
                     sketchController.clipDrawing = false;
                 }
 
+                userLayer.clear();
+
                 if (result.status === "draw") {
                     //sketch
 
@@ -498,6 +501,7 @@ ws.onmessage = function(event) {
                         ...result,
                         svg: sketchController.svg, //only use canvas paths at that point
                     });
+
                     timeKeeper.style.width = "100%";
                     timeKeeper.setAttribute("max", String(sketchController.step + 1));
                     timeKeeper.value = String(sketchController.step + 1);
@@ -506,14 +510,10 @@ ws.onmessage = function(event) {
 
                     // To do change this so it is just max num sketchController.traces
                     if (sketchController.numTraces > 1) {
-                        userLayer.clear();
                         showTraceHistoryFrom(
                             sketchController.stack.historyHolder.length - 1
                         );
                     } else {
-                        userLayer.clear();
-                        sketchController.inputLines += sketchController.addPaths;
-
                         sketchController.lastRender = parseFromSvg(
                             result.svg,
                             userLayer,

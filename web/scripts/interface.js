@@ -82,6 +82,7 @@ document.getElementById("delete").addEventListener("click", () =>
             sketchController.lastPrompt = null;
             userLayer.clear();
             modal.style.display = "none";
+            sketchController.userPaths = [];
             updateSelectUI();
 
             // Save again for redraws
