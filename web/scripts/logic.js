@@ -94,6 +94,18 @@ const setActionUI = (state) => {
     let lastDrawState = sketchController.drawState;
     aiMessage.classList.remove("typed-out");
 
+    if (state == "pruning") {
+        aiMessage.classList.remove("typed-out");
+        aiMessage.innerHTML = "Just a moment while I tidy up!";
+        aiMessage.classList.add("typed-out");
+        canvas.classList.add("loading-canvas");
+        document.getElementById("history-block").style.display = "none";
+        actionControls.forEach((elem) => {
+            elem.classList.add("inactive-action");
+            elem.classList.remove("active");
+        });
+    }
+
     if (sketchController.activeStates.includes(state)) {
         // AI Active
 
@@ -105,10 +117,7 @@ const setActionUI = (state) => {
         stopButton.classList.remove("inactive-action");
         stopButton.style.background = "#ff6060";
         stopButton.style.color = "#ffffff";
-        document.getElementById("stop-icon").classList.add("fa-stop");
-        document.getElementById("stop-icon").classList.remove("fa-repeat");
-        document.getElementById("stop-icon").style.color = "#ffffff";
-        stopButton.querySelector("p").innerHTML = "Stop";
+        stopButton.querySelector("i").style.color = "#ffffff";
 
         document.getElementById("lasso").classList.add("inactive-top-action");
         document.getElementById("undo").classList.add("inactive-top-action");
@@ -129,19 +138,22 @@ const setActionUI = (state) => {
         } else if (state == "refining") {
             aiMessage.innerHTML = `Okay, refining the lines for ${sketchController.prompt}...`;
             document.getElementById("refine").classList.add("active");
-        } else if (state == "redrawing") {
-            aiMessage.innerHTML = `No worries, how about this instead?`;
-            document.getElementById("redraw").classList.add("active");
-            // } else if (state == "generating") {
-            //     aiMessage.innerHTML = `Sure! Adding ${sketchController.prompt} to the moodboard!`;
-            //     actionControls[3].classList.add("active");
-        } else if (state == "continuing") {
+        }
+        // else if (state == "redrawing") {
+        //     aiMessage.innerHTML = `No worries, how about this instead?`;
+        //     document.getElementById("redraw").classList.add("active");
+        //     // } else if (state == "generating") {
+        //     //     aiMessage.innerHTML = `Sure! Adding ${sketchController.prompt} to the moodboard!`;
+        //     //     actionControls[3].classList.add("active");
+        // }
+        else if (state == "continuing") {
             aiMessage.innerHTML = `Nice, I'll make that it into ${sketchController.prompt}.`;
         }
         aiMessage.classList.add("typed-out");
     } else if (state === "stop") {
-        // Loop through brainstorm and stop each of them
+        canvas.classList.remove("loading-canvas");
 
+        // Loop through brainstorm and stop each of them
         explorer.childNodes.forEach((child, i) => {
             let stopButton = child.querySelector(".fa-stop");
             let loader = child.querySelector(".card-loading");
@@ -161,15 +173,15 @@ const setActionUI = (state) => {
         });
         stopButton.style.background = "#f3f1ff";
         stopButton.style.color = "#7b66ff";
-        document.getElementById("stop-icon").classList.remove("fa-stop");
-        document.getElementById("stop-icon").classList.add("fa-repeat");
-        document.getElementById("stop-icon").style.color = "#7b66ff";
-        document.getElementById("stop-text").innerHTML = "Redraw";
+        // document.getElementById("stop-icon").classList.remove("fa-stop");
+        // document.getElementById("stop-icon").classList.add("fa-repeat");
+        stopButton.querySelector("i").style.color = "#7b66ff";
+        // document.getElementById("stop-text").innerHTML = "Redraw";
 
         document.getElementById("spinner").style.display = "none";
         promptInput.style.display = "flex";
         document.getElementById("add-refine").style.display = "none";
-        aiMessage.innerHTML = "I'm stopping! What can we draw next?";
+        aiMessage.innerHTML = "All done! What should we draw next?";
         aiMessage.classList.add("typed-out");
 
         // document
@@ -184,7 +196,7 @@ const setActionUI = (state) => {
             lastDrawState !== "brainstorming-exemplars" &&
             sketchController.stack.historyHolder.length > 1 //first elem empty
         ) {
-            document.getElementById("contain-dot").style.display = "flex";
+            document.getElementById("history-block").style.display = "flex";
         }
     } else if (state === "stopSingle") {
         aiMessage.innerHTML = `Stopped a single sketch!`;
@@ -346,6 +358,7 @@ const deletePath = () => {
             data: pathList,
         });
 
+        // TO DO FIX
         sketchController.userPaths = sketchController.userPaths.filter(
             (ref) => ref !== path
         ); //remove ref
@@ -483,21 +496,21 @@ ws.onmessage = function(event) {
 
             if (result.status === "draw") {
                 console.log("DRAWING: ", result);
-                userLayer.clear();
+                // userLayer.clear();
 
-                // if (sketchController.isFirstIteration) {
-                //     userLayer.clear();
-                //     sketchController.isFirstIteration = false;
-                // } else {
-                //     if (sketchController.lastRender) {
-                //         sketchController.lastRender.remove();
-                //     }
-                //     if (sketchController.traces) {
-                //         for (const trace of sketchController.traces) {
-                //             trace.remove();
-                //         }
-                //     }
-                // }
+                if (sketchController.isFirstIteration) {
+                    userLayer.clear();
+                    sketchController.isFirstIteration = false;
+                } else {
+                    if (sketchController.lastRender) {
+                        sketchController.lastRender.remove();
+                    }
+                    if (sketchController.traces) {
+                        for (const trace of sketchController.traces) {
+                            trace.remove();
+                        }
+                    }
+                }
 
                 sketchController.stack.historyHolder.push({
                     ...result,
@@ -530,7 +543,7 @@ ws.onmessage = function(event) {
                 ${sketchController.lastRollingLoss.toPrecision(5)}`;
 
                 console.log(
-                    `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}`
+                    `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}. Drawn ${sketchController.step}`
                 );
 
                 if (sketchController.drawState == "pruning") {
@@ -604,7 +617,7 @@ const createExemplar = (scope, isUserSketch, sketchCountIndex = null) => {
 
         exemplarCanvas.addEventListener("click", () => {
             importStaticSketch(sketchCountIndex);
-            document.getElementById("contain-dot").style.display = "none";
+            document.getElementById("history-block").style.display = "none";
         });
 
         // Make draggable

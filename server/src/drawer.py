@@ -82,6 +82,7 @@ class Drawer:
 
             if use_region:
                 self.drawing_area = calculate_draw_region(region, normaliseScaleFactor)
+            logging.info("Parsed SVG")
         except Exception as e:
             logging.error(e)
             logging.error("SVG Parsing failed")
@@ -352,7 +353,6 @@ class Drawer:
             # 'geometric': geo_loss,
         }
 
-        # Update sketch
         if t % 1 == 0:
         # if t % self.refresh_rate == 0:
             await self.render_and_save(t, loss)
@@ -368,9 +368,8 @@ class Drawer:
             )
 
             # render_shapes, render_shape_groups = self.shapes, self.shape_groups
-            print("RENDERED SIZE: ", self.user_canvas_w)
-            print("Scaled: ", 224 / self.resizeScaleFactor)
-            # scale
+            # print("RENDERED SIZE: ", self.user_canvas_w)
+            # print("Scaled: ", 224 / self.resizeScaleFactor)
 
             pydiffvg.save_svg(
                 f"results/output-{str(self.sketch_reference_index)}.svg",
@@ -470,21 +469,18 @@ class Drawer:
 
     async def continue_update_sketch(self, data, restart = False):
         """Keep the last drawer running"""
-        logging.info("Continuing with new sketch...")
+        logging.info("Adding sketch changes...")
 
         svg_string = data["data"]["svg"]
 
         if svg_string is not None:
             async with aiofiles.open('data/interface_paths.svg', 'w') as f:
                 await f.write(svg_string)
-        try:
-            self.parse_svg(self.last_region)
-        except Exception as e:
-            logging.error("Failed to parse the new sketch")
+
+        self.parse_svg(self.last_region)
 
         try:
-            self.num_user_paths = data["data"]["num_user_paths"]
-            logging.info("Number of user paths: ", self.num_user_paths)
+            self.num_user_paths = int(data["data"]["num_user_paths"])
         except Exception as e:
             logging.error("Must include number of user pathss")
 
@@ -507,15 +503,9 @@ class Drawer:
 
     async def loop(self):
         while self.is_running and self.iteration < self.num_iter:
-            logging.info(f"Running iteration {self.iteration}...")
             try:
                 await self.run_epoch()
-                # if self.iteration in self.prune_places:
-                # if self.iteration % 5 == 0:
-                #     self.prune()
-
             except Exception as e:
                 logging.info("Iteration failed on: ", self.sketch_reference_index)
                 await self.stop()
-        logging.info("Loop Stopped")
         

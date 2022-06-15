@@ -1189,7 +1189,7 @@ input[type="number"] {
     margin-bottom: 1em;
 }
 
-#contain-dot {
+#history-block {
     display: none;
     /* bottom: 0; */
     /* display: flex; */
@@ -1398,6 +1398,12 @@ input[type="number"] {
     font-size: 2em;
     margin: 1em;
 } */
+
+.loading-canvas {
+    opacity: 0.3;
+    pointer-events: none;
+    transition: 0.5s;
+}
 
 #swatches {
     display: flex;

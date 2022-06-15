@@ -15,7 +15,7 @@ multiTool.onMouseDown = function(event) {
     // refactor for multitouch
     clearTimeout(sketchTimer);
     // hide time slider
-    document.getElementById("contain-dot").style.display = "none";
+    document.getElementById("history-block").style.display = "none";
 
     switch (sketchController.penMode) {
         case "select":
@@ -232,6 +232,7 @@ multiTool.onMouseUp = function() {
         asString: true,
     });
 
+    console.log(sketchController.userPaths);
     logger.event(sketchController.penMode + "-up");
 };
 

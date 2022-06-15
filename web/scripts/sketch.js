@@ -108,7 +108,6 @@ class SketchHandler {
                 sketch_index: sketchScopeIndex,
             },
         };
-        console.log("SENDING TO SOCKET");
         console.log(res);
         ws.send(JSON.stringify(res));
     }
@@ -126,6 +125,7 @@ class SketchHandler {
             asString: true,
         }); //for svg parsing
 
+        console.log("Sorted: ", sorted);
         console.log("USER: ", this.userPaths.length);
         console.log("AI: ", aiPaths.length);
         console.log("TOTAL: ", userLayer.getItems().length);
@@ -240,9 +240,6 @@ class SketchHandler {
             this.clipDrawing = true;
 
             if (this.targetDrawing) {
-                //continue all the brain storm drawers
-
-                // reorderPaths??
                 explorer.childNodes.forEach((child, i) => {
                     try {
                         this.updateDrawer({

@@ -391,9 +391,10 @@ stopButton.addEventListener("click", () => {
     if (sketchController.activeStates.includes(sketchController.drawState)) {
         //active
         sketchController.stop();
-    } else {
-        sketchController.redraw();
     }
+    // else {
+    //     sketchController.redraw();
+    // }
 });
 
 document.getElementById("prune").addEventListener("click", () => {
@@ -401,11 +402,11 @@ document.getElementById("prune").addEventListener("click", () => {
 });
 
 // Redraw
-document.getElementById("redraw").addEventListener("click", () => {
-    if (sketchController.drawState === "stop") {
-        sketchController.redraw();
-    }
-});
+// document.getElementById("redraw").addEventListener("click", () => {
+//     if (sketchController.drawState === "stop") {
+//         sketchController.redraw();
+//     }
+// });
 // // Contine
 // actionControls[6].addEventListener("click", () => {
 //     if (sketchController.drawState === "stop") {
