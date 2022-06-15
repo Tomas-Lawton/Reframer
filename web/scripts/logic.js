@@ -496,7 +496,7 @@ ws.onmessage = function(event) {
 
             if (result.status === "draw") {
                 console.log("DRAWING: ", result);
-                // userLayer.clear();
+                userLayer.clear();
 
                 if (sketchController.isFirstIteration) {
                     userLayer.clear();

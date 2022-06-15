@@ -17,12 +17,6 @@ class Clip_Instance:
         ):  # Should this all be refactored to not be a "class instance" since it is only used once?
             raise Exception("Clip is already instantiated.")
 
-        logging.info(f"Torch version: {torch.__version__}")
-        assert torch.__version__.split(".") >= [
-            "1",
-            "7",
-            "1",
-        ], "PyTorch 1.7.1 or later is required"
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         logging.info(f"These clip models are available: \n{clip.available_models()}")
@@ -116,8 +110,8 @@ class Clip_Instance:
                 logging.error(f"Failed to tokenize: {token_list}")
         if tokens == []:
             return tokens
-        if self.device == 'cuda:0':
-            tokens = tokens.to('cuda:0')
+        # if self.device == 'cuda:0':
+        tokens = tokens.to('cuda:0')
         with torch.no_grad():
             text_features = self.model.encode_text(tokens) # normalise
             return text_features / text_features.norm(dim=-1, keepdim=True)

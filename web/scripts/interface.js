@@ -635,9 +635,9 @@ document.getElementById("show-all-paths").addEventListener("click", () => {
 //     }
 // });
 
-// document.getElementById("num-squiggles").oninput = function() {
-//     sketchController.numRandomCurves = parseInt(this.value);
-// };
+document.getElementById("num-squiggles").oninput = function() {
+    sketchController.numRandomCurves = parseInt(this.value);
+};
 
 document.getElementById("num-traces").oninput = function() {
     sketchController.numTraces = parseInt(this.value);

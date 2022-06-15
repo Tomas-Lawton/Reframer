@@ -1,9 +1,10 @@
+import copy
 import torch
 import pydiffvg
 import time
 from util.processing import get_augment_trans
 
-# from util.loss import CLIPConvLoss2
+from util.loss import CLIPConvLoss2
 from util.utils import area_mask, use_penalisation, k_max_elements
 from util.render_design import rescale_constants, calculate_draw_region, UserSketch
 from util.render_design import add_shape_groups, treebranch_initialization
@@ -39,6 +40,7 @@ class Drawer:
         self.w_widths = 0.01
         self.w_img = 0.01
         self.w_full_img = 0.001
+        self.w_geo = 10
         self.drawing_area = {'x0': 0.0, 'x1': 1.0, 'y0': 0.0, 'y1': 1.0}
         self.prune_places = [round(self.num_iter * (k + 1) * 0.8 / 1) for k in range(1)]
         self.p0 = 0.4
@@ -54,7 +56,7 @@ class Drawer:
         pydiffvg.set_print_timing(False)
         pydiffvg.set_use_gpu(torch.cuda.is_available())
         pydiffvg.set_device(self.device)
-        # self.clipConvLoss = CLIPConvLoss2(self.device)
+        self.clipConvLoss = CLIPConvLoss2(self.device)
         return
 
     def reset(self):
@@ -128,7 +130,7 @@ class Drawer:
         )
         try:
             self.path_list += shapes2paths(
-                shapes_rnd, shape_groups_rnd, tie=False
+                shapes_rnd, shape_groups_rnd, False
             )
         except Exception as e:
             logging.error("Problem adding to the path list")
@@ -152,15 +154,20 @@ class Drawer:
         for group in self.shape_groups:
             group.stroke_color.requires_grad = True
             self.color_vars.append(group.stroke_color)
+
         self.render = pydiffvg.RenderFunction.apply
         self.mask = area_mask(self.canvas_w, self.canvas_h, self.drawing_area).to(
             self.device
         )
         self.user_sketch.init_vars()
-        self.points_vars0 = self.user_sketch.points_vars
-        self.stroke_width_vars0 = self.user_sketch.stroke_width_vars
-        self.color_vars0 = self.user_sketch.color_vars
-        self.img0 = self.user_sketch.img
+        self.points_vars0 = copy.deepcopy(self.points_vars)
+        self.stroke_width_vars0 = copy.deepcopy(self.stroke_width_vars)
+        self.color_vars0 = copy.deepcopy(self.color_vars)
+        for k in range(len(self.color_vars0)):
+            self.points_vars0[k].requires_grad = False
+            self.stroke_width_vars0[k].requires_grad = False
+            self.color_vars0[k].requires_grad = False
+        self.img0 = copy.deepcopy(self.user_sketch.img)
         logging.info("Initialised vars")
 
     def initialize_optimizer(self):
@@ -313,7 +320,7 @@ class Drawer:
         widths_loss = 0
         colors_loss = 0
 
-        for k in range(len(self.points_vars)):
+        for k in range(len(self.points_vars0)):
             if self.path_list[k].is_tied:
                 points_loss += torch.norm(self.points_vars[k] - self.points_vars0[k])
                 colors_loss += torch.norm(self.color_vars[k] - self.color_vars0[k])
@@ -325,7 +332,6 @@ class Drawer:
         loss += self.w_colors * colors_loss
         loss += self.w_widths * widths_loss
         loss += self.w_img * img_loss
-
         # geo_loss = self.clipConvLoss(img * self.mask + 1 - self.mask, self.img0)
 
         # for l_name in geo_loss:
@@ -349,7 +355,7 @@ class Drawer:
             'points': points_loss,
             'widhts': widths_loss,
             'colors': colors_loss,
-            'image': img_loss,
+            # 'image': img_loss,
             # 'geometric': geo_loss,
         }
 

@@ -556,7 +556,7 @@ class CLIPConvLoss2(torch.nn.Module):
 
         self.distance_metrics = {"L2": l2_layers, "L1": l1_layers, "Cos": cos_layers}
 
-        self.model, clip_preprocess = clip_model.load(self.Clip_name, device, jit=False)
+        self.model, clip_preprocess = clip.load(self.Clip_name, device, jit=False)
 
         self.visual_model = self.model.visual
         layers = list(self.model.visual.children())
