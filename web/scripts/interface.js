@@ -689,50 +689,59 @@ respectSlider.onmouseup = () => {
 
 // LOAD UI
 
+const scaleGroup = (group, to) => {
+    group.scale(to);
+    group.children.forEach((item, i) => {
+        item.strokeWidth *= to;
+    });
+    return group;
+};
+
 // Random partial sketch
-// (() => {
-//     let idx = Math.floor(Math.random() * partialSketches.length);
-//     console.log(idx);
-//     let partial = partialSketches[idx];
-//     const loadedPartial = userLayer.importSVG(partial);
-//     loadedPartial.scale(userLayer.view.viewSize.width);
+(() => {
+    const scaleTo = userLayer.view.viewSize.width;
+    const idx = Math.floor(Math.random() * partialSketches.length);
+    const partial = partialSketches[idx];
 
-//     loadedPartial.set({
-//         position: new Point(
-//             userLayer.view.viewSize.width / 2,
-//             userLayer.view.viewSize.width / 2
-//         ),
-//         strokeWidth: sketchController.strokeWidth,
-//         opacity: sketchController.opacity,
-//         strokeCap: "round",
-//         strokeJoin: "round",
-//     });
+    try {
+        var loadedPartial = userLayer.importSVG(partial);
+        loadedPartial.set({
+            position: new Point(
+                userLayer.view.viewSize.width / 2,
+                userLayer.view.viewSize.width / 2
+            ),
+            opacity: sketchController.opacity,
+            strokeCap: "round",
+            strokeJoin: "round",
+        });
+    } catch (e) {
+        console.error("Partial sketch import is cooked");
+    }
 
-//     // let importCount = 0;
-//     loadedPartial.getItems().forEach((item) => {
-//         if (item instanceof Group) {
-//             item.children.forEach((child) => {
-//                 userLayer.addChild(child.clone());
-//                 // importCount++;
-//             });
-//         } else if (item instanceof Shape) {
-//             item.remove(); // rectangles are banned
-//         } else {
-//             if (item instanceof Path) {
-//                 userLayer.addChild(item.clone());
-//                 // importCount++;
-//             }
-//         }
-//     });
-//     loadedPartial.remove();
+    loadedPartial.getItems().forEach((item) => {
+        if (item instanceof Group) {
+            item.children.forEach((child) => {
+                let newElem = userLayer.addChild(child.clone());
+                sketchController.userPaths.push(newElem);
+            });
+        } else if (item instanceof Shape) {
+            item.remove(); // rectangles are banned
+        } else {
+            if (item instanceof Path) {
+                let newElem = userLayer.addChild(item.clone());
+                sketchController.userPaths.push(newElem);
+            }
+        }
+    });
+    loadedPartial.remove();
 
-//     // sketchController.numAddedPaths = importCount;
-//     sketchController.svg = paper.project.exportSVG({
-//         asString: true,
-//     });
-// })();
+    scaleGroup(userLayer, scaleTo);
 
-// /////////
+    sketchController.svg = paper.project.exportSVG({
+        asString: true,
+    });
+    console.log("LOADED: ", userLayer);
+})();
 
 const picker = new Picker({
     parent: document.getElementById("color-picker"),

@@ -24,7 +24,7 @@ multiTool.onMouseDown = function(event) {
                 segments: true,
                 stroke: true,
                 fill: true,
-                tolerance: 10,
+                tolerance: 4,
             });
 
             // TO change to simple hit test
