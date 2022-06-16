@@ -5,36 +5,42 @@ const importStaticSketch = (i) => {
             message: "Import into the main canvas? Contents will be saved.",
             confirmAction: () => {
                 pauseActiveDrawer();
-                saveSketch(); //make copy
-                importToSketch(i, true);
+                saveSketch();
+                importToSketch(i, true); //overwrite
             },
         });
     } else {
         pauseActiveDrawer();
-        saveSketch(); //make copy
-        importToSketch(i, false);
+        saveSketch();
+        importToSketch(i, false); //copy traces
     }
 };
 
 const importToSketch = (exemplarIndex, clear) => {
     console.log("IMPORTING");
     let copy = exemplarScope.projects[exemplarIndex].activeLayer.clone();
-    let expandedExemplar = copy.scale(scaleRatio);
+    let expandedExemplar = copy.scale(scaleRatio, new Point(0, 0));
     if (clear) {
         userLayer.clear();
         var newSketch = userLayer.addChild(expandedExemplar);
-        newSketch.getItems((path) => (path.strokeWidth *= scaleRatio));
+        newSketch.getItems((path) => {
+            path.strokeWidth *= scaleRatio;
+            if (!sketchController.userPaths.includes(path)) {
+                sketchController.userPaths.push(path);
+                path.opacity = 1;
+            }
+        });
     } else {
         var newSketch = userLayer.addChild(expandedExemplar);
         newSketch.getItems((path) => {
             path.strokeWidth *= scaleRatio;
             path.opacity *= 0.5;
+            if (!sketchController.userPaths.includes(path)) {
+                sketchController.userPaths.push(path);
+                path.opacity = 1;
+            }
         });
     }
-    newSketch.position = new Point(
-        sketchController.frameSize / 2,
-        sketchController.frameSize / 2
-    );
     newSketch.getItems((path) =>
         userLayer.addChild(path.clone({ insert: true }))
     );
@@ -53,7 +59,7 @@ const exportToExemplar = () => {
     }
 
     let scaledSketch = userLayer.clone({ insert: false });
-    scaledSketch.scale(1 / scaleRatio);
+    scaledSketch.scale(1 / scaleRatio, new Point(0, 0));
     scaledSketch.getItems((item) => (item.strokeWidth /= scaleRatio));
     let result = scaledSketch.exportJSON();
     scaledSketch.remove();
@@ -83,7 +89,7 @@ const saveSketch = (fromSketch = null) => {
     let newElem = createExemplar(exemplarScope, true, sketchCountIndex);
     let toCanvas = exemplarScope.projects[sketchCountIndex];
     let imported = toCanvas.activeLayer.importJSON(jsonGroup);
-    imported.position = new Point(exemplarSize / 2, exemplarSize / 2);
+    // imported.position = new Point(exemplarSize / 2, exemplarSize / 2);
 
     newElem.classList.add("bounce");
     document.getElementById("exemplar-grid").prepend(newElem);

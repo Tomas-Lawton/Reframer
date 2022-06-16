@@ -651,7 +651,7 @@ respectSlider.onmouseup = () => {
 // LOAD UI
 
 const scaleGroup = (group, to) => {
-    group.scale(to);
+    group.scale(to, new Point(0, 0));
     group.children.forEach((item, i) => {
         item.strokeWidth *= to;
     });
@@ -667,10 +667,6 @@ const scaleGroup = (group, to) => {
     try {
         var loadedPartial = userLayer.importSVG(partial);
         loadedPartial.set({
-            position: new Point(
-                userLayer.view.viewSize.width / 2,
-                userLayer.view.viewSize.width / 2
-            ),
             opacity: sketchController.opacity,
             strokeCap: "round",
             strokeJoin: "round",
@@ -737,4 +733,8 @@ for (let i = 0; i < 4; i++) {
     newElem.classList.add("inactive-exemplar");
     document.getElementById("explore-sketches").appendChild(newElem);
 }
-sketchBook.style.display = "none";
+// sketchBook.style.display = "none";
+console.log(sketchBook.getBoundingClientRect());
+sketchBook.style.left =
+    window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";
+controlPanel.style.left = 5 + "px";
