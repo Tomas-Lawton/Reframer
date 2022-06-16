@@ -57,7 +57,7 @@
         <input id="num-traces" type="number" min="1" value="1" max="5">
     </div>
 
-    <div id="pen-dropdown">
+    <div class="ai-ui" id="pen-dropdown">
         <div class="simple-drop pen-mode" id="select">
             <div>
                 <i class="select fa-solid fa-arrow-pointer fa-fw"></i>
@@ -72,16 +72,16 @@
         </div>
     </div>
 
-    <div class="top-action">
+    <div class="top-action" id="pen-controls">
         <i class="fa-solid fa-arrow-pointer fa-fw simple-hover pen-mode" id="pen-drop"></i>
         <i class="fa-solid fa-pen fa-fw pen-mode selected-mode" id="pen"></i>
         <i class="fa-solid fa-eraser fa-fw pen-mode" id="erase"></i>
         <i class="fa-solid fa-rotate-left fa-fw simple-hover" id="undo"></i>
         <i class="fa-solid fa-rotate-right fa-fw simple-hover" id="redo"></i>
-        <i class="fa-solid fa-sliders fa-fw panel-open" id="palette"></i>
     </div>
 
     <div class="top-action" id="top-action-right">
+        <i class="fa-solid fa-sliders fa-fw panel-open" id="palette"></i>
         <i class="fa-solid fa-book fa-fw panel-open" id="scrapbook"></i>
         <i class="fa-solid fa-trash fa-fw" id="delete"></i>
         <i class="fa-solid fa-save fa-fw" id="save"></i>
@@ -314,24 +314,22 @@
     <!-- <p id="rolling-loss">Step: 0 Loss: 0</p> -->
     <div class="top-center" id="swatches">
         <div class="red swatch"></div>
-        <div class="yellow swatch"></div>
-        <div class="green swatch"></div>
+        <div class="yellow swatch "></div>
+        <div class="green swatch hide-swatch"></div>
         <div class="blue swatch"></div>
-        <div class="pink swatch"></div>
-        <div class="purple swatch"></div>
+        <div class="pink swatch hide-swatch"></div>
+        <div class="purple swatch hide-swatch"></div>
         <div class="off-black swatch"></div>
-        <div class="white swatch"></div>
+        <div class="white swatch hide-swatch"></div>
 
         <div id="points">
             <div class="center">
                 <div class="circle" id="circle-small"></div>
             </div>
             <div class="center">
-
                 <div class="circle" id="circle-med"></div>
             </div>
             <div class="center">
-
                 <div class="circle" id="circle-large"></div>
             </div>
         </div>

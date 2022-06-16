@@ -10,7 +10,6 @@ if (useAI) {
 
 const http = "http://";
 // const http = "https://";
-
 // const base = "0.0.0.0:8000";
 // const base = "vector-logging-server.herokuapp.com";
 const base = "localhost:8000";
@@ -75,10 +74,6 @@ let liveCollab = false;
 let allowOverwrite = true;
 let myPath, erasePath, regionPath, tmpGroup, mask, selectBox;
 
-// const exemplarSize = document
-//     .querySelector(".exemplar-canvas")
-//     .getBoundingClientRect().width;
-
 const exemplarTemplate = document.getElementById("exemplar-template");
 
 const padding = parseInt(
@@ -91,15 +86,8 @@ const containerRect = document
     .getElementById("contain-canvas")
     .getBoundingClientRect();
 
-// let parent = document.getElementById("sketchbook-content").offsetWidth * 0.7;
-// console.log(parent);
-// const exemplarSize = 168;
-
-// const exemplarSize = exemplarTemplate.getBoundingClientRect().width;
-// console.log(document.querySelectorAll("div#exemplar-grid"))[0].offsetWidth;
 const exemplarSize =
     document.querySelectorAll("div#exemplar-grid")[0].offsetWidth / 2 - 5;
-// console.log(exemplarSize);
 const reusableExemplar = exemplarTemplate.cloneNode(true); //clone to use
 exemplarTemplate.remove();
 
@@ -117,14 +105,7 @@ const scaleRatio = canvas.width / exemplarSize;
 paper.install(window);
 const scope = new PaperScope();
 const exemplarScope = new PaperScope();
-
-// exemplars.forEach((exemplar) => {
-//     exemplar.width = exemplarSize;
-//     exemplar.height = exemplarSize;
-//     exemplarScope.setup(exemplar);
-// });
 exemplarScope.activate();
-// exemplarScope.projects.forEach((project) => project.activate());
 scope.setup(canvas);
 scope.activate();
 

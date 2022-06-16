@@ -64,7 +64,6 @@ document.querySelectorAll(".swatch").forEach((elem) => {
         opacitySlider.value = 100;
         sketchController.strokeColor = col;
         picker.setColor(col);
-        // getRGBA();
     });
 });
 
@@ -282,23 +281,23 @@ document.getElementById("autonomy-slider").oninput = function() {
 
 document
     .getElementById("circle-small")
-    .parentElement.addEventListener("click", () => {
-        setPenMode("pen", pen);
+    .parentElement.addEventListener("click", (e) => {
         setPointSize(document.getElementById("circle-small").offsetWidth);
+        setPenMode("pen", pen);
     });
 
 document
     .getElementById("circle-med")
-    .parentElement.addEventListener("click", () => {
-        setPenMode("pen", pen);
+    .parentElement.addEventListener("click", (e) => {
         setPointSize(document.getElementById("circle-med").offsetWidth);
+        setPenMode("pen", pen);
     });
 
 document
     .getElementById("circle-large")
-    .parentElement.addEventListener("click", () => {
-        setPenMode("pen", pen);
+    .parentElement.addEventListener("click", (e) => {
         setPointSize(document.getElementById("circle-large").offsetWidth);
+        setPenMode("pen", pen);
     });
 
 document.getElementById("settings").addEventListener("click", () => {
@@ -733,8 +732,21 @@ for (let i = 0; i < 4; i++) {
     newElem.classList.add("inactive-exemplar");
     document.getElementById("explore-sketches").appendChild(newElem);
 }
-// sketchBook.style.display = "none";
 console.log(sketchBook.getBoundingClientRect());
 sketchBook.style.left =
     window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";
 controlPanel.style.left = 5 + "px";
+
+sketchBook.style.display = "none";
+controlPanel.style.display = "none";
+// if (window.innerWidth < 650) {
+//     document
+//         .getElementById("content")
+//         .appendChild(document.getElementById("style-content"));
+// }
+
+if (window.innerWidth < 650 || window.innerWidth > 1000) {
+    document
+        .querySelectorAll(".hide-swatch")
+        .forEach((elem) => elem.classList.remove("hide-swatch"));
+}

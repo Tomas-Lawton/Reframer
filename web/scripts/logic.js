@@ -674,29 +674,48 @@ const setPenMode = (mode, accentTarget) => {
         accentTarget.classList.add("selected-mode");
         accentTarget.classList.remove("simple-hover");
     }
-    console.log(mode);
-
     switch (mode) {
         case "pen-drop":
-            if (dropdown.style.display === "none" || !dropdown.style.display) {
-                dropdown.style.display = "flex";
-                dropdown.style.top = buttonPanel.getBoundingClientRect().bottom + "px";
-                dropdown.style.left =
-                    penDrop.getBoundingClientRect().left +
-                    penDrop.getBoundingClientRect().width / 2 +
-                    "px";
-                setPenMode(sketchController.penDropMode, penDrop);
+            if (useAI) {
+                if (dropdown.style.display !== "flex") {
+                    dropdown.style.display = "flex";
+                    dropdown.style.top =
+                        buttonPanel.getBoundingClientRect().bottom + "px";
+                    dropdown.style.left =
+                        penDrop.getBoundingClientRect().left +
+                        penDrop.getBoundingClientRect().width / 2 +
+                        "px";
+                    setPenMode(sketchController.penDropMode, penDrop);
+                } else {
+                    dropdown.style.display = "none";
+                }
             } else {
-                dropdown.style.display = "none";
+                setPenMode("select", penDrop);
             }
 
             break;
         case "erase":
-            dropdown.style.display = "none";
+            if (useAI) {
+                dropdown.style.display = "none";
+            }
             eraseTool.activate();
             sketchController.penMode = mode;
             break;
         case "pen":
+            let swatches = document.getElementById("swatches");
+
+            if (window.innerWidth < 650) {
+                if (swatches.style.display !== "flex") {
+                    swatches.style.display = "flex";
+                    swatches.style.top =
+                        document.getElementById("pen-controls").getBoundingClientRect()
+                        .bottom +
+                        5 +
+                        "px";
+                } else {
+                    swatches.style.display = "none";
+                }
+            }
             dropdown.style.display = "none";
             multiTool.activate();
             sketchController.penMode = mode;
