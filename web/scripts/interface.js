@@ -257,49 +257,20 @@ document.getElementById("width-slider").oninput = function() {
     // setPenMode("pen", document.getElementById("pen"));
 };
 
-selectGroup = null;
-
 rotateSlider.oninput = function() {
-    hideSelectUI(false);
-    let r = this.value;
-    sketchController.transformGroup.rotation = r;
-    let items = getSelectedPaths();
-    fitToSelection(items, "rotating");
-    updateSelectUI();
-};
-
-rotateNumber.oninput = function() {
-    hideSelectUI(false);
-    let r = this.value;
-    sketchController.transformGroup.rotation = r;
-    let items = getSelectedPaths();
-    fitToSelection(items, "rotating");
-    updateSelectUI();
+    rotateSelectGroup(sketchController.transformGroup, this.value);
 };
 
 scaleSlider.oninput = function() {
-    // if (sketchController.boundingBox.data.state === "rotating") {
-    hideSelectUI(false);
-    let selectedPaths = getSelectedPaths(); // all selected
+    scaleSelectGroup(sketchController.transformGroup, this.value / 5);
+};
 
-    for (child of selectedPaths) {
-        child.applyMatrix = false;
-        child.scaling = this.value / 5;
-    }
-    fitToSelection(selectedPaths, "scaling");
-    updateSelectUI();
+rotateNumber.oninput = function() {
+    rotateSelectGroup(sketchController.transformGroup, this.value);
 };
 
 scaleNumber.oninput = function() {
-    hideSelectUI(false);
-    let selectedPaths = getSelectedPaths(); // all selected
-
-    for (child of selectedPaths) {
-        child.applyMatrix = false;
-        child.scaling = this.value / 5;
-    }
-    fitToSelection(selectedPaths, "scaling");
-    updateSelectUI();
+    scaleSelectGroup(sketchController.transformGroup, this.value / 5);
 };
 
 opacitySlider.oninput = function() {
@@ -698,50 +669,50 @@ const scaleGroup = (group, to) => {
 };
 
 // Random partial sketch
-(() => {
-    const scaleTo = userLayer.view.viewSize.width;
-    const idx = Math.floor(Math.random() * partialSketches.length);
-    const partial = partialSketches[idx];
+// (() => {
+//     const scaleTo = userLayer.view.viewSize.width;
+//     const idx = Math.floor(Math.random() * partialSketches.length);
+//     const partial = partialSketches[idx];
 
-    try {
-        var loadedPartial = userLayer.importSVG(partial);
-        loadedPartial.set({
-            position: new Point(
-                userLayer.view.viewSize.width / 2,
-                userLayer.view.viewSize.width / 2
-            ),
-            opacity: sketchController.opacity,
-            strokeCap: "round",
-            strokeJoin: "round",
-        });
-    } catch (e) {
-        console.error("Partial sketch import is cooked");
-    }
+//     try {
+//         var loadedPartial = userLayer.importSVG(partial);
+//         loadedPartial.set({
+//             position: new Point(
+//                 userLayer.view.viewSize.width / 2,
+//                 userLayer.view.viewSize.width / 2
+//             ),
+//             opacity: sketchController.opacity,
+//             strokeCap: "round",
+//             strokeJoin: "round",
+//         });
+//     } catch (e) {
+//         console.error("Partial sketch import is cooked");
+//     }
 
-    loadedPartial.getItems().forEach((item) => {
-        if (item instanceof Group) {
-            item.children.forEach((child) => {
-                let newElem = userLayer.addChild(child.clone());
-                sketchController.userPaths.push(newElem);
-            });
-        } else if (item instanceof Shape) {
-            item.remove(); // rectangles are banned
-        } else {
-            if (item instanceof Path) {
-                let newElem = userLayer.addChild(item.clone());
-                sketchController.userPaths.push(newElem);
-            }
-        }
-    });
-    loadedPartial.remove();
+//     loadedPartial.getItems().forEach((item) => {
+//         if (item instanceof Group) {
+//             item.children.forEach((child) => {
+//                 let newElem = userLayer.addChild(child.clone());
+//                 sketchController.userPaths.push(newElem);
+//             });
+//         } else if (item instanceof Shape) {
+//             item.remove(); // rectangles are banned
+//         } else {
+//             if (item instanceof Path) {
+//                 let newElem = userLayer.addChild(item.clone());
+//                 sketchController.userPaths.push(newElem);
+//             }
+//         }
+//     });
+//     loadedPartial.remove();
 
-    scaleGroup(userLayer, scaleTo);
+//     scaleGroup(userLayer, scaleTo);
 
-    sketchController.svg = paper.project.exportSVG({
-        asString: true,
-    });
-    console.log("LOADED: ", userLayer);
-})();
+//     sketchController.svg = paper.project.exportSVG({
+//         asString: true,
+//     });
+//     console.log("LOADED: ", userLayer);
+// })();
 
 const picker = new Picker({
     parent: document.getElementById("color-picker"),

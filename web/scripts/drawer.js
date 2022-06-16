@@ -77,6 +77,7 @@ multiTool.onMouseDown = function(event) {
                 rotateNumber.value = 0;
                 let transformGroup = new Group({ children: items });
                 transformGroup.transformContent = false;
+                transformGroup.strokeScaling = false;
                 sketchController.transformGroup = transformGroup;
             }
             break;
@@ -183,6 +184,7 @@ multiTool.onMouseUp = function() {
                 rotateNumber.value = 0;
                 let transformGroup = new Group({ children: items });
                 transformGroup.transformContent = false;
+                transformGroup.strokeScaling = false;
                 sketchController.transformGroup = transformGroup;
             }
             break;

@@ -205,17 +205,35 @@ const setActionUI = (state) => {
     sketchController.drawState = state;
 };
 
+const scaleSelectGroup = (g, s) => {
+    g.scaling = s;
+    hideSelectUI(false);
+    let items = getSelectedPaths();
+    fitToSelection(items, "scaling");
+    updateSelectUI();
+};
+
+const rotateSelectGroup = (g, r) => {
+    g.rotation = r;
+    hideSelectUI(false);
+    let items = getSelectedPaths();
+    fitToSelection(items, "rotating");
+    updateSelectUI();
+};
+
 const unpackGroup = () => {
     if (sketchController.transformGroup !== null) {
-        // Need to apply the group scale to the paths within the group
-        sketchController.transformGroup.applyMatrix = true;
-        // how does scaling the group change the path children?
-        userLayer.insertChildren(
+        sketchController.transformGroup.applyMatrix = true; // apply group rotation/scale to children on unpack
+        let added = userLayer.insertChildren(
             sketchController.transformGroup.index,
             sketchController.transformGroup.removeChildren()
         );
-        sketchController.transformGroup.remove();
-        sketchController.transformGroup = null;
+        if (sketchController.transformGroup.opacity != 1) {
+            added.forEach(
+                (addedPath) =>
+                (addedPath.opacity = sketchController.transformGroup.opacity)
+            );
+        }
     }
 };
 
