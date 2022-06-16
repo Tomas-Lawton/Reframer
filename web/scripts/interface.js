@@ -61,10 +61,9 @@ document.querySelectorAll(".swatch").forEach((elem) => {
         let col = window.getComputedStyle(elem).backgroundColor;
         sketchController.opacity = 1;
         opacitySlider.value = 100;
-
         sketchController.strokeColor = col;
         picker.setColor(col);
-        getRGBA();
+        // getRGBA();
     });
 });
 
@@ -275,10 +274,13 @@ scaleNumber.oninput = function() {
 
 opacitySlider.oninput = function() {
     sketchController.opacity = this.value / 100;
-    getRGBA();
-    getSelectedPaths().forEach(
-        (item) => (item.opacity = sketchController.opacity)
+    sketchController.transformGroup.children.forEach(
+        (child) => (child.opacity = this.value / 100)
     );
+    // set the preview
+    let rgba = getRGBA();
+    document.getElementById("pen-color").style.background = rgba;
+    document.getElementById("point-size").style.background = rgba;
 };
 
 document.getElementById("autonomy-slider").oninput = function() {
@@ -726,11 +728,12 @@ const picker = new Picker({
 picker.setColor(sketchController.strokeColor);
 picker.onChange = (color) => {
     sketchController.strokeColor = color.rgbaString;
-    getRGBA();
     getSelectedPaths().forEach(
         (item) => (item.strokeColor = sketchController.strokeColor)
     );
-    // setPenMode("pen", document.getElementById("pen"));
+    let rgba = getRGBA();
+    document.getElementById("pen-color").style.background = rgba;
+    document.getElementById("point-size").style.background = rgba;
 };
 
 setActionUI("inactive");

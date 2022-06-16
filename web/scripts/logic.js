@@ -224,16 +224,10 @@ const rotateSelectGroup = (g, r) => {
 const unpackGroup = () => {
     if (sketchController.transformGroup !== null) {
         sketchController.transformGroup.applyMatrix = true; // apply group rotation/scale to children on unpack
-        let added = userLayer.insertChildren(
+        userLayer.insertChildren(
             sketchController.transformGroup.index,
             sketchController.transformGroup.removeChildren()
         );
-        if (sketchController.transformGroup.opacity != 1) {
-            added.forEach(
-                (addedPath) =>
-                (addedPath.opacity = sketchController.transformGroup.opacity)
-            );
-        }
     }
 };
 
@@ -749,8 +743,5 @@ const setPenMode = (mode, accentTarget) => {
 const getRGBA = () => {
     let rgba = sketchController.strokeColor.replace(/[^\d,]/g, "").split(",");
     rgba[3] = sketchController.opacity;
-    let col = `rgba(${rgba.join()})`;
-    console.log(col);
-    document.getElementById("pen-color").style.background = col;
-    document.getElementById("point-size").style.background = col;
+    return `rgba(${rgba.join()})`;
 };
