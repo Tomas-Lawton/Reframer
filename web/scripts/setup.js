@@ -1,3 +1,13 @@
+const useAI = true;
+if (useAI) {
+    document
+        .querySelectorAll(".ai-ui")
+        .forEach((aiItem) => aiItem.classList.remove("ai-ui"));
+    document.getElementById("style-view").style.display = "none";
+} else {
+    document.getElementById("ai-view").style.display = "none";
+}
+
 const http = "http://";
 // const http = "https://";
 

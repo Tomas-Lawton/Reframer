@@ -360,7 +360,7 @@ const updateSelectPosition = () => {
 };
 
 const updateSelectUI = () => {
-    if (sketchController.boundingBox) {
+    if (sketchController.boundingBox && getSelectedPaths().length) {
         deleteHandler.style.display = "block";
         // initialiseHandler.style.display = "block";
         // reviseHandler.style.display = "block";
@@ -686,9 +686,7 @@ const setPenMode = (mode, accentTarget) => {
     switch (mode) {
         case "pen-drop":
             console.log(sketchController.penDropMode);
-
             setPenMode(sketchController.penDropMode, accentTarget);
-            // Dropdown
             if (dropdown.style.display === "none" || !dropdown.style.display) {
                 dropdown.style.display = "flex";
                 let penButton = document
@@ -702,22 +700,21 @@ const setPenMode = (mode, accentTarget) => {
             }
             break;
         case "erase":
-            penDrop.classList.remove("fa-pen");
-            penDrop.classList.add("fa-eraser");
+            dropdown.style.display = "none";
             eraseTool.activate();
             sketchController.penMode = mode;
             sketchController.penDropMode = mode;
             break;
         case "pen":
-            penDrop.classList.remove("fa-eraser");
-            penDrop.classList.add("fa-pen");
+            dropdown.style.display = "none";
             multiTool.activate();
             sketchController.penMode = mode;
             sketchController.penDropMode = mode;
             "pen";
             break;
         case "select":
-            dropdown.style.display = "none";
+            penDrop.classList.remove("fa-eraser");
+            penDrop.classList.add("fa-arrow-pointer");
             multiTool.activate();
             sketchController.penMode = mode;
             break;

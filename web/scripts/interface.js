@@ -263,7 +263,7 @@ scaleNumber.oninput = function() {
 opacitySlider.oninput = function() {
     sketchController.opacity = this.value / 100;
 
-    if (sketchController.transformGrou) {
+    if (sketchController.transformGroup) {
         sketchController.transformGroup.children.forEach(
             (child) => (child.opacity = this.value / 100)
         );
@@ -606,16 +606,6 @@ document.getElementById("show-all-paths").addEventListener("click", () => {
     document.getElementById("show-all-paths").classList.toggle("inactive-pill");
 });
 
-// document.getElementById("use-squiggles").addEventListener("change", (event) => {
-//     sketchController.initRandomCurves = !sketchController.initRandomCurves;
-//     let container = document.getElementById("contain-num-squiggles");
-//     if (container.style.display === "none") {
-//         container.style.display = "contents";
-//     } else {
-//         container.style.display = "none";
-//     }
-// });
-
 document.getElementById("num-squiggles").oninput = function() {
     sketchController.numRandomCurves = parseInt(this.value);
 };
@@ -679,50 +669,50 @@ const scaleGroup = (group, to) => {
 };
 
 // Random partial sketch
-// (() => {
-//     const scaleTo = userLayer.view.viewSize.width;
-//     const idx = Math.floor(Math.random() * partialSketches.length);
-//     const partial = partialSketches[idx];
+(() => {
+    const scaleTo = userLayer.view.viewSize.width;
+    const idx = Math.floor(Math.random() * partialSketches.length);
+    const partial = partialSketches[idx];
 
-//     try {
-//         var loadedPartial = userLayer.importSVG(partial);
-//         loadedPartial.set({
-//             position: new Point(
-//                 userLayer.view.viewSize.width / 2,
-//                 userLayer.view.viewSize.width / 2
-//             ),
-//             opacity: sketchController.opacity,
-//             strokeCap: "round",
-//             strokeJoin: "round",
-//         });
-//     } catch (e) {
-//         console.error("Partial sketch import is cooked");
-//     }
+    try {
+        var loadedPartial = userLayer.importSVG(partial);
+        loadedPartial.set({
+            position: new Point(
+                userLayer.view.viewSize.width / 2,
+                userLayer.view.viewSize.width / 2
+            ),
+            opacity: sketchController.opacity,
+            strokeCap: "round",
+            strokeJoin: "round",
+        });
+    } catch (e) {
+        console.error("Partial sketch import is cooked");
+    }
 
-//     loadedPartial.getItems().forEach((item) => {
-//         if (item instanceof Group) {
-//             item.children.forEach((child) => {
-//                 let newElem = userLayer.addChild(child.clone());
-//                 sketchController.userPaths.push(newElem);
-//             });
-//         } else if (item instanceof Shape) {
-//             item.remove(); // rectangles are banned
-//         } else {
-//             if (item instanceof Path) {
-//                 let newElem = userLayer.addChild(item.clone());
-//                 sketchController.userPaths.push(newElem);
-//             }
-//         }
-//     });
-//     loadedPartial.remove();
+    loadedPartial.getItems().forEach((item) => {
+        if (item instanceof Group) {
+            item.children.forEach((child) => {
+                let newElem = userLayer.addChild(child.clone());
+                sketchController.userPaths.push(newElem);
+            });
+        } else if (item instanceof Shape) {
+            item.remove(); // rectangles are banned
+        } else {
+            if (item instanceof Path) {
+                let newElem = userLayer.addChild(item.clone());
+                sketchController.userPaths.push(newElem);
+            }
+        }
+    });
+    loadedPartial.remove();
 
-//     scaleGroup(userLayer, scaleTo);
+    scaleGroup(userLayer, scaleTo);
 
-//     sketchController.svg = paper.project.exportSVG({
-//         asString: true,
-//     });
-//     console.log("LOADED: ", userLayer);
-// })();
+    sketchController.svg = paper.project.exportSVG({
+        asString: true,
+    });
+    console.log("LOADED: ", userLayer);
+})();
 
 const picker = new Picker({
     parent: document.getElementById("color-picker"),

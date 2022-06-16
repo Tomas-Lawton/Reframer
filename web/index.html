@@ -58,17 +58,11 @@
     </div>
 
     <div id="pen-dropdown">
-        <div class="simple-drop pen-mode" id="pen">
+        <div class="simple-drop pen-mode" id="select">
             <div>
-                <i class="brush fa-solid fa-pen fa-fw"></i>
+                <i class="select fa-solid fa-arrow-pointer fa-fw"></i>
             </div>
-            <p>Pen</p>
-        </div>
-        <div class="simple-drop pen-mode" id="erase">
-            <div>
-                <i class="erase fa-solid fa-eraser fa-fw"></i>
-            </div>
-            <p>Erase</p>
+            <p>Select</p>
         </div>
         <div class="simple-drop pen-mode ai-ui" id="lasso">
             <div>
@@ -79,8 +73,9 @@
     </div>
 
     <div class="top-action">
-        <i class="select fa-solid fa-arrow-pointer fa-fw pen-mode simple-hover" id="select"></i>
-        <i class="brush fa-solid fa-pen fa-fw pen-mode selected-mode" id="pen-drop"></i>
+        <i class="select fa-solid fa-arrow-pointer fa-fw pen-mode simple-hover" id="pen-drop"></i>
+        <i class="brush fa-solid fa-pen fa-fw pen-mode selected-mode" id="pen"></i>
+        <i class="erase fa-solid fa-eraser fa-fw" id="erase"></i>
         <i class="undo fa-solid fa-rotate-left fa-fw simple-hover" id="undo"></i>
         <i class="redo fa-solid fa-rotate-right fa-fw simple-hover" id="redo"></i>
         <i class="fa-solid fa-sliders fa-fw panel-open" id="palette"></i>
@@ -97,16 +92,14 @@
     <div id="control-panel">
         <div id="tabs">
             <div class="tab-item active-tab ai-ui" id="collab-tab">
-                <!-- <h2>Collab</h2> -->
                 <i class="fa-solid fa-robot fa-fw"></i>
             </div>
             <div class="tab-item" id="style-tab">
-                <!-- <h2>Style</h2> -->
                 <i class="fa-solid fa-brush fa-fw"></i>
             </div>
         </div>
 
-        <div class="content-margin ai-ui">
+        <div class="ai-ui content-margin" id="ai-view">
             <div id="ai-content">
                 <div class="tab-info flex">
                     <div>
@@ -182,9 +175,12 @@
                         </div>
                     </div>
 
-                    <div id="contain-num-squiggles">
-                        <label>Max lines:</label>
-                        <input id="num-squiggles" type="number" min="1" value="32" max="100">
+                    <div class="inactive-section slider-block">
+                        <div class="flex">
+                            <p class="slider-label">Maximum lines: </p>
+                            <p class="slider-label" id="calc-lines">Adding: </p>
+                        </div>
+                        <input id="num-squiggles" type="range" min="1" value="32" max="150">
                     </div>
 
                 </div>
@@ -221,7 +217,7 @@
             </div>
         </div>
 
-        <div class="content-margin">
+        <div class="content-margin" id="style-view">
             <div id="style-content">
                 <div class="tab-info">
                     <div>
@@ -361,21 +357,21 @@
                             <i class="basic-grey fa-solid fa-trash fa-fw"></i>
                         </div>
                     </div>
-                    <div id="revise-handler" class="select-ui">
+                    <!-- <div id="revise-handler" class="select-ui">
                         <div>
                             <i class="basic-grey fa-arrows-to-circle fa-fw"></i>
                         </div>
-                    </div>
+                    </div> -->
                     <div id="duplicate-handler" class="select-ui">
                         <div>
                             <i class="basic-grey fa-solid fa-copy fa-fw"></i>
                         </div>
                     </div>
-                    <div id="initialise-handler" class="select-ui">
+                    <!-- <div id="initialise-handler" class="select-ui">
                         <div>
                             <i class="basic-grey fa-solid fa-user-minus fa-fw"></i>
                         </div>
-                    </div>
+                    </div> -->
 
                     <div id="transform-ui" style="display: none">
                         <div class="transformer">
