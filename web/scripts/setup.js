@@ -55,7 +55,7 @@ const penControls = document.getElementById("pen-controls");
 const message = document.getElementById("message");
 const palette = document.getElementById("palette");
 const timeKeeper = document.getElementById("time-slider");
-const lossText = document.getElementById("rolling-loss");
+// const lossText = document.getElementById("rolling-loss");
 const setTraces = document.getElementById("num-traces");
 const selectDot = document.getElementById("contain-pen-dot");
 const opacitySlider = document.getElementById("opacity-slider");
@@ -68,6 +68,7 @@ const sketchContainer = document.getElementById("canvas-drop");
 const staticSketches = document.getElementById("static-sketches");
 const explorer = document.getElementById("explore-sketches");
 const sketchGrid = document.getElementById("grid-container");
+const pen = document.getElementById("pen");
 
 // Utility
 let liveCollab = false;

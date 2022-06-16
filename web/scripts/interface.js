@@ -58,6 +58,7 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
 });
 document.querySelectorAll(".swatch").forEach((elem) => {
     elem.addEventListener("click", () => {
+        setPenMode("pen", pen);
         let col = window.getComputedStyle(elem).backgroundColor;
         sketchController.opacity = 1;
         opacitySlider.value = 100;
@@ -282,34 +283,23 @@ document.getElementById("autonomy-slider").oninput = function() {
 document
     .getElementById("circle-small")
     .parentElement.addEventListener("click", () => {
+        setPenMode("pen", pen);
         setPointSize(document.getElementById("circle-small").offsetWidth);
     });
 
 document
     .getElementById("circle-med")
     .parentElement.addEventListener("click", () => {
+        setPenMode("pen", pen);
         setPointSize(document.getElementById("circle-med").offsetWidth);
     });
 
 document
     .getElementById("circle-large")
     .parentElement.addEventListener("click", () => {
+        setPenMode("pen", pen);
         setPointSize(document.getElementById("circle-large").offsetWidth);
     });
-
-// document.getElementById("enthusiasm-slider").oninput = function() {
-//     let val = 11 - this.value;
-//     let label = document.getElementById("speed-text");
-//     if (val === 10) {
-//         //max time
-//         sketchController.doneSketching = null; // never add
-//         label.innerHTML = "I'll leave it to you...";
-//     } else {
-//         sketchController.doneSketching = val * 1.3 * 1000 + 2000;
-//         if (val < 7) label.innerHTML = "I'll help if you're stuck...";
-//         if (val < 4) label.innerHTML = "Let's draw together!";
-//     }
-// };
 
 document.getElementById("settings").addEventListener("click", () => {
     openModal({

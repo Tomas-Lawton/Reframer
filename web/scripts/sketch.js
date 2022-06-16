@@ -38,7 +38,7 @@ class SketchHandler {
             "continuing",
         ];
         this.lastHistoryIndex = 0;
-        this.penDropMode = "pen";
+        this.penDropMode = "select";
         this.sketchScopeIndex = 0;
         this.addPaths = 4;
         // TODO Refactor

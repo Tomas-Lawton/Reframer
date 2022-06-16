@@ -561,8 +561,8 @@ ws.onmessage = function(event) {
 
                 calcRollingLoss();
 
-                lossText.innerHTML = `Step: ${sketchController.step}\nLoss: 
-                ${sketchController.lastRollingLoss.toPrecision(5)}`;
+                // lossText.innerHTML = `Step: ${sketchController.step}\nLoss:
+                // ${sketchController.lastRollingLoss.toPrecision(5)}`;
 
                 console.log(
                     `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}. Drawn ${sketchController.step}`
@@ -613,8 +613,6 @@ const createExemplar = (scope, isUserSketch, sketchCountIndex = null) => {
         exemplarCanvas.id = `${type}-sketch-canvas-${sketchCountIndex}`;
         newElem.querySelector("h3").innerHTML = `${type}${sketchCountIndex}`;
 
-        // scope.setup(exemplarCanvas);
-
         if (isUserSketch) {
             stopButton.style.display = "none";
             loader.style.display = "none";
@@ -647,21 +645,9 @@ const createExemplar = (scope, isUserSketch, sketchCountIndex = null) => {
             "dragstart",
             function(e) {
                 e.dataTransfer.setData("text/plain", sketchCountIndex);
-                // sketchContainer.classList.remove("canvas-standard-drop");
-                // sketchContainer.classList.add("canvas-hover-light");
-                // if (!isUserSketch) {
-                //     staticSketches.classList.add("canvas-hover-light");
-                // }
             },
             false
         );
-        newElem.addEventListener("dragend", function(e) {
-            // sketchContainer.classList.add("canvas-standard-drop");
-            // sketchContainer.classList.remove("canvas-hover-light");
-            // if (!isUserSketch) {
-            //     staticSketches.classList.remove("canvas-hover-light");
-            // }
-        });
     } else {
         // is default ui
         newElem.id = `default-sketch-item`;
@@ -682,11 +668,10 @@ const setPenMode = (mode, accentTarget) => {
         accentTarget.classList.add("selected-mode");
         accentTarget.classList.remove("simple-hover");
     }
+    console.log(mode);
 
     switch (mode) {
         case "pen-drop":
-            console.log(sketchController.penDropMode);
-            // setPenMode(sketchController.penDropMode, accentTarget);
             if (dropdown.style.display === "none" || !dropdown.style.display) {
                 dropdown.style.display = "flex";
                 dropdown.style.top = buttonPanel.getBoundingClientRect().bottom + "px";
@@ -694,16 +679,11 @@ const setPenMode = (mode, accentTarget) => {
                     penDrop.getBoundingClientRect().left +
                     penDrop.getBoundingClientRect().width / 2 +
                     "px";
-                if (sketchController.penMode === "select") {
-                    document.getElementById("select").classList.add("selected-mode");
-                }
-                if (sketchController.penMode === "select") {
-                    document.getElementById("lasso");
-                    document.getElementById("select").classList.add("selected-mode");
-                }
+                setPenMode(sketchController.penDropMode, penDrop);
             } else {
                 dropdown.style.display = "none";
             }
+
             break;
         case "erase":
             dropdown.style.display = "none";

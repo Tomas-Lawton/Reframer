@@ -111,7 +111,7 @@ class Clip_Instance:
         if tokens == []:
             return tokens
         # if self.device == 'cuda:0':
-        tokens = tokens.to('cuda:0')
+        # tokens = tokens.to('cuda:0')
         with torch.no_grad():
             text_features = self.model.encode_text(tokens) # normalise
             return text_features / text_features.norm(dim=-1, keepdim=True)
