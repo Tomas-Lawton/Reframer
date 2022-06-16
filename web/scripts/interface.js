@@ -108,27 +108,22 @@ copyHandler.addEventListener("click", (e) => {
     // copy selection next to ???
 });
 
-reviseHandler.addEventListener("click", (e) => {
-    if (
-        sketchController.drawState === "inactive" ||
-        sketchController.drawState === "stop"
-    ) {
-        sketchController.draw(false, null, true);
-    }
-});
+// reviseHandler.addEventListener("click", (e) => {
+//     if (
+//         sketchController.drawState === "inactive" ||
+//         sketchController.drawState === "stop"
+//     ) {
+//         sketchController.draw(false, null, true);
+//     }
+// });
 
-initialiseHandler.addEventListener("click", (e) => {
-    const remove = userLayer.getItems().filter((path) => !path.selected);
-    remove.forEach((item) => item.remove());
-    let items = getSelectedPaths();
-    fitToSelection(items, "moving");
-    updateSelectUI();
-
-    // const svg = paper.project.exportSVG({
-    //     asString: true,
-    // });
-    // sketchController.draw(false, svg); //breaks with group
-});
+// initialiseHandler.addEventListener("click", (e) => {
+//     const remove = userLayer.getItems().filter((path) => !path.selected);
+//     remove.forEach((item) => item.remove());
+//     let items = getSelectedPaths();
+//     fitToSelection(items, "moving");
+//     updateSelectUI();
+// });
 
 document.getElementById("begin").addEventListener("click", () => {
     document.getElementById("sliding-overlay").style.bottom = "100%";
@@ -246,14 +241,7 @@ document.getElementById("save").addEventListener("click", () => {
     });
 });
 document.getElementById("width-slider").oninput = function() {
-    sketchController.strokeWidth = this.value;
-    const point = document.getElementById("point-size");
-    point.style.width = sketchController.strokeWidth + "px";
-    point.style.height = sketchController.strokeWidth + "px";
-    getSelectedPaths().forEach(
-        (item) => (item.strokeWidth = sketchController.strokeWidth)
-    );
-    // setPenMode("pen", document.getElementById("pen"));
+    setPointSize(this.value);
 };
 
 rotateSlider.oninput = function() {
@@ -274,10 +262,12 @@ scaleNumber.oninput = function() {
 
 opacitySlider.oninput = function() {
     sketchController.opacity = this.value / 100;
-    sketchController.transformGroup.children.forEach(
-        (child) => (child.opacity = this.value / 100)
-    );
-    // set the preview
+
+    if (sketchController.transformGrou) {
+        sketchController.transformGroup.children.forEach(
+            (child) => (child.opacity = this.value / 100)
+        );
+    }
     let rgba = getRGBA();
     document.getElementById("pen-color").style.background = rgba;
     document.getElementById("point-size").style.background = rgba;
@@ -288,6 +278,24 @@ document.getElementById("autonomy-slider").oninput = function() {
     // 0-10
     sketchController.addPaths = val; //used for adding
 };
+
+document
+    .getElementById("circle-small")
+    .parentElement.addEventListener("click", () => {
+        setPointSize(document.getElementById("circle-small").offsetWidth);
+    });
+
+document
+    .getElementById("circle-med")
+    .parentElement.addEventListener("click", () => {
+        setPointSize(document.getElementById("circle-med").offsetWidth);
+    });
+
+document
+    .getElementById("circle-large")
+    .parentElement.addEventListener("click", () => {
+        setPointSize(document.getElementById("circle-large").offsetWidth);
+    });
 
 // document.getElementById("enthusiasm-slider").oninput = function() {
 //     let val = 11 - this.value;
@@ -414,7 +422,7 @@ document.getElementById("brainstorm").addEventListener("click", () => {
         });
         return;
     } else {
-        // TO DO: Clean up old scopes (now unused)
+        // TO DO: Clean up old scopes (now unused) think you can remove without destorying
         //loop through old refs
 
         // console.log(sketchController.scopeRef);

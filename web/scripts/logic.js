@@ -221,6 +221,16 @@ const rotateSelectGroup = (g, r) => {
     updateSelectUI();
 };
 
+const setPointSize = (s) => {
+    const point = document.getElementById("point-size");
+    sketchController.strokeWidth = s;
+    point.style.width = sketchController.strokeWidth + "px";
+    point.style.height = sketchController.strokeWidth + "px";
+    getSelectedPaths().forEach(
+        (item) => (item.strokeWidth = sketchController.strokeWidth)
+    );
+};
+
 const unpackGroup = () => {
     if (sketchController.transformGroup !== null) {
         sketchController.transformGroup.applyMatrix = true; // apply group rotation/scale to children on unpack
@@ -312,8 +322,8 @@ const hideSelectUI = (includeTransform = true) => {
         transformControl.style.display = "none";
     }
     deleteHandler.style.display = "none";
-    initialiseHandler.style.display = "none";
-    reviseHandler.style.display = "none";
+    // initialiseHandler.style.display = "none";
+    // reviseHandler.style.display = "none";
     copyHandler.style.display = "none";
 };
 
@@ -333,18 +343,18 @@ const updateSelectPosition = () => {
     let uiOffset = deleteHandler.getBoundingClientRect().height / 2 + 5;
     deleteHandler.style.left =
         sketchController.boundingBox.bounds.topRight.x + "px";
-    reviseHandler.style.left =
-        sketchController.boundingBox.bounds.topLeft.x + "px";
+    // reviseHandler.style.left =
+    //     sketchController.boundingBox.bounds.topLeft.x + "px";
     deleteHandler.style.top =
         sketchController.boundingBox.bounds.top - uiOffset + "px";
-    reviseHandler.style.top =
-        sketchController.boundingBox.bounds.top - uiOffset + "px";
+    // reviseHandler.style.top =
+    //     sketchController.boundingBox.bounds.top - uiOffset + "px";
 
-    initialiseHandler.style.left =
-        sketchController.boundingBox.bounds.topRight.x + "px";
+    // initialiseHandler.style.left =
+    //     sketchController.boundingBox.bounds.topRight.x + "px";
     copyHandler.style.left = sketchController.boundingBox.bounds.topLeft.x + "px";
-    initialiseHandler.style.top =
-        sketchController.boundingBox.bounds.bottom + uiOffset + "px";
+    // initialiseHandler.style.top =
+    //     sketchController.boundingBox.bounds.bottom + uiOffset + "px";
     copyHandler.style.top =
         sketchController.boundingBox.bounds.bottom + uiOffset + "px";
 };
@@ -352,8 +362,8 @@ const updateSelectPosition = () => {
 const updateSelectUI = () => {
     if (sketchController.boundingBox) {
         deleteHandler.style.display = "block";
-        initialiseHandler.style.display = "block";
-        reviseHandler.style.display = "block";
+        // initialiseHandler.style.display = "block";
+        // reviseHandler.style.display = "block";
         copyHandler.style.display = "block";
         transformControl.style.display = "flex";
         updateSelectPosition();

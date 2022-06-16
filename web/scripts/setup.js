@@ -26,13 +26,13 @@ const aiCard = document.getElementById("describe-card");
 const deleteHandler = document.getElementById("delete-handler");
 const rotateSlider = document.getElementById("rotate-slider");
 const copyHandler = document.getElementById("duplicate-handler");
-const reviseHandler = document.getElementById("revise-handler");
+// const reviseHandler = document.getElementById("revise-handler");
 const rotateNumber = document.getElementById("rotate-number");
 const scaleSlider = document.getElementById("scale-slider");
 const scaleNumber = document.getElementById("scale-number");
 
 // Change to revise
-const initialiseHandler = document.getElementById("initialise-handler");
+// const initialiseHandler = document.getElementById("initialise-handler");
 const transformControl = document.getElementById("transform-ui");
 
 // General UI
