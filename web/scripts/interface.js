@@ -607,7 +607,7 @@ document.getElementById("show-all-paths").addEventListener("click", () => {
 });
 
 document.getElementById("num-squiggles").oninput = function() {
-    sketchController.numRandomCurves = parseInt(this.value);
+    setLineLabels(parseInt(this.value));
 };
 
 document.getElementById("num-traces").oninput = function() {
@@ -711,6 +711,9 @@ const scaleGroup = (group, to) => {
     sketchController.svg = paper.project.exportSVG({
         asString: true,
     });
+
+    setLineLabels(32);
+
     console.log("LOADED: ", userLayer);
 })();
 

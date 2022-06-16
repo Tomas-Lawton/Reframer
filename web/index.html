@@ -75,7 +75,7 @@
     <div class="top-action">
         <i class="select fa-solid fa-arrow-pointer fa-fw pen-mode simple-hover" id="pen-drop"></i>
         <i class="brush fa-solid fa-pen fa-fw pen-mode selected-mode" id="pen"></i>
-        <i class="erase fa-solid fa-eraser fa-fw" id="erase"></i>
+        <i class="erase fa-solid fa-eraser fa-fw pen-mode" id="erase"></i>
         <i class="undo fa-solid fa-rotate-left fa-fw simple-hover" id="undo"></i>
         <i class="redo fa-solid fa-rotate-right fa-fw simple-hover" id="redo"></i>
         <i class="fa-solid fa-sliders fa-fw panel-open" id="palette"></i>
@@ -177,10 +177,10 @@
 
                     <div class="inactive-section slider-block">
                         <div class="flex">
-                            <p class="slider-label">Maximum lines: </p>
+                            <p class="slider-label" id="max-lines">Max lines: </p>
                             <p class="slider-label" id="calc-lines">Adding: </p>
                         </div>
-                        <input id="num-squiggles" type="range" min="1" value="32" max="150">
+                        <input id="num-squiggles" type="range" min="0" value="32" max="150">
                     </div>
 
                 </div>
@@ -196,9 +196,9 @@
                     <div class="inactive-section slider-block" id="respect-block">
                         <div class="flex">
                             <p class="slider-label">Respect User Input</p>
-                            <p class="slider-label" id="fix-label">1</p>
+                            <p class="slider-label" id="fix-label">3</p>
                         </div>
-                        <input type="range" id="respect-slider" value="1" min="0" max="4">
+                        <input type="range" id="respect-slider" value="3" min="0" max="4">
                     </div>
 
                     <!-- <p class="slider-label" id="speed-text">Change User Strokes</p>

@@ -686,15 +686,21 @@ const setPenMode = (mode, accentTarget) => {
     switch (mode) {
         case "pen-drop":
             console.log(sketchController.penDropMode);
-            setPenMode(sketchController.penDropMode, accentTarget);
+            // setPenMode(sketchController.penDropMode, accentTarget);
             if (dropdown.style.display === "none" || !dropdown.style.display) {
                 dropdown.style.display = "flex";
-                let penButton = document
-                    .getElementById("pen-drop")
-                    .getBoundingClientRect();
-                let bar = buttonPanel.getBoundingClientRect();
-                dropdown.style.top = bar.bottom + "px";
-                dropdown.style.left = penButton.left + penButton.width / 2 + "px";
+                dropdown.style.top = buttonPanel.getBoundingClientRect().bottom + "px";
+                dropdown.style.left =
+                    penDrop.getBoundingClientRect().left +
+                    penDrop.getBoundingClientRect().width / 2 +
+                    "px";
+                if (sketchController.penMode === "select") {
+                    document.getElementById("select").classList.add("selected-mode");
+                }
+                if (sketchController.penMode === "select") {
+                    document.getElementById("lasso");
+                    document.getElementById("select").classList.add("selected-mode");
+                }
             } else {
                 dropdown.style.display = "none";
             }
@@ -703,20 +709,21 @@ const setPenMode = (mode, accentTarget) => {
             dropdown.style.display = "none";
             eraseTool.activate();
             sketchController.penMode = mode;
-            sketchController.penDropMode = mode;
             break;
         case "pen":
             dropdown.style.display = "none";
             multiTool.activate();
             sketchController.penMode = mode;
-            sketchController.penDropMode = mode;
             "pen";
             break;
         case "select":
+            penDrop.classList.add("selected-mode");
             penDrop.classList.remove("fa-eraser");
+            penDrop.classList.remove("fa-object-group");
             penDrop.classList.add("fa-arrow-pointer");
             multiTool.activate();
             sketchController.penMode = mode;
+            sketchController.penDropMode = mode;
             break;
         case "lasso":
             multiTool.activate();
@@ -727,7 +734,12 @@ const setPenMode = (mode, accentTarget) => {
                     message: "You need a prompt to generate sketches with the region tool.",
                 });
             } else {
+                penDrop.classList.add("selected-mode");
+                penDrop.classList.remove("fa-eraser");
+                penDrop.classList.remove("fa-arrow-pointer");
+                penDrop.classList.add("fa-object-group");
                 sketchController.penMode = mode;
+                sketchController.penDropMode = mode;
             }
             break;
     }
@@ -744,6 +756,7 @@ const setPenMode = (mode, accentTarget) => {
     ) {
         sketchController.drawRegion = undefined;
         if (regionPath) regionPath.remove();
+        penDrop.classList.remove("selected-mode");
     }
 };
 
@@ -751,4 +764,13 @@ const getRGBA = () => {
     let rgba = sketchController.strokeColor.replace(/[^\d,]/g, "").split(",");
     rgba[3] = sketchController.opacity;
     return `rgba(${rgba.join()})`;
+};
+
+const setLineLabels = (maxLines) => {
+    let res = maxLines - userLayer.children.length;
+    sketchController.numAddedCurves = res > 0 ? res : 0;
+    document.getElementById("max-lines").innerHTML = `Max lines : ${maxLines}`;
+    document.getElementById(
+        "calc-lines"
+    ).innerHTML = `Adding : ${sketchController.numAddedCurves}`;
 };

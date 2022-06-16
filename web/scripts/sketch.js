@@ -55,7 +55,7 @@ class SketchHandler {
         this.traces = null;
         this.boundingBox = null;
         this.transformGroup = null;
-        this.useFixation = 2;
+        this.useFixation = 3;
         this.showAllLines = true;
         this.targetDrawing = false;
         this.userPaths = [];
@@ -63,7 +63,7 @@ class SketchHandler {
         // Settings panel
         this.useAdvanced = false;
         this.initRandomCurves = true;
-        this.numRandomCurves = 32;
+        this.numAddedCurves = 32;
         this.numTraces = 1;
 
         // Undo/redo stack
@@ -153,7 +153,7 @@ class SketchHandler {
                     lines: disableLines ?
                         0 :
                         this.initRandomCurves ?
-                        this.numRandomCurves :
+                        this.numAddedCurves :
                         0,
                     fixation: this.useFixation,
                 });
@@ -181,7 +181,7 @@ class SketchHandler {
         //         hasRegion: false,
         //         frameSize: exemplarSize,
         //         prompt: this.prompt,
-        //         lines: this.initRandomCurves ? this.numRandomCurves : 0,
+        //         lines: this.initRandomCurves ? this.numAddedCurves : 0,
         //     });
         //     this.clipDrawing = true;
         //     setActionUI("generating");
@@ -200,7 +200,7 @@ class SketchHandler {
                 hasRegion: false,
                 frameSize: exemplarSize,
                 prompt: this.prompt,
-                lines: this.numRandomCurves,
+                lines: this.numAddedCurves,
                 sketchScopeIndex: sketchCountIndex,
                 fixation: this.useFixation,
             });
