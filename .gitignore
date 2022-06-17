@@ -10,4 +10,4 @@ server/src/env
 
 reactcanvas/node_modules
 
-**__pycache__
+__pycache__/
