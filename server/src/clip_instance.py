@@ -17,6 +17,10 @@ class Clip_Instance:
         ):  # Should this all be refactored to not be a "class instance" since it is only used once?
             raise Exception("Clip is already instantiated.")
 
+        tv = torch.__version__.split(".")
+        tv = 10000*int(tv[0]) + 100*int(tv[1]) + int(tv[2])
+        assert tv >= 10701, "PyTorch 1.7.1 or later is required"
+
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         logging.info(f"These clip models are available: \n{clip.available_models()}")
