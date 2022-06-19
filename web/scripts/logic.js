@@ -67,8 +67,7 @@ const exportToExemplar = () => {
 };
 
 const exploreToStatic = (i) => {
-    console.log("EXPORTING");
-    console.log(exemplarScope.projects[i]);
+    console.log("EXPORTING: ", i);
     let saveSketch = exemplarScope.projects[i].activeLayer.clone({
         insert: false,
     });
@@ -87,10 +86,9 @@ const saveSketch = (fromSketch = null) => {
     }
     let sketchCountIndex = sketchController.sketchScopeIndex;
     let newElem = createExemplar(exemplarScope, true, sketchCountIndex);
+    console.log("Adding to ", sketchCountIndex);
     let toCanvas = exemplarScope.projects[sketchCountIndex];
-    let imported = toCanvas.activeLayer.importJSON(jsonGroup);
-    // imported.position = new Point(exemplarSize / 2, exemplarSize / 2);
-
+    toCanvas.activeLayer.importJSON(jsonGroup);
     newElem.classList.add("bounce");
     document.getElementById("exemplar-grid").prepend(newElem);
     sketchController.sketchScopeIndex += 1;
@@ -130,7 +128,7 @@ const setActionUI = (state) => {
         document.getElementById("redo").classList.add("inactive-top-action");
 
         promptInput.style.display = "none";
-        document.getElementById("add-refine").style.display = "block";
+        // document.getElementById("add-refine").style.display = "block";
         document.getElementById("spinner").style.display = "flex";
 
         // document.getElementById("respect-block").classList.add("inactive-section");
@@ -186,7 +184,7 @@ const setActionUI = (state) => {
 
         document.getElementById("spinner").style.display = "none";
         promptInput.style.display = "flex";
-        document.getElementById("add-refine").style.display = "none";
+        // document.getElementById("add-refine").style.display = "none";
         aiMessage.innerHTML = "All done! What should we draw next?";
         aiMessage.classList.add("typed-out");
 
@@ -422,38 +420,46 @@ const showHide = (item) => {
 const parseFromSvg = (svg, layer, showAllPaths = true) => {
     if (svg === "" || svg === undefined) return null;
     let paperObject = layer.importSVG(svg);
-    // to do check children exist
-    const numPaths = paperObject.children[0].children.length; // drawn on the canvas right now
-    const numUserPaths = sketchController.userPaths.length;
+    if (paperObject.children[0].children) {
+        // paperObject.scale(userLayer.view.viewSize.width / 224, new Point(0, 0));
 
-    const sentUserPaths = sketchController.userPaths;
-    sketchController.userPaths = [];
+        paperObject.scale(exemplarSize / 224, new Point(0, 0));
 
-    for (const returnedIndex in paperObject.children[0].children) {
-        const child = paperObject.children[0].children[returnedIndex];
-        child.smooth();
+        const numUserPaths = sketchController.userPaths.length;
+        sketchController.userPaths = [];
 
-        if (sketchController.initRandomCurves && !sketchController.linesDisabled) {
-            if (returnedIndex >= numUserPaths) {
-                child.opacity *= 0.5;
+        for (const returnedIndex in paperObject.children[0].children) {
+            const child = paperObject.children[0].children[returnedIndex];
+            child.smooth();
+            // child.strokeWidth *= userLayer.view.viewSize.width / 224;
+
+            child.strokeWidth *= exemplarSize / 224;
+
+            if (
+                sketchController.initRandomCurves &&
+                !sketchController.linesDisabled
+            ) {
+                if (returnedIndex >= numUserPaths) {
+                    child.opacity *= 0.5;
+                }
             }
+
+            const pathEffect = child.clone({ insert: false });
+
+            if (!showAllPaths) {
+                if (returnedIndex < numUserPaths) {
+                    layer.addChild(pathEffect);
+                }
+            } else {
+                // Add all
+                let added = layer.addChild(pathEffect);
+                if (returnedIndex < numUserPaths) {
+                    sketchController.userPaths.push(added);
+                }
+            }
+
+            // layer.addChild(pathEffect);
         }
-
-        const pathEffect = child.clone({ insert: false });
-
-        if (!showAllPaths) {
-            if (returnedIndex < numUserPaths) {
-                layer.addChild(pathEffect);
-            }
-        } else {
-            // Add all
-            let added = layer.addChild(pathEffect);
-            if (returnedIndex < numUserPaths) {
-                sketchController.userPaths.push(added);
-            }
-        }
-
-        // layer.addChild(pathEffect);
     }
     paperObject.remove();
     return paperObject;
@@ -507,94 +513,116 @@ const showTraceHistoryFrom = (fromIndex) => {
 };
 
 ws.onmessage = function(event) {
-    try {
-        var result = JSON.parse(event.data);
-    } catch (e) {
-        console.log("Unexpected JSON event\n", e);
-        console.log(event);
-        sketchController.clipDrawing = false;
-    }
-
-    if (sketchController.clipDrawing) {
-        if (event.data !== "") {
-            if (result.status === "stop") {
-                console.log("WHYYYYYY");
-                sketchController.clipDrawing = false;
-            }
-
-            if (result.status === "draw") {
-                console.log("DRAWING: ", result);
-                userLayer.clear();
-
-                if (sketchController.isFirstIteration) {
-                    userLayer.clear();
-                    sketchController.isFirstIteration = false;
-                } else {
-                    if (sketchController.lastRender) {
-                        sketchController.lastRender.remove();
+    console.log(event);
+    if (event.data !== "" && event.data) {
+        try {
+            if ((event.data.match(/{/g) || []).length > 1) {
+                console.log("Parsing Concurrent JSON events");
+                let responses = [];
+                let res = "";
+                for (let ch of event.data) {
+                    if (ch === "{") {
+                        res = [];
                     }
-                    if (sketchController.traces) {
-                        for (const trace of sketchController.traces) {
-                            trace.remove();
-                        }
+                    res += ch;
+                    if (ch === "}") {
+                        responses.push(res);
                     }
                 }
-
-                sketchController.stack.historyHolder.push({
-                    ...result,
-                    svg: sketchController.svg, //only use canvas paths at that point
+                responses.forEach((parsedRes) => {
+                    loadResponse(JSON.parse(parsedRes));
                 });
-
-                timeKeeper.style.width = "100%";
-                timeKeeper.setAttribute("max", String(sketchController.step + 1));
-                timeKeeper.value = String(sketchController.step + 1);
-                setTraces.setAttribute("max", String(sketchController.step + 1));
-                sketchController.step += 1; //avoid disconnected iteration after stopping
-
-                // To do change this so it is just max num sketchController.traces
-                if (sketchController.numTraces > 1) {
-                    showTraceHistoryFrom(sketchController.stack.historyHolder.length - 1);
-                } else {
-                    sketchController.lastRender = parseFromSvg(
-                        result.svg,
-                        userLayer,
-                        sketchController.showAllLines
-                    );
-                    sketchController.svg = paper.project.exportSVG({
-                        asString: true,
-                    });
-                }
-
-                calcRollingLoss();
-
-                // lossText.innerHTML = `Step: ${sketchController.step}\nLoss:
-                // ${sketchController.lastRollingLoss.toPrecision(5)}`;
-
-                console.log(
-                    `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}. Drawn ${sketchController.step}`
-                );
-
-                if (sketchController.drawState == "pruning") {
-                    sketchController.clipDrawing = false;
-                    setActionUI("stop");
-                }
+                console.log("Done");
+            } else {
+                loadResponse(JSON.parse(event.data));
             }
+        } catch (e) {
+            console.log("Cooked ", e);
+            sketchController.clipDrawing = false;
+        }
+        console.log("Update");
+    }
+};
 
-            var matches = result.status.match(/\d+/g); //if status is a num
-            if (matches != null) {
-                if (result.svg === "") return null;
+const loadResponse = (result) => {
+    if (sketchController.clipDrawing) {
+        if (result.status === "stop") {
+            console.log("WHYYYYYY");
+            sketchController.clipDrawing = false;
+        }
+
+        if (result.status === "draw") {
+            console.log("DRAWING: ", result);
+            userLayer.clear();
+
+            if (sketchController.isFirstIteration) {
                 userLayer.clear();
-
-                let thisCanvas = exemplarScope.projects[result.sketch_index];
-
-                console.log(result.sketch_index);
-                thisCanvas.clear();
-                let imported = parseFromSvg(
-                    result.svg,
-                    thisCanvas.activeLayer
-                    // sketchController.showAllLines
-                );
+                sketchController.isFirstIteration = false;
+            } else {
+                if (sketchController.lastRender) {
+                    sketchController.lastRender.remove();
+                }
+                if (sketchController.traces) {
+                    for (const trace of sketchController.traces) {
+                        trace.remove();
+                    }
+                }
             }
+
+            sketchController.stack.historyHolder.push({
+                ...result,
+                svg: sketchController.svg, //only use canvas paths at that point
+            });
+
+            timeKeeper.style.width = "100%";
+            timeKeeper.setAttribute("max", String(sketchController.step + 1));
+            timeKeeper.value = String(sketchController.step + 1);
+            setTraces.setAttribute("max", String(sketchController.step + 1));
+            sketchController.step += 1; //avoid disconnected iteration after stopping
+
+            // To do change this so it is just max num sketchController.traces
+            if (sketchController.numTraces > 1) {
+                showTraceHistoryFrom(sketchController.stack.historyHolder.length - 1);
+            } else {
+                sketchController.lastRender = parseFromSvg(
+                    result.svg,
+                    userLayer,
+                    sketchController.showAllLines
+                );
+                sketchController.svg = paper.project.exportSVG({
+                    asString: true,
+                });
+            }
+
+            calcRollingLoss();
+
+            // lossText.innerHTML = `Step: ${sketchController.step}\nLoss:
+            // ${sketchController.lastRollingLoss.toPrecision(5)}`;
+
+            console.log(
+                `Draw iteration: ${result.iterations} \nLoss value: ${result.loss}. Drawn ${sketchController.step}`
+            );
+
+            if (sketchController.drawState == "pruning") {
+                sketchController.clipDrawing = false;
+                setActionUI("stop");
+            }
+        }
+
+        var matches = result.status.match(/\d+/g); //if status is a num
+        if (matches != null) {
+            if (result.svg === "") return null;
+            // userLayer.clear();
+
+            let thisCanvas = exemplarScope.projects[result.sketch_index];
+
+            console.log(result.sketch_index);
+            thisCanvas.clear();
+            let imported = parseFromSvg(
+                result.svg,
+                thisCanvas.activeLayer
+                // sketchController.showAllLines
+            );
         }
     }
 };

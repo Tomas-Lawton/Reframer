@@ -192,7 +192,6 @@ class SketchHandler {
                 console.error("exemplars not found");
             }
             console.log("Starting exemplar: ", sketchCountIndex);
-            this.clipDrawing = true;
             this.targetDrawing = true;
             this.updateDrawer({
                 status: "add_new_exemplar",
@@ -204,7 +203,6 @@ class SketchHandler {
                 sketchScopeIndex: sketchCountIndex,
                 fixation: this.useFixation,
             });
-            this.clipDrawing = true;
         }
     }
     redraw() {

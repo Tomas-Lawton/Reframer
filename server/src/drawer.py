@@ -369,11 +369,13 @@ class Drawer:
             if self.sketch_reference_index is not None:
                     self.resizeScaleFactor = 224 / self.frame_size
 
-            render_shapes, render_shape_groups = rescale_constants(
-                self.shapes, self.shape_groups, self.resizeScaleFactor
-            )
 
-            # render_shapes, render_shape_groups = self.shapes, self.shape_groups
+            # MUST FIX or just don't scale it
+            # render_shapes, render_shape_groups = rescale_constants(
+            #     self.shapes, self.shape_groups, self.resizeScaleFactor
+            # )
+
+            render_shapes, render_shape_groups = self.shapes, self.shape_groups
             # print("RENDERED SIZE: ", self.user_canvas_w)
             # print("Scaled: ", 224 / self.resizeScaleFactor)
 
@@ -401,19 +403,17 @@ class Drawer:
                     "status": status, 
                     "svg": svg, 
                     "iterations": t, 
-                    "loss": loss.item(), 
+                    "loss": str(loss.item()), 
                     "sketch_index": self.sketch_reference_index,
-                    # "w": self.user_canvas_w,
-                    # "shapes": render_shapes,
-                    # "groups": render_shape_groups,
                 }
-                # logging.info(result)
-                self.last_result = result  # won't go to client unless continued is used
+                self.last_result = result  # only for continue
                 try:
+                    # concurrent drawers can send simultanious json so
                     await self.socket.send_json(result)
                     logging.info("Sent update")
                 except Exception as e:
                     logging.error("Failed sending WS response")
+                    pass
             except Exception as e:
                 logging.error("WS Response Failed")
                 await self.stop()
@@ -488,7 +488,7 @@ class Drawer:
         try:
             self.num_user_paths = int(data["data"]["num_user_paths"])
         except Exception as e:
-            logging.error("Must include number of user pathss")
+            logging.error("Must include number of user paths")
 
         self.w_points, self.w_colors, self.w_widths = use_penalisation(data["data"]["fixation"])
 
@@ -500,7 +500,9 @@ class Drawer:
     async def stop(self):
         logging.info(f"Stopping... {self.sketch_reference_index}")
         self.is_running = False
-        await self.socket.send_json({"status": "stop"})
+        # check the socket is still open before sending stop
+        # logging.info(f"Sent stop for... {self.sketch_reference_index}")
+        # await self.socket.send_json({"status": "stop"})
 
     def run_async(self):
         self.is_running = True  # for loop to continue

@@ -273,11 +273,11 @@ opacitySlider.oninput = function() {
     document.getElementById("point-size").style.background = rgba;
 };
 
-document.getElementById("autonomy-slider").oninput = function() {
-    let val = 11 - this.value;
-    // 0-10
-    sketchController.addPaths = val; //used for adding
-};
+// document.getElementById("autonomy-slider").oninput = function() {
+//     let val = 11 - this.value;
+//     // 0-10
+//     sketchController.addPaths = val; //used for adding
+// };
 
 document
     .getElementById("circle-small")
@@ -452,6 +452,7 @@ document.getElementById("brainstorm").addEventListener("click", () => {
                 sketchController.sketchScopeIndex += 1;
             }
         }
+        sketchController.clipDrawing = true;
         setActionUI("brainstorming-exemplars");
     }
 });
@@ -590,10 +591,10 @@ autoButton.addEventListener("click", () => {
     autoButton.classList.toggle("inactive-pill");
 });
 
-document.getElementById("show-all-paths").addEventListener("click", () => {
-    sketchController.showAllLines = !sketchController.showAllLines;
-    document.getElementById("show-all-paths").classList.toggle("inactive-pill");
-});
+// document.getElementById("show-all-paths").addEventListener("click", () => {
+//     sketchController.showAllLines = !sketchController.showAllLines;
+//     document.getElementById("show-all-paths").classList.toggle("inactive-pill");
+// });
 
 document.getElementById("num-squiggles").oninput = function() {
     setLineLabels(parseInt(this.value));
@@ -737,8 +738,8 @@ sketchBook.style.left =
     window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";
 controlPanel.style.left = 5 + "px";
 
-sketchBook.style.display = "none";
-controlPanel.style.display = "none";
+// sketchBook.style.display = "none";
+// controlPanel.style.display = "none";
 // if (window.innerWidth < 650) {
 //     document
 //         .getElementById("content")

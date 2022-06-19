@@ -91,7 +91,7 @@ if os.environ.get('CONNECTAI') == "True":
                 try:
                     data = await websocket.receive_json()
                     logging.info(data)
-                except Exception as e:
+                except RuntimeError:
                     logging.warning("Unexpected json received by socket")
                     await artefact_drawer.stop()
                     del artefact_drawer
@@ -99,7 +99,7 @@ if os.environ.get('CONNECTAI') == "True":
                         logging.info("Suspend Brainstorm")
                         await drawer.stop()
                         del drawer
-                    break
+                    pass
 
                 if data["status"] == "draw":
                     try:
