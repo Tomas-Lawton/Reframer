@@ -86,6 +86,10 @@ if os.environ.get('CONNECTAI') == "True":
         except Exception as e:
             logging.error("Bad socket")
 
+        # Send the data
+
+
+        # Recieve the data
         try:
             while True:
                 try:

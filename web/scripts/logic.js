@@ -532,7 +532,6 @@ ws.onmessage = function(event) {
                 responses.forEach((parsedRes) => {
                     loadResponse(JSON.parse(parsedRes));
                 });
-                console.log("Done");
             } else {
                 loadResponse(JSON.parse(event.data));
             }

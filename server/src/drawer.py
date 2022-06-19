@@ -1,14 +1,16 @@
 import copy
 import torch
 import pydiffvg
-import time
 from util.processing import get_augment_trans
-
 from util.loss import CLIPConvLoss2
 from util.utils import area_mask, use_penalisation, k_max_elements
 from util.render_design import rescale_constants, calculate_draw_region, UserSketch
 from util.render_design import add_shape_groups, treebranch_initialization
 from util.clip_utility import get_noun_data, parse_svg, shapes2paths
+
+
+
+from datetime import datetime
 import logging
 import asyncio
 import aiofiles
@@ -501,8 +503,8 @@ class Drawer:
         logging.info(f"Stopping... {self.sketch_reference_index}")
         self.is_running = False
         # check the socket is still open before sending stop
-        # logging.info(f"Sent stop for... {self.sketch_reference_index}")
-        # await self.socket.send_json({"status": "stop"})
+        logging.info(f"Sent stop for... {self.sketch_reference_index}")
+        await self.socket.send_json({"status": "stop"})
 
     def run_async(self):
         self.is_running = True  # for loop to continue
