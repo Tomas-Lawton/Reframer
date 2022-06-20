@@ -17,7 +17,6 @@ const importStaticSketch = (i) => {
 };
 
 const importToSketch = (exemplarIndex, clear) => {
-    console.log("IMPORTING");
     let copy = exemplarScope.projects[exemplarIndex].activeLayer.clone();
     let expandedExemplar = copy.scale(scaleRatio, new Point(0, 0));
     if (clear) {
@@ -48,7 +47,6 @@ const importToSketch = (exemplarIndex, clear) => {
 };
 
 const exportToExemplar = () => {
-    console.log("EXPORTING");
     unpackGroup();
     userLayer.getItems().forEach((path) => {
         path.selected = false;
@@ -67,7 +65,6 @@ const exportToExemplar = () => {
 };
 
 const exploreToStatic = (i) => {
-    console.log("EXPORTING: ", i);
     let toSketchbook = exemplarScope.projects[i].activeLayer.clone({
         insert: false,
     });
@@ -86,7 +83,6 @@ const toSketchbook = (fromSketch = null) => {
     }
     let sketchCountIndex = sketchController.sketchScopeIndex;
     let newElem = createExemplar(exemplarScope, true, sketchCountIndex);
-    console.log("Adding to ", sketchCountIndex);
     let toCanvas = exemplarScope.projects[sketchCountIndex];
     toCanvas.activeLayer.importJSON(jsonGroup);
     newElem.classList.add("bounce");
@@ -406,7 +402,6 @@ const deletePath = () => {
         sketchController.continueSketch();
         liveCollab = false;
     }
-    console.log(sketchController.userPaths);
     logger.event("deleted-path");
 };
 

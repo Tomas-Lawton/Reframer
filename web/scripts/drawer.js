@@ -234,7 +234,6 @@ multiTool.onMouseUp = function() {
         asString: true,
     });
 
-    console.log(sketchController.userPaths);
     logger.event(sketchController.penMode + "-up");
 };
 
@@ -302,9 +301,6 @@ eraseTool.onMouseUp = function(event) {
         overlapping: deleteShape.bounds,
     });
     erasorItems.forEach(function(erasorItem) {
-        // breaks with groups because groups can't do boolean ops
-        console.log(erasorItem);
-
         const result = erasorItem.subtract(deleteShape, {
             trace: false,
             insert: false,
@@ -361,12 +357,10 @@ eraseTool.onMouseUp = function(event) {
         asString: true,
     });
 
-    console.log(sketchController.userPaths);
     logger.event("erase-up");
 
     if (liveCollab) {
         sketchController.continueSketch();
         liveCollab = false;
     }
-    console.log(sketchController.userPaths);
 };

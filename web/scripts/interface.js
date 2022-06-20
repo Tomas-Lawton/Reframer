@@ -105,8 +105,6 @@ deleteHandler.addEventListener("click", (e) => {
 });
 
 copyHandler.addEventListener("click", (e) => {
-    // copy selection next to ???
-    console.log(sketchController.boundingBox);
     let offset = sketchController.boundingBox.bounds.width;
     hideSelectUI(false);
 
@@ -696,8 +694,6 @@ const scaleGroup = (group, to) => {
     });
 
     setLineLabels(32);
-
-    console.log("LOADED: ", userLayer);
 })();
 
 const picker = new Picker({

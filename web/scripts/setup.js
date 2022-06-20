@@ -86,7 +86,7 @@ const exemplarSize =
     document.querySelectorAll("div#exemplar-grid")[0].offsetWidth / 2 - 5;
 const reusableExemplar = exemplarTemplate.cloneNode(true); //clone to use
 exemplarTemplate.remove();
-console.log(exemplarSize);
+// console.log(exemplarSize);
 
 if (containerRect.width > window.innerHeight) {
     canvas.width = window.innerHeight - padding * 2;

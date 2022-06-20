@@ -125,10 +125,10 @@ class SketchHandler {
             asString: true,
         }); //for svg parsing
 
-        console.log("Sorted: ", sorted);
-        console.log("USER: ", this.userPaths.length);
-        console.log("AI: ", aiPaths.length);
-        console.log("TOTAL: ", userLayer.getItems().length);
+        // console.log("Sorted: ", sorted);
+        // console.log("USER: ", this.userPaths.length);
+        // console.log("AI: ", aiPaths.length);
+        // console.log("TOTAL: ", userLayer.getItems().length);
     }
 
     draw(withRegion = false, svg = null, disableLines = false) {
@@ -191,7 +191,6 @@ class SketchHandler {
             if (!exemplarSize) {
                 console.error("exemplars not found");
             }
-            console.log("Starting exemplar: ", sketchCountIndex);
             this.targetDrawing = true;
             this.updateDrawer({
                 status: "add_new_exemplar",
