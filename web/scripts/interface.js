@@ -41,7 +41,7 @@ function dropSketch(e) {
     const sketchCountIndex = e.dataTransfer.getData("text/plain");
     let dragItem = document.querySelector(`#AI-sketch-item-${sketchCountIndex}`);
     if (dragItem) {
-        saveSketch(sketchCountIndex); //backup current
+        toSketchbook(sketchCountIndex); //backup current
     }
 }
 
@@ -106,6 +106,23 @@ deleteHandler.addEventListener("click", (e) => {
 
 copyHandler.addEventListener("click", (e) => {
     // copy selection next to ???
+    console.log(sketchController.boundingBox);
+    let offset = sketchController.boundingBox.bounds.width;
+    hideSelectUI(false);
+
+    getSelectedPaths().forEach((path) => {
+        let duplicate = path.clone();
+        duplicate.position.x += offset;
+        duplicate.selected = true;
+    });
+
+    sketchController.svg = paper.project.exportSVG({
+        asString: true,
+    });
+    logger.event("duplicate-selection");
+
+    fitToSelection(getSelectedPaths(), "moving");
+    updateSelectUI();
 });
 
 // reviseHandler.addEventListener("click", (e) => {
@@ -554,7 +571,8 @@ document.getElementById("scrapbook").addEventListener("click", () => {
 // });
 
 document.getElementById("save-sketch").addEventListener("click", () => {
-    saveSketch();
+    toSketchbook();
+    logger.event("to-sketchbook");
 });
 
 const autoButton = document.getElementById("autodraw-button");

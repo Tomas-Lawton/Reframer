@@ -5,13 +5,13 @@ const importStaticSketch = (i) => {
             message: "Import into the main canvas? Contents will be saved.",
             confirmAction: () => {
                 pauseActiveDrawer();
-                saveSketch();
+                toSketchbook();
                 importToSketch(i, true); //overwrite
             },
         });
     } else {
         pauseActiveDrawer();
-        saveSketch();
+        toSketchbook();
         importToSketch(i, false); //copy traces
     }
 };
@@ -68,16 +68,16 @@ const exportToExemplar = () => {
 
 const exploreToStatic = (i) => {
     console.log("EXPORTING: ", i);
-    let saveSketch = exemplarScope.projects[i].activeLayer.clone({
+    let toSketchbook = exemplarScope.projects[i].activeLayer.clone({
         insert: false,
     });
-    saveSketch.getItems().forEach((path) => {
+    toSketchbook.getItems().forEach((path) => {
         path.selected = false;
     });
-    return saveSketch.exportJSON();
+    return toSketchbook.exportJSON();
 };
 
-const saveSketch = (fromSketch = null) => {
+const toSketchbook = (fromSketch = null) => {
     let jsonGroup;
     if (fromSketch !== null) {
         jsonGroup = exploreToStatic(fromSketch);
