@@ -20,7 +20,8 @@ logging.info("Starting App")
 app = FastAPI(title="Clip Algorithm API")
 origins = [
     "http://127.0.0.1:8000",
-    "https://tomas-lawton.github.io/drawing-client"
+    "https://tomas-lawton.github.io/drawing-client",
+    "https://tomas-lawton.github.io",
     "http://localhost:5500"
 ]
 
