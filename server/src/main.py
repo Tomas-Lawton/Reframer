@@ -1,12 +1,13 @@
-from drawer import Drawer
-from clip_instance import Clip_Instance
 import logging
 import os
 import uvicorn
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
+
+# from drawer import Drawer
+# from clip_instance import Clip_Instance
+# from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 
 # TO DO add environment var to set log mode
 logging.basicConfig(
@@ -18,10 +19,7 @@ logging.info("Starting App")
 
 app = FastAPI(title="Clip Algorithm API")
 origins = [
-    "http://localhost",
     "http://127.0.0.1:8000",
-    "http://127.0.0.1:5500",
-    "https://tomas-lawton.github.io",
     "https://tomas-lawton.github.io/drawing-client"
     "http://localhost:5500"
 ]
