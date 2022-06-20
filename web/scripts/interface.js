@@ -168,6 +168,13 @@ document.getElementById("undo").addEventListener("click", () => {
             let afterDelete = userLayer.exportJSON();
             userLayer.clear();
             userLayer.importJSON(lastEvent.data);
+            let addedGroup = userLayer.lastChild;
+            if (addedGroup instanceof Group) {
+                addedGroup.children.forEach((child) =>
+                    userLayer.addChild(child.clone())
+                );
+                addedGroup.remove();
+            }
             sketchController.stack.redoStack.push({
                 type: "delete-event",
                 data: afterDelete, //use ref

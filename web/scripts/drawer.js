@@ -303,6 +303,8 @@ eraseTool.onMouseUp = function(event) {
     });
     erasorItems.forEach(function(erasorItem) {
         // breaks with groups because groups can't do boolean ops
+        console.log(erasorItem);
+
         const result = erasorItem.subtract(deleteShape, {
             trace: false,
             insert: false,
