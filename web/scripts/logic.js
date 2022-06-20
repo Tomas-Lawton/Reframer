@@ -408,10 +408,10 @@ const deletePath = () => {
 };
 
 const showHide = (item) => {
-    if (item.style.display == undefined || item.style.display == "none") {
-        item.style.display = "flex";
-    } else {
+    if (item.style.display === "flex") {
         item.style.display = "none";
+    } else {
+        item.style.display = "flex";
     }
 };
 
@@ -512,36 +512,38 @@ const showTraceHistoryFrom = (fromIndex) => {
     }
 };
 
-ws.onmessage = function(event) {
-    console.log(event);
-    if (event.data !== "" && event.data) {
-        try {
-            if ((event.data.match(/{/g) || []).length > 1) {
-                console.log("Parsing Concurrent JSON events");
-                let responses = [];
-                let res = "";
-                for (let ch of event.data) {
-                    if (ch === "{") {
-                        res = [];
+if (useAI) {
+    ws.onmessage = function(event) {
+        console.log(event);
+        if (event.data !== "" && event.data) {
+            try {
+                if ((event.data.match(/{/g) || []).length > 1) {
+                    console.log("Parsing Concurrent JSON events");
+                    let responses = [];
+                    let res = "";
+                    for (let ch of event.data) {
+                        if (ch === "{") {
+                            res = [];
+                        }
+                        res += ch;
+                        if (ch === "}") {
+                            responses.push(res);
+                        }
                     }
-                    res += ch;
-                    if (ch === "}") {
-                        responses.push(res);
-                    }
+                    responses.forEach((parsedRes) => {
+                        loadResponse(JSON.parse(parsedRes));
+                    });
+                } else {
+                    loadResponse(JSON.parse(event.data));
                 }
-                responses.forEach((parsedRes) => {
-                    loadResponse(JSON.parse(parsedRes));
-                });
-            } else {
-                loadResponse(JSON.parse(event.data));
+            } catch (e) {
+                console.log("Cooked ", e);
+                sketchController.clipDrawing = false;
             }
-        } catch (e) {
-            console.log("Cooked ", e);
-            sketchController.clipDrawing = false;
+            console.log("Update");
         }
-        console.log("Update");
-    }
-};
+    };
+}
 
 const loadResponse = (result) => {
     if (sketchController.clipDrawing) {
@@ -731,7 +733,7 @@ const setPenMode = (mode, accentTarget) => {
         case "pen":
             let swatches = document.getElementById("swatches");
 
-            if (window.innerWidth < 650) {
+            if (window.innerWidth < 700) {
                 if (swatches.style.display !== "flex") {
                     swatches.style.display = "flex";
                     swatches.style.top =
@@ -805,4 +807,34 @@ const setLineLabels = (maxLines) => {
     document.getElementById(
         "calc-lines"
     ).innerHTML = `Adding : ${sketchController.numAddedCurves}`;
+};
+
+const downloadSketch = () => {
+    // REMOVE REFs to select box
+    userLayer.getItems().forEach((path) => {
+        path.selected = false;
+    });
+    // Remove the select box
+    sketchController.svg = paper.project.exportSVG({
+        asString: true,
+    });
+    logger.event("save-sketch");
+
+    canvas.toBlob((blob) => {
+        let url = window.URL || window.webkitURL;
+        let link = url.createObjectURL(blob);
+        // window.open(link, "_blank");
+
+        let isIE = false || !!document.documentMode;
+        if (isIE) {
+            window.navigator.msSaveBlob(blob, fileName);
+        } else {
+            let a = document.createElement("a");
+            a.setAttribute("download", "sketch.png");
+            a.setAttribute("href", link);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    });
 };

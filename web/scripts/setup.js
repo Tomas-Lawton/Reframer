@@ -1,31 +1,27 @@
-const useAI = true;
-if (useAI) {
-    document
-        .querySelectorAll(".ai-ui")
-        .forEach((aiItem) => aiItem.classList.remove("ai-ui"));
-    document.getElementById("style-view").style.display = "none";
-} else {
-    document.getElementById("ai-view").style.display = "none";
-}
-
 const http = "http://";
 // const http = "https://";
 // const base = "0.0.0.0:8000";
 // const base = "vector-logging-server.herokuapp.com";
 const base = "localhost:8000";
-const ws = new WebSocket("ws://" + base + "/ws");
-ws.onclose = (event) => {
-    console.log("Closed socket... Running without AI\n" + event);
-};
+
+const useAI = false;
+if (useAI) {
+    document
+        .querySelectorAll(".ai-ui")
+        .forEach((aiItem) => aiItem.classList.remove("ai-ui"));
+    document.getElementById("style-view").style.display = "none";
+
+    var ws = new WebSocket("ws://" + base + "/ws");
+    ws.onclose = (event) => {
+        console.log("Closed socket... Running without AI\n" + event);
+    };
+} else {
+    document.getElementById("ai-view").style.display = "none";
+    document.getElementById("tabs").remove();
+}
 
 // Sketching UI
 const canvas = document.getElementById("canvas");
-const exemplars = [
-    document.getElementById("canvas1"),
-    document.getElementById("canvas2"),
-    document.getElementById("canvas3"),
-    document.getElementById("canvas4"),
-];
 
 // Actions
 const actionControls = document.querySelectorAll(".ai-action");
@@ -90,6 +86,7 @@ const exemplarSize =
     document.querySelectorAll("div#exemplar-grid")[0].offsetWidth / 2 - 5;
 const reusableExemplar = exemplarTemplate.cloneNode(true); //clone to use
 exemplarTemplate.remove();
+console.log(exemplarSize);
 
 if (containerRect.width > window.innerHeight) {
     canvas.width = window.innerHeight - padding * 2;

@@ -411,8 +411,9 @@ class Drawer:
                 self.last_result = result  # only for continue
                 try:
                     # concurrent drawers can send simultanious json so
+                    logging.info(f"SENDING {self.sketch_reference_index} AT ", datetime.strftime())
                     await self.socket.send_json(result)
-                    logging.info("Sent update")
+                    logging.info(f"Finished update for {self.sketch_reference_index}")
                 except Exception as e:
                     logging.error("Failed sending WS response")
                     pass

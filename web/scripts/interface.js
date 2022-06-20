@@ -212,34 +212,9 @@ document.getElementById("redo").addEventListener("click", () => {
     }
 });
 document.getElementById("save").addEventListener("click", () => {
-    // REMOVE REFs to select box
-    userLayer.getItems().forEach((path) => {
-        path.selected = false;
-    });
-    // Remove the select box
-    sketchController.svg = paper.project.exportSVG({
-        asString: true,
-    });
-    logger.event("save-sketch");
-
-    canvas.toBlob((blob) => {
-        let url = window.URL || window.webkitURL;
-        let link = url.createObjectURL(blob);
-        // window.open(link, "_blank");
-
-        let isIE = false || !!document.documentMode;
-        if (isIE) {
-            window.navigator.msSaveBlob(blob, fileName);
-        } else {
-            let a = document.createElement("a");
-            a.setAttribute("download", "sketch.png");
-            a.setAttribute("href", link);
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-    });
+    downloadSketch();
 });
+
 document.getElementById("width-slider").oninput = function() {
     setPointSize(this.value);
 };
@@ -300,13 +275,13 @@ document
         setPenMode("pen", pen);
     });
 
-document.getElementById("settings").addEventListener("click", () => {
-    openModal({
-        title: "Advanced",
-        message: "Change the drawing behaviour and UI.",
-        ui: document.getElementById("settings-ui"),
-    });
-});
+// document.getElementById("settings").addEventListener("click", () => {
+//     openModal({
+//         title: "Advanced",
+//         message: "Change the drawing behaviour and UI.",
+//         ui: document.getElementById("settings-ui"),
+//     });
+// });
 
 timeKeeper.oninput = function() {
     if (this.value === 0) return; // 0 is pre-generation state
@@ -459,18 +434,21 @@ document.getElementById("brainstorm").addEventListener("click", () => {
 
 // Control panel
 controlPanel.onmousedown = (e) => {
-    if (window.innerWidth > 650) {
+    if (window.innerWidth > 700) {
         let content;
-        document.querySelectorAll(".tab-item").forEach((tab) => {
-            if (tab.classList.contains("active-tab")) {
-                if (tab.id === "collab-tab") {
-                    content = document.getElementById("ai-content");
-                } else {
-                    content = document.getElementById("style-content");
+        if (useAI) {
+            document.querySelectorAll(".tab-item").forEach((tab) => {
+                if (tab.classList.contains("active-tab")) {
+                    if (tab.id === "collab-tab") {
+                        content = document.getElementById("ai-content");
+                    } else {
+                        content = document.getElementById("style-content");
+                    }
                 }
-            }
-        });
-        // content = document.getElementById("style-content");
+            });
+        } else {
+            content = document.getElementById("style-content");
+        }
 
         let bounds = content.getBoundingClientRect();
         e = e || window.event;
@@ -489,7 +467,7 @@ controlPanel.onmousedown = (e) => {
 };
 
 document.getElementById("explore-margin").onmousedown = (e) => {
-    if (window.innerWidth > 650) {
+    if (window.innerWidth > 700) {
         let content = document.getElementById("explore-sketches");
         let bounds = content.getBoundingClientRect();
         e = e || window.event;
@@ -508,7 +486,7 @@ document.getElementById("explore-margin").onmousedown = (e) => {
 };
 
 document.getElementById("static-margin").onmousedown = (e) => {
-    if (window.innerWidth > 650) {
+    if (window.innerWidth > 700) {
         let content = document.getElementById("static-sketches");
         let bounds = content.getBoundingClientRect();
         e = e || window.event;
@@ -733,21 +711,34 @@ for (let i = 0; i < 4; i++) {
     newElem.classList.add("inactive-exemplar");
     document.getElementById("explore-sketches").appendChild(newElem);
 }
-console.log(sketchBook.getBoundingClientRect());
-sketchBook.style.left =
-    window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";
-controlPanel.style.left = 5 + "px";
 
-// sketchBook.style.display = "none";
+// sketchBook.style.left =
+//     window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";
+sketchBook.style.display = "none";
+// controlPanel.style.left = 5 + "px";
 // controlPanel.style.display = "none";
-// if (window.innerWidth < 650) {
+// if (window.innerWidth < 700) {
 //     document
 //         .getElementById("content")
 //         .appendChild(document.getElementById("style-content"));
 // }
 
-if (window.innerWidth < 650 || window.innerWidth > 1000) {
+if (window.innerWidth <= 700 || window.innerWidth >= 1000) {
     document
         .querySelectorAll(".hide-swatch")
         .forEach((elem) => elem.classList.remove("hide-swatch"));
+}
+
+if (window.innerWidth <= 700) {
+    penControls.appendChild(document.getElementById("scrapbook"));
+    penControls.appendChild(document.getElementById("delete"));
+
+    document.getElementById("save").removeEventListener("click", () => {
+        downloadSketch();
+    });
+    document
+        .getElementById("save")
+        .parentElement.addEventListener("click", () => {
+            downloadSketch();
+        });
 }

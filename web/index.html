@@ -29,7 +29,7 @@
 <body>
     <div id="modal">
         <div id="simple-modal">
-            <div class="modal-status">
+            <div class="flex">
                 <h2 id="modal-title"></h2>
                 <i id="modal-cross" class="fa-solid fa-xmark"></i>
             </div>
@@ -76,16 +76,16 @@
         <i class="fa-solid fa-arrow-pointer fa-fw simple-hover pen-mode" id="pen-drop"></i>
         <i class="fa-solid fa-pen fa-fw pen-mode selected-mode" id="pen"></i>
         <i class="fa-solid fa-eraser fa-fw pen-mode" id="erase"></i>
-        <i class="fa-solid fa-sliders fa-fw panel-open" id="palette"></i>
+        <i class="fa-solid fa-sliders fa-fw" id="palette"></i>
         <i class="fa-solid fa-rotate-left fa-fw simple-hover" id="undo"></i>
         <i class="fa-solid fa-rotate-right fa-fw simple-hover" id="redo"></i>
     </div>
 
     <div class="top-action" id="top-action-right">
-        <i class="fa-solid fa-book fa-fw panel-open" id="scrapbook"></i>
+        <i class="fa-solid fa-book fa-fw" id="scrapbook"></i>
         <i class="fa-solid fa-trash fa-fw" id="delete"></i>
         <i class="fa-solid fa-save fa-fw" id="save"></i>
-        <i class="fa-solid fa-cog fa-fw" id="settings"></i>
+        <!-- <i class="fa-solid fa-cog fa-fw" id="settin    gs"></i> -->
     </div>
     <!-- <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i> -->
 
@@ -363,7 +363,7 @@
 
                     <div id="transform-ui" style="display: none">
                         <div class="transformer">
-                            <div class="number-input">
+                            <div class="flex">
                                 <p>Rotate</p>
                                 <input type="number" id="rotate-number" value="0" min="-180" max="180" step="1">
                             </div>
@@ -372,7 +372,7 @@
                             </div>
                         </div>
                         <div class="transformer">
-                            <div class="number-input">
+                            <div class="flex">
                                 <p>Scale</p>
                                 <input type="number" id="scale-number" value="15" min="1" max="20">
                             </div>
