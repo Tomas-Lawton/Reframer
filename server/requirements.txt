@@ -15,5 +15,4 @@ uvicorn
 ftfy
 regex
 tqdm
-aiofiles==0.6.0
 black

@@ -8,13 +8,8 @@ from util.render_design import rescale_constants, calculate_draw_region, UserSke
 from util.render_design import add_shape_groups, treebranch_initialization
 from util.clip_utility import get_noun_data, parse_svg, shapes2paths
 
-
-
-from datetime import datetime
 import logging
 import asyncio
-import aiofiles
-
 
 class Drawer:
     def __init__(self, clip, websocket, sketch_reference_index=None):
@@ -189,7 +184,7 @@ class Drawer:
         img = img[:, :, :3].unsqueeze(0).permute(0, 3, 1, 2)  # NHWC -> NCHW
         return img
 
-    async def prune(self):
+    def prune(self):
         prune_ratio = self.prune_ratio
         with torch.no_grad():
 
@@ -270,11 +265,9 @@ class Drawer:
         self.initialize_variables()
         self.prune_ratio += self.p0 / len(self.prune_places)
         logging.info("Prune complete")
-        # Run single step
-        await self.run_epoch()
 
 
-    async def run_epoch(self):
+    def run_epoch(self):
         t = self.iteration
         logging.info(f"Starting run {t} in drawer {str(self.sketch_reference_index)}")
 
@@ -361,63 +354,50 @@ class Drawer:
             # 'geometric': geo_loss,
         }
 
-        # if t % 1 == 0:
-        # if t % self.refresh_rate == 0:
-        await self.render_and_save(t, loss)
         logging.info(f"Completed run {t} in drawer {str(self.sketch_reference_index)}")
         self.iteration += 1
 
     async def render_and_save(self, t, loss):
+            svg = ''
+            status = "draw"
             if self.sketch_reference_index is not None:
                     self.resizeScaleFactor = 224 / self.frame_size
-            # MUST FIX or just don't scale it
-            # render_shapes, render_shape_groups = rescale_constants(
-            #     self.shapes, self.shape_groups, self.resizeScaleFactor
-            # )
-
-            render_shapes, render_shape_groups = self.shapes, self.shape_groups
-            # print("RENDERED SIZE: ", self.user_canvas_w)
-            # print("Scaled: ", 224 / self.resizeScaleFactor)
+            # render_shapes, render_shape_groups = rescale_constants(self.shapes, self.shape_groups, self.resizeScaleFactor)
 
             pydiffvg.save_svg(
                 f"results/output-{str(self.sketch_reference_index)}.svg",
                 self.user_canvas_w,
                 self.user_canvas_h,
-                render_shapes,
-                render_shape_groups,
+                self.shapes,
+                self.shape_groups,
             )
-            try: 
+
+            with open(
+                f"results/output-{str(self.sketch_reference_index)}.svg", "r"
+                ) as f:
+                svg = f.read()
+                
+            if isinstance(self.sketch_reference_index, int):
+                logging.info(f"Sending exemplar {self.sketch_reference_index}")
+                status = str(self.sketch_reference_index)
+
+            result = {
+                "status": status, 
+                "svg": svg, 
+                "iterations": t, 
+                "loss": str(loss.item()), 
+                "sketch_index": self.sketch_reference_index,
+            }
+            try:
                 logging.info("Sending...")
-                svg = ''
-                async with aiofiles.open(
-                    f"results/output-{str(self.sketch_reference_index)}.svg", "r"
-                    ) as f:
-                    svg = await f.read()
-                    
-                status = "draw"
-                if isinstance(self.sketch_reference_index, int):
-                    logging.info(f"Sending exemplar {self.sketch_reference_index}")
-                    status = str(self.sketch_reference_index)
-
-                result = {
-                    "status": status, 
-                    "svg": svg, 
-                    "iterations": t, 
-                    "loss": str(loss.item()), 
-                    "sketch_index": self.sketch_reference_index,
-                }
+                await self.socket.send_json(result)
+                logging.info(f"Finished update for {self.sketch_reference_index}")
                 self.last_result = result  # only for continue
-                try:
-                    await self.socket.send_json(result)
-                    logging.info(f"Finished update for {self.sketch_reference_index}")
-                except Exception as e:
-                    logging.error("Failed sending WS response")
-                    pass
             except Exception as e:
-                logging.error("WS Response Failed")
-                await self.stop()
+                logging.error("Failed sending WS response")
+                pass
 
-    async def draw(self, data):
+    def draw(self, data):
         """Use current paths with the given (possibly different) prompt to generate options"""
         logging.info("Updating...")
         prompt = data["data"]["prompt"]
@@ -427,8 +407,8 @@ class Drawer:
         self.w_points, self.w_colors, self.w_widths = use_penalisation(data["data"]["fixation"])
         self.clip_interface.positive = prompt
         if svg_string is not None:
-            async with aiofiles.open('data/interface_paths.svg', 'w') as f:
-                await f.write(svg_string)
+            with open('data/interface_paths.svg', 'w') as f:
+                f.write(svg_string)
         try:
             self.reset()
             logging.info("Starting clip drawer")
@@ -445,42 +425,22 @@ class Drawer:
         logging.info("Got features")
         return self.activate()
 
-    async def redraw(self):
+    def redraw(self):
         """Use original paths with origional prompt to try new options from same settings"""
         logging.info("Starting redraw")
         self.parse_svg(self.last_region)
         self.iteration = 0
         return self.activate()
 
-    # async def continue_update(self, data):
-    #     """Keep the last drawer running"""
-    #     logging.info("Continuing...")
-    #     prompt = data["data"]["prompt"]
-    #     neg_prompt = []
-    #     try:
-    #         if prompt == self.clip_interface.positive:
-    #             await self.socket.send_json(self.last_result)
-    #         else:
-    #             self.clip_interface.positive = prompt
-    #             prompt_features = self.clip_interface.encode_text_classes([prompt])
-    #             neg_prompt_features = self.clip_interface.encode_text_classes(
-    #                 neg_prompt
-    #             )
-    #             self.set_text_features(prompt_features, neg_prompt_features)
-    #             logging.info("Continuing with new prompt")
-    #     except Exception as e:
-    #         logging.error(e)
-    #         logging.error("Failed to encode features in clip")
-
-    async def continue_update_sketch(self, data, restart = False):
+    def continue_update_sketch(self, data, restart = False):
         """Keep the last drawer running"""
         logging.info("Adding sketch changes...")
 
         svg_string = data["data"]["svg"]
 
         if svg_string is not None:
-            async with aiofiles.open('data/interface_paths.svg', 'w') as f:
-                await f.write(svg_string)
+            with open('data/interface_paths.svg', 'w') as f:
+                f.write(svg_string)
 
         self.parse_svg(self.last_region)
 
@@ -497,22 +457,23 @@ class Drawer:
             return self.activate_without_curves()
 
     async def stop(self):
+        # check the socket is still open before sending stop
         logging.info(f"Stopping... {self.sketch_reference_index}")
         self.is_running = False
-        # check the socket is still open before sending stop
-        logging.info(f"Sent stop for... {self.sketch_reference_index}")
         await self.socket.send_json({"status": "stop"})
-
-    def run_async(self):
-        self.is_running = True  # for loop to continue
-        loop = asyncio.get_running_loop()
-        loop.run_in_executor(None, lambda: asyncio.run(self.loop()))
 
     async def loop(self):
         while self.is_running and self.iteration < self.num_iter:
             try:
-                await self.run_epoch()
+                self.run_epoch()
+                # if self.iteration % self.refresh_rate == 0:
+                await self.render_and_save(self.iteration, self.losses['global'])
             except Exception as e:
                 logging.info("Iteration failed on: ", self.sketch_reference_index)
                 await self.stop()
+
+    def run_async(self):
+        self.is_running = True # for loop to continue
+        loop = asyncio.get_running_loop()
+        loop.run_in_executor(None, lambda: asyncio.run(self.loop()))
         
