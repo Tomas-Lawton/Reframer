@@ -376,24 +376,27 @@ const updateSelectUI = () => {
 
 const deletePath = () => {
     selected = getSelectedPaths();
+    if (sketchController.boundingBox) {
+        hideSelectUI();
+    }
+    sketchController.transformGroup = null;
+    unpackGroup();
+    userLayer.getItems().forEach((path) => {
+        path.selected = false;
+    });
+    sketchController.stack.undoStack.push({
+        type: "delete-event",
+        data: userLayer.exportJSON(),
+    });
+
     if (selected.length > 0) {
         pathList = selected.map((path) => path.exportJSON()); //dont use paper ref
-        console.log(pathList);
-        sketchController.stack.undoStack.push({
-            type: "delete-event",
-            data: pathList,
-        });
-
         // TO DO FIX
         sketchController.userPaths = sketchController.userPaths.filter(
             (ref) => ref !== path
         ); //remove ref
         selected.map((path) => path.remove()); // remove from sketch
     }
-    if (sketchController.boundingBox) {
-        hideSelectUI();
-    }
-    sketchController.transformGroup = null;
 
     sketchController.svg = paper.project.exportSVG({
         asString: true,

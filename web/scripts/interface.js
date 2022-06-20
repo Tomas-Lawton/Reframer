@@ -165,21 +165,18 @@ document.getElementById("undo").addEventListener("click", () => {
             thisPath.remove();
         }
         if (lastEvent.type === "delete-event") {
-            let pathData = [];
-            lastEvent.data.map((redrawPath) => {
-                let thisPath = new Path();
-                thisPath = thisPath.importJSON(redrawPath);
-                pathData.push(thisPath);
-            });
+            let afterDelete = userLayer.exportJSON();
+            userLayer.clear();
+            userLayer.importJSON(lastEvent.data);
             sketchController.stack.redoStack.push({
                 type: "delete-event",
-                data: pathData, //use ref
+                data: afterDelete, //use ref
             });
         }
         if (lastEvent.type === "erase-event") {
             let afterErase = userLayer.exportJSON();
             userLayer.clear();
-            let lastItems = userLayer.importJSON(lastEvent.data);
+            userLayer.importJSON(lastEvent.data);
             sketchController.stack.redoStack.push({
                 type: "erase-event",
                 data: afterErase, //use ref
@@ -201,21 +198,18 @@ document.getElementById("redo").addEventListener("click", () => {
             sketchController.stack.undoStack.push(lastEvent);
         }
         if (lastEvent.type === "delete-event") {
-            let pathList = [];
-            lastEvent.data.map((path) => {
-                let pathCopy = path.exportJSON();
-                path.remove();
-                pathList.push(pathCopy);
-            });
+            let beforeDelete = userLayer.exportJSON();
+            userLayer.clear();
+            userLayer.importJSON(lastEvent.data);
             sketchController.stack.undoStack.push({
                 type: "delete-event",
-                data: pathList,
-            }); // need to store a json to redraw
+                data: beforeDelete, //use ref
+            });
         }
         if (lastEvent.type === "erase-event") {
             let beforeErase = userLayer.exportJSON();
             userLayer.clear();
-            let eraseItems = userLayer.importJSON(lastEvent.data);
+            userLayer.importJSON(lastEvent.data);
             sketchController.stack.undoStack.push({
                 type: "erase-event",
                 data: beforeErase, //use ref
