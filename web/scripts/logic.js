@@ -1,4 +1,5 @@
 const importStaticSketch = (i) => {
+    console.log(i);
     if (allowOverwrite) {
         openModal({
             title: "Overwriting Canvas",
@@ -415,13 +416,11 @@ const showHide = (item) => {
 
 // switchControls();
 
-const parseFromSvg = (svg, layer, showAllPaths = true) => {
+const parseFromSvg = (scale, svg, layer, showAllPaths = true) => {
     if (svg === "" || svg === undefined) return null;
     let paperObject = layer.importSVG(svg);
     if (paperObject.children[0].children) {
-        // paperObject.scale(userLayer.view.viewSize.width / 224, new Point(0, 0));
-
-        paperObject.scale(exemplarSize / 224, new Point(0, 0));
+        paperObject.scale(scale, new Point(0, 0));
 
         const numUserPaths = sketchController.userPaths.length;
         sketchController.userPaths = [];
@@ -429,9 +428,7 @@ const parseFromSvg = (svg, layer, showAllPaths = true) => {
         for (const returnedIndex in paperObject.children[0].children) {
             const child = paperObject.children[0].children[returnedIndex];
             child.smooth();
-            // child.strokeWidth *= userLayer.view.viewSize.width / 224;
-
-            child.strokeWidth *= exemplarSize / 224;
+            child.strokeWidth *= scale;
 
             if (
                 sketchController.initRandomCurves &&
@@ -504,7 +501,7 @@ const showTraceHistoryFrom = (fromIndex) => {
         let refList = [];
         for (let pastGen of items) {
             userLayer.importSVG(pastGen.svg);
-            refList.push(parseFromSvg(pastGen.svg, userLayer));
+            refList.push(parseFromSvg(1, pastGen.svg, userLayer));
         }
         sketchController.traces = refList;
     }
@@ -584,6 +581,7 @@ const loadResponse = (result) => {
                 showTraceHistoryFrom(sketchController.stack.historyHolder.length - 1);
             } else {
                 sketchController.lastRender = parseFromSvg(
+                    userLayer.view.viewSize.width / 224,
                     result.svg,
                     userLayer,
                     sketchController.showAllLines
@@ -614,10 +612,12 @@ const loadResponse = (result) => {
             // userLayer.clear();
 
             let thisCanvas = exemplarScope.projects[result.sketch_index];
+            console.log("Writing into canvas: ", result.sketch_index);
 
             console.log(result.sketch_index);
             thisCanvas.clear();
             let imported = parseFromSvg(
+                exemplarSize / 224,
                 result.svg,
                 thisCanvas.activeLayer
                 // sketchController.showAllLines
@@ -627,6 +627,7 @@ const loadResponse = (result) => {
 };
 
 const createExemplar = (scope, isUserSketch, sketchCountIndex = null) => {
+    console.log(sketchCountIndex);
     let type = isUserSketch ? "U" : "AI";
 
     let newElem = exemplarTemplate.cloneNode(reusableExemplar);

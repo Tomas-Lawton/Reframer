@@ -308,7 +308,7 @@ timeKeeper.oninput = function() {
     } else {
         userLayer.clear();
         let svg = sketchController.stack.historyHolder[historyIndex].svg;
-        parseFromSvg(svg, userLayer, true);
+        parseFromSvg(1, svg, userLayer, true);
         sketchController.svg = paper.project.exportSVG({
             asString: true,
         });
@@ -387,7 +387,7 @@ document.getElementById("go-back").addEventListener("click", () => {
         userLayer.clear();
         let svg = sketchController.stack.historyHolder[1].svg;
         timeKeeper.value = 1;
-        parseFromSvg(svg, userLayer, true);
+        parseFromSvg(1, svg, userLayer, true);
         sketchController.svg = paper.project.exportSVG({
             asString: true,
         });

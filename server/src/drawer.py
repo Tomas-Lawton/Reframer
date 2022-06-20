@@ -361,17 +361,15 @@ class Drawer:
             # 'geometric': geo_loss,
         }
 
-        if t % 1 == 0:
+        # if t % 1 == 0:
         # if t % self.refresh_rate == 0:
-            await self.render_and_save(t, loss)
+        await self.render_and_save(t, loss)
         logging.info(f"Completed run {t} in drawer {str(self.sketch_reference_index)}")
         self.iteration += 1
 
     async def render_and_save(self, t, loss):
             if self.sketch_reference_index is not None:
                     self.resizeScaleFactor = 224 / self.frame_size
-
-
             # MUST FIX or just don't scale it
             # render_shapes, render_shape_groups = rescale_constants(
             #     self.shapes, self.shape_groups, self.resizeScaleFactor
@@ -410,8 +408,6 @@ class Drawer:
                 }
                 self.last_result = result  # only for continue
                 try:
-                    # concurrent drawers can send simultanious json so
-                    logging.info(f"SENDING {self.sketch_reference_index} AT ", datetime.strftime())
                     await self.socket.send_json(result)
                     logging.info(f"Finished update for {self.sketch_reference_index}")
                 except Exception as e:

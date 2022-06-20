@@ -1,12 +1,12 @@
 //heroku
-const http = "https://";
-const base = "vector-logging-server.herokuapp.com";
+// const http = "https://";
+// const base = "vector-logging-server.herokuapp.com";
 
 // local
-// const http = "http://";
-// const base = "localhost:8000";
+const http = "http://";
+const base = "localhost:8000";
 
-const useAI = false;
+const useAI = true;
 if (useAI) {
     document
         .querySelectorAll(".ai-ui")
@@ -16,6 +16,9 @@ if (useAI) {
     var ws = new WebSocket("ws://" + base + "/ws");
     ws.onclose = (event) => {
         console.log("Closed socket... Running without AI\n" + event);
+    };
+    ws.onopen = (event) => {
+        console.log("Connected AI Socket\n" + event);
     };
 } else {
     document.getElementById("ai-view").style.display = "none";
