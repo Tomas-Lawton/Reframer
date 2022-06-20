@@ -7,6 +7,7 @@ server/logs.log
 server/.DS_Store
 server/src/diffvg
 server/src/env
+server/src/util/__pycache__/
 
 reactcanvas/node_modules
 
