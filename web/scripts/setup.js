@@ -1,8 +1,8 @@
 const http = "http://";
 // const http = "https://";
 // const base = "0.0.0.0:8000";
-// const base = "vector-logging-server.herokuapp.com";
-const base = "localhost:8000";
+const base = "vector-logging-server.herokuapp.com";
+// const base = "localhost:8000";
 
 const useAI = false;
 if (useAI) {
