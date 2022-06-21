@@ -11,7 +11,8 @@ from util.clip_utility import get_noun_data, parse_svg, shapes2paths
 import logging
 import asyncio
 
-class Drawer:
+
+class CICADA:
     def __init__(self, clip, websocket, sketch_reference_index=None):
         """These inputs are defaults and can have methods for setting them after the inital start up"""
 
@@ -44,10 +45,10 @@ class Drawer:
         self.prune_ratio = self.p0 / len(self.prune_places)
         self.iteration = 0
         self.num_augs = 4
-        self.update_frequency = 1 # remove?
+        self.update_frequency = 1  # remove?
         self.frame_size = None
         self.refresh_rate = 15
-        self.num_user_paths = None # add AI paths
+        self.num_user_paths = None  # add AI paths
         # Configure rasterisor
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         pydiffvg.set_print_timing(False)
@@ -93,7 +94,7 @@ class Drawer:
         self.num_sketch_paths = len(user_sketch.shapes)
         self.augment_trans = get_augment_trans(self.canvas_w, self.normalize_clip)
         self.user_sketch = user_sketch
-        logging.info("Initialised shapes")      
+        logging.info("Initialised shapes")
 
     def update_user_paths(self):
         for i, path in enumerate(self.path_list):
@@ -102,14 +103,13 @@ class Drawer:
             else:
                 path.is_tied = False
 
-
     def activate_without_curves(self):
         self.is_active = True
         self.update_user_paths()
         self.initialise_without_treebranch()
         self.initialize_variables()
         self.initialize_optimizer()
-        
+
     def activate(self):
         self.is_active = True
         self.initialize_shapes()
@@ -126,9 +126,7 @@ class Drawer:
             self.drawing_area,
         )
         try:
-            self.path_list += shapes2paths(
-                shapes_rnd, shape_groups_rnd, False
-            )
+            self.path_list += shapes2paths(shapes_rnd, shape_groups_rnd, False)
         except Exception as e:
             logging.error("Problem adding to the path list")
 
@@ -266,7 +264,6 @@ class Drawer:
         self.prune_ratio += self.p0 / len(self.prune_places)
         logging.info("Prune complete")
 
-
     def run_epoch(self):
         t = self.iteration
         logging.info(f"Starting run {t} in drawer {str(self.sketch_reference_index)}")
@@ -357,54 +354,53 @@ class Drawer:
         logging.info(f"Completed run {t} in drawer {str(self.sketch_reference_index)}")
         self.iteration += 1
 
-    async def render_and_save(self, t, loss):
-            svg = ''
-            status = "draw"
-            if self.sketch_reference_index is not None:
-                    self.resizeScaleFactor = 224 / self.frame_size
-            # render_shapes, render_shape_groups = rescale_constants(self.shapes, self.shape_groups, self.resizeScaleFactor)
+    async def render_and_save(self, t, loss, pruning=False):
+        status = str(self.sketch_reference_index)
+        if pruning:
+            status="pruning"
+        if self.sketch_reference_index is not None:
+            self.resizeScaleFactor = 224 / self.frame_size
 
-            pydiffvg.save_svg(
-                f"results/output-{str(self.sketch_reference_index)}.svg",
-                self.user_canvas_w,
-                self.user_canvas_h,
-                self.shapes,
-                self.shape_groups,
-            )
+        # render_shapes, render_shape_groups = rescale_constants(self.shapes, self.shape_groups, self.resizeScaleFactor)
 
-            with open(
-                f"results/output-{str(self.sketch_reference_index)}.svg", "r"
-                ) as f:
-                svg = f.read()
-                
-            if isinstance(self.sketch_reference_index, int):
-                logging.info(f"Sending exemplar {self.sketch_reference_index}")
-                status = str(self.sketch_reference_index)
+        pydiffvg.save_svg(
+            f"results/output-{str(self.sketch_reference_index)}.svg",
+            self.user_canvas_w,
+            self.user_canvas_h,
+            self.shapes,
+            self.shape_groups,
+        )
 
-            result = {
-                "status": status, 
-                "svg": svg, 
-                "iterations": t, 
-                "loss": str(loss.item()), 
-                "sketch_index": self.sketch_reference_index,
-            }
-            try:
-                logging.info("Sending...")
-                await self.socket.send_json(result)
-                logging.info(f"Finished update for {self.sketch_reference_index}")
-                self.last_result = result  # only for continue
-            except Exception as e:
-                logging.error("Failed sending WS response")
-                pass
+        svg = ""
+        with open(f"results/output-{str(self.sketch_reference_index)}.svg", "r") as f:
+            svg = f.read()
 
-    def draw(self, data):
+        result = {
+            "status": status,
+            "svg": svg,
+            "iterations": t,
+            "loss": str(loss.item()),
+            "sketch_index": self.sketch_reference_index,
+        }
+        try:
+            logging.info("Sending...")
+            await self.socket.send_json(result)
+            logging.info(f"Finished update for {self.sketch_reference_index}")
+            self.last_result = result  # only for continue
+        except Exception as e:
+            logging.error("Failed sending WS response")
+            pass
+
+    def setup_draw(self, data):
         """Use current paths with the given (possibly different) prompt to generate options"""
         logging.info("Updating...")
         prompt = data["data"]["prompt"]
         neg_prompt = []
         svg_string = data["data"]["svg"]
         region = data["data"]["region"]
-        self.w_points, self.w_colors, self.w_widths = use_penalisation(data["data"]["fixation"])
+        self.w_points, self.w_colors, self.w_widths = use_penalisation(
+            data["data"]["fixation"]
+        )
         self.clip_interface.positive = prompt
         if svg_string is not None:
             with open('data/interface_paths.svg', 'w') as f:
@@ -432,7 +428,7 @@ class Drawer:
         self.iteration = 0
         return self.activate()
 
-    def continue_update_sketch(self, data, restart = False):
+    def continue_update_sketch(self, data, restart=False):
         """Keep the last drawer running"""
         logging.info("Adding sketch changes...")
 
@@ -449,10 +445,12 @@ class Drawer:
         except Exception as e:
             logging.error("Must include number of user paths")
 
-        self.w_points, self.w_colors, self.w_widths = use_penalisation(data["data"]["fixation"])
+        self.w_points, self.w_colors, self.w_widths = use_penalisation(
+            data["data"]["fixation"]
+        )
 
         if restart:
-            return self.activate()    
+            return self.activate()
         else:
             return self.activate_without_curves()
 
@@ -473,7 +471,6 @@ class Drawer:
                 await self.stop()
 
     def run_async(self):
-        self.is_running = True # for loop to continue
+        self.is_running = True  # for loop to continue
         loop = asyncio.get_running_loop()
         loop.run_in_executor(None, lambda: asyncio.run(self.loop()))
-        

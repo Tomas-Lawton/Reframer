@@ -14,10 +14,20 @@ def save_data(save_path, name, params):
         f.write('w_img: ' + str(params.w_img) + '\n')
         f.close()
 
-logList = [[0.0001, 0.0001, 0.0001], [0.00032, 0.0032, 0.00032], [0.001, 0.01, 0.001], [0.1, 1, 0.1], [1, 1, 1]]
+
+logList = [
+    [0.0001, 0.0001, 0.0001],
+    [0.00032, 0.0032, 0.00032],
+    [0.001, 0.01, 0.001],
+    [0.1, 1, 0.1],
+    [1, 1, 1],
+]
+
+
 def use_penalisation(i):
     (a, b, c) = logList[i]
     return a, b, c
+
 
 def area_mask(width, height, drawing_area):
     j0 = round(drawing_area['x0'] * width)

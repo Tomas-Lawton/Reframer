@@ -1,21 +1,11 @@
-let sketchTimer;
+//TODO Combine multitool and erasor into single tool
 
-const pauseActiveDrawer = () => {
-    if (sketchController.activeStates.includes(sketchController.drawState)) {
-        // TO DO: check if can just check if clip is drawing.. should work?
-        liveCollab = true;
-        sketchController.pause(); //continue on pen up
-        aiMessage.classList.remove("typed-out");
-        aiMessage.innerHTML = `I'mma let you finish...`;
-        aiMessage.classList.add("typed-out");
-    }
-};
+let sketchTimer;
 
 multiTool.onMouseDown = function(event) {
     // refactor for multitouch
     clearTimeout(sketchTimer);
-    // hide time slider
-    document.getElementById("history-block").style.display = "none";
+    sketchController.resetMetaControls();
 
     switch (sketchController.penMode) {
         case "select":
@@ -218,7 +208,7 @@ multiTool.onMouseUp = function() {
             }
             break;
         case "lasso":
-            sketchController.resetHistory(); //reset since not continuing
+            sketchController.resetSketch(); //reset since not continuing
             sketchController.draw(true);
             sketchController.clipDrawing = true;
             regionPath.remove();
@@ -233,12 +223,14 @@ multiTool.onMouseUp = function() {
     sketchController.svg = paper.project.exportSVG({
         asString: true,
     });
+    setLineLabels(userLayer);
 
     logger.event(sketchController.penMode + "-up");
 };
 
 eraseTool.onMouseDown = function(event) {
     pauseActiveDrawer();
+    sketchController.resetMetaControls();
 
     sketchController.stack.undoStack.push({
         type: "erase-event",
@@ -356,6 +348,7 @@ eraseTool.onMouseUp = function(event) {
     sketchController.svg = paper.project.exportSVG({
         asString: true,
     });
+    setLineLabels(userLayer);
 
     logger.event("erase-up");
 

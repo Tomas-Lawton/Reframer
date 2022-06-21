@@ -602,7 +602,8 @@ hr {
 
 /* Stop */
 
-#stop {
+
+/* #stop {
     color: white;
 }
 
@@ -612,7 +613,7 @@ hr {
 
 #stop i:hover {
     color: white;
-}
+} */
 
 
 /* Stop */
@@ -700,11 +701,12 @@ input:focus {
 }
 
 .typed-out {
-    overflow: hidden;
-    border-right: 0.15em solid orange;
-    animation: typing 1s steps(20, end) forwards;
     font-size: 1.6rem;
-    width: 0;
+    background-size: calc(var(--n) * 1ch) 200%;
+    -webkit-background-clip: padding-box, text;
+    background-clip: padding-box, text;
+    background-repeat: no-repeat;
+    animation: b 0.7s infinite steps(1), t calc(var(--n) * 0.3s) steps(var(--n)) forwards;
 }
 
 @keyframes MoveUpDown {
@@ -717,12 +719,15 @@ input:focus {
     }
 }
 
-@keyframes typing {
+@keyframes t {
     from {
-        width: 0;
+        background-size: 0 200%;
     }
-    to {
-        width: 100%;
+}
+
+@keyframes b {
+    50% {
+        background-position: 0 -100%, 0 0;
     }
 }
 
@@ -1834,6 +1839,10 @@ input[type="range"]::-webkit-slider-thumb {
     display: none;
 }
 
+#control-lines {
+    margin-bottom: 0.5em;
+}
+
 @media screen and (max-width: 700px) {
     #pen-controls {
         top: 0;
@@ -1866,7 +1875,7 @@ input[type="range"]::-webkit-slider-thumb {
     }
     #static-margin {
         /* width: 16vw; */
-        width: 35vw;
+        width: 25vw;
     }
     #content {
         flex-direction: initial;
@@ -1915,7 +1924,7 @@ input[type="range"]::-webkit-slider-thumb {
         transform: initial;
         top: 20%;
         /* display: flex; */
-        width: 25%;
+        width: 30%;
     }
     #sketchbook-panel {
         /* width: 26em; */

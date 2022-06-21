@@ -16,12 +16,10 @@
     <script type="text/javascript" src="scripts/svg.js" defer></script>
     <script type="text/javascript" src="scripts/setup.js" defer></script>
     <script type="text/javascript" src="scripts/api.js" defer></script>
-    <script type="text/javascript" src="scripts/drawer.js" defer></script>
     <script type="text/javascript" src="scripts/logic.js" defer></script>
+    <script type="text/javascript" src="scripts/drawer.js" defer></script>
     <script type="text/javascript" src="scripts/sketch.js" defer></script>
-
     <script type="text/javascript" src="scripts/logger.js" defer></script>
-
     <script type="text/javascript" src="scripts/interface.js" defer></script>
 
 </head>
@@ -175,15 +173,6 @@
                             <p>Try again</p>
                         </div>
                     </div>
-
-                    <div class="inactive-section slider-block">
-                        <div class="flex">
-                            <p class="slider-label" id="max-lines">Max lines: </p>
-                            <p class="slider-label" id="calc-lines">Adding: </p>
-                        </div>
-                        <input id="num-squiggles" type="range" min="0" value="32" max="150">
-                    </div>
-
                 </div>
 
 
@@ -194,10 +183,27 @@
                         </h1>
                         <p class="pill inactive-pill" id="autodraw-button">Solo draw</p>
                     </div>
-                    <div class="inactive-section slider-block" id="respect-block">
+                    <!-- 
+                    <div class="inactive-section slider-block">
                         <div class="flex">
-                            <p class="slider-label">Respect User Input</p>
-                            <p class="slider-label" id="fix-label">3</p>
+                            <p class="slider-label" id="max-lines">Max lines: </p>
+                            <p class="slider-label" id="calc-lines">Adding: </p>
+                        </div>
+                        <input id="num-squiggles" type="range" min="0" value="32" max="150">
+                    </div> -->
+
+                    <div class="inactive-section slider-block" id="respect-block">
+                        <div id="control-lines">
+                            <div class="flex">
+                                <p class="slider-label" id="max-lines">Lines: </p>
+                                <p class="slider-label" id="calc-lines">Add: </p>
+                            </div>
+                            <input id="num-squiggles" type="range" min="0" value="32" max="150">
+                        </div>
+
+                        <div class="flex">
+                            <p class="slider-label">User Paths</p>
+                            <p class="slider-label" id="fix-label">Respect</p>
                         </div>
                         <input type="range" id="respect-slider" value="3" min="0" max="4">
                     </div>

@@ -324,19 +324,14 @@ palette.addEventListener("click", () => {
     palette.classList.toggle("panel-open");
 });
 
-// let typingTimer;
-// let doneTypingInterval = 1000;
 prompt.addEventListener("input", (e) => {
     sketchController.prompt = e.target.value;
     aiMessage.innerHTML = `Sure! I can draw ${sketchController.prompt}...`;
-
     document
         .querySelectorAll(".inactive-section")
         .forEach((elem) => elem.classList.remove("inactive-section"));
 });
 
-// TODO Refactor into the setActionUI switch statement using states
-// Draw
 document.getElementById("draw").addEventListener("click", () => {
     if (
         sketchController.drawState === "inactive" ||
@@ -345,42 +340,29 @@ document.getElementById("draw").addEventListener("click", () => {
         sketchController.draw();
     }
 });
-// // Trial / Brainstorm
 
-// Stop
 stopButton.addEventListener("click", () => {
-    if (sketchController.activeStates.includes(sketchController.drawState)) {
-        //active
-        sketchController.stop();
+    if (
+        sketchController.drawState === "drawing" ||
+        sketchController.drawState === "continuing"
+    ) {
+        sketchController.clipDrawing = false;
+        sketchController.stop(); //flag
+    } else if (
+        sketchController.drawState === "explore" ||
+        sketchController.drawState === "continue-explore"
+    ) {
+        aiMessage.innerHTML = "All done! What should we draw next?";
+        aiMessage.classList.add("typed-out");
+        sketchController.clipDrawing = false;
+        setActionUI("stopSingle");
+        killExploratorySketches();
     }
-    // else {
-    //     sketchController.redraw();
-    // }
 });
 
 document.getElementById("prune").addEventListener("click", () => {
     sketchController.prune();
 });
-
-// Redraw
-// document.getElementById("redraw").addEventListener("click", () => {
-//     if (sketchController.drawState === "stop") {
-//         sketchController.redraw();
-//     }
-// });
-// // Contine
-// actionControls[6].addEventListener("click", () => {
-//     if (sketchController.drawState === "stop") {
-//         sketchController.continue();
-//     }
-// });
-
-// Old generate
-// document.getElementById("brainstorm").addEventListener("click", () => {
-//     if (sketchController.drawState === "inactive" || sketchController.drawState === "stop") {
-//         sketchController.generate();
-//     }
-// });
 
 document.getElementById("go-back").addEventListener("click", () => {
     if (sketchController.drawState === "stop") {
@@ -416,27 +398,16 @@ document.getElementById("brainstorm").addEventListener("click", () => {
         for (let i = 0; i < 4; i++) {
             explorer.removeChild(explorer.firstChild);
             if (sketchController.sketchScopeIndex > total) {
-                let newElem = createExemplar(
-                    exemplarScope,
-                    false
-                    // sketchController.sketchScopeIndex
-                ); //don't increase the number of scopes
-                // sketchController.scopeRef.push(
-                //     exemplarScope.projects[sketchController.sketchScopeIndex]
-                // );
+                let newElem = createExemplar(defaults, false);
                 sketchController.scopeRef.push(sketchController.sketchScopeIndex);
                 explorer.appendChild(newElem);
                 newElem.classList.add("inactive-exemplar");
-                // sketchController.sketchScopeIndex += 1;
             } else {
                 let newElem = createExemplar(
                     exemplarScope,
                     false,
                     sketchController.sketchScopeIndex
                 );
-                // sketchController.scopeRef.push(
-                //     exemplarScope.projects[sketchController.sketchScopeIndex]
-                // );
                 sketchController.scopeRef.push(sketchController.sketchScopeIndex);
                 explorer.appendChild(newElem);
                 sketchController.drawExemplar(sketchController.sketchScopeIndex);
@@ -444,7 +415,7 @@ document.getElementById("brainstorm").addEventListener("click", () => {
             }
         }
         sketchController.clipDrawing = true;
-        setActionUI("brainstorming-exemplars");
+        setActionUI("explore");
     }
 });
 
@@ -592,7 +563,8 @@ autoButton.addEventListener("click", () => {
 // });
 
 document.getElementById("num-squiggles").oninput = function() {
-    setLineLabels(parseInt(this.value));
+    sketchController.maxCurves = parseInt(this.value);
+    setLineLabels(userLayer);
 };
 
 document.getElementById("num-traces").oninput = function() {
@@ -614,7 +586,8 @@ let lastFixation = sketchController.useFixation;
 
 respectSlider.oninput = function() {
     sketchController.useFixation = parseInt(this.value);
-    document.getElementById("fix-label").innerHTML = sketchController.useFixation;
+    let msg = sketchController.useFixation > 2 ? "Respect" : "Change";
+    document.getElementById("fix-label").innerHTML = msg;
 };
 
 respectSlider.onmousedown = () => {
@@ -657,6 +630,7 @@ const scaleGroup = (group, to) => {
 (() => {
     const scaleTo = userLayer.view.viewSize.width;
     const idx = Math.floor(Math.random() * partialSketches.length);
+    console.log(idx);
     const partial = partialSketches[idx];
 
     try {
@@ -693,7 +667,7 @@ const scaleGroup = (group, to) => {
         asString: true,
     });
 
-    setLineLabels(32);
+    setLineLabels(userLayer);
 })();
 
 const picker = new Picker({

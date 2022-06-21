@@ -14,6 +14,7 @@ class DrawingPath:
         self.num_segments = num_segments
         self.is_tied = is_tied
 
+
 def shapes2paths(shapes, shape_groups, tie):
     path_list = []
     for k in range(len(shapes)):
@@ -23,6 +24,7 @@ def shapes2paths(shapes, shape_groups, tie):
         color = shape_groups[k].stroke_color
         path_list.append(DrawingPath(path, color, width, num_segments, tie))
     return path_list
+
 
 def get_noun_data():
     with open('data/noun_list.txt', 'r') as f:
@@ -132,10 +134,9 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
             continue
 
         num_segments = len(att['d'].split(',')) // 3
-        
+
         if num_segments == 0:
             continue
-
 
         # could refactor now local file is seperate function
         stroke_width = 15
@@ -181,7 +182,7 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
             logging.error("Couldn't parse stroke opacity")
 
         color = get_color(color_code, opacity)
-        
+
         try:
             path = []
             spaced_data = att['d'].split('c')

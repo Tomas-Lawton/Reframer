@@ -6,6 +6,7 @@ import logging
 from util.clip_utility import get_noun_data
 import numpy as np
 
+
 class Clip_Instance:
     """Init clip, then configure the classifier type, then set the required img/class/prompt parameters"""
 
@@ -18,26 +19,24 @@ class Clip_Instance:
             raise Exception("Clip is already instantiated.")
 
         tv = torch.__version__.split(".")
-        tv = 10000*int(tv[0]) + 100*int(tv[1]) + int(tv[2])
+        tv = 10000 * int(tv[0]) + 100 * int(tv[1]) + int(tv[2])
         assert tv >= 10701, "PyTorch 1.7.1 or later is required"
 
-
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        logging.info(f"These clip models are available: \n{clip.available_models()}")
+        # logging.info(f"These clip models are available: \n{clip.available_models()}")
         self.model, self.preprocess = clip.load('ViT-B/32', self.device, jit=False)
         input_resolution = self.model.visual.input_resolution
         context_length = self.model.context_length
         vocab_size = self.model.vocab_size
 
-        logging.info(
-            f"Model parameters: {np.sum([int(np.prod(p.shape)) for p in self.model.parameters()]):,}"
-        )
-        logging.info(f"Input resolution: {input_resolution}")
-        logging.info(f"Context length: {context_length}")
-        logging.info(f"Vocab size: {vocab_size}")
+        # logging.info(
+        #     f"Model parameters: {np.sum([int(np.prod(p.shape)) for p in self.model.parameters()]):,}"
+        # )
+        # logging.info(f"Input resolution: {input_resolution}")
+        # logging.info(f"Context length: {context_length}")
+        # logging.info(f"Vocab size: {vocab_size}")
 
         self.preprocess
-        logging.info("Preprocess complete")
         logging.info("Model ready")
         Clip_Instance.__instance == self
 
@@ -99,8 +98,8 @@ class Clip_Instance:
     def encode_image_tensors(self, img_tensor):
         image_input = torch.tensor(img_tensor)
         with torch.no_grad():
-            image_features = (
-                self.model.encode_image(image_input)
+            image_features = self.model.encode_image(
+                image_input
             )  # normalise add to device
             return image_features / image_features.norm(dim=-1, keepdim=True)
 
@@ -117,5 +116,5 @@ class Clip_Instance:
         # if self.device == 'cuda:0':
         # tokens = tokens.to('cuda:0')
         with torch.no_grad():
-            text_features = self.model.encode_text(tokens) # normalise
+            text_features = self.model.encode_text(tokens)  # normalise
             return text_features / text_features.norm(dim=-1, keepdim=True)

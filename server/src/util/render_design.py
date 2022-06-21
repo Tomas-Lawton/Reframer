@@ -32,13 +32,14 @@ def calculate_draw_region(region, normaliseScaleFactor):
 
 def rescale_constants(shapes, groups, scale_ratio):
     """Scale up points since they are absolute positioned."""
-    #breaks!!!!!
+    # breaks!!!!!
     shapes_copy = copy.deepcopy(shapes)
     shape_groups_copy = copy.deepcopy(groups)
     for path in shapes_copy:
         path.points = torch.div(path.points, scale_ratio)
         path.stroke_width = torch.div(path.stroke_width, scale_ratio)
     return shapes_copy, shape_groups_copy
+
 
 class UserSketch:
     def __init__(self, path_list, canvas_height, canvas_width):

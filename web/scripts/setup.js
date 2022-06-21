@@ -115,7 +115,7 @@ const userLayer = new Layer(); //for drawing + erase mask
 const multiTool = new Tool();
 const eraseTool = new Tool();
 
-timeKeeper.style.width = "0";
+// timeKeeper.style.width = "0";
 multiTool.minDistance = 5;
 eraseTool.minDistance = 10;
 

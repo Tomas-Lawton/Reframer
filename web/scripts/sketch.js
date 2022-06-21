@@ -33,14 +33,13 @@ class SketchHandler {
             "drawing",
             "generating",
             "refining",
-            "brainstorming-exemplars",
+            "explore",
             "redrawing",
             "continuing",
         ];
         this.lastHistoryIndex = 0;
         this.penDropMode = "select";
         this.sketchScopeIndex = 0;
-        this.addPaths = 4;
         // TODO Refactor
         this.buttonControlLeft = true;
         this.doneSketching = null;
@@ -63,7 +62,8 @@ class SketchHandler {
         // Settings panel
         this.useAdvanced = false;
         this.initRandomCurves = true;
-        this.numAddedCurves = 32;
+        this.maxCurves = 32;
+        this.addLines = 0;
         this.numTraces = 1;
 
         // Undo/redo stack
@@ -81,8 +81,8 @@ class SketchHandler {
         userPaths,
     }) {
         this.isFirstIteration = true; //reset canvas
-        const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
         this.lastPrompt = prompt;
+        const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
 
         const res = {
             status: status,
@@ -112,7 +112,7 @@ class SketchHandler {
         ws.send(JSON.stringify(res));
     }
     sortPaths() {
-        let aiPaths = []; // update after
+        let aiPaths = [];
         userLayer.getItems().forEach((item) => {
             if (!this.userPaths.includes(item)) {
                 aiPaths.push(item);
@@ -123,122 +123,76 @@ class SketchHandler {
         sorted.forEach((elem) => userLayer.addChild(elem)); //deleting doesn't destroy references
         this.svg = paper.project.exportSVG({
             asString: true,
-        }); //for svg parsing
-
+        });
         // console.log("Sorted: ", sorted);
         // console.log("USER: ", this.userPaths.length);
         // console.log("AI: ", aiPaths.length);
         // console.log("TOTAL: ", userLayer.getItems().length);
     }
-
     draw(withRegion = false, svg = null, disableLines = false) {
-            if (noPrompt()) {
-                openModal({
-                    title: "Type a prompt first!",
-                    message: "You need a target for AI sketching.",
-                });
-                return;
-            }
-            if (!this.clipDrawing) {
-                this.clipDrawing = true;
-                this.targetDrawing = false;
-
-                sketchController.linesDisabled = disableLines;
-                this.updateDrawer({
-                    status: "draw",
-                    svg: svg || this.svg,
-                    hasRegion: withRegion,
-                    frameSize: this.frameSize,
-                    prompt: this.prompt,
-                    lines: disableLines ?
-                        0 :
-                        this.initRandomCurves ?
-                        this.numAddedCurves :
-                        0,
-                    fixation: this.useFixation,
-                });
-                this.step = 0;
-                this.clipDrawing = true;
-                setActionUI(disableLines ? "refining" : "drawing");
-            } else {
-                throw new Error("Can't continue if already running");
-            }
+        if (noPrompt()) {
+            openModal({
+                title: "Type a prompt first!",
+                message: "You need a target for AI sketching.",
+            });
+            return;
         }
-        // generate() {
-        //     if (!exemplarSize) {
-        //         console.error("exemplars not found");
-        //     }
-        //     if (noPrompt()) {
-        //         openModal({
-        //             title: "Type a prompt first!",
-        //             message: "You need a target for AI exemplars.",
-        //         });
-        //         return;
-        //     }
-        //     this.updateDrawer({
-        //         status: "sketch_exemplars",
-        //         svg: this.svg,
-        //         hasRegion: false,
-        //         frameSize: exemplarSize,
-        //         prompt: this.prompt,
-        //         lines: this.initRandomCurves ? this.numAddedCurves : 0,
-        //     });
-        //     this.clipDrawing = true;
-        //     setActionUI("generating");
-        // }
+        if (!this.clipDrawing) {
+            this.clipDrawing = true;
+            this.targetDrawing = false;
+
+            sketchController.linesDisabled = disableLines;
+            setLineLabels(userLayer);
+            document.getElementById("calc-lines").innerHTML = `Add : 0`;
+
+            this.updateDrawer({
+                status: "draw",
+                svg: svg || this.svg,
+                hasRegion: withRegion,
+                frameSize: this.frameSize,
+                prompt: this.prompt,
+                lines: disableLines ? 0 : this.initRandomCurves ? this.addLines : 0,
+                fixation: this.useFixation,
+            });
+            this.step = 0;
+            this.clipDrawing = true;
+            setActionUI(disableLines ? "refining" : "drawing");
+        } else {
+            throw new Error("Can't continue if already running");
+        }
+    }
     drawExemplar(sketchCountIndex) {
         if (!this.clipDrawing) {
             if (!exemplarSize) {
                 console.error("exemplars not found");
             }
             this.targetDrawing = true;
+            setLineLabels(userLayer);
+            document.getElementById("calc-lines").innerHTML = `Add : 0`;
+
             this.updateDrawer({
                 status: "add_new_exemplar",
                 svg: this.svg,
                 hasRegion: false,
                 frameSize: exemplarSize,
                 prompt: this.prompt,
-                lines: this.numAddedCurves,
+                lines: this.addLines,
                 sketchScopeIndex: sketchCountIndex,
                 fixation: this.useFixation,
             });
         }
     }
-    redraw() {
-            // this.targetDrawing = false;
-
-            // Should redraw also draw exploratory sketches?
-            if (!this.clipDrawing) {
-                this.clipDrawing = true;
-                this.updateDrawer({
-                    status: "redraw",
-                });
-                this.step = 0;
-                this.clipDrawing = true;
-                setActionUI("redrawing");
-            } else {
-                throw new Error("Can't continue if already running");
-            }
-        }
-        // continue () {
-        //     // need to change this so it supports updating the prompt or using a new svg
-        //     this.updateDrawer({
-        //         status: "continue",
-        //         prompt: this.prompt,
-        //         frameSize: this.frameSize, //can remove?
-        //     });
-        //     this.clipDrawing = true;
-        //     console.log("continuing with potential updated prompt");
-        //     setActionUI("continuing");
-        // }
     continueSketch() {
-        // check the drawing mode. if it's brainstorming with add_new_exemplar then each of the drawers should be continued. continue all brainstorms.
         if (!this.clipDrawing) {
             this.clipDrawing = true;
 
             if (this.targetDrawing) {
                 explorer.childNodes.forEach((child, i) => {
                     try {
+                        // TO DO CHANGE
+                        setLineLabels(userLayer);
+                        document.getElementById("calc-lines").innerHTML = `Add : 0`;
+
                         this.updateDrawer({
                             status: "continue_single_sketch",
                             svg: this.svg,
@@ -246,6 +200,7 @@ class SketchHandler {
                             fixation: this.useFixation,
                             sketchScopeIndex: sketchController.scopeRef[i],
                         });
+                        setActionUI("continue-explore");
                     } catch (e) {
                         console.log("Problem with update");
                     }
@@ -253,6 +208,9 @@ class SketchHandler {
             } else {
                 try {
                     this.sortPaths();
+                    setLineLabels(userLayer);
+                    document.getElementById("calc-lines").innerHTML = `Add : 0`;
+
                     this.updateDrawer({
                         status: "continue_sketch",
                         svg: this.svg,
@@ -260,11 +218,11 @@ class SketchHandler {
                         fixation: this.useFixation,
                         userPaths: this.userPaths.length,
                     });
+                    setActionUI("continuing");
                 } catch (e) {
                     console.log("Problem with update");
                 }
             }
-            setActionUI("continuing");
         } else {
             throw new Error("Can't continue if already running");
         }
@@ -278,21 +236,8 @@ class SketchHandler {
             setActionUI("pruning");
         }
     }
-    stopSingle(i) {
-        this.updateDrawer({
-            status: "stop_single_sketch",
-            sketchScopeIndex: i,
-        });
-        this.clipDrawing = false;
-        setActionUI("stopSingle");
-    }
     stop() {
-        if (this.drawState === "active") {
-            timeKeeper.style.visibility = "visible";
-        }
-
         this.updateDrawer({ status: "stop" });
-        this.clipDrawing = false;
         setActionUI("stop");
     }
     pause() {
@@ -300,10 +245,18 @@ class SketchHandler {
         this.clipDrawing = false;
         setActionUI("pause");
     }
-    resetHistory() {
-        sketchController.step = 0; // reset since not continuing
-        sketchController.stack.historyHolder = [{ svg: "" }];
-        timeKeeper.style.width = "0";
+    stopSingle(i) {
+        this.updateDrawer({
+            status: "stop_single_sketch",
+            sketchScopeIndex: i,
+        });
+    }
+    resetMetaControls() {
+        document.getElementById("prune").classList.add("inactive-action");
+        console.log("clear");
+        document.getElementById("history-block").style.display = "none";
+        this.step = 0;
+        this.stack.historyHolder = [{ svg: "" }];
         timeKeeper.setAttribute("max", "0");
         timeKeeper.value = "0";
     }
