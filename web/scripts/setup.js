@@ -7,6 +7,8 @@ const http = "http://";
 const base = "localhost:8000";
 
 const useAI = true;
+let socketConnected = false;
+
 if (useAI) {
     document
         .querySelectorAll(".ai-ui")
@@ -19,6 +21,7 @@ if (useAI) {
     };
     ws.onopen = (event) => {
         console.log("Connected AI Socket\n" + event);
+        socketConnected = true;
     };
 } else {
     document.getElementById("ai-view").style.display = "none";

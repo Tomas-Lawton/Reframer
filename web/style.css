@@ -625,6 +625,7 @@ hr {
     background: #f5f5f5;
     color: #d2d2d2;
     cursor: default;
+    pointer-events: none;
 }
 
 .inactive-action i {
@@ -1732,7 +1733,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 
-/* #brainstorm {
+/* #inspire {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1741,11 +1742,11 @@ input[type="range"]::-moz-range-thumb {
     padding: 0.4em;
 }
 
-#brainstorm i {
+#inspire i {
     color: white;
 }
 
-#brainstorm:after {
+#inspire:after {
     content: "";
     display: block;
     padding-bottom: 100%;

@@ -197,7 +197,10 @@ multiTool.onMouseUp = function() {
                 liveCollab = false;
             } else {
                 //just drawing
-                if (!noPrompt() && sketchController.doneSketching !== null) {
+                if (!noPrompt() &&
+                    sketchController.doneSketching !== null &&
+                    socketConnected
+                ) {
                     clearTimeout(sketchTimer);
                     sketchTimer = setTimeout(userStuck, sketchController.doneSketching);
 
@@ -208,10 +211,12 @@ multiTool.onMouseUp = function() {
             }
             break;
         case "lasso":
-            sketchController.resetSketch(); //reset since not continuing
-            sketchController.draw(true);
-            sketchController.clipDrawing = true;
-            regionPath.remove();
+            if (socketConnected) {
+                sketchController.resetSketch(); //reset since not continuing
+                sketchController.draw(true);
+                sketchController.clipDrawing = true;
+                regionPath.remove();
+            }
             break;
     }
     // remove??

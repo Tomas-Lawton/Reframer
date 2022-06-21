@@ -69,10 +69,10 @@ async def home():
     return {"hello", "world"}
 
 
-async def stop_all(d, a):
-    await a.stop()
+def stop_all(d, a):
+    a.is_running = False
     for drawer in d:
-        await drawer.stop()
+        drawer.is_running = False
         del drawer
 
 
@@ -156,10 +156,10 @@ else:
                     #     await drawer.stop()  # don't del because may restart
 
         except WebSocketDisconnect:
-            await stop_all(exemplar_drawers, artefact_drawer)
+            stop_all(exemplar_drawers, artefact_drawer)
             logging.info("Client disconnected")
         except KeyboardInterrupt:
-            await stop_all(exemplar_drawers, artefact_drawer)
+            stop_all(exemplar_drawers, artefact_drawer)
             logging.info("Client killed")
 
 

@@ -333,35 +333,77 @@ prompt.addEventListener("input", (e) => {
 });
 
 document.getElementById("draw").addEventListener("click", () => {
-    if (
-        sketchController.drawState === "inactive" ||
-        sketchController.drawState === "stop"
-    ) {
-        sketchController.draw();
+    if (socketConnected) {
+        if (
+            sketchController.drawState === "inactive" ||
+            sketchController.drawState === "stop"
+        ) {
+            sketchController.draw();
+        }
+    }
+});
+
+document.getElementById("inspire").addEventListener("click", () => {
+    if (socketConnected) {
+        if (noPrompt()) {
+            openModal({
+                title: "Type a prompt first!",
+                message: "You need a target for AI exemplars.",
+            });
+            return;
+        } else {
+            // TO DO: Clean up old scopes (now unused) // sketchController.scopeRef
+            const total =
+                sketchController.sketchScopeIndex + Math.floor(Math.random() * 5);
+            for (let i = 0; i < 4; i++) {
+                explorer.removeChild(explorer.firstChild);
+                if (sketchController.sketchScopeIndex > total) {
+                    let newElem = createExemplar(defaults, false);
+                    sketchController.scopeRef.push(sketchController.sketchScopeIndex);
+                    explorer.appendChild(newElem);
+                    newElem.classList.add("inactive-exemplar");
+                } else {
+                    let newElem = createExemplar(
+                        exemplarScope,
+                        false,
+                        sketchController.sketchScopeIndex
+                    );
+                    sketchController.scopeRef.push(sketchController.sketchScopeIndex);
+                    explorer.appendChild(newElem);
+                    sketchController.drawExemplar(sketchController.sketchScopeIndex);
+                    sketchController.sketchScopeIndex += 1;
+                }
+            }
+            sketchController.clipDrawing = true;
+            setActionUI("explore");
+        }
     }
 });
 
 stopButton.addEventListener("click", () => {
-    if (
-        sketchController.drawState === "drawing" ||
-        sketchController.drawState === "continuing"
-    ) {
-        sketchController.clipDrawing = false;
-        sketchController.stop(); //flag
-    } else if (
-        sketchController.drawState === "explore" ||
-        sketchController.drawState === "continue-explore"
-    ) {
-        aiMessage.innerHTML = "All done! What should we draw next?";
-        aiMessage.classList.add("typed-out");
-        sketchController.clipDrawing = false;
-        setActionUI("stopSingle");
-        killExploratorySketches();
+    if (socketConnected) {
+        if (
+            sketchController.drawState === "drawing" ||
+            sketchController.drawState === "continuing"
+        ) {
+            sketchController.clipDrawing = false;
+            sketchController.stop(); //flag
+        } else if (
+            sketchController.drawState === "explore" ||
+            sketchController.drawState === "continue-explore"
+        ) {
+            aiMessage.innerHTML = "All done! What should we draw next?";
+            aiMessage.classList.add("typed-out");
+            sketchController.clipDrawing = false;
+            setActionUI("stopSingle");
+            killExploratorySketches();
+        }
     }
 });
 
 document.getElementById("prune").addEventListener("click", () => {
-    sketchController.prune();
+    if (socketConnected && sketchController.drawState === "stop")
+        sketchController.prune();
 });
 
 document.getElementById("go-back").addEventListener("click", () => {
@@ -373,49 +415,6 @@ document.getElementById("go-back").addEventListener("click", () => {
         sketchController.svg = paper.project.exportSVG({
             asString: true,
         });
-    }
-});
-
-document.getElementById("brainstorm").addEventListener("click", () => {
-    if (noPrompt()) {
-        openModal({
-            title: "Type a prompt first!",
-            message: "You need a target for AI exemplars.",
-        });
-        return;
-    } else {
-        // TO DO: Clean up old scopes (now unused) think you can remove without destorying
-        //loop through old refs
-
-        // console.log(sketchController.scopeRef);
-        // for (let oldScope of sketchController.scopeRef) {
-        //     oldScope.remove();
-        // }
-        // console.log(sketchController.scopeRef);
-
-        const total =
-            sketchController.sketchScopeIndex + Math.floor(Math.random() * 5);
-        for (let i = 0; i < 4; i++) {
-            explorer.removeChild(explorer.firstChild);
-            if (sketchController.sketchScopeIndex > total) {
-                let newElem = createExemplar(defaults, false);
-                sketchController.scopeRef.push(sketchController.sketchScopeIndex);
-                explorer.appendChild(newElem);
-                newElem.classList.add("inactive-exemplar");
-            } else {
-                let newElem = createExemplar(
-                    exemplarScope,
-                    false,
-                    sketchController.sketchScopeIndex
-                );
-                sketchController.scopeRef.push(sketchController.sketchScopeIndex);
-                explorer.appendChild(newElem);
-                sketchController.drawExemplar(sketchController.sketchScopeIndex);
-                sketchController.sketchScopeIndex += 1;
-            }
-        }
-        sketchController.clipDrawing = true;
-        setActionUI("explore");
     }
 });
 

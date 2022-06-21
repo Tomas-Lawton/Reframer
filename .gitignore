@@ -9,6 +9,7 @@ server/src/diffvg
 server/src/env
 server/src/util/__pycache__/
 server/src/results/
+server/src/data/
 
 reactcanvas/node_modules
 

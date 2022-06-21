@@ -152,6 +152,8 @@ const setActionUI = (state) => {
             // elem.classList.remove("active");
         });
         inactiveStop();
+    } else if (state == "stop-prune") {
+        drawingFinished();
     } else if (sketchController.activeStates.includes(state)) {
         actionControls.forEach((elem) => {
             elem.classList.add("inactive-action");
@@ -173,7 +175,7 @@ const setActionUI = (state) => {
             // document.getElementById("draw").classList.add("active");
         } else if (state == "explore") {
             aiMessage.innerHTML = `I've got some ideas for ${sketchController.prompt}!`;
-            // document.getElementById("brainstorm").classList.add("active");
+            // document.getElementById("inspire").classList.add("active");
         } else if (state == "refining") {
             aiMessage.innerHTML = `Okay, refining the lines for ${sketchController.prompt}...`;
             // document.getElementById("refine").classList.add("active");
@@ -570,7 +572,7 @@ const loadResponse = (result) => {
 
         if (sketchController.drawState == "pruning") {
             updateMainSketch(result);
-            setActionUI("stop");
+            setActionUI("stop-prune");
             sketchController.clipDrawing = false; //single update
         }
 
