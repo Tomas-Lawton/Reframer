@@ -32,7 +32,6 @@ multiTool.onMouseDown = function(event) {
             // DESELECT
             if ((!hitResult && !isInBounds) || (!hitResult && isInBounds == null)) {
                 hideSelectUI();
-
                 // Clean up group
                 unpackGroup();
                 userLayer.getItems().forEach((path) => {
@@ -135,9 +134,7 @@ multiTool.onMouseDrag = function(event) {
                     strokeColor: "#7b66ff",
                     selected: true,
                 });
-                console.log(userLayer);
             }
-            console.log("Before ", userLayer.children);
             break;
         case "lasso":
             sketchController.drawRegion.width += event.delta.x;
@@ -169,7 +166,6 @@ multiTool.onMouseUp = function() {
                 let items = userLayer.getItems({ inside: selectBox.bounds });
                 items.pop().remove();
                 items.forEach((item) => (item.selected = true));
-                console.log(userLayer);
                 if (sketchController.selectBox) {
                     sketchController.selectBox = null;
                     selectBox.remove();
@@ -182,8 +178,8 @@ multiTool.onMouseUp = function() {
                 createGroup(items); //transformGroup
                 updateSelectUI();
             }
-            console.log("LAYER ", userLayer.children);
-            console.log("Ref: ", sketchController.userPaths);
+            // console.log("LAYER ", userLayer.children);
+            // console.log("Ref: ", sketchController.userPaths);
             break;
         case "pen":
             myPath.simplify();
