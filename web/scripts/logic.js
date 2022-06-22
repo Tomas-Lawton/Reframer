@@ -175,6 +175,9 @@ const setActionUI = (state) => {
             // document.getElementById("draw").classList.add("active");
         } else if (state == "explore") {
             aiMessage.innerHTML = `I've got some ideas for ${sketchController.prompt}!`;
+            canvas.classList.add("loading-canvas");
+            document.getElementById("history-block").style.display = "none";
+
             // document.getElementById("inspire").classList.add("active");
         } else if (state == "refining") {
             aiMessage.innerHTML = `Okay, refining the lines for ${sketchController.prompt}...`;
@@ -564,12 +567,8 @@ const updateMainSketch = (result) => {
 };
 
 const loadResponse = (result) => {
+    console.log("Result: ", result);
     if (sketchController.clipDrawing) {
-        if (result.status === "stop") {
-            console.log("WHYYYYYY");
-            sketchController.clipDrawing = false;
-        }
-
         if (sketchController.drawState == "pruning") {
             updateMainSketch(result);
             setActionUI("stop-prune");

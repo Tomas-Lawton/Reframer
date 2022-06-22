@@ -47,7 +47,7 @@ class CICADA:
         self.num_augs = 4
         self.update_frequency = 1  # remove?
         self.frame_size = None
-        self.refresh_rate = 15
+        self.refresh_rate = 10
         self.num_user_paths = None  # add AI paths
         # Configure rasterisor
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -458,14 +458,15 @@ class CICADA:
         # check the socket is still open before sending stop
         logging.info(f"Stopping... {self.sketch_reference_index}")
         self.is_running = False
-        await self.socket.send_json({"status": "stop"})
+        # await self.socket.send_json({"status": "stop"})
 
     async def loop(self):
         while self.is_running and self.iteration < self.num_iter:
             try:
                 self.run_epoch()
-                # if self.iteration % self.refresh_rate == 0:
-                await self.render_and_save(self.iteration, self.losses['global'])
+                if self.iteration % 3 == 0 or self.iteration == 1:
+                # if self.iteration % self.refresh_rate == 0 or self.iteration == 1:
+                    await self.render_and_save(self.iteration, self.losses['global'])
             except Exception as e:
                 logging.info("Iteration failed on: ", self.sketch_reference_index)
                 await self.stop()

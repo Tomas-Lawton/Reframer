@@ -18,10 +18,12 @@ if (useAI) {
     var ws = new WebSocket("ws://" + base + "/ws");
     ws.onclose = (event) => {
         console.log("Closed socket... Running without AI\n" + event);
+        alert("It died :(, restart server");
     };
     ws.onopen = (event) => {
         console.log("Connected AI Socket\n" + event);
         socketConnected = true;
+        alert("Connected");
     };
 } else {
     document.getElementById("ai-view").style.display = "none";

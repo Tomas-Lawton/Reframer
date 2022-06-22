@@ -334,12 +334,7 @@ prompt.addEventListener("input", (e) => {
 
 document.getElementById("draw").addEventListener("click", () => {
     if (socketConnected) {
-        if (
-            sketchController.drawState === "inactive" ||
-            sketchController.drawState === "stop"
-        ) {
-            sketchController.draw();
-        }
+        sketchController.draw();
     }
 });
 
@@ -386,28 +381,36 @@ stopButton.addEventListener("click", () => {
             sketchController.drawState === "drawing" ||
             sketchController.drawState === "continuing"
         ) {
-            sketchController.clipDrawing = false;
             sketchController.stop(); //flag
+            sketchController.clipDrawing = false;
         } else if (
             sketchController.drawState === "explore" ||
             sketchController.drawState === "continue-explore"
         ) {
             aiMessage.innerHTML = "All done! What should we draw next?";
             aiMessage.classList.add("typed-out");
-            sketchController.clipDrawing = false;
             setActionUI("stopSingle");
             killExploratorySketches();
+            sketchController.clipDrawing = false;
         }
     }
 });
 
 document.getElementById("prune").addEventListener("click", () => {
-    if (socketConnected && sketchController.drawState === "stop")
-        sketchController.prune();
+    if (socketConnected) {
+        if (
+            sketchController.drawState === "stop" ||
+            sketchController.drawState === "stop-prune"
+        ) {
+            // after  draw
+            sketchController.prune();
+        }
+    }
 });
 
 document.getElementById("go-back").addEventListener("click", () => {
     if (sketchController.drawState === "stop") {
+        // after  draw
         userLayer.clear();
         let svg = sketchController.stack.historyHolder[1].svg;
         timeKeeper.value = 1;

@@ -566,51 +566,6 @@ const partialSketches = [
      id="path939-9-3" />
 </svg>`,
     `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-    <svg
-       id="svg5"
-       version="1.1"
-       viewBox="0 0 1 1"
-       height="1mm"
-       width="1mm"
-       xmlns="http://www.w3.org/2000/svg"
-       xmlns:svg="http://www.w3.org/2000/svg"
-       xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-       xmlns:cc="http://creativecommons.org/ns#"
-       xmlns:dc="http://purl.org/dc/elements/1.1/">
-      <metadata
-         id="metadata6530">
-        <rdf:RDF>
-          <cc:Work
-             rdf:about="">
-            <dc:format>image/svg+xml</dc:format>
-            <dc:type
-               rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-          </cc:Work>
-        </rdf:RDF>
-      </metadata>
-      <path
-         style="font-variation-settings:normal;fill:none;fill-opacity:0.933333;stroke:#000000;stroke-width:0.01;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.93333304;stop-color:#000000"
-         d="m 0.39226139,0.42145116 c -0.0400022,0.0451062 -0.0740141,0.0930913 -0.0740141,0.0930913 0,0 0.033854,-0.0367783 0.0463595,-0.0247761 0.0125055,0.0120026 -0.0480994,0.0604495 -0.0387996,0.0693761 0.0093,0.008927 0.0683713,0.11586035 0.0738459,0.13378318"
-         id="path51862-6" />
-      <path
-         style="font-variation-settings:normal;fill:none;fill-opacity:0.933333;stroke:#000000;stroke-width:0.01;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.93333304;stop-color:#000000"
-         d="m 0.58275062,0.39617795 c 0.10526865,0.0943765 0.0942315,0.0803307 0.0941593,0.0856161 -7.752e-5,0.005286 -0.039645,-0.0116895 -0.0343429,-0.005435 0.005303,0.006254 0.0558655,0.0535612 0.0518845,0.0599452 -0.003981,0.006384 -0.22421527,0.19825868 -0.24598922,0.20413718 -0.0217739,0.005878 -0.0672856,0.0176802 -0.0789096,0.0151444 C 0.3579279,0.75304983 0.56804389,0.4615827 0.57073701,0.4495686 0.57343001,0.4375552 0.58089031,0.3869352 0.58089031,0.3869352"
-         id="path51864-1" />
-      <path
-         style="font-variation-settings:normal;fill:none;fill-opacity:0.933333;stroke:#000000;stroke-width:0.01;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.93333304;stop-color:#000000"
-         d="M 0.45562892,0.60471096 C 0.42617127,0.51296431 0.40488051,0.42851244 0.39477189,0.4224367"
-         id="path51866-0" />
-      <path
-         style="font-variation-settings:normal;fill:none;fill-opacity:0.933333;stroke:#000000;stroke-width:0.01;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.93333304;stop-color:#000000"
-         d="m 0.33683519,0.48270342 c -0.0924359,0.0487865 -0.12605781,0.0673735 -0.12709335,0.0803046 -0.001035,0.0129311 0.0619143,0.17148557 0.0792406,0.18838106 0.0173259,0.0168956 0.33849445,0.0179494 0.36457816,-3.0855e-4 C 0.67964449,0.7328232 0.79837563,0.56496424 0.79120983,0.54937495 0.78403786,0.5337857 0.69295968,0.49411977 0.67298304,0.48288368"
-         id="path51868-6" />
-      <path
-         style="font-variation-settings:normal;fill:none;fill-opacity:0.933333;stroke:#000000;stroke-width:0.01;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.93333304;stop-color:#000000"
-         d="m 0.38051237,0.76402889 c 0.022148,0.0235599 0.0437381,0.0433317 0.0351345,0.054939 -0.008605,0.0116078 -0.0713449,0.0533436 -0.0713449,0.0691508 0,0.0158061 0.0108921,0.064358 0.0608274,0.0786048 0.0499356,0.0142514 0.1281346,0.0295038 0.19425103,-0.005722 C 0.6581685,0.92968389 0.6542648,0.89275519 0.6392879,0.86660599 0.6279469,0.84680689 0.5839591,0.82588519 0.580642,0.81991419 0.577324,0.81394419 0.573268,0.78556079 0.5982362,0.76223809"
-         id="path51870-3" />
-    </svg>
-    `,
-    `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
