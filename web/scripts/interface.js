@@ -58,11 +58,11 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
 });
 document.querySelectorAll(".swatch").forEach((elem) => {
     elem.addEventListener("click", () => {
-        setPenMode("pen", pen);
         let col = window.getComputedStyle(elem).backgroundColor;
         sketchController.opacity = 1;
         opacitySlider.value = 100;
         sketchController.strokeColor = col;
+        getSelectedPaths().forEach((path) => (path.strokeColor = col));
         picker.setColor(col);
     });
 });
@@ -301,13 +301,12 @@ timeKeeper.oninput = function() {
     if (sketchController.numTraces > 1) {
         showTraceHistoryFrom(historyIndex);
     } else {
-        let svg = sketchController.stack.historyHolder[historyIndex].svg;
-        parseFromSvg(1, svg, userLayer);
+        let stored = sketchController.stack.historyHolder[historyIndex];
+        parseFromSvg(1, stored.svg, stored.num, userLayer);
         sketchController.svg = paper.project.exportSVG({
             asString: true,
         });
     }
-
     sketchController.svg = paper.project.exportSVG({
         asString: true,
     });
@@ -404,9 +403,9 @@ document.getElementById("prune").addEventListener("click", () => {
 
 document.getElementById("go-back").addEventListener("click", () => {
     if (sketchController.drawState === "stop") {
-        let svg = sketchController.stack.historyHolder[1].svg;
+        let stored = sketchController.stack.historyHolder[1];
         timeKeeper.value = 1;
-        parseFromSvg(1, svg, userLayer);
+        parseFromSvg(1, stored.svg, stored.num, userLayer);
         sketchController.svg = paper.project.exportSVG({
             asString: true,
         });
@@ -580,7 +579,7 @@ let lastFixation = sketchController.useFixation;
 
 respectSlider.oninput = function() {
     sketchController.useFixation = parseInt(this.value);
-    let msg = sketchController.useFixation > 2 ? "None" : "A lot";
+    let msg = sketchController.useFixation > 2 ? "More" : "Less";
     document.getElementById("fix-label").innerHTML = msg;
 };
 
@@ -621,7 +620,7 @@ const scaleGroup = (group, to) => {
 };
 
 // Random partial sketch
-(() => {
+if (!useAI) {
     const scaleTo = userLayer.view.viewSize.width;
     const idx = Math.floor(Math.random() * partialSketches.length);
     // const idx = 5;
@@ -650,7 +649,7 @@ const scaleGroup = (group, to) => {
     sketchController.svg = paper.project.exportSVG({
         asString: true,
     });
-})();
+}
 
 const picker = new Picker({
     parent: document.getElementById("color-picker"),

@@ -465,9 +465,8 @@ class CICADA:
         while self.is_running and self.iteration < self.num_iter:
             try:
                 self.run_epoch()
-                if self.iteration % 3 == 0 or self.iteration == 1:
                 # if self.iteration % self.refresh_rate == 0 or self.iteration == 1:
-                    await self.render_and_save(self.iteration, self.losses['global'])
+                await self.render_and_save(self.iteration, self.losses['global'])
             except Exception as e:
                 logging.info("Iteration failed on: ", self.sketch_reference_index)
                 await self.stop()

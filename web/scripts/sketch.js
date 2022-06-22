@@ -119,16 +119,13 @@ class SketchHandler {
             }
             item.remove(); //preserves reference
         });
-
         sorted.forEach((elem) => userLayer.addChild(elem));
-
-        this.svg = paper.project.exportSVG({
-            asString: true,
-        });
-
         console.log("USER: ", this.userPaths.length);
         console.log("AI: ", sorted.length - this.userPaths.length);
         console.log("Sorted: ", sorted);
+        return paper.project.exportSVG({
+            asString: true,
+        });
     }
     draw(withRegion = false, svg = null, disableLines = false) {
         if (noPrompt()) {
@@ -142,7 +139,7 @@ class SketchHandler {
             this.clipDrawing = true;
             this.targetDrawing = false;
             sketchController.linesDisabled = disableLines;
-            this.sortPaths();
+            this.svg = this.sortPaths();
             setLineLabels(userLayer);
             document.getElementById("calc-lines").innerHTML = `Add : 0`;
 
@@ -187,45 +184,43 @@ class SketchHandler {
         if (!this.clipDrawing) {
             this.clipDrawing = true;
 
-            // if (this.targetDrawing) {
-            //     explorer.childNodes.forEach((child, i) => {
-            //         try {
-            //             this.sortPaths();
-            //             // TO DO CHANGE
-            //             setLineLabels(userLayer);
-            //             document.getElementById("calc-lines").innerHTML = `Add : 0`;
+            if (this.targetDrawing) {
+                //     explorer.childNodes.forEach((child, i) => {
+                //         try {
+                //             this.sortPaths();
+                //             // TO DO CHANGE
+                //             setLineLabels(userLayer);
+                //             document.getElementById("calc-lines").innerHTML = `Add : 0`;
+                //             this.updateDrawer({
+                //                 status: "continue_single_sketch",
+                //                 svg: this.svg,
+                //                 frameSize: this.frameSize, //can remove?
+                //                 fixation: this.useFixation,
+                //                 sketchScopeIndex: sketchController.scopeRef[i],
+                //             });
+                //             setActionUI("continue-explore");
+                //         } catch (e) {
+                //             console.log("Problem with update");
+                //         }
+                //     });
+            } else {
+                try {
+                    this.svg = this.sortPaths();
+                    setLineLabels(userLayer);
+                    document.getElementById("calc-lines").innerHTML = `Add : 0`;
 
-            //             this.updateDrawer({
-            //                 status: "continue_single_sketch",
-            //                 svg: this.svg,
-            //                 frameSize: this.frameSize, //can remove?
-            //                 fixation: this.useFixation,
-            //                 sketchScopeIndex: sketchController.scopeRef[i],
-            //             });
-            //             setActionUI("continue-explore");
-            //         } catch (e) {
-            //             console.log("Problem with update");
-            //         }
-            //     });
-            // } else {
-
-            try {
-                this.sortPaths();
-                setLineLabels(userLayer);
-                document.getElementById("calc-lines").innerHTML = `Add : 0`;
-
-                this.updateDrawer({
-                    status: "continue_sketch",
-                    svg: this.svg,
-                    frameSize: this.frameSize, //can remove?
-                    fixation: this.useFixation,
-                    userPaths: this.userPaths.length,
-                });
-                setActionUI("continuing");
-            } catch (e) {
-                console.log("Problem with update");
+                    this.updateDrawer({
+                        status: "continue_sketch",
+                        svg: this.svg,
+                        frameSize: this.frameSize, //can remove?
+                        fixation: this.useFixation,
+                        userPaths: this.userPaths.length,
+                    });
+                    setActionUI("continuing");
+                } catch (e) {
+                    console.log("Problem with update");
+                }
             }
-            // }
         } else {
             throw new Error("Can't continue if already running");
         }
@@ -233,7 +228,7 @@ class SketchHandler {
     prune() {
         if (!this.clipDrawing) {
             this.clipDrawing = true;
-            this.sortPaths();
+            this.svg = this.sortPaths();
             this.updateDrawer({
                 status: "prune",
             });

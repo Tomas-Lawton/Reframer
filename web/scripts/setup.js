@@ -6,7 +6,7 @@
 const http = "http://";
 const base = "localhost:8000";
 
-const useAI = false;
+const useAI = true;
 let socketConnected = false;
 
 if (useAI) {

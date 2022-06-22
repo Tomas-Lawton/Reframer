@@ -175,13 +175,10 @@ const setActionUI = (state) => {
             // document.getElementById("draw").classList.add("active");
         } else if (state == "explore") {
             aiMessage.innerHTML = `I've got some ideas for ${sketchController.prompt}!`;
-            canvas.classList.add("loading-canvas");
+            // canvas.classList.add("loading-canvas");
             document.getElementById("history-block").style.display = "none";
 
             // document.getElementById("inspire").classList.add("active");
-        } else if (state == "refining") {
-            aiMessage.innerHTML = `Okay, refining the lines for ${sketchController.prompt}...`;
-            // document.getElementById("refine").classList.add("active");
         } else if (state == "continuing" || state == "continue-explore") {
             aiMessage.innerHTML = `Nice, I'll make that it into ${sketchController.prompt}.`;
         }
@@ -415,16 +412,13 @@ const showHide = (item) => {
 // switchControls();
 
 // TO DO: Allow drawing a list of svgs, if svg is array.
-const parseFromSvg = (s, svg, l) => {
+const parseFromSvg = (s, svg, humanPaths, l) => {
     if (svg === "" || svg === undefined) return null;
     l.clear();
     let g = l.importSVG(svg).children[0];
     scaleGroup(g, s);
     l.insertChildren(g.index, g.removeChildren());
-
-    const humanPaths = sketchController.userPaths.length;
     sketchController.userPaths = [];
-
     l.getItems().forEach((path, i) => {
         i < humanPaths ?
             sketchController.userPaths.push(path) :
@@ -472,9 +466,9 @@ const showTraceHistoryFrom = (fromIndex) => {
     if (items) {
         sketchController.traces = null;
         let refList = [];
-        for (let pastGen of items) {
-            userLayer.importSVG(pastGen.svg);
-            refList.push(parseFromSvg(1, pastGen.svg, userLayer));
+        for (let stored of items) {
+            userLayer.importSVG(stored.svg);
+            refList.push(parseFromSvg(1, stored.svg, stored.num, userLayer));
         }
         sketchController.traces = refList;
     }
@@ -511,10 +505,11 @@ const updateMainSketch = (result) => {
         }
     }
 
-    // sketchController.stack.historyHolder.push({
-    //     ...result,
-    //     svg: sketchController.svg,
-    // });
+    sketchController.stack.historyHolder.push({
+        ...result,
+        svg: sketchController.sortPaths(),
+        num: sketchController.userPaths.length,
+    });
 
     timeKeeper.setAttribute("max", String(sketchController.step + 1));
     timeKeeper.value = String(sketchController.step + 1);
@@ -528,6 +523,7 @@ const updateMainSketch = (result) => {
         sketchController.lastRender = parseFromSvg(
             userLayer.view.viewSize.width / 224,
             result.svg,
+            sketchController.userPaths.length,
             userLayer
         );
         sketchController.svg = paper.project.exportSVG({
@@ -555,7 +551,12 @@ const loadResponse = (result) => {
         if (matches != null) {
             if (result.svg === "") return null;
             let thisCanvas = exemplarScope.projects[result.sketch_index];
-            parseFromSvg(exemplarSize / 224, result.svg, thisCanvas.activeLayer);
+            parseFromSvg(
+                exemplarSize / 224,
+                result.svg,
+                sketchController.userPaths.length,
+                thisCanvas.activeLayer
+            );
         }
     }
 };
