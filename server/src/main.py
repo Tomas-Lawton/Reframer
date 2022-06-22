@@ -79,7 +79,7 @@ def stop_all(d, a):
 if not os.environ.get('CONNECTAI') == "True":
     logging.info("Running without AI")
 else:
-    logging.info("Establishing AI Connection...")
+    logging.info("Establishing Connection...")
     clip_class = Clip_Instance()
     exemplar_drawers = []
 

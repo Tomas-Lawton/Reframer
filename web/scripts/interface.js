@@ -629,48 +629,47 @@ const scaleGroup = (group, to) => {
 };
 
 // Random partial sketch
-(() => {
-    const scaleTo = userLayer.view.viewSize.width;
-    const idx = Math.floor(Math.random() * partialSketches.length);
-    console.log(idx);
-    const partial = partialSketches[idx];
+// (() => {
+//     const scaleTo = userLayer.view.viewSize.width;
+//     const idx = Math.floor(Math.random() * partialSketches.length);
+//     console.log(idx);
+//     const partial = partialSketches[idx];
 
-    try {
-        var loadedPartial = userLayer.importSVG(partial);
-        loadedPartial.set({
-            opacity: sketchController.opacity,
-            strokeCap: "round",
-            strokeJoin: "round",
-        });
-    } catch (e) {
-        console.error("Partial sketch import is cooked");
-    }
+//     try {
+//         var loadedPartial = userLayer.importSVG(partial);
+//         loadedPartial.set({
+//             opacity: sketchController.opacity,
+//             strokeCap: "round",
+//             strokeJoin: "round",
+//         });
+//     } catch (e) {
+//         console.error("Partial sketch import is cooked");
+//     }
 
-    loadedPartial.getItems().forEach((item) => {
-        if (item instanceof Group) {
-            item.children.forEach((child) => {
-                let newElem = userLayer.addChild(child.clone());
-                sketchController.userPaths.push(newElem);
-            });
-        } else if (item instanceof Shape) {
-            item.remove(); // rectangles are banned
-        } else {
-            if (item instanceof Path) {
-                let newElem = userLayer.addChild(item.clone());
-                sketchController.userPaths.push(newElem);
-            }
-        }
-    });
-    loadedPartial.remove();
+//     loadedPartial.getItems().forEach((item) => {
+//         if (item instanceof Group) {
+//             item.children.forEach((child) => {
+//                 let newElem = userLayer.addChild(child.clone());
+//                 sketchController.userPaths.push(newElem);
+//             });
+//         } else if (item instanceof Shape) {
+//             item.remove(); // rectangles are banned
+//         } else {
+//             if (item instanceof Path) {
+//                 let newElem = userLayer.addChild(item.clone());
+//                 sketchController.userPaths.push(newElem);
+//             }
+//         }
+//     });
+//     loadedPartial.remove();
 
-    scaleGroup(userLayer, scaleTo);
+//     scaleGroup(userLayer, scaleTo);
 
-    sketchController.svg = paper.project.exportSVG({
-        asString: true,
-    });
+//     sketchController.svg = paper.project.exportSVG({
+//         asString: true,
+//     });
 
-    setLineLabels(userLayer);
-})();
+// })();
 
 const picker = new Picker({
     parent: document.getElementById("color-picker"),
@@ -691,6 +690,8 @@ picker.onChange = (color) => {
     document.getElementById("pen-color").style.background = rgba;
     document.getElementById("point-size").style.background = rgba;
 };
+
+setLineLabels(userLayer);
 
 setActionUI("inactive");
 

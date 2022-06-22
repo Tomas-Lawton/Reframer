@@ -779,6 +779,18 @@ const setLineLabels = (layer) => {
     ).innerHTML = `Add : ${sketchController.addLines}`;
 };
 
+const createGroup = (items) => {
+    rotateSlider.value = 0;
+    rotateNumber.value = 0;
+    scaleSlider.value = 10;
+    scaleSlider.value = 10;
+    sketchController.transformGroup = new Group({
+        children: items,
+        strokeScaling: false,
+        transformContent: false,
+    });
+};
+
 const downloadSketch = () => {
     // REMOVE REFs to select box
     userLayer.getItems().forEach((path) => {

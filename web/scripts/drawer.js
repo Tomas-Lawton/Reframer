@@ -27,25 +27,33 @@ multiTool.onMouseDown = function(event) {
                     event.point.y < sketchController.boundingBox.bounds.bottom;
             }
 
+            // DESELECT
             if ((!hitResult && !isInBounds) || (!hitResult && isInBounds == null)) {
+                hideSelectUI();
+
+                // Clean up group
                 unpackGroup();
                 userLayer.getItems().forEach((path) => {
                     path.selected = false;
                 });
-                sketchController.transformGroup = null;
-                if (sketchController.boundingBox) {
-                    hideSelectUI();
+
+                if (sketchController.transformGroup !== null) {
+                    sketchController.transformGroup.remove();
+                    sketchController.transformGroup = null;
                 }
 
+                // Update
+                sketchController.svg = paper.project.exportSVG({
+                    asString: true,
+                });
+                setLineLabels(userLayer);
+
+                // Prepare
                 if (liveCollab) {
-                    sketchController.svg = paper.project.exportSVG({
-                        asString: true,
-                    }); //grab latest changes during the selection
                     sketchController.continueSketch();
                     liveCollab = false;
                 }
 
-                // Create a new selection in case drag is starting
                 sketchController.selectBox = new Rectangle(event.point);
             }
 
@@ -60,15 +68,9 @@ multiTool.onMouseDown = function(event) {
                 path = hitResult.item;
                 path.selected = true;
                 let items = getSelectedPaths();
+                createGroup(items);
                 fitToSelection(items, "moving");
                 updateSelectUI();
-                //can't group on input because group must already be set. so the rotation is set non-functionally to the group
-                rotateSlider.value = 0;
-                rotateNumber.value = 0;
-                let transformGroup = new Group({ children: items });
-                transformGroup.transformContent = false;
-                transformGroup.strokeScaling = false;
-                sketchController.transformGroup = transformGroup;
             }
             break;
         case "pen":
@@ -157,26 +159,23 @@ multiTool.onMouseUp = function() {
         case "select":
             if (selectBox) {
                 //moving selection
+                console.log("here");
                 let items = userLayer.getItems({ inside: selectBox.bounds });
-                items.pop();
+                items.pop().remove();
                 items.forEach((item) => (item.selected = true));
 
-                // sketchController.selectBox.remove();
                 if (sketchController.selectBox) {
                     sketchController.selectBox = null;
+                    selectBox.remove();
+                    selectBox = null;
                 }
-                selectBox.remove();
-                selectBox = null;
                 fitToSelection(items, "moving");
+                createGroup(items);
                 updateSelectUI();
-                // Create group
-                rotateSlider.value = 0;
-                rotateNumber.value = 0;
-                let transformGroup = new Group({ children: items });
-                transformGroup.transformContent = false;
-                transformGroup.strokeScaling = false;
-                sketchController.transformGroup = transformGroup;
             }
+            //has a group
+            console.log("LAYER ", userLayer.children);
+            console.log("Ref: ", sketchController.userPaths);
             break;
         case "pen":
             myPath.simplify();
@@ -209,6 +208,10 @@ multiTool.onMouseUp = function() {
                     }
                 }
             }
+            sketchController.svg = paper.project.exportSVG({
+                asString: true,
+            });
+            setLineLabels(userLayer);
             break;
         case "lasso":
             if (socketConnected) {
@@ -217,18 +220,16 @@ multiTool.onMouseUp = function() {
                 sketchController.clipDrawing = true;
                 regionPath.remove();
             }
+            sketchController.svg = paper.project.exportSVG({
+                asString: true,
+            });
+            setLineLabels(userLayer);
             break;
     }
     // remove??
     if (sketchController.boundingBox) {
         sketchController.boundingBox.data.state = "moving";
     }
-
-    // use updates
-    sketchController.svg = paper.project.exportSVG({
-        asString: true,
-    });
-    setLineLabels(userLayer);
 
     logger.event(sketchController.penMode + "-up");
 };
