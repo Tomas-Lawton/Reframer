@@ -101,7 +101,7 @@ const killExploratorySketches = () => {
         loader.classList.add("fa-check");
         stopButton.style.background = "#f5f5f5";
         stopButton.style.background = "#d2d2d2";
-        sketchController.stopSingle(sketchController.scopeRef[i]);
+        sketchController.stopSingle(sketchController.inspireScopes[i]);
     });
 };
 

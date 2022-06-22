@@ -103,7 +103,7 @@ body {
 }
 
 .drop-ready {
-    background: #474747;
+    background: #ffffff23;
     transition: 0.5s;
 }
 
@@ -812,6 +812,13 @@ input:focus {
     overflow-y: overlay;
     margin-bottom: 1em;
     border-radius: 1em;
+    /* padding: 1.5em; */
+    box-shadow: inset 2px 10px 18px #111111;
+    transition: 0.5s;
+}
+
+.basic-background {
+    background: #ffffff0d;
 }
 
 .exemplar-card {
@@ -1126,7 +1133,7 @@ input[type="number"] {
 #explore-sketches {
     /* width: 30%; */
     /* background: #474747; */
-    background: #110f18;
+    /* background: #110f18; */
     border-radius: 1em 0px 0px 1em;
     /* border-right: 1px solid #5a5a5a; */
     display: flex;
@@ -1139,9 +1146,10 @@ input[type="number"] {
 
 #explore-margin {
     /* padding: 30px; */
-    padding: 20px;
+    /* padding: 20px; */
+    padding: 20px 0 20px 20px;
     /* background: #474747; */
-    background: #110f18;
+    background: #19152f;
     /* border-radius: 1em 0px 0px 1em; */
     /* border-right: 1px solid #5a5a5a; */
     display: flex;

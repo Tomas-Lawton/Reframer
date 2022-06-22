@@ -17,7 +17,8 @@ class SketchHandler {
             asString: true,
         }); //for svg parsing
         this.frameSize = canvas.getBoundingClientRect().width;
-        this.scopeRef = [];
+        this.inspireScopes = [];
+        this.staticScopes = [];
 
         // Defaults
         this.strokeColor = "rgb(24,24,24)";
@@ -197,7 +198,7 @@ class SketchHandler {
                 //                 svg: this.svg,
                 //                 frameSize: this.frameSize, //can remove?
                 //                 fixation: this.useFixation,
-                //                 sketchScopeIndex: sketchController.scopeRef[i],
+                //                 sketchScopeIndex: sketchController.inspireScopes[i],
                 //             });
                 //             setActionUI("continue-explore");
                 //         } catch (e) {

@@ -22,18 +22,16 @@ sketchContainer.addEventListener("dragenter", dragentercanvas);
 sketchContainer.addEventListener("dragleave", dragleavecanvas);
 sketchContainer.addEventListener("drop", dropCanvas);
 
-function dragentersketches(e) {
+function dragoverhover(e) {
     e.preventDefault();
-    if (
-        sketchController.scopeRef.includes(e.dataTransfer.getData("text/plain"))
-    ) {
-        sketchGrid.classList.add("drop-ready");
-    }
+    sketchGrid.classList.add("drop-ready");
+    sketchGrid.classList.remove("basic-background");
 }
 
 function dragleavesketch(e) {
     e.preventDefault();
     sketchGrid.classList.remove("drop-ready");
+    sketchGrid.classList.add("basic-background");
 }
 
 function dropSketch(e) {
@@ -45,8 +43,8 @@ function dropSketch(e) {
     }
 }
 
-sketchGrid.addEventListener("dragover", dragover);
-sketchGrid.addEventListener("dragenter", dragentersketches);
+sketchGrid.addEventListener("dragover", dragoverhover);
+// sketchGrid.addEventListener("dragenter", dragentersketches);
 sketchGrid.addEventListener("dragleave", dragleavesketch);
 sketchGrid.addEventListener("drop", dropSketch);
 
@@ -344,14 +342,16 @@ document.getElementById("inspire").addEventListener("click", () => {
             });
             return;
         } else {
-            // TO DO: Clean up old scopes (now unused) // sketchController.scopeRef
+            // TO DO: Clean up old scopes (now unused) // sketchController.inspireScopes
             const total =
                 sketchController.sketchScopeIndex + Math.floor(Math.random() * 5);
             for (let i = 0; i < 4; i++) {
                 explorer.removeChild(explorer.firstChild);
                 if (sketchController.sketchScopeIndex > total) {
                     let newElem = createExemplar(defaults, false);
-                    sketchController.scopeRef.push(sketchController.sketchScopeIndex);
+                    sketchController.inspireScopes.push(
+                        sketchController.sketchScopeIndex
+                    );
                     explorer.appendChild(newElem);
                     newElem.classList.add("inactive-exemplar");
                 } else {
@@ -360,7 +360,9 @@ document.getElementById("inspire").addEventListener("click", () => {
                         false,
                         sketchController.sketchScopeIndex
                     );
-                    sketchController.scopeRef.push(sketchController.sketchScopeIndex);
+                    sketchController.inspireScopes.push(
+                        sketchController.sketchScopeIndex
+                    );
                     explorer.appendChild(newElem);
                     sketchController.newExploreSketch(sketchController.sketchScopeIndex);
                     sketchController.sketchScopeIndex += 1;
