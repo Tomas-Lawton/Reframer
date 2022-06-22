@@ -48,12 +48,11 @@ multiTool.onMouseDown = function(event) {
                 });
                 setLineLabels(userLayer);
 
-                // Prepare
+                // Continue
                 if (liveCollab) {
                     sketchController.continueSketch();
                     liveCollab = false;
                 }
-
                 sketchController.selectBox = new Rectangle(event.point);
             }
 
@@ -103,6 +102,7 @@ multiTool.onMouseDrag = function(event) {
             break;
         case "select":
             if (sketchController.boundingBox) {
+                //moving box
                 if (sketchController.boundingBox.data.state === "moving") {
                     const selectedPaths = getSelectedPaths(); // all selected
                     selectedPaths[0].children.forEach((path) => {
@@ -119,6 +119,9 @@ multiTool.onMouseDrag = function(event) {
                     updateSelectUI();
                 }
             } else if (sketchController.selectBox != undefined) {
+                //creating box
+                pauseActiveDrawer();
+
                 sketchController.selectBox.width += event.delta.x;
                 sketchController.selectBox.height += event.delta.y;
                 if (selectBox) {
@@ -306,16 +309,14 @@ eraseTool.onMouseUp = function(event) {
         });
         if (result.children) {
             //split path
-            splitPaths = result.removeChildren();
+            let splitPaths = result.removeChildren();
             erasorItem.parent.insertChildren(erasorItem.index, splitPaths);
-
             let newList = [];
             let foundUserPath = false;
             for (let i = 0; i < sketchController.userPaths.length; i++) {
                 if (sketchController.userPaths[i] === erasorItem) {
                     splitPaths.forEach((newPath) => {
-                        // replace old ref with the new children
-                        newList.push(newPath);
+                        newList.push(newPath); // replace
                     });
                     foundUserPath = true;
                 } else {
@@ -323,7 +324,7 @@ eraseTool.onMouseUp = function(event) {
                 }
             }
             if (!foundUserPath) {
-                // children should be added to the end, no need to delete old ref
+                //ai erasorItem
                 splitPaths.forEach((newPath) => {
                     newPath.opacity = 1;
                     newList.push(newPath);
@@ -341,11 +342,11 @@ eraseTool.onMouseUp = function(event) {
                 ); //remove ref
                 erasorItem.remove();
             } else {
-                if (!sketchController.userPaths.includes(erasorItem)) {
-                    result.opacity = 1;
-                    sketchController.userPaths.push(result);
-                }
-                erasorItem.replaceWith(result);
+                sketchController.userPaths = sketchController.userPaths.filter(
+                    (ref) => ref !== erasorItem
+                );
+                erasorItem.replaceWith(result); //replace
+                sketchController.userPaths.push(result); //replace
             }
         }
     });

@@ -83,11 +83,6 @@ document.getElementById("delete").addEventListener("click", () =>
             modal.style.display = "none";
             sketchController.userPaths = [];
             updateSelectUI();
-
-            // Save again for redraws
-            sketchController.svg = paper.project.exportSVG({
-                asString: true,
-            });
         },
     })
 );
@@ -306,9 +301,8 @@ timeKeeper.oninput = function() {
     if (sketchController.numTraces > 1) {
         showTraceHistoryFrom(historyIndex);
     } else {
-        userLayer.clear();
         let svg = sketchController.stack.historyHolder[historyIndex].svg;
-        parseFromSvg(1, svg, userLayer, true);
+        parseFromSvg(1, svg, userLayer);
         sketchController.svg = paper.project.exportSVG({
             asString: true,
         });
@@ -410,11 +404,9 @@ document.getElementById("prune").addEventListener("click", () => {
 
 document.getElementById("go-back").addEventListener("click", () => {
     if (sketchController.drawState === "stop") {
-        // after  draw
-        userLayer.clear();
         let svg = sketchController.stack.historyHolder[1].svg;
         timeKeeper.value = 1;
-        parseFromSvg(1, svg, userLayer, true);
+        parseFromSvg(1, svg, userLayer);
         sketchController.svg = paper.project.exportSVG({
             asString: true,
         });
@@ -588,7 +580,7 @@ let lastFixation = sketchController.useFixation;
 
 respectSlider.oninput = function() {
     sketchController.useFixation = parseInt(this.value);
-    let msg = sketchController.useFixation > 2 ? "Respect" : "Change";
+    let msg = sketchController.useFixation > 2 ? "None" : "A lot";
     document.getElementById("fix-label").innerHTML = msg;
 };
 
@@ -629,47 +621,36 @@ const scaleGroup = (group, to) => {
 };
 
 // Random partial sketch
-// (() => {
-//     const scaleTo = userLayer.view.viewSize.width;
-//     const idx = Math.floor(Math.random() * partialSketches.length);
-//     console.log(idx);
-//     const partial = partialSketches[idx];
+(() => {
+    const scaleTo = userLayer.view.viewSize.width;
+    const idx = Math.floor(Math.random() * partialSketches.length);
+    // const idx = 6;
+    console.log(idx);
+    const partial = partialSketches[idx][0];
+    const drawPrompt = partialSketches[idx][1];
+    document.getElementById("partial-message").innerHTML = drawPrompt;
 
-//     try {
-//         var loadedPartial = userLayer.importSVG(partial);
-//         loadedPartial.set({
-//             opacity: sketchController.opacity,
-//             strokeCap: "round",
-//             strokeJoin: "round",
-//         });
-//     } catch (e) {
-//         console.error("Partial sketch import is cooked");
-//     }
+    var loadedPartial = userLayer.importSVG(partial);
+    loadedPartial.set({
+        opacity: sketchController.opacity,
+        strokeCap: "round",
+        strokeJoin: "round",
+    });
+    loadedPartial.getItems().forEach((item) => {
+        if (item instanceof Path) {
+            let newElem = userLayer.addChild(item.clone());
+            sketchController.userPaths.push(newElem);
+        }
+    });
+    loadedPartial.remove();
+    console.log(userLayer);
 
-//     loadedPartial.getItems().forEach((item) => {
-//         if (item instanceof Group) {
-//             item.children.forEach((child) => {
-//                 let newElem = userLayer.addChild(child.clone());
-//                 sketchController.userPaths.push(newElem);
-//             });
-//         } else if (item instanceof Shape) {
-//             item.remove(); // rectangles are banned
-//         } else {
-//             if (item instanceof Path) {
-//                 let newElem = userLayer.addChild(item.clone());
-//                 sketchController.userPaths.push(newElem);
-//             }
-//         }
-//     });
-//     loadedPartial.remove();
+    scaleGroup(userLayer, scaleTo);
 
-//     scaleGroup(userLayer, scaleTo);
-
-//     sketchController.svg = paper.project.exportSVG({
-//         asString: true,
-//     });
-
-// })();
+    sketchController.svg = paper.project.exportSVG({
+        asString: true,
+    });
+})();
 
 const picker = new Picker({
     parent: document.getElementById("color-picker"),
@@ -724,6 +705,9 @@ if (window.innerWidth <= 700 || window.innerWidth >= 1000) {
 if (window.innerWidth <= 700) {
     penControls.appendChild(document.getElementById("scrapbook"));
     penControls.appendChild(document.getElementById("delete"));
+    document
+        .getElementById("top-action-right")
+        .prepend((document.createElement("p").innerHTML = "DONE"));
 
     document.getElementById("save").removeEventListener("click", () => {
         downloadSketch();

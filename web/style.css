@@ -116,7 +116,16 @@ body {
     position: relative;
     /* border-radius: 2em; */
     display: flex;
-    overflow: hidden;
+    /* overflow: hidden; */
+}
+
+#partial-message {
+    position: absolute;
+    bottom: 0%;
+    padding: 0.2em;
+    width: 100%;
+    text-align: center;
+    display: none;
 }
 
 #multiple-canvas {
@@ -1863,7 +1872,7 @@ input[type="range"]::-webkit-slider-thumb {
         /* width: 100%; */
         margin: 0;
         border-radius: 0;
-        justify-content: flex-end;
+        justify-content: space-between;
         background: limegreen;
         width: 100%;
     }

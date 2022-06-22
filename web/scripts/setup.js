@@ -6,7 +6,7 @@
 const http = "http://";
 const base = "localhost:8000";
 
-const useAI = true;
+const useAI = false;
 let socketConnected = false;
 
 if (useAI) {
@@ -18,7 +18,7 @@ if (useAI) {
     var ws = new WebSocket("ws://" + base + "/ws");
     ws.onclose = (event) => {
         console.log("Closed socket... Running without AI\n" + event);
-        alert("It died :(, restart server");
+        alert("Restart server... ded");
     };
     ws.onopen = (event) => {
         console.log("Connected AI Socket\n" + event);
@@ -26,6 +26,7 @@ if (useAI) {
         alert("Connected");
     };
 } else {
+    document.getElementById("partial-message").style.display = "block";
     document.getElementById("ai-view").style.display = "none";
     document.getElementById("tabs").remove();
 }

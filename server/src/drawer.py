@@ -435,6 +435,7 @@ class CICADA:
         svg_string = data["data"]["svg"]
 
         if svg_string is not None:
+            logging.info("Updating sketch")
             with open('data/interface_paths.svg', 'w') as f:
                 f.write(svg_string)
 

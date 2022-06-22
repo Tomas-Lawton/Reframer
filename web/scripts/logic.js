@@ -241,6 +241,7 @@ const unpackGroup = () => {
             sketchController.transformGroup.removeChildren()
         );
     }
+    sketchController.transformGroup = null;
 };
 
 const fitToSelection = (items, state) => {
@@ -373,13 +374,11 @@ const updateSelectUI = () => {
 };
 
 const deletePath = () => {
-    selected = getSelectedPaths();
-    if (sketchController.boundingBox) {
-        hideSelectUI();
-    }
-    sketchController.transformGroup = null;
+    // Save
+    hideSelectUI();
     unpackGroup();
-    userLayer.getItems().forEach((path) => {
+    let g = getSelectedPaths();
+    g.forEach((path) => {
         path.selected = false;
     });
     sketchController.stack.undoStack.push({
@@ -387,15 +386,13 @@ const deletePath = () => {
         data: userLayer.exportJSON(),
     });
 
-    if (selected.length > 0) {
-        pathList = selected.map((path) => path.exportJSON()); //dont use paper ref
-        // TO DO FIX
-        sketchController.userPaths = sketchController.userPaths.filter(
-            (ref) => ref !== path
-        ); //remove ref
-        selected.map((path) => path.remove()); // remove from sketch
-    }
+    // Delete
+    sketchController.userPaths = sketchController.userPaths.filter(
+        (ref) => !g.includes(ref)
+    );
+    g.forEach((path) => path.remove());
 
+    // Save again
     sketchController.svg = paper.project.exportSVG({
         asString: true,
     });
@@ -417,49 +414,24 @@ const showHide = (item) => {
 
 // switchControls();
 
-const parseFromSvg = (scale, svg, layer, showAllPaths = true) => {
+// TO DO: Allow drawing a list of svgs, if svg is array.
+const parseFromSvg = (s, svg, l) => {
     if (svg === "" || svg === undefined) return null;
-    let paperObject = layer.importSVG(svg);
-    if (paperObject.children[0].children) {
-        paperObject.scale(scale, new Point(0, 0));
+    l.clear();
+    let g = l.importSVG(svg).children[0];
+    scaleGroup(g, s);
+    l.insertChildren(g.index, g.removeChildren());
 
-        const numUserPaths = sketchController.userPaths.length;
-        sketchController.userPaths = [];
+    const humanPaths = sketchController.userPaths.length;
+    sketchController.userPaths = [];
 
-        for (const returnedIndex in paperObject.children[0].children) {
-            const child = paperObject.children[0].children[returnedIndex];
-            child.smooth();
-            child.strokeWidth *= scale;
-
-            if (
-                sketchController.initRandomCurves &&
-                !sketchController.linesDisabled
-            ) {
-                if (returnedIndex >= numUserPaths) {
-                    child.opacity *= 0.5;
-                }
-            }
-
-            const pathEffect = child.clone({ insert: false });
-
-            if (!showAllPaths) {
-                if (returnedIndex < numUserPaths) {
-                    layer.addChild(pathEffect);
-                }
-            } else {
-                // Add all
-                let added = layer.addChild(pathEffect);
-                if (returnedIndex < numUserPaths) {
-                    sketchController.userPaths.push(added);
-                }
-            }
-
-            // layer.addChild(pathEffect);
-        }
-    }
-    paperObject.remove();
-    return paperObject;
+    l.getItems().forEach((path, i) => {
+        i < humanPaths ?
+            sketchController.userPaths.push(path) :
+            (path.opacity *= 0.5);
+    });
 };
+// return paperObject;
 
 const getHistoryBatch = (maxSize, startIdx) => {
     let len = sketchController.stack.historyHolder.length;
@@ -539,10 +511,10 @@ const updateMainSketch = (result) => {
         }
     }
 
-    sketchController.stack.historyHolder.push({
-        ...result,
-        svg: sketchController.svg,
-    });
+    // sketchController.stack.historyHolder.push({
+    //     ...result,
+    //     svg: sketchController.svg,
+    // });
 
     timeKeeper.setAttribute("max", String(sketchController.step + 1));
     timeKeeper.value = String(sketchController.step + 1);
@@ -556,8 +528,7 @@ const updateMainSketch = (result) => {
         sketchController.lastRender = parseFromSvg(
             userLayer.view.viewSize.width / 224,
             result.svg,
-            userLayer,
-            sketchController.showAllLines
+            userLayer
         );
         sketchController.svg = paper.project.exportSVG({
             asString: true,
@@ -584,13 +555,7 @@ const loadResponse = (result) => {
         if (matches != null) {
             if (result.svg === "") return null;
             let thisCanvas = exemplarScope.projects[result.sketch_index];
-            thisCanvas.clear();
-            let imported = parseFromSvg(
-                exemplarSize / 224,
-                result.svg,
-                thisCanvas.activeLayer
-                // sketchController.showAllLines
-            );
+            parseFromSvg(exemplarSize / 224, result.svg, thisCanvas.activeLayer);
         }
     }
 };
