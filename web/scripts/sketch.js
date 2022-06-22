@@ -2,7 +2,7 @@ class SimpleStack {
     constructor() {
         this.undoStack = [];
         this.redoStack = [];
-        this.historyHolder = [""];
+        this.historyHolder = [{ svg: "", num: 0 }];
     }
 }
 
@@ -112,6 +112,7 @@ class SketchHandler {
         ws.send(JSON.stringify(res));
     }
     sortPaths() {
+        // TO DO abstract?
         let sorted = [...this.userPaths];
         userLayer.getItems().forEach((item) => {
             if (!this.userPaths.includes(item)) {
@@ -255,9 +256,9 @@ class SketchHandler {
         console.log("clear");
         document.getElementById("history-block").style.display = "none";
         this.step = 0;
-        this.stack.historyHolder = [{ svg: "" }];
         timeKeeper.setAttribute("max", "0");
         timeKeeper.value = "0";
+        this.stack.historyHolder = [{ svg: "", num: 0 }];
     }
 }
 

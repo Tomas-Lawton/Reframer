@@ -5,7 +5,7 @@ let sketchTimer;
 multiTool.onMouseDown = function(event) {
     // refactor for multitouch
     clearTimeout(sketchTimer);
-    sketchController.resetMetaControls();
+    // sketchController.resetMetaControls();
 
     switch (sketchController.penMode) {
         case "select":
@@ -240,7 +240,7 @@ multiTool.onMouseUp = function() {
 
 eraseTool.onMouseDown = function(event) {
     pauseActiveDrawer();
-    sketchController.resetMetaControls();
+    // sketchController.resetMetaControls();
 
     sketchController.stack.undoStack.push({
         type: "erase-event",
@@ -327,6 +327,7 @@ eraseTool.onMouseUp = function(event) {
                 //ai erasorItem
                 splitPaths.forEach((newPath) => {
                     newPath.opacity = 1;
+                    newPath.strokeColor.alpha = 1;
                     newList.push(newPath);
                 });
             }

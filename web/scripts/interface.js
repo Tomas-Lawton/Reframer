@@ -302,10 +302,7 @@ timeKeeper.oninput = function() {
         showTraceHistoryFrom(historyIndex);
     } else {
         let stored = sketchController.stack.historyHolder[historyIndex];
-        parseFromSvg(1, stored.svg, stored.num, userLayer);
-        sketchController.svg = paper.project.exportSVG({
-            asString: true,
-        });
+        sketchController.svg = parseFromSvg(1, stored.svg, stored.num, userLayer);
     }
     sketchController.svg = paper.project.exportSVG({
         asString: true,

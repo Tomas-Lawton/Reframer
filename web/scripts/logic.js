@@ -411,8 +411,8 @@ const showHide = (item) => {
 
 // switchControls();
 
-// TO DO: Allow drawing a list of svgs, if svg is array.
-const parseFromSvg = (s, svg, humanPaths, l) => {
+// TO DO: Add svg arr
+const parseFromSvg = (s, svg, n, l) => {
     if (svg === "" || svg === undefined) return null;
     l.clear();
     let g = l.importSVG(svg).children[0];
@@ -420,9 +420,7 @@ const parseFromSvg = (s, svg, humanPaths, l) => {
     l.insertChildren(g.index, g.removeChildren());
     sketchController.userPaths = [];
     l.getItems().forEach((path, i) => {
-        i < humanPaths ?
-            sketchController.userPaths.push(path) :
-            (path.opacity *= 0.5);
+        i < n ? sketchController.userPaths.push(path) : (path.opacity *= 0.5);
     });
 };
 // return paperObject;
@@ -474,6 +472,17 @@ const showTraceHistoryFrom = (fromIndex) => {
     }
 };
 
+const incrementHistory = () => {
+    sketchController.stack.historyHolder.push({
+        svg: sketchController.svg,
+        num: sketchController.userPaths.length,
+    });
+    timeKeeper.setAttribute("max", String(sketchController.step + 1));
+    timeKeeper.value = String(sketchController.step + 1);
+    setTraces.setAttribute("max", String(sketchController.step + 1));
+    sketchController.step += 1;
+};
+
 if (useAI) {
     ws.onmessage = function(event) {
         try {
@@ -489,32 +498,23 @@ if (useAI) {
 }
 
 const updateMainSketch = (result) => {
-    userLayer.clear();
+    // userLayer.clear();
 
-    if (sketchController.isFirstIteration) {
-        userLayer.clear();
-        sketchController.isFirstIteration = false;
-    } else {
-        if (sketchController.lastRender) {
-            sketchController.lastRender.remove();
-        }
-        if (sketchController.traces) {
-            for (const trace of sketchController.traces) {
-                trace.remove();
-            }
-        }
-    }
-
-    sketchController.stack.historyHolder.push({
-        ...result,
-        svg: sketchController.sortPaths(),
-        num: sketchController.userPaths.length,
-    });
-
-    timeKeeper.setAttribute("max", String(sketchController.step + 1));
-    timeKeeper.value = String(sketchController.step + 1);
-    setTraces.setAttribute("max", String(sketchController.step + 1));
-    sketchController.step += 1; //avoid disconnected iteration after stopping
+    // if (sketchController.isFirstIteration) {
+    //     userLayer.clear();
+    //     sketchController.isFirstIteration = false;
+    // } else {
+    //     if (sketchController.lastRender) {
+    //         sketchController.lastRender.remove();
+    //     }
+    //     if (sketchController.traces) {
+    //         for (const trace of sketchController.traces) {
+    //             trace.remove();
+    //         }
+    //     }
+    // }
+    console.log(sketchController.stack.historyHolder);
+    incrementHistory();
 
     // To do change this so it is just max num sketchController.traces
     if (sketchController.numTraces > 1) {
@@ -535,6 +535,7 @@ const updateMainSketch = (result) => {
 
 const loadResponse = (result) => {
     console.log("Result: ", result);
+
     if (sketchController.clipDrawing) {
         if (sketchController.drawState == "pruning") {
             updateMainSketch(result);
@@ -543,7 +544,6 @@ const loadResponse = (result) => {
         }
 
         if (result.status === "None") {
-            console.log("DRAWING: ", result);
             updateMainSketch(result);
         }
 
