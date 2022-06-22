@@ -784,6 +784,7 @@ const downloadSketch = () => {
             document.body.removeChild(a);
         }
     });
+    location.reload();
 };
 
 const pauseActiveDrawer = () => {

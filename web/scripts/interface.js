@@ -624,7 +624,7 @@ const scaleGroup = (group, to) => {
 (() => {
     const scaleTo = userLayer.view.viewSize.width;
     const idx = Math.floor(Math.random() * partialSketches.length);
-    // const idx = 6;
+    // const idx = 5;
     console.log(idx);
     const partial = partialSketches[idx][0];
     const drawPrompt = partialSketches[idx][1];
@@ -705,9 +705,10 @@ if (window.innerWidth <= 700 || window.innerWidth >= 1000) {
 if (window.innerWidth <= 700) {
     penControls.appendChild(document.getElementById("scrapbook"));
     penControls.appendChild(document.getElementById("delete"));
-    document
-        .getElementById("top-action-right")
-        .prepend((document.createElement("p").innerHTML = "DONE"));
+
+    let saveText = document.createElement("p");
+    saveText.innerHTML = "Done";
+    document.getElementById("top-action-right").prepend(saveText);
 
     document.getElementById("save").removeEventListener("click", () => {
         downloadSketch();

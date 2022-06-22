@@ -379,6 +379,7 @@ hr {
 
 .top-action {
     display: flex;
+    align-items: center;
     background-color: #000000d6;
     color: white;
     position: absolute;
