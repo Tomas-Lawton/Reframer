@@ -108,10 +108,11 @@ multiTool.onMouseDrag = function(event) {
                     selectedPaths[0].children.forEach((path) => {
                         path.position.x += event.delta.x;
                         path.position.y += event.delta.y;
-                        if (!sketchController.userPaths.includes(path)) {
-                            sketchController.userPaths.push(path);
-                            path.opacity = 1;
-                        }
+                        sketchController.userPaths = sketchController.userPaths.filter(
+                            (item) => item !== path
+                        ); //remove ref
+                        sketchController.userPaths.push(path);
+                        path.opacity = 1;
                     });
                     sketchController.boundingBox.position.x += event.delta.x;
                     sketchController.boundingBox.position.y += event.delta.y;

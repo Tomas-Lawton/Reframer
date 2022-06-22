@@ -365,7 +365,7 @@ document.getElementById("inspire").addEventListener("click", () => {
                     );
                     sketchController.scopeRef.push(sketchController.sketchScopeIndex);
                     explorer.appendChild(newElem);
-                    sketchController.drawExemplar(sketchController.sketchScopeIndex);
+                    sketchController.newExploreSketch(sketchController.sketchScopeIndex);
                     sketchController.sketchScopeIndex += 1;
                 }
             }
