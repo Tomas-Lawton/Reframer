@@ -101,11 +101,12 @@ deleteHandler.addEventListener("click", (e) => {
 
 copyHandler.addEventListener("click", (e) => {
     let offset = sketchController.boundingBox.bounds.width;
+    let paths = getSelectedPaths();
     hideSelectUI(false);
-
-    getSelectedPaths().forEach((path) => {
+    paths.forEach((path) => {
         let duplicate = path.clone();
         duplicate.position.x += offset;
+        sketchController.userPaths.push(duplicate);
         duplicate.selected = true;
     });
 
@@ -302,7 +303,13 @@ timeKeeper.oninput = function() {
         showTraceHistoryFrom(historyIndex);
     } else {
         let stored = sketchController.stack.historyHolder[historyIndex];
-        sketchController.svg = parseFromSvg(1, stored.svg, stored.num, userLayer);
+        sketchController.svg = parseFromSvg(
+            1,
+            stored.svg,
+            stored.num,
+            userLayer,
+            false // don't reapply opacity
+        );
     }
     sketchController.svg = paper.project.exportSVG({
         asString: true,

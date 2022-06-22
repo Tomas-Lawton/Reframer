@@ -237,8 +237,9 @@ const unpackGroup = () => {
             sketchController.transformGroup.index,
             sketchController.transformGroup.removeChildren()
         );
+        sketchController.transformGroup.remove();
+        sketchController.transformGroup = null;
     }
-    sketchController.transformGroup = null;
 };
 
 const fitToSelection = (items, state) => {
@@ -246,6 +247,7 @@ const fitToSelection = (items, state) => {
         return !bbox ? item.bounds : bbox.unite(item.bounds);
     }, null);
     // Add stroke width so no overflow over bounds?
+    // Also shouldn't set the boundingBox, should set boundingBox.bounds ???
     sketchController.boundingBox = new Path.Rectangle(bbox);
     sketchController.boundingBox.sendToBack();
     sketchController.boundingBox.set({
@@ -255,6 +257,7 @@ const fitToSelection = (items, state) => {
         strokeWidth: 2,
     });
     sketchController.boundingBox.data.state = state;
+    return sketchController.boundingBox;
 };
 
 const getSelectedPaths = () =>
@@ -412,15 +415,15 @@ const showHide = (item) => {
 // switchControls();
 
 // TO DO: Add svg arr
-const parseFromSvg = (s, svg, n, l) => {
-    if (svg === "" || svg === undefined) return null;
+const parseFromSvg = (s, svg, n, l, a = true) => {
+    if (svg === "" || svg === undefined) return;
     l.clear();
     let g = l.importSVG(svg).children[0];
     scaleGroup(g, s);
     l.insertChildren(g.index, g.removeChildren());
     sketchController.userPaths = [];
     l.getItems().forEach((path, i) => {
-        i < n ? sketchController.userPaths.push(path) : (path.opacity *= 0.5);
+        i < n ? sketchController.userPaths.push(path) : a && (path.opacity *= 0.5);
     });
 };
 // return paperObject;

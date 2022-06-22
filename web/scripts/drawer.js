@@ -9,6 +9,8 @@ multiTool.onMouseDown = function(event) {
 
     switch (sketchController.penMode) {
         case "select":
+            console.log(userLayer);
+
             path = null;
             let hitResult = paper.project.hitTest(event.point, {
                 segments: true,
@@ -118,10 +120,9 @@ multiTool.onMouseDrag = function(event) {
                     sketchController.boundingBox.position.y += event.delta.y;
                     updateSelectUI();
                 }
-            } else if (sketchController.selectBox != undefined) {
+            } else if (sketchController.selectBox !== undefined) {
                 //creating box
                 pauseActiveDrawer();
-
                 sketchController.selectBox.width += event.delta.x;
                 sketchController.selectBox.height += event.delta.y;
                 if (selectBox) {
@@ -134,7 +135,9 @@ multiTool.onMouseDrag = function(event) {
                     strokeColor: "#7b66ff",
                     selected: true,
                 });
+                console.log(userLayer);
             }
+            console.log("Before ", userLayer.children);
             break;
         case "lasso":
             sketchController.drawRegion.width += event.delta.x;
@@ -163,21 +166,22 @@ multiTool.onMouseUp = function() {
         case "select":
             if (selectBox) {
                 //moving selection
-                console.log("here");
                 let items = userLayer.getItems({ inside: selectBox.bounds });
                 items.pop().remove();
                 items.forEach((item) => (item.selected = true));
-
+                console.log(userLayer);
                 if (sketchController.selectBox) {
                     sketchController.selectBox = null;
                     selectBox.remove();
                     selectBox = null;
                 }
-                fitToSelection(items, "moving");
-                createGroup(items);
+                let path = fitToSelection(items, "moving"); //try update
+                if (!getSelectedPaths().length) {
+                    path.remove();
+                }
+                createGroup(items); //transformGroup
                 updateSelectUI();
             }
-            //has a group
             console.log("LAYER ", userLayer.children);
             console.log("Ref: ", sketchController.userPaths);
             break;
