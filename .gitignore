@@ -10,6 +10,7 @@ server/src/env
 server/src/util/__pycache__/
 server/src/results/
 server/src/data/
+server/src/data/interface_paths.svg
 
 reactcanvas/node_modules
 

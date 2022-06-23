@@ -389,7 +389,7 @@ class Sketch {
                         this.extractScaledJSON(overwriting, 1 / scaleRatio),
                         overwriting.userPathList.length
                     );
-                    const clone = controller.sketches[i].clone();
+                    const clone = controller.sketches[i].useLayer.clone();
                     this.overwrite(overwriting.useLayer, clone, scaleRatio);
                 },
             });
@@ -401,7 +401,7 @@ class Sketch {
                 this.extractScaledJSON(overwriting, 1 / scaleRatio),
                 overwriting.userPathList.length
             );
-            const clone = controller.sketches[i].clone();
+            const clone = controller.sketches[i].useLayer.clone();
             this.add(overwriting.useLayer, clone, scaleRatio);
         }
     }
@@ -424,7 +424,7 @@ class Sketch {
         scaledSketch.remove();
         return res;
     }
-    saveStatic = (json, len) => {
+    saveStatic(json, len) {
         let sketchCountIndex = controller.sketchScopeIndex;
         let sketch = new Sketch(
             sketchCountIndex,
@@ -438,7 +438,7 @@ class Sketch {
         newElem.classList.add("bounce");
         document.getElementById("sketch-grid").prepend(newElem);
         controller.sketchScopeIndex += 1;
-    };
+    }
 }
 
 mainSketch = new Sketch("main-sketch", scope, 0, "main");
