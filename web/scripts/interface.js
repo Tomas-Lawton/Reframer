@@ -348,14 +348,14 @@ document.getElementById("inspire").addEventListener("click", () => {
             for (let i = 0; i < 4; i++) {
                 explorer.removeChild(explorer.firstChild);
                 if (sketchController.sketchScopeIndex > total) {
-                    let newElem = createExemplar(defaults, false);
+                    let newElem = newSketchUI(defaults, false);
                     sketchController.inspireScopes.push(
                         sketchController.sketchScopeIndex
                     );
                     explorer.appendChild(newElem);
                     newElem.classList.add("inactive-exemplar");
                 } else {
-                    let newElem = createExemplar(
+                    let newElem = newSketchUI(
                         exemplarScope,
                         false,
                         sketchController.sketchScopeIndex
@@ -684,7 +684,7 @@ setActionUI("inactive");
 const defaults = new PaperScope();
 defaults.activate();
 for (let i = 0; i < 4; i++) {
-    let newElem = createExemplar(defaults, false);
+    let newElem = newSketchUI(defaults, false);
     // sketchController.sketchScopeIndex += 1; //remove later
     newElem.classList.add("inactive-exemplar");
     document.getElementById("explore-sketches").appendChild(newElem);

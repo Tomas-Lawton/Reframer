@@ -83,7 +83,7 @@ const toSketchbook = (fromSketch = null) => {
         jsonGroup = exportToExemplar();
     }
     let sketchCountIndex = sketchController.sketchScopeIndex;
-    let newElem = createExemplar(exemplarScope, true, sketchCountIndex);
+    let newElem = newSketchUI(exemplarScope, true, sketchCountIndex);
     let toCanvas = exemplarScope.projects[sketchCountIndex];
     toCanvas.activeLayer.importJSON(jsonGroup);
     newElem.classList.add("bounce");
@@ -550,9 +550,9 @@ const loadResponse = (result) => {
     }
 };
 
-const createExemplar = (scope, isUserSketch, sketchCountIndex = null) => {
-    console.log(sketchCountIndex);
-    let type = isUserSketch ? "U" : "AI";
+const newSketchUI = (useScope, userSketch, i = null) => {
+    console.log(i);
+    let type = userSketch ? "U" : "AI";
 
     let newElem = exemplarTemplate.cloneNode(reusableExemplar);
     newElem.style.visibility = "initial";
@@ -560,18 +560,18 @@ const createExemplar = (scope, isUserSketch, sketchCountIndex = null) => {
     let exemplarCanvas = newElem.querySelector("canvas");
     exemplarCanvas.width = exemplarSize;
     exemplarCanvas.height = exemplarSize;
-    scope.setup(exemplarCanvas);
+    useScope.setup(exemplarCanvas);
 
-    if (sketchCountIndex !== null) {
+    if (i !== null) {
         let removeButton = newElem.querySelector(".fa-minus");
         let stopButton = newElem.querySelector(".fa-stop");
         let loader = newElem.querySelector(".card-loading");
 
-        newElem.id = `${type}-sketch-item-${sketchCountIndex}`;
-        exemplarCanvas.id = `${type}-sketch-canvas-${sketchCountIndex}`;
-        newElem.querySelector("h3").innerHTML = `${type}${sketchCountIndex}`;
+        newElem.id = `${type}-sketch-item-${i}`;
+        exemplarCanvas.id = `${type}-sketch-canvas-${i}`;
+        newElem.querySelector("h3").innerHTML = `${type}${i}`;
 
-        if (isUserSketch) {
+        if (userSketch) {
             stopButton.style.display = "none";
             loader.style.display = "none";
             removeButton.addEventListener("click", () => {
@@ -585,16 +585,16 @@ const createExemplar = (scope, isUserSketch, sketchCountIndex = null) => {
                 stopButton.style.background = "#f5f5f5";
                 stopButton.style.background = "#d2d2d2";
 
-                sketchController.stopSingle(sketchCountIndex);
+                sketchController.stopSingle(i);
             });
             removeButton.addEventListener("click", () => {
                 newElem.classList.add("inactive-exemplar");
-                sketchController.stopSingle(sketchCountIndex);
+                sketchController.stopSingle(i);
             });
         }
 
         exemplarCanvas.addEventListener("click", () => {
-            importStaticSketch(sketchCountIndex);
+            importStaticSketch(i);
             sketchController.resetMetaControls();
         });
 
@@ -602,7 +602,7 @@ const createExemplar = (scope, isUserSketch, sketchCountIndex = null) => {
         newElem.addEventListener(
             "dragstart",
             function(e) {
-                e.dataTransfer.setData("text/plain", sketchCountIndex);
+                e.dataTransfer.setData("text/plain", i);
             },
             false
         );
