@@ -343,7 +343,7 @@ class Sketch {
                 if (mainSketch) {
                     this.import(mainSketch);
                 }
-                controller.resetMetaControls();
+                // controller.resetMetaControls();
             });
             // Make draggable
             newElem.addEventListener(
@@ -370,11 +370,14 @@ class Sketch {
             sketch.removeChildren()
         );
         overwriting.userPathList = [];
-        imported.forEach((item, i) => {
-            if (i < newNum) {
-                overwriting.userPathList.push(item);
-            }
-        });
+
+        if (imported !== null) {
+            imported.forEach((item, i) => {
+                if (i < newNum) {
+                    overwriting.userPathList.push(item);
+                }
+            });
+        }
         console.log(overwriting.userPathList);
     }
     add(overwriting, sketch, newNum, s) {
@@ -385,24 +388,45 @@ class Sketch {
         overwriting.useLayer.insertChildren(added.index, adding); // flatten
         added.remove();
 
-        adding.forEach((item, i) => {
-            if (i < newNum) {
-                overwriting.userPathList.push(item);
-            }
-            // else {
-            //     item.opacity *= 0.5;
-            // }
-        });
+        if (adding !== null) {
+            adding.forEach((item, i) => {
+                if (i < newNum) {
+                    overwriting.userPathList.push(item);
+                }
+                // else {
+                //     item.opacity *= 0.5;
+                // }
+            });
+        }
         console.log(overwriting.userPathList);
     }
     import (overwriting) {
         let i = this.i;
-        if (allowOverwrite) {
+        if (controller.clipDrawing) {
+            openModal({
+                title: "Overwriting Canvas",
+                message: "This will stop AI drawing. Are you sure?",
+                confirmAction: () => {
+                    controller.stop();
+                    controller.clipDrawing = false;
+                    // pauseActiveDrawer();
+                    unpackGroup();
+                    hideSelectUI();
+                    this.saveStatic(
+                        overwriting.extractScaledJSON(1 / scaleRatio),
+                        overwriting.userPathList.length
+                    );
+                    const clone = controller.sketches[i].useLayer.clone();
+                    const newNum = controller.sketches[i].num;
+                    this.overwrite(overwriting, clone, newNum, scaleRatio);
+                },
+            });
+        } else if (allowOverwrite) {
             openModal({
                 title: "Overwriting Canvas",
                 message: "Import into the main canvas? Sketch will be saved.",
                 confirmAction: () => {
-                    pauseActiveDrawer();
+                    // pauseActiveDrawer();
                     unpackGroup();
                     hideSelectUI();
                     this.saveStatic(
@@ -415,7 +439,7 @@ class Sketch {
                 },
             });
         } else {
-            pauseActiveDrawer();
+            // pauseActiveDrawer();
             unpackGroup();
             hideSelectUI();
             this.saveStatic(

@@ -127,3 +127,5 @@ eraseTool.minDistance = 10;
 
 const maxPointSize = 47.99;
 document.getElementById("width-slider").setAttribute("max", maxPointSize);
+
+const promptList = partialSketches.map((elem) => elem[1]);

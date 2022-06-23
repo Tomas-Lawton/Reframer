@@ -205,11 +205,18 @@ multiTool.onMouseUp = function() {
                     socketConnected
                 ) {
                     clearTimeout(sketchTimer);
-                    sketchTimer = setTimeout(userStuck, controller.doneSketching);
-
-                    function userStuck() {
+                    sketchTimer = setTimeout(() => {
+                        setActionUI("drawing");
                         controller.draw();
-                    }
+                        controller.clipDrawing = true;
+
+                        let time = (Math.floor(Math.random() * 5) + 5) * 1000;
+                        setTimeout(() => {
+                            console.log("drawing for: ", time);
+                            controller.stop();
+                            controller.clipDrawing = false;
+                        }, time);
+                    }, controller.doneSketching);
                 }
             }
             mainSketch.svg = paper.project.exportSVG({

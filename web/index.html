@@ -115,7 +115,7 @@
 
                 <div id="prompt-input">
                     <input type="text" id="messageText" placeholder="A majestic rainbow unicorn..." />
-                    <!-- <i class="fas fa-robot"></i> -->
+                    <i class="fas fa-lightbulb" id="random-prompt"></i>
                 </div>
 
                 <!-- <div class="panel-section">
@@ -263,13 +263,18 @@
     </div>
 
 
+    <div class="ai-ui" id="explore-margin">
+        <div id="explore-sketches"></div>
+        <div id="explorer-buttons">
+
+            <p class="pill" id="empty">Empty</p>
+            <p class="pill" id="overwrite">Overwrite</p>
+            <p class="pill" id="close-explorer">Close <i class="fa-solid fa-xmark"></i></p>
+        </div>
+    </div>
 
     <div id="sketchbook-panel">
         <div id="sketchbook-content">
-            <div class="ai-ui" id="explore-margin">
-                <div id="explore-sketches"></div>
-            </div>
-
             <div id="static-margin">
                 <div id="static-sketches">
                     <div class="flex" id="title-block">
@@ -290,8 +295,6 @@
                             <input type="checkbox">
                             <span class="slider round"></span>
                         </label> -->
-
-                        <p class="pill" id="overwrite">Overwrite</p>
 
                     </div>
                     <div class="basic-background" id="grid-container">

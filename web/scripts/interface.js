@@ -288,6 +288,25 @@ document
         setPenMode("pen", pen);
     });
 
+document.getElementById("close-explorer").addEventListener("click", (e) => {
+    showHide(document.getElementById("explore-margin"));
+});
+document.getElementById("empty").addEventListener("click", (e) => {
+    aiMessage.innerHTML = "All done! What should we draw next?";
+    aiMessage.classList.add("typed-out");
+    setActionUI("stopSingle");
+    killExploratorySketches();
+    controller.clipDrawing = false;
+    for (let i = 0; i < 4; i++) {
+        explorer.removeChild(explorer.firstChild);
+        let sketch = new Sketch(null, defaults, mainSketch.userPathList.length);
+        let newElem = sketch.renderMini();
+        controller.inspireScopes.push(controller.sketchScopeIndex);
+        explorer.appendChild(newElem);
+        newElem.classList.add("inactive-sketch");
+    }
+});
+
 // document.getElementById("settings").addEventListener("click", () => {
 //     openModal({
 //         title: "Advanced",
@@ -345,7 +364,8 @@ document.getElementById("inspire").addEventListener("click", () => {
             return;
         } else {
             // TO DO: Clean up old scopes (now unused) // controller.inspireScopes
-            const total = controller.sketchScopeIndex + Math.floor(Math.random() * 5);
+            // const total = controller.sketchScopeIndex + Math.floor(Math.random() * 5);
+            total = 4;
             for (let i = 0; i < 4; i++) {
                 explorer.removeChild(explorer.firstChild);
                 if (controller.sketchScopeIndex > total) {
@@ -413,6 +433,7 @@ document.getElementById("prune").addEventListener("click", () => {
 
 document.getElementById("go-back").addEventListener("click", () => {
     if (controller.drawState === "stop") {
+        incrementHistory();
         let stored = controller.stack.historyHolder[1];
         timeKeeper.value = 1;
         mainSketch.load(1, stored.svg, stored.num);
@@ -422,23 +443,35 @@ document.getElementById("go-back").addEventListener("click", () => {
     }
 });
 
+document.getElementById("random-prompt").addEventListener("click", () => {
+    let randomPrompt =
+        promptList[Math.floor(Math.random() * promptList.length)].toLowerCase();
+    prompt.value = randomPrompt;
+    controller.prompt = randomPrompt;
+    aiMessage.innerHTML = `Sure! I can draw ${randomPrompt}...`;
+    document
+        .querySelectorAll(".inactive-section")
+        .forEach((elem) => elem.classList.remove("inactive-section"));
+});
+
 // Control panel
+
 controlPanel.onmousedown = (e) => {
     if (window.innerWidth > 700) {
         let content;
-        if (useAI) {
-            document.querySelectorAll(".tab-item").forEach((tab) => {
-                if (tab.classList.contains("active-tab")) {
-                    if (tab.id === "collab-tab") {
-                        content = document.getElementById("ai-content");
-                    } else {
-                        content = document.getElementById("style-content");
-                    }
-                }
-            });
-        } else {
+        if (!useAI) {
             content = document.getElementById("style-content");
         }
+
+        document.querySelectorAll(".tab-item").forEach((tab) => {
+            if (tab.classList.contains("active-tab")) {
+                if (tab.id === "collab-tab") {
+                    content = document.getElementById("ai-content");
+                } else {
+                    content = document.getElementById("style-content");
+                }
+            }
+        });
 
         let bounds = content.getBoundingClientRect();
         e = e || window.event;
@@ -452,6 +485,26 @@ controlPanel.onmousedown = (e) => {
         ) {
             document.onmouseup = closeDragElement;
             document.onmousemove = (e) => elementDrag(e, controlPanel);
+        }
+    }
+};
+
+sketchBook.onmousedown = (e) => {
+    if (window.innerWidth > 700) {
+        let content = document.getElementById("static-sketches");
+        let bounds = content.getBoundingClientRect();
+        e = e || window.event;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        if (
+            pos3 < bounds.left ||
+            pos3 > bounds.right ||
+            pos4 < bounds.top ||
+            pos4 > bounds.bottom
+        ) {
+            document.onmouseup = closeDragElement;
+            document.onmousemove = (e) => elementDrag(e, sketchBook);
+            console.log("dragging");
         }
     }
 };
@@ -470,26 +523,9 @@ document.getElementById("explore-margin").onmousedown = (e) => {
             pos4 > bounds.bottom
         ) {
             document.onmouseup = closeDragElement;
-            document.onmousemove = (e) => elementDrag(e, sketchBook);
-        }
-    }
-};
-
-document.getElementById("static-margin").onmousedown = (e) => {
-    if (window.innerWidth > 700) {
-        let content = document.getElementById("static-sketches");
-        let bounds = content.getBoundingClientRect();
-        e = e || window.event;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        if (
-            pos3 < bounds.left ||
-            pos3 > bounds.right ||
-            pos4 < bounds.top ||
-            pos4 > bounds.bottom
-        ) {
-            document.onmouseup = closeDragElement;
-            document.onmousemove = (e) => elementDrag(e, sketchBook);
+            // document.onmousemove = (e) => elementDrag(e, sketchBook);
+            document.onmousemove = (e) =>
+                elementDrag(e, document.getElementById("explore-margin"));
         }
     }
 };

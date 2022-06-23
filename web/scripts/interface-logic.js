@@ -79,12 +79,14 @@ const setActionUI = (state) => {
 
         if (state == "drawing") {
             aiMessage.innerHTML = `Got it! Drawing ${controller.prompt}!`;
+            // sketchBook.style.display = "flex";
+            // document.getElementById("scrapbook").classList.add("panel-open");
             // document.getElementById("draw").classList.add("active");
         } else if (state == "explore") {
             aiMessage.innerHTML = `I've got some ideas for ${controller.prompt}!`;
             // canvas.classList.add("loading-canvas");
             document.getElementById("history-block").style.display = "none";
-
+            document.getElementById("explore-margin").style.display = "flex";
             // document.getElementById("inspire").classList.add("active");
         } else if (state == "continuing" || state == "continue-explore") {
             aiMessage.innerHTML = `Nice, I'll make that it into ${controller.prompt}.`;
