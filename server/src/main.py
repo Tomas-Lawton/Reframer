@@ -114,7 +114,7 @@ else:
                     artefact_drawer.redraw()
                     artefact_drawer.run_async()
 
-                if data["status"] == "add_new_exemplar":
+                if data["status"] == "add_new_sketch":
                     new_exemplar = CICADA(
                         clip_class, websocket, data["data"]["sketch_index"]
                     )

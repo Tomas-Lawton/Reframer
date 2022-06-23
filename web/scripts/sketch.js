@@ -327,7 +327,7 @@ class Sketch {
             }
 
             sketchCanvas.addEventListener("click", () => {
-                // TO DO refactor so class doesn't reference mainsketch???
+                // TO DO refactor so class doesn't reference mainSketch???
                 if (mainSketch) {
                     this.import(mainSketch);
                 }
@@ -385,7 +385,7 @@ class Sketch {
                     pauseActiveDrawer();
                     unpackGroup();
                     hideSelectUI();
-                    saveStatic(
+                    mainSketch.saveStatic(
                         this.extractScaledJSON(overwriting, 1 / scaleRatio),
                         overwriting.userPathList.length
                     );
@@ -397,7 +397,7 @@ class Sketch {
             pauseActiveDrawer();
             unpackGroup();
             hideSelectUI();
-            saveStatic(
+            mainSketch.saveStatic(
                 this.extractScaledJSON(overwriting, 1 / scaleRatio),
                 overwriting.userPathList.length
             );
@@ -424,6 +424,21 @@ class Sketch {
         scaledSketch.remove();
         return res;
     }
+    saveStatic = (json, len) => {
+        let sketchCountIndex = controller.sketchScopeIndex;
+        let sketch = new Sketch(
+            sketchCountIndex,
+            sketchScope,
+            len, //paths in main change
+            "U"
+        );
+        let newElem = sketch.renderMini();
+        let toCanvas = sketchScope.projects[sketchCountIndex];
+        toCanvas.activeLayer.importJSON(json);
+        newElem.classList.add("bounce");
+        document.getElementById("sketch-grid").prepend(newElem);
+        controller.sketchScopeIndex += 1;
+    };
 }
 
 mainSketch = new Sketch("main-sketch", scope, 0, "main");

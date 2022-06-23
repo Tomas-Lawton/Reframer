@@ -39,14 +39,12 @@ function dropSketch(e) {
     sketchGrid.classList.remove("drop-ready");
     const sketchCountIndex = e.dataTransfer.getData("text/plain");
     if (document.querySelector(`#AI-sketch-item-${sketchCountIndex}`)) {
-        saveStatic(
-            controller.sketches[sketchCountIndex].exportJSON(),
+        mainSketch.saveStatic(
+            controller.sketches[sketchCountIndex].extractJSON(),
             controller.sketches[sketchCountIndex].num
         );
     }
 }
-
-// sketch.saveStatic()
 
 sketchGrid.addEventListener("dragover", dragoverhover);
 // sketchGrid.addEventListener("dragenter", dragentersketches);
@@ -547,11 +545,9 @@ document.getElementById("scrapbook").addEventListener("click", () => {
 // });
 
 document.getElementById("save-sketch").addEventListener("click", () => {
-    // clear mainsketch groups
-    unpackGroup(); //do before calling this function.
-    hideSelectUI(); // check bounding box??
-    //
-    saveStatic(
+    unpackGroup();
+    hideSelectUI();
+    mainSketch.saveStatic(
         mainSketch.extractScaledJSON(mainSketch, 1 / scaleRatio), //adds as backup
         mainSketch.userPathList.length
     );
