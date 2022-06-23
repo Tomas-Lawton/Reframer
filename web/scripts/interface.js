@@ -10,7 +10,7 @@ function dragentercanvas(e) {
 function dropCanvas(e) {
     canvas.classList.remove("drop-ready");
     let i = e.dataTransfer.getData("text/plain");
-    controller.sketches[i].import();
+    controller.sketches[i].import(mainSketch);
 }
 
 function dragleavecanvas(e) {
@@ -76,7 +76,7 @@ document.getElementById("delete").addEventListener("click", () =>
         message: "Are you sure you want to delete your drawing?",
         confirmAction: () => {
             // Save before clearing
-            controller.svg = paper.project.exportSVG({
+            mainSketch.svg = paper.project.exportSVG({
                 asString: true,
             });
             logger.event("clear-sketch");
@@ -84,7 +84,7 @@ document.getElementById("delete").addEventListener("click", () =>
             controller.lastPrompt = null;
             userLayer.clear();
             modal.style.display = "none";
-            controller.userPaths = [];
+            mainSketch.userPathList = [];
             updateSelectUI();
         },
     })
@@ -109,11 +109,11 @@ copyHandler.addEventListener("click", (e) => {
     paths.forEach((path) => {
         let duplicate = path.clone();
         duplicate.position.x += offset;
-        controller.userPaths.push(duplicate);
+        mainSketch.userPathList.push(duplicate);
         duplicate.selected = true;
     });
 
-    controller.svg = paper.project.exportSVG({
+    mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
     logger.event("duplicate-selection");
@@ -187,7 +187,7 @@ document.getElementById("undo").addEventListener("click", () => {
             });
         }
 
-        controller.svg = paper.project.exportSVG({
+        mainSketch.svg = paper.project.exportSVG({
             asString: true,
         });
         logger.event("undo-" + lastEvent.type);
@@ -220,7 +220,7 @@ document.getElementById("redo").addEventListener("click", () => {
             });
         }
 
-        controller.svg = paper.project.exportSVG({
+        mainSketch.svg = paper.project.exportSVG({
             asString: true,
         });
         logger.event("redo-" + lastEvent.type);
@@ -306,7 +306,7 @@ timeKeeper.oninput = function() {
         showTraceHistoryFrom(historyIndex);
     } else {
         let stored = controller.stack.historyHolder[historyIndex];
-        controller.svg = parseFromSvg(
+        mainSketch.svg = parseFromSvg(
             1,
             stored.svg,
             stored.num,
@@ -314,7 +314,7 @@ timeKeeper.oninput = function() {
             false // don't reapply opacity
         );
     }
-    controller.svg = paper.project.exportSVG({
+    mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
 };
@@ -352,7 +352,11 @@ document.getElementById("inspire").addEventListener("click", () => {
             for (let i = 0; i < 4; i++) {
                 explorer.removeChild(explorer.firstChild);
                 if (controller.sketchScopeIndex > total) {
-                    let sketch = new Sketch(null, defaults, controller.userPaths.length);
+                    let sketch = new Sketch(
+                        null,
+                        defaults,
+                        mainSketch.userPathList.length
+                    );
                     let newElem = sketch.renderMini();
                     controller.inspireScopes.push(controller.sketchScopeIndex);
                     explorer.appendChild(newElem);
@@ -361,7 +365,7 @@ document.getElementById("inspire").addEventListener("click", () => {
                     let sketch = new Sketch(
                         controller.sketchScopeIndex,
                         sketchScope,
-                        controller.userPaths.length, //based on current
+                        mainSketch.userPathList.length, //based on current
                         "AI"
                     );
                     let newElem = sketch.renderMini();
@@ -415,7 +419,7 @@ document.getElementById("go-back").addEventListener("click", () => {
         let stored = controller.stack.historyHolder[1];
         timeKeeper.value = 1;
         parseFromSvg(1, stored.svg, stored.num, userLayer);
-        controller.svg = paper.project.exportSVG({
+        mainSketch.svg = paper.project.exportSVG({
             asString: true,
         });
     }
@@ -543,7 +547,14 @@ document.getElementById("scrapbook").addEventListener("click", () => {
 // });
 
 document.getElementById("save-sketch").addEventListener("click", () => {
-    saveStatic(extractMainSketch(), controller.userPaths.length);
+    // clear mainsketch groups
+    unpackGroup(); //do before calling this function.
+    hideSelectUI(); // check bounding box??
+    //
+    saveStatic(
+        mainSketch.extractScaled(mainSketch, 1 / scaleRatio), //adds as backup
+        mainSketch.userPathList.length
+    );
     logger.event("to-sketchbook");
 });
 
@@ -647,7 +658,7 @@ if (!useAI) {
     loadedPartial.getItems().forEach((item) => {
         if (item instanceof Path) {
             let newElem = userLayer.addChild(item.clone());
-            controller.userPaths.push(newElem);
+            mainSketch.userPathList.push(newElem);
         }
     });
     loadedPartial.remove();
@@ -655,7 +666,7 @@ if (!useAI) {
 
     scaleGroup(userLayer, scaleTo);
 
-    controller.svg = paper.project.exportSVG({
+    mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
 }

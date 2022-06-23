@@ -14,7 +14,7 @@ class UserData {
         //         event_count: self.events,
         //         data: {
         //             prompt: controller.prompt,
-        //             svg: controller.svg,
+        //             svg: mainSketch.svg,
         //             sketch_size: controller.frameSize,
         //             sketch_size: 0,
         //             mode: controller.penMode,

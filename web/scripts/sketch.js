@@ -10,13 +10,8 @@ class Controller {
     // Maintains a logical state for sending over WS
     constructor() {
         this.drawState;
-
         // Sketching Data
         this.prompt = null;
-        this.svg = paper.project.exportSVG({
-            asString: true,
-        }); //for svg parsing
-        this.frameSize = canvas.getBoundingClientRect().width;
         this.inspireScopes = [];
         this.sketches = {};
 
@@ -58,7 +53,6 @@ class Controller {
         this.useFixation = 3;
         this.showAllLines = true;
         this.targetDrawing = false;
-        this.userPaths = [];
 
         // Settings panel
         this.useAdvanced = false;
@@ -114,16 +108,16 @@ class Controller {
     }
     sortPaths() {
         // TO DO abstract?
-        let sorted = [...this.userPaths];
+        let sorted = [...mainSketch.userPathList];
         userLayer.getItems().forEach((item) => {
-            if (!this.userPaths.includes(item)) {
+            if (!mainSketch.userPathList.includes(item)) {
                 sorted.push(item);
             }
             item.remove(); //preserves reference
         });
         sorted.forEach((elem) => userLayer.addChild(elem));
-        console.log("USER: ", this.userPaths.length);
-        console.log("AI: ", sorted.length - this.userPaths.length);
+        console.log("USER: ", mainSketch.userPathList.length);
+        console.log("AI: ", sorted.length - mainSketch.userPathList.length);
         console.log("Sorted: ", sorted);
         return paper.project.exportSVG({
             asString: true,
@@ -141,15 +135,15 @@ class Controller {
             this.clipDrawing = true;
             this.targetDrawing = false;
             controller.linesDisabled = disableLines;
-            this.svg = this.sortPaths();
+            mainSketch.svg = this.sortPaths();
             setLineLabels(userLayer);
             document.getElementById("calc-lines").innerHTML = `Add : 0`;
 
             this.updateDrawer({
                 status: "draw",
-                svg: svg || this.svg,
+                svg: svg || mainSketch.svg,
                 hasRegion: withRegion,
-                frameSize: this.frameSize,
+                frameSize: mainSketch.frameSize,
                 prompt: this.prompt,
                 lines: disableLines ? 0 : this.initRandomCurves ? this.addLines : 0,
                 fixation: this.useFixation,
@@ -172,7 +166,7 @@ class Controller {
 
             this.updateDrawer({
                 status: "add_new_sketch",
-                svg: this.svg,
+                svg: mainSketch.svg,
                 hasRegion: false,
                 frameSize: sketchSize,
                 prompt: this.prompt,
@@ -195,8 +189,8 @@ class Controller {
                 //             document.getElementById("calc-lines").innerHTML = `Add : 0`;
                 //             this.updateDrawer({
                 //                 status: "continue_single_sketch",
-                //                 svg: this.svg,
-                //                 frameSize: this.frameSize, //can remove?
+                //                 svg: mainSketch.svg,
+                //                 frameSize: mainSketch.frameSize, //can remove?
                 //                 fixation: this.useFixation,
                 //                 sketchScopeIndex: controller.inspireScopes[i],
                 //             });
@@ -207,16 +201,16 @@ class Controller {
                 //     });
             } else {
                 try {
-                    this.svg = this.sortPaths();
+                    mainSketch.svg = this.sortPaths();
                     setLineLabels(userLayer);
                     document.getElementById("calc-lines").innerHTML = `Add : 0`;
 
                     this.updateDrawer({
                         status: "continue_sketch",
-                        svg: this.svg,
-                        frameSize: this.frameSize, //can remove?
+                        svg: mainSketch.svg,
+                        frameSize: mainSketch.frameSize, //can remove?
                         fixation: this.useFixation,
-                        userPaths: this.userPaths.length,
+                        userPaths: mainSketch.userPathList.length,
                     });
                     setActionUI("continuing");
                 } catch (e) {
@@ -230,7 +224,7 @@ class Controller {
     prune() {
         if (!this.clipDrawing) {
             this.clipDrawing = true;
-            this.svg = this.sortPaths();
+            mainSketch.svg = this.sortPaths();
             this.updateDrawer({
                 status: "prune",
             });
@@ -266,16 +260,24 @@ class Controller {
 controller = new Controller();
 
 class Sketch {
-    constructor(i = null, scope, userPaths, type = "default") {
+    constructor(i = null, scope, num, type = "default") {
         this.i = i;
-        this.userPaths = userPaths;
+        this.num = num;
         this.useScope = scope;
         this.type = type; //U or AI or Main?
         this.svg; //sorted already
         this.elem; //DOM elem
+        this.userPathList = [];
+        this.useLayer;
 
         controller.sketches[this.i] = this;
         console.log("Created: ", this.i);
+
+        if (type === "main") {
+            this.frameSize = canvas.getBoundingClientRect().width;
+        } else {
+            this.frameSize = sketchSize;
+        }
     }
     renderMini() {
         let domIdx = this.i;
@@ -289,6 +291,11 @@ class Sketch {
         this.useScope.setup(sketchCanvas);
 
         if (domIdx !== null) {
+            if (this.useScope !== null) {
+                console.log(this.useScope);
+                this.useLayer = this.useScope.projects[domIdx].activeLayer;
+            }
+
             let removeButton = newElem.querySelector(".fa-minus");
             let stopButton = newElem.querySelector(".fa-stop");
             let loader = newElem.querySelector(".card-loading");
@@ -320,7 +327,10 @@ class Sketch {
             }
 
             sketchCanvas.addEventListener("click", () => {
-                this.import();
+                // TO DO refactor so class doesn't reference mainsketch???
+                if (mainSketch) {
+                    this.import(mainSketch);
+                }
                 controller.resetMetaControls();
             });
             // Make draggable
@@ -339,7 +349,7 @@ class Sketch {
         this.elem = newElem;
         return this.elem;
     }
-    import () {
+    import (backup) {
         let i = this.i;
         if (allowOverwrite) {
             openModal({
@@ -347,27 +357,45 @@ class Sketch {
                 message: "Import into the main canvas? Contents will be saved.",
                 confirmAction: () => {
                     pauseActiveDrawer();
-                    saveStatic(extractMainSketch(), controller.userPaths.length);
+                    unpackGroup();
+                    hideSelectUI();
+                    saveStatic(
+                        this.extractScaled(backup, 1 / scaleRatio),
+                        backup.userPathList.length
+                    );
                     toMainSketch(i, true); //overwrite
                 },
             });
         } else {
             pauseActiveDrawer();
-            saveStatic(extractMainSketch(), controller.userPaths.length);
+            unpackGroup();
+            hideSelectUI();
+            saveStatic(
+                this.extractScaled(backup, 1 / scaleRatio),
+                backup.userPathList.length
+            );
             toMainSketch(i, false); //copy traces
         }
     }
-    extractJSON() {
-        let i = this.i;
-        let copy = sketchScope.projects[i].activeLayer.clone({
+    clone() {
+        let clone = this.useLayer.clone({
             insert: false,
         });
-        copy.getItems().forEach((path) => {
+        clone.getItems().forEach((path) => {
             path.selected = false;
         });
-        return copy.exportJSON();
+        return clone;
     }
-
+    extractJSON() {
+        return this.clone().exportJSON();
+    }
+    extractScaled(sketch, s) {
+        let clone = sketch.clone();
+        let scaledSketch = scaleGroup(clone, s);
+        let res = scaledSketch.exportJSON();
+        scaledSketch.remove();
+        return res;
+    }
     updateSVG() {
         // set svg data
         // parsefromSVG here????
@@ -389,4 +417,8 @@ class Sketch {
     }
 }
 
-// mainSketch = new Sketch(null, scope, 0, "Main");
+mainSketch = new Sketch(null, scope, 0, "main");
+mainSketch.svg = paper.project.exportSVG({
+    asString: true,
+}); //for svg parsing
+mainSketch.useLayer = userLayer;

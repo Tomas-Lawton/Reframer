@@ -1,30 +1,3 @@
-// To do make transfering between main and static better
-
-// To DO: Refactor into sketch class
-// Extracting json should be the same. And then just apply the necessary scaling with helper.
-
-// Get the main svg, scale
-const extractMainSketch = () => {
-    unpackGroup();
-    userLayer.getItems().forEach((path) => {
-        path.selected = false;
-    });
-    controller.transformGroup = null;
-    if (controller.boundingBox) {
-        hideSelectUI();
-    }
-    let scaledSketch = userLayer.clone({ insert: false });
-    scaledSketch = scaleGroup(scaledSketch, 1 / scaleRatio);
-    let result = scaledSketch.exportJSON();
-    scaledSketch.remove();
-    return result;
-};
-
-// To DO: Refactor into sketch class
-// clear the sketch
-// get the scaled version
-// import method or overwrite method.
-
 const toMainSketch = (sketchIndex, clear) => {
     let copy = sketchScope.projects[sketchIndex].activeLayer.clone();
     let expandedExemplar = copy.scale(scaleRatio, new Point(0, 0));
@@ -33,8 +6,8 @@ const toMainSketch = (sketchIndex, clear) => {
         var newSketch = userLayer.addChild(expandedExemplar);
         newSketch.getItems((path) => {
             path.strokeWidth *= scaleRatio;
-            if (!controller.userPaths.includes(path)) {
-                controller.userPaths.push(path);
+            if (!mainSketch.userPathList.includes(path)) {
+                mainSketch.userPathList.push(path);
                 path.opacity = 1;
             }
         });
@@ -43,8 +16,8 @@ const toMainSketch = (sketchIndex, clear) => {
         newSketch.getItems((path) => {
             path.strokeWidth *= scaleRatio;
             path.opacity *= 0.5;
-            if (!controller.userPaths.includes(path)) {
-                controller.userPaths.push(path);
+            if (!mainSketch.userPathList.includes(path)) {
+                mainSketch.userPathList.push(path);
                 path.opacity = 1;
             }
         });
@@ -366,11 +339,13 @@ const deletePath = () => {
     });
 
     // Delete
-    controller.userPaths = controller.userPaths.filter((ref) => !g.includes(ref));
+    mainSketch.userPathList = mainSketch.userPathList.filter(
+        (ref) => !g.includes(ref)
+    );
     g.forEach((path) => path.remove());
 
     // Save again
-    controller.svg = paper.project.exportSVG({
+    mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
 
@@ -398,9 +373,9 @@ const parseFromSvg = (s, svg, n, l, a = true) => {
     let g = l.importSVG(svg).children[0];
     scaleGroup(g, s);
     l.insertChildren(g.index, g.removeChildren());
-    controller.userPaths = [];
+    mainSketch.userPathList = [];
     l.getItems().forEach((path, i) => {
-        i < n ? controller.userPaths.push(path) : a && (path.opacity *= 0.5);
+        i < n ? mainSketch.userPathList.push(path) : a && (path.opacity *= 0.5);
     });
 };
 // return paperObject;
@@ -454,8 +429,8 @@ const showTraceHistoryFrom = (fromIndex) => {
 
 const incrementHistory = () => {
     controller.stack.historyHolder.push({
-        svg: controller.svg,
-        num: controller.userPaths.length,
+        svg: mainSketch.svg,
+        num: mainSketch.userPathList.length,
     });
     timeKeeper.setAttribute("max", String(controller.step + 1));
     timeKeeper.value = String(controller.step + 1);
@@ -486,10 +461,10 @@ const updateMainSketch = (result) => {
         controller.lastRender = parseFromSvg(
             userLayer.view.viewSize.width / 224,
             result.svg,
-            controller.userPaths.length,
+            mainSketch.userPathList.length,
             userLayer
         );
-        controller.svg = paper.project.exportSVG({
+        mainSketch.svg = paper.project.exportSVG({
             asString: true,
         });
     }
@@ -513,7 +488,7 @@ const loadResponse = (result) => {
             parseFromSvg(
                 sketchSize / 224,
                 result.svg,
-                controller.userPaths.length,
+                mainSketch.userPathList.length,
                 thisCanvas.activeLayer
             );
         }
@@ -661,7 +636,7 @@ const downloadSketch = () => {
         path.selected = false;
     });
     // Remove the select box
-    controller.svg = paper.project.exportSVG({
+    mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
     logger.event("save-sketch");

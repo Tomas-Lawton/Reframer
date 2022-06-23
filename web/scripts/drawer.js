@@ -44,7 +44,7 @@ multiTool.onMouseDown = function(event) {
                 }
 
                 // Update
-                controller.svg = paper.project.exportSVG({
+                mainSketch.svg = paper.project.exportSVG({
                     asString: true,
                 });
                 setLineLabels(userLayer);
@@ -109,10 +109,10 @@ multiTool.onMouseDrag = function(event) {
                     selectedPaths[0].children.forEach((path) => {
                         path.position.x += event.delta.x;
                         path.position.y += event.delta.y;
-                        controller.userPaths = controller.userPaths.filter(
+                        mainSketch.userPathList = mainSketch.userPathList.filter(
                             (item) => item !== path
                         ); //remove ref
-                        controller.userPaths.push(path);
+                        mainSketch.userPathList.push(path);
                         path.opacity = 1;
                     });
                     controller.boundingBox.position.x += event.delta.x;
@@ -155,7 +155,7 @@ multiTool.onMouseDrag = function(event) {
 
 multiTool.onMouseUp = function() {
     // so the latest sketch is available to the drawer
-    controller.svg = paper.project.exportSVG({
+    mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
 
@@ -179,7 +179,7 @@ multiTool.onMouseUp = function() {
                 updateSelectUI();
             }
             // console.log("LAYER ", userLayer.children);
-            // console.log("Ref: ", controller.userPaths);
+            // console.log("Ref: ", mainSketch.userPathList);
             break;
         case "pen":
             myPath.simplify();
@@ -189,11 +189,11 @@ multiTool.onMouseUp = function() {
                 data: myPath,
             });
 
-            controller.svg = paper.project.exportSVG({
+            mainSketch.svg = paper.project.exportSVG({
                 asString: true,
             });
 
-            controller.userPaths.push(myPath);
+            mainSketch.userPathList.push(myPath);
 
             if (liveCollab) {
                 controller.continueSketch();
@@ -212,7 +212,7 @@ multiTool.onMouseUp = function() {
                     }
                 }
             }
-            controller.svg = paper.project.exportSVG({
+            mainSketch.svg = paper.project.exportSVG({
                 asString: true,
             });
             setLineLabels(userLayer);
@@ -224,7 +224,7 @@ multiTool.onMouseUp = function() {
                 controller.clipDrawing = true;
                 regionPath.remove();
             }
-            controller.svg = paper.project.exportSVG({
+            mainSketch.svg = paper.project.exportSVG({
                 asString: true,
             });
             setLineLabels(userLayer);
@@ -313,14 +313,14 @@ eraseTool.onMouseUp = function(event) {
             erasorItem.parent.insertChildren(erasorItem.index, splitPaths);
             let newList = [];
             let foundUserPath = false;
-            for (let i = 0; i < controller.userPaths.length; i++) {
-                if (controller.userPaths[i] === erasorItem) {
+            for (let i = 0; i < mainSketch.userPathList.length; i++) {
+                if (mainSketch.userPathList[i] === erasorItem) {
                     splitPaths.forEach((newPath) => {
                         newList.push(newPath); // replace
                     });
                     foundUserPath = true;
                 } else {
-                    newList.push(controller.userPaths[i]);
+                    newList.push(mainSketch.userPathList[i]);
                 }
             }
             if (!foundUserPath) {
@@ -332,29 +332,29 @@ eraseTool.onMouseUp = function(event) {
                 });
             }
 
-            controller.userPaths = newList;
+            mainSketch.userPathList = newList;
             erasorItem.remove();
             result.remove(); //remove the compound paths
         } else {
             // don't split
             if (result.length === 0) {
-                controller.userPaths = controller.userPaths.filter(
+                mainSketch.userPathList = mainSketch.userPathList.filter(
                     (ref) => ref !== erasorItem
                 ); //remove ref
                 erasorItem.remove();
             } else {
-                controller.userPaths = controller.userPaths.filter(
+                mainSketch.userPathList = mainSketch.userPathList.filter(
                     (ref) => ref !== erasorItem
                 );
                 erasorItem.replaceWith(result); //replace
-                controller.userPaths.push(result); //replace
+                mainSketch.userPathList.push(result); //replace
             }
         }
     });
     userLayer.addChildren(tmpGroup.removeChildren());
     mask.remove();
 
-    controller.svg = paper.project.exportSVG({
+    mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
     setLineLabels(userLayer);
