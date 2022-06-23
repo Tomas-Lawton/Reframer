@@ -501,24 +501,7 @@ if (useAI) {
 }
 
 const updateMainSketch = (result) => {
-    // userLayer.clear();
-
-    // if (sketchController.isFirstIteration) {
-    //     userLayer.clear();
-    //     sketchController.isFirstIteration = false;
-    // } else {
-    //     if (sketchController.lastRender) {
-    //         sketchController.lastRender.remove();
-    //     }
-    //     if (sketchController.traces) {
-    //         for (const trace of sketchController.traces) {
-    //             trace.remove();
-    //         }
-    //     }
-    // }
-    console.log(sketchController.stack.historyHolder);
     incrementHistory();
-
     // To do change this so it is just max num sketchController.traces
     if (sketchController.numTraces > 1) {
         showTraceHistoryFrom(sketchController.stack.historyHolder.length - 1);
@@ -540,16 +523,12 @@ const loadResponse = (result) => {
     console.log("Result: ", result);
 
     if (sketchController.clipDrawing) {
-        if (sketchController.drawState == "pruning") {
-            updateMainSketch(result);
-            setActionUI("stop-prune");
-            sketchController.clipDrawing = false; //single update
-        }
-
+        // Main
         if (result.status === "None") {
             updateMainSketch(result);
         }
 
+        // Explore
         var matches = result.status.match(/\d+/g); //if status is a num
         if (matches != null) {
             if (result.svg === "") return null;
@@ -560,6 +539,13 @@ const loadResponse = (result) => {
                 sketchController.userPaths.length,
                 thisCanvas.activeLayer
             );
+        }
+
+        // Prune Main
+        if (sketchController.drawState == "pruning") {
+            updateMainSketch(result);
+            setActionUI("stop-prune");
+            sketchController.clipDrawing = false; //single update
         }
     }
 };
