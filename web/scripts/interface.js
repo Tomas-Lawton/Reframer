@@ -631,14 +631,6 @@ respectSlider.onmouseup = () => {
 
 // LOAD UI
 
-const scaleGroup = (group, to) => {
-    group.scale(to, new Point(0, 0));
-    group.children.forEach((item, i) => {
-        item.strokeWidth *= to;
-    });
-    return group;
-};
-
 // Random partial sketch
 if (!useAI) {
     const scaleTo = userLayer.view.viewSize.width;

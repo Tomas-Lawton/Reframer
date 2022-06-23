@@ -349,21 +349,48 @@ class Sketch {
         this.elem = newElem;
         return this.elem;
     }
-    import (backup) {
+    overwrite(l, sketch, s) {
+        if (!sketch) return;
+        l.clear();
+        sketch = scaleGroup(sketch, s);
+        sketch.getItems((path) => {
+            if (!mainSketch.userPathList.includes(path)) {
+                mainSketch.userPathList.push(path);
+                path.opacity = 1;
+            }
+        });
+        l.insertChildren(0, sketch.removeChildren());
+    }
+    add(l, sketch, s) {
+        if (!sketch) return;
+        let added = l.addChild(sketch);
+        added = scaleGroup(added, s);
+        added.getItems((path) => {
+            path.opacity *= 0.5;
+            if (!mainSketch.userPathList.includes(path)) {
+                mainSketch.userPathList.push(path);
+                path.opacity = 1;
+            }
+        });
+        l.insertChildren(added.index, added.removeChildren()); // flatten
+        added.remove();
+    }
+    import (overwriting) {
         let i = this.i;
         if (allowOverwrite) {
             openModal({
                 title: "Overwriting Canvas",
-                message: "Import into the main canvas? Contents will be saved.",
+                message: "Import into the main canvas? Sketch will be saved.",
                 confirmAction: () => {
                     pauseActiveDrawer();
                     unpackGroup();
                     hideSelectUI();
                     saveStatic(
-                        this.extractScaled(backup, 1 / scaleRatio),
-                        backup.userPathList.length
+                        this.extractScaled(overwriting, 1 / scaleRatio),
+                        overwriting.userPathList.length
                     );
-                    toMainSketch(i, true); //overwrite
+                    const clone = controller.sketches[i].clone();
+                    this.overwrite(overwriting.useLayer, clone, scaleRatio);
                 },
             });
         } else {
@@ -371,10 +398,11 @@ class Sketch {
             unpackGroup();
             hideSelectUI();
             saveStatic(
-                this.extractScaled(backup, 1 / scaleRatio),
-                backup.userPathList.length
+                this.extractScaled(overwriting, 1 / scaleRatio),
+                overwriting.userPathList.length
             );
-            toMainSketch(i, false); //copy traces
+            const clone = controller.sketches[i].clone();
+            this.add(overwriting.useLayer, clone, scaleRatio);
         }
     }
     clone() {
@@ -396,29 +424,31 @@ class Sketch {
         scaledSketch.remove();
         return res;
     }
-    updateSVG() {
-        // set svg data
-        // parsefromSVG here????
-    }
-    importToMain() {
-        //
-    }
-    exportToStatic() {
-        //
-    }
-    save() {
-        //
-    }
-    remove() {
-        // delete
-    }
-    stop() {
-        // tell controll to stop this i
-    }
+
+    // updateSVG() {
+    //     // set svg data
+    //     // parsefromSVG here????
+    // }
+    // importToMain() {
+    //     //
+    // }
+    // exportToStatic() {
+    //     //
+    // }
+    // save() {
+    //     //
+    // }
+    // remove() {
+    //     // delete
+    // }
+    // stop() {
+    //     // tell controll to stop this i
+    // }
 }
 
-mainSketch = new Sketch(null, scope, 0, "main");
+mainSketch = new Sketch("main-sketch", scope, 0, "main");
 mainSketch.svg = paper.project.exportSVG({
     asString: true,
 }); //for svg parsing
 mainSketch.useLayer = userLayer;
+console.log(userLayer);

@@ -1,33 +1,3 @@
-const toMainSketch = (sketchIndex, clear) => {
-    let copy = sketchScope.projects[sketchIndex].activeLayer.clone();
-    let expandedExemplar = copy.scale(scaleRatio, new Point(0, 0));
-    if (clear) {
-        userLayer.clear();
-        var newSketch = userLayer.addChild(expandedExemplar);
-        newSketch.getItems((path) => {
-            path.strokeWidth *= scaleRatio;
-            if (!mainSketch.userPathList.includes(path)) {
-                mainSketch.userPathList.push(path);
-                path.opacity = 1;
-            }
-        });
-    } else {
-        var newSketch = userLayer.addChild(expandedExemplar);
-        newSketch.getItems((path) => {
-            path.strokeWidth *= scaleRatio;
-            path.opacity *= 0.5;
-            if (!mainSketch.userPathList.includes(path)) {
-                mainSketch.userPathList.push(path);
-                path.opacity = 1;
-            }
-        });
-    }
-    newSketch.getItems((path) =>
-        userLayer.addChild(path.clone({ insert: true }))
-    );
-    newSketch.remove();
-};
-
 // TO DO When mainsketch is instance of Sketch add to Sketch class so can call mainsketch.saveStatic()
 const saveStatic = (json, paths) => {
     let sketchCountIndex = controller.sketchScopeIndex;
@@ -172,6 +142,14 @@ const rotateSelectGroup = (g, r) => {
     let items = getSelectedPaths();
     fitToSelection(items, "rotating");
     updateSelectUI();
+};
+
+const scaleGroup = (group, to) => {
+    group.scale(to, new Point(0, 0));
+    group.children.forEach((item, i) => {
+        item.strokeWidth *= to;
+    });
+    return group;
 };
 
 const setPointSize = (s) => {

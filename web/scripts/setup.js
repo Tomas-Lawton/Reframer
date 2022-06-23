@@ -23,7 +23,7 @@ if (useAI) {
     ws.onopen = (event) => {
         console.log("Connected AI Socket\n" + event);
         socketConnected = true;
-        alert("Connected");
+        // alert("Connected");
     };
 } else {
     document.getElementById("partial-message").style.display = "block";
