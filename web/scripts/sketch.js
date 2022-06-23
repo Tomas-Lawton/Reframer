@@ -111,6 +111,7 @@ class Controller {
             openModal({
                 title: "Type a prompt first!",
                 message: "You need a target for AI sketching.",
+                confirmAction: () => (controlPanel.style.display = "flex"),
             });
             return;
         }

@@ -353,6 +353,7 @@ const setPenMode = (mode, accentTarget) => {
                 openModal({
                     title: "Add a prompt first!",
                     message: "You need a prompt to generate sketches with the region tool.",
+                    confirmAction: () => (controlPanel.style.display = "flex"),
                 });
             } else {
                 penDrop.classList.add("selected-mode");

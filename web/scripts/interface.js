@@ -101,23 +101,18 @@ deleteHandler.addEventListener("click", (e) => {
 });
 
 copyHandler.addEventListener("click", (e) => {
-    let offset = controller.boundingBox.bounds.width;
-    let paths = getSelectedPaths();
-    hideSelectUI(false);
-    paths.forEach((path) => {
-        let duplicate = path.clone();
-        duplicate.position.x += offset;
-        mainSketch.userPathList.push(duplicate);
-        duplicate.selected = true;
-    });
-
-    mainSketch.svg = paper.project.exportSVG({
-        asString: true,
-    });
-    logger.event("duplicate-selection");
-
-    fitToSelection(getSelectedPaths(), "moving");
-    updateSelectUI();
+    // const group = getSelectedPaths()[0];
+    // // group.getItems((child) => {
+    // //     const newChild = child.clone();
+    // //     mainSketch.userPathList.push(newChild);
+    // // });
+    // group.clone();
+    // mainSketch.svg = paper.project.exportSVG({
+    //     asString: true,
+    // });
+    // logger.event("duplicate-selection");
+    // fitToSelection(getSelectedPaths(), "moving");
+    // updateSelectUI();
 });
 
 // reviseHandler.addEventListener("click", (e) => {
@@ -360,6 +355,7 @@ document.getElementById("inspire").addEventListener("click", () => {
             openModal({
                 title: "Type a prompt first!",
                 message: "You need a target for AI sketchs.",
+                confirmAction: () => (controlPanel.style.display = "flex"),
             });
             return;
         } else {
