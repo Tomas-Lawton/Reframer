@@ -36,13 +36,13 @@ function dragleavesketch(e) {
 }
 
 function dropSketch(e) {
+    // AI to Static
     sketchGrid.classList.remove("drop-ready");
     const sketchCountIndex = e.dataTransfer.getData("text/plain");
     if (document.querySelector(`#AI-sketch-item-${sketchCountIndex}`)) {
-        mainSketch.saveStatic(
-            controller.sketches[sketchCountIndex].extractJSON(),
-            controller.sketches[sketchCountIndex].num
-        );
+        // COME BACK HERE
+        let importing = controller.sketches[sketchCountIndex];
+        importing.saveStatic(importing.extractJSON(), importing.num);
     }
 }
 
@@ -304,11 +304,10 @@ timeKeeper.oninput = function() {
         showTraceHistoryFrom(historyIndex);
     } else {
         let stored = controller.stack.historyHolder[historyIndex];
-        mainSketch.svg = parseFromSvg(
+        mainSketch.svg = mainSketch.load(
             1,
             stored.svg,
             stored.num,
-            userLayer,
             false // don't reapply opacity
         );
     }
@@ -416,7 +415,7 @@ document.getElementById("go-back").addEventListener("click", () => {
     if (controller.drawState === "stop") {
         let stored = controller.stack.historyHolder[1];
         timeKeeper.value = 1;
-        parseFromSvg(1, stored.svg, stored.num, userLayer);
+        mainSketch.load(1, stored.svg, stored.num);
         mainSketch.svg = paper.project.exportSVG({
             asString: true,
         });
@@ -545,10 +544,13 @@ document.getElementById("scrapbook").addEventListener("click", () => {
 // });
 
 document.getElementById("save-sketch").addEventListener("click", () => {
+    console.log(mainSketch.userPathList);
     unpackGroup();
     hideSelectUI();
+    // mainSketch.load(1, mainSketch.sortPaths(), mainSketch.num, false);
+    mainSketch.sortPaths();
     mainSketch.saveStatic(
-        mainSketch.extractScaledJSON(mainSketch, 1 / scaleRatio), //adds as backup
+        mainSketch.extractScaledJSON(1 / scaleRatio), //adds as backup
         mainSketch.userPathList.length
     );
     logger.event("to-sketchbook");

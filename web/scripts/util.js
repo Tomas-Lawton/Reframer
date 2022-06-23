@@ -156,18 +156,6 @@ const showHide = (item) => {
 
 // switchControls();
 
-// TO DO: Add svg arr
-const parseFromSvg = (s, svg, n, l, a = true) => {
-    if (svg === "" || svg === undefined) return;
-    l.clear();
-    let g = l.importSVG(svg).children[0];
-    scaleGroup(g, s);
-    l.insertChildren(g.index, g.removeChildren());
-    mainSketch.userPathList = [];
-    l.getItems().forEach((path, i) => {
-        i < n ? mainSketch.userPathList.push(path) : a && (path.opacity *= 0.5);
-    });
-};
 // return paperObject;
 
 const getHistoryBatch = (maxSize, startIdx) => {
@@ -211,7 +199,7 @@ const showTraceHistoryFrom = (fromIndex) => {
         let refList = [];
         for (let stored of items) {
             userLayer.importSVG(stored.svg);
-            refList.push(parseFromSvg(1, stored.svg, stored.num, userLayer));
+            refList.push(mainSketch.load(1, stored.svg, stored.num));
         }
         controller.traces = refList;
     }
@@ -248,11 +236,10 @@ const updateMainSketch = (result) => {
     if (controller.numTraces > 1) {
         showTraceHistoryFrom(controller.stack.historyHolder.length - 1);
     } else {
-        controller.lastRender = parseFromSvg(
+        controller.lastRender = mainSketch.load(
             userLayer.view.viewSize.width / 224,
             result.svg,
-            mainSketch.userPathList.length,
-            userLayer
+            mainSketch.userPathList.length
         );
         mainSketch.svg = paper.project.exportSVG({
             asString: true,
@@ -274,12 +261,12 @@ const loadResponse = (result) => {
         var matches = result.status.match(/\d+/g); //if status is a num
         if (matches != null) {
             if (result.svg === "") return null;
-            let thisCanvas = sketchScope.projects[result.sketch_index];
-            parseFromSvg(
+            let sketch = controller.sketches[result.sketch_index];
+            sketch.load(
                 sketchSize / 224,
                 result.svg,
                 mainSketch.userPathList.length,
-                thisCanvas.activeLayer
+                sketch.userLayer
             );
         }
 
