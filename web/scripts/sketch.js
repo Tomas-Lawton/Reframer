@@ -386,7 +386,7 @@ class Sketch {
                     unpackGroup();
                     hideSelectUI();
                     saveStatic(
-                        this.extractScaled(overwriting, 1 / scaleRatio),
+                        this.extractScaledJSON(overwriting, 1 / scaleRatio),
                         overwriting.userPathList.length
                     );
                     const clone = controller.sketches[i].clone();
@@ -398,7 +398,7 @@ class Sketch {
             unpackGroup();
             hideSelectUI();
             saveStatic(
-                this.extractScaled(overwriting, 1 / scaleRatio),
+                this.extractScaledJSON(overwriting, 1 / scaleRatio),
                 overwriting.userPathList.length
             );
             const clone = controller.sketches[i].clone();
@@ -417,33 +417,13 @@ class Sketch {
     extractJSON() {
         return this.clone().exportJSON();
     }
-    extractScaled(sketch, s) {
+    extractScaledJSON(sketch, s) {
         let clone = sketch.clone();
         let scaledSketch = scaleGroup(clone, s);
         let res = scaledSketch.exportJSON();
         scaledSketch.remove();
         return res;
     }
-
-    // updateSVG() {
-    //     // set svg data
-    //     // parsefromSVG here????
-    // }
-    // importToMain() {
-    //     //
-    // }
-    // exportToStatic() {
-    //     //
-    // }
-    // save() {
-    //     //
-    // }
-    // remove() {
-    //     // delete
-    // }
-    // stop() {
-    //     // tell controll to stop this i
-    // }
 }
 
 mainSketch = new Sketch("main-sketch", scope, 0, "main");

@@ -552,7 +552,7 @@ document.getElementById("save-sketch").addEventListener("click", () => {
     hideSelectUI(); // check bounding box??
     //
     saveStatic(
-        mainSketch.extractScaled(mainSketch, 1 / scaleRatio), //adds as backup
+        mainSketch.extractScaledJSON(mainSketch, 1 / scaleRatio), //adds as backup
         mainSketch.userPathList.length
     );
     logger.event("to-sketchbook");
