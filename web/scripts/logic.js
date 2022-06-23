@@ -1,32 +1,40 @@
-const importStaticSketch = (i) => {
-    console.log(i);
-    if (allowOverwrite) {
-        openModal({
-            title: "Overwriting Canvas",
-            message: "Import into the main canvas? Contents will be saved.",
-            confirmAction: () => {
-                pauseActiveDrawer();
-                toSketchbook();
-                importToSketch(i, true); //overwrite
-            },
-        });
-    } else {
-        pauseActiveDrawer();
-        toSketchbook();
-        importToSketch(i, false); //copy traces
+// To do make transfering between main and static better
+
+// To DO: Refactor into sketch class
+// Extracting json should be the same. And then just apply the necessary scaling with helper.
+
+// Get the main svg, scale
+const extractMainSketch = () => {
+    unpackGroup();
+    userLayer.getItems().forEach((path) => {
+        path.selected = false;
+    });
+    controller.transformGroup = null;
+    if (controller.boundingBox) {
+        hideSelectUI();
     }
+    let scaledSketch = userLayer.clone({ insert: false });
+    scaledSketch = scaleGroup(scaledSketch, 1 / scaleRatio);
+    let result = scaledSketch.exportJSON();
+    scaledSketch.remove();
+    return result;
 };
 
-const importToSketch = (exemplarIndex, clear) => {
-    let copy = exemplarScope.projects[exemplarIndex].activeLayer.clone();
+// To DO: Refactor into sketch class
+// clear the sketch
+// get the scaled version
+// import method or overwrite method.
+
+const toMainSketch = (sketchIndex, clear) => {
+    let copy = sketchScope.projects[sketchIndex].activeLayer.clone();
     let expandedExemplar = copy.scale(scaleRatio, new Point(0, 0));
     if (clear) {
         userLayer.clear();
         var newSketch = userLayer.addChild(expandedExemplar);
         newSketch.getItems((path) => {
             path.strokeWidth *= scaleRatio;
-            if (!sketchController.userPaths.includes(path)) {
-                sketchController.userPaths.push(path);
+            if (!controller.userPaths.includes(path)) {
+                controller.userPaths.push(path);
                 path.opacity = 1;
             }
         });
@@ -35,8 +43,8 @@ const importToSketch = (exemplarIndex, clear) => {
         newSketch.getItems((path) => {
             path.strokeWidth *= scaleRatio;
             path.opacity *= 0.5;
-            if (!sketchController.userPaths.includes(path)) {
-                sketchController.userPaths.push(path);
+            if (!controller.userPaths.includes(path)) {
+                controller.userPaths.push(path);
                 path.opacity = 1;
             }
         });
@@ -47,48 +55,21 @@ const importToSketch = (exemplarIndex, clear) => {
     newSketch.remove();
 };
 
-const exportToExemplar = () => {
-    unpackGroup();
-    userLayer.getItems().forEach((path) => {
-        path.selected = false;
-    });
-    sketchController.transformGroup = null;
-    if (sketchController.boundingBox) {
-        hideSelectUI();
-    }
-
-    let scaledSketch = userLayer.clone({ insert: false });
-    scaledSketch.scale(1 / scaleRatio, new Point(0, 0));
-    scaledSketch.getItems((item) => (item.strokeWidth /= scaleRatio));
-    let result = scaledSketch.exportJSON();
-    scaledSketch.remove();
-    return result;
-};
-
-const exploreToStatic = (i) => {
-    let toSketchbook = exemplarScope.projects[i].activeLayer.clone({
-        insert: false,
-    });
-    toSketchbook.getItems().forEach((path) => {
-        path.selected = false;
-    });
-    return toSketchbook.exportJSON();
-};
-
-const toSketchbook = (fromSketch = null) => {
-    let jsonGroup;
-    if (fromSketch !== null) {
-        jsonGroup = exploreToStatic(fromSketch);
-    } else {
-        jsonGroup = exportToExemplar();
-    }
-    let sketchCountIndex = sketchController.sketchScopeIndex;
-    let newElem = newSketchUI(exemplarScope, true, sketchCountIndex);
-    let toCanvas = exemplarScope.projects[sketchCountIndex];
-    toCanvas.activeLayer.importJSON(jsonGroup);
+// TO DO When mainsketch is instance of Sketch add to Sketch class so can call mainsketch.saveStatic()
+const saveStatic = (json, paths) => {
+    let sketchCountIndex = controller.sketchScopeIndex;
+    let sketch = new Sketch(
+        sketchCountIndex,
+        sketchScope,
+        paths, //paths in main change
+        "U"
+    );
+    let newElem = sketch.renderMini();
+    let toCanvas = sketchScope.projects[sketchCountIndex];
+    toCanvas.activeLayer.importJSON(json);
     newElem.classList.add("bounce");
-    document.getElementById("exemplar-grid").prepend(newElem);
-    sketchController.sketchScopeIndex += 1;
+    document.getElementById("sketch-grid").prepend(newElem);
+    controller.sketchScopeIndex += 1;
 };
 
 const killExploratorySketches = () => {
@@ -101,7 +82,7 @@ const killExploratorySketches = () => {
         loader.classList.add("fa-check");
         stopButton.style.background = "#f5f5f5";
         stopButton.style.background = "#d2d2d2";
-        sketchController.stopSingle(sketchController.inspireScopes[i]);
+        controller.stopSingle(controller.inspireScopes[i]);
     });
 };
 
@@ -139,7 +120,7 @@ const drawingFinished = () => {
 };
 
 const setActionUI = (state) => {
-    let lastDrawState = sketchController.drawState;
+    let lastDrawState = controller.drawState;
     aiMessage.classList.remove("typed-out");
 
     if (state == "pruning") {
@@ -154,7 +135,7 @@ const setActionUI = (state) => {
         inactiveStop();
     } else if (state == "stop-prune") {
         drawingFinished();
-    } else if (sketchController.activeStates.includes(state)) {
+    } else if (controller.activeStates.includes(state)) {
         actionControls.forEach((elem) => {
             elem.classList.add("inactive-action");
             // elem.classList.remove("active");
@@ -171,16 +152,16 @@ const setActionUI = (state) => {
         // document.getElementById("respect-block").classList.add("inactive-section");
 
         if (state == "drawing") {
-            aiMessage.innerHTML = `Got it! Drawing ${sketchController.prompt}!`;
+            aiMessage.innerHTML = `Got it! Drawing ${controller.prompt}!`;
             // document.getElementById("draw").classList.add("active");
         } else if (state == "explore") {
-            aiMessage.innerHTML = `I've got some ideas for ${sketchController.prompt}!`;
+            aiMessage.innerHTML = `I've got some ideas for ${controller.prompt}!`;
             // canvas.classList.add("loading-canvas");
             document.getElementById("history-block").style.display = "none";
 
             // document.getElementById("inspire").classList.add("active");
         } else if (state == "continuing" || state == "continue-explore") {
-            aiMessage.innerHTML = `Nice, I'll make that it into ${sketchController.prompt}.`;
+            aiMessage.innerHTML = `Nice, I'll make that it into ${controller.prompt}.`;
         }
         aiMessage.classList.add("typed-out");
 
@@ -190,7 +171,7 @@ const setActionUI = (state) => {
         aiMessage.classList.add("typed-out");
         drawingFinished();
         if (
-            sketchController.stack.historyHolder.length > 1 //first elem empty
+            controller.stack.historyHolder.length > 1 //first elem empty
         ) {
             document.getElementById("history-block").style.display = "flex";
         }
@@ -198,9 +179,9 @@ const setActionUI = (state) => {
         aiMessage.innerHTML = `Stopped a single sketch!`;
         aiMessage.classList.add("typed-out");
         drawingFinished();
-        sketchController.resetMetaControls();
+        controller.resetMetaControls();
     }
-    sketchController.drawState = state;
+    controller.drawState = state;
     console.log("Set: ", state);
 };
 
@@ -222,23 +203,23 @@ const rotateSelectGroup = (g, r) => {
 
 const setPointSize = (s) => {
     const point = document.getElementById("point-size");
-    sketchController.strokeWidth = s;
-    point.style.width = sketchController.strokeWidth + "px";
-    point.style.height = sketchController.strokeWidth + "px";
+    controller.strokeWidth = s;
+    point.style.width = controller.strokeWidth + "px";
+    point.style.height = controller.strokeWidth + "px";
     getSelectedPaths().forEach(
-        (item) => (item.strokeWidth = sketchController.strokeWidth)
+        (item) => (item.strokeWidth = controller.strokeWidth)
     );
 };
 
 const unpackGroup = () => {
-    if (sketchController.transformGroup !== null) {
-        sketchController.transformGroup.applyMatrix = true; // apply group rotation/scale to children on unpack
+    if (controller.transformGroup !== null) {
+        controller.transformGroup.applyMatrix = true; // apply group rotation/scale to children on unpack
         userLayer.insertChildren(
-            sketchController.transformGroup.index,
-            sketchController.transformGroup.removeChildren()
+            controller.transformGroup.index,
+            controller.transformGroup.removeChildren()
         );
-        sketchController.transformGroup.remove();
-        sketchController.transformGroup = null;
+        controller.transformGroup.remove();
+        controller.transformGroup = null;
     }
 };
 
@@ -248,25 +229,25 @@ const fitToSelection = (items, state) => {
     }, null);
     // Add stroke width so no overflow over bounds?
     // Also shouldn't set the boundingBox, should set boundingBox.bounds ???
-    sketchController.boundingBox = new Path.Rectangle(bbox);
-    sketchController.boundingBox.sendToBack();
-    sketchController.boundingBox.set({
+    controller.boundingBox = new Path.Rectangle(bbox);
+    controller.boundingBox.sendToBack();
+    controller.boundingBox.set({
         fillColor: "#f5f5f5",
         opacity: 0.4,
         strokeColor: "#7b66ff",
         strokeWidth: 2,
     });
-    sketchController.boundingBox.data.state = state;
-    return sketchController.boundingBox;
+    controller.boundingBox.data.state = state;
+    return controller.boundingBox;
 };
 
 const getSelectedPaths = () =>
     userLayer.getItems().filter((path) => path.selected);
 
 const noPrompt = () =>
-    sketchController.prompt === "" ||
-    sketchController.prompt === null ||
-    sketchController.prompt === prompt.getAttribute("placeholder");
+    controller.prompt === "" ||
+    controller.prompt === null ||
+    controller.prompt === prompt.getAttribute("placeholder");
 
 const openModal = (data) => {
     if (data.hasOwnProperty("ui")) {
@@ -304,21 +285,21 @@ const openModal = (data) => {
 };
 
 // const switchControls = () => {
-//     if (sketchController.buttonControlLeft) {
+//     if (controller.buttonControlLeft) {
 //         console.log(window.innerWidth);
 //         buttonPanel.style.left = `${window.innerWidth - buttonPanel.offsetWidth}px`;
 //     } else {
 //         buttonPanel.style.left = 0;
 //     }
-//     sketchController.buttonControlLeft = !sketchController.buttonControlLeft;
+//     controller.buttonControlLeft = !controller.buttonControlLeft;
 // };
 
 // dragging moves select elements + ui
 const hideSelectUI = (includeTransform = true) => {
     // remove rect
-    if (sketchController.boundingBox) {
-        sketchController.boundingBox.remove();
-        sketchController.boundingBox = null;
+    if (controller.boundingBox) {
+        controller.boundingBox.remove();
+        controller.boundingBox = null;
     }
     // hide ui
     if (includeTransform) {
@@ -331,39 +312,37 @@ const hideSelectUI = (includeTransform = true) => {
 };
 
 const updateRectBounds = (from, to) => {
-    sketchController.boundingBox.bounds = new Rectangle(from, to);
-    sketchController.boundingBox.bounds.set({
+    controller.boundingBox.bounds = new Rectangle(from, to);
+    controller.boundingBox.bounds.set({
         fillColor: "#f5f5f5",
         opacity: 0.4,
         strokeColor: "#7b66ff",
         strokeWidth: 2,
     });
-    sketchController.boundingBox.data.state = "resizing";
+    controller.boundingBox.data.state = "resizing";
     updateSelectPosition();
 };
 
 const updateSelectPosition = () => {
     let uiOffset = deleteHandler.getBoundingClientRect().height / 2 + 5;
-    deleteHandler.style.left =
-        sketchController.boundingBox.bounds.topRight.x + "px";
+    deleteHandler.style.left = controller.boundingBox.bounds.topRight.x + "px";
     // reviseHandler.style.left =
-    //     sketchController.boundingBox.bounds.topLeft.x + "px";
-    deleteHandler.style.top =
-        sketchController.boundingBox.bounds.top - uiOffset + "px";
+    //     controller.boundingBox.bounds.topLeft.x + "px";
+    deleteHandler.style.top = controller.boundingBox.bounds.top - uiOffset + "px";
     // reviseHandler.style.top =
-    //     sketchController.boundingBox.bounds.top - uiOffset + "px";
+    //     controller.boundingBox.bounds.top - uiOffset + "px";
 
     // initialiseHandler.style.left =
-    //     sketchController.boundingBox.bounds.topRight.x + "px";
-    copyHandler.style.left = sketchController.boundingBox.bounds.topLeft.x + "px";
+    //     controller.boundingBox.bounds.topRight.x + "px";
+    copyHandler.style.left = controller.boundingBox.bounds.topLeft.x + "px";
     // initialiseHandler.style.top =
-    //     sketchController.boundingBox.bounds.bottom + uiOffset + "px";
+    //     controller.boundingBox.bounds.bottom + uiOffset + "px";
     copyHandler.style.top =
-        sketchController.boundingBox.bounds.bottom + uiOffset + "px";
+        controller.boundingBox.bounds.bottom + uiOffset + "px";
 };
 
 const updateSelectUI = () => {
-    if (sketchController.boundingBox && getSelectedPaths().length) {
+    if (controller.boundingBox && getSelectedPaths().length) {
         deleteHandler.style.display = "block";
         // initialiseHandler.style.display = "block";
         // reviseHandler.style.display = "block";
@@ -381,24 +360,22 @@ const deletePath = () => {
     g.forEach((path) => {
         path.selected = false;
     });
-    sketchController.stack.undoStack.push({
+    controller.stack.undoStack.push({
         type: "delete-event",
         data: userLayer.exportJSON(),
     });
 
     // Delete
-    sketchController.userPaths = sketchController.userPaths.filter(
-        (ref) => !g.includes(ref)
-    );
+    controller.userPaths = controller.userPaths.filter((ref) => !g.includes(ref));
     g.forEach((path) => path.remove());
 
     // Save again
-    sketchController.svg = paper.project.exportSVG({
+    controller.svg = paper.project.exportSVG({
         asString: true,
     });
 
     if (liveCollab) {
-        sketchController.continueSketch();
+        controller.continueSketch();
         liveCollab = false;
     }
     logger.event("deleted-path");
@@ -421,21 +398,21 @@ const parseFromSvg = (s, svg, n, l, a = true) => {
     let g = l.importSVG(svg).children[0];
     scaleGroup(g, s);
     l.insertChildren(g.index, g.removeChildren());
-    sketchController.userPaths = [];
+    controller.userPaths = [];
     l.getItems().forEach((path, i) => {
-        i < n ? sketchController.userPaths.push(path) : a && (path.opacity *= 0.5);
+        i < n ? controller.userPaths.push(path) : a && (path.opacity *= 0.5);
     });
 };
 // return paperObject;
 
 const getHistoryBatch = (maxSize, startIdx) => {
-    let len = sketchController.stack.historyHolder.length;
+    let len = controller.stack.historyHolder.length;
     if (len <= 1) return null;
     let traceList = [];
     let batchSize = Math.min(maxSize, startIdx); // not first item
     // num traces
     for (let i = 0; i < batchSize; i++) {
-        traceList.push(sketchController.stack.historyHolder[startIdx - i - 1]);
+        traceList.push(controller.stack.historyHolder[startIdx - i - 1]);
     }
     return traceList;
 };
@@ -444,7 +421,7 @@ const getHistoryBatch = (maxSize, startIdx) => {
 const calcRollingLoss = () => {
     const items = getHistoryBatch(
         setTraces.value,
-        sketchController.stack.historyHolder.length - 1
+        controller.stack.historyHolder.length - 1
     );
     if (items) {
         const sum = items.reduce(
@@ -452,38 +429,38 @@ const calcRollingLoss = () => {
             0
         );
         const newRollingLoss = sum / items.length;
-        // if (sketchController.lastRollingLoss !== undefined) {
-        //     if (Math.abs(sketchController.lastRollingLoss - newRollingLoss) < 0.0001) {
+        // if (controller.lastRollingLoss !== undefined) {
+        //     if (Math.abs(controller.lastRollingLoss - newRollingLoss) < 0.0001) {
         //         lossText.innerHTML = `Converged at: ${newRollingLoss}`;
         //         stopClip();
         //     }
         // }
-        sketchController.lastRollingLoss = newRollingLoss;
+        controller.lastRollingLoss = newRollingLoss;
     }
 };
 
 const showTraceHistoryFrom = (fromIndex) => {
-    const items = getHistoryBatch(sketchController.numTraces, fromIndex);
+    const items = getHistoryBatch(controller.numTraces, fromIndex);
     if (items) {
-        sketchController.traces = null;
+        controller.traces = null;
         let refList = [];
         for (let stored of items) {
             userLayer.importSVG(stored.svg);
             refList.push(parseFromSvg(1, stored.svg, stored.num, userLayer));
         }
-        sketchController.traces = refList;
+        controller.traces = refList;
     }
 };
 
 const incrementHistory = () => {
-    sketchController.stack.historyHolder.push({
-        svg: sketchController.svg,
-        num: sketchController.userPaths.length,
+    controller.stack.historyHolder.push({
+        svg: controller.svg,
+        num: controller.userPaths.length,
     });
-    timeKeeper.setAttribute("max", String(sketchController.step + 1));
-    timeKeeper.value = String(sketchController.step + 1);
-    setTraces.setAttribute("max", String(sketchController.step + 1));
-    sketchController.step += 1;
+    timeKeeper.setAttribute("max", String(controller.step + 1));
+    timeKeeper.value = String(controller.step + 1);
+    setTraces.setAttribute("max", String(controller.step + 1));
+    controller.step += 1;
 };
 
 if (useAI) {
@@ -495,24 +472,24 @@ if (useAI) {
                 console.log("Parsing Concurrent JSON events");
             }
             console.log("Cooked ", e);
-            sketchController.clipDrawing = false;
+            controller.clipDrawing = false;
         }
     };
 }
 
 const updateMainSketch = (result) => {
     incrementHistory();
-    // To do change this so it is just max num sketchController.traces
-    if (sketchController.numTraces > 1) {
-        showTraceHistoryFrom(sketchController.stack.historyHolder.length - 1);
+    // To do change this so it is just max num controller.traces
+    if (controller.numTraces > 1) {
+        showTraceHistoryFrom(controller.stack.historyHolder.length - 1);
     } else {
-        sketchController.lastRender = parseFromSvg(
+        controller.lastRender = parseFromSvg(
             userLayer.view.viewSize.width / 224,
             result.svg,
-            sketchController.userPaths.length,
+            controller.userPaths.length,
             userLayer
         );
-        sketchController.svg = paper.project.exportSVG({
+        controller.svg = paper.project.exportSVG({
             asString: true,
         });
     }
@@ -522,7 +499,7 @@ const updateMainSketch = (result) => {
 const loadResponse = (result) => {
     console.log("Result: ", result);
 
-    if (sketchController.clipDrawing) {
+    if (controller.clipDrawing) {
         // Main
         if (result.status === "None") {
             updateMainSketch(result);
@@ -532,91 +509,26 @@ const loadResponse = (result) => {
         var matches = result.status.match(/\d+/g); //if status is a num
         if (matches != null) {
             if (result.svg === "") return null;
-            let thisCanvas = exemplarScope.projects[result.sketch_index];
+            let thisCanvas = sketchScope.projects[result.sketch_index];
             parseFromSvg(
-                exemplarSize / 224,
+                sketchSize / 224,
                 result.svg,
-                sketchController.userPaths.length,
+                controller.userPaths.length,
                 thisCanvas.activeLayer
             );
         }
 
         // Prune Main
-        if (sketchController.drawState == "pruning") {
+        if (controller.drawState == "pruning") {
             updateMainSketch(result);
             setActionUI("stop-prune");
-            sketchController.clipDrawing = false; //single update
+            controller.clipDrawing = false; //single update
         }
     }
-};
-
-const newSketchUI = (useScope, userSketch, i = null) => {
-    console.log(i);
-    let type = userSketch ? "U" : "AI";
-
-    let newElem = exemplarTemplate.cloneNode(reusableExemplar);
-    newElem.style.visibility = "initial";
-
-    let exemplarCanvas = newElem.querySelector("canvas");
-    exemplarCanvas.width = exemplarSize;
-    exemplarCanvas.height = exemplarSize;
-    useScope.setup(exemplarCanvas);
-
-    if (i !== null) {
-        let removeButton = newElem.querySelector(".fa-minus");
-        let stopButton = newElem.querySelector(".fa-stop");
-        let loader = newElem.querySelector(".card-loading");
-
-        newElem.id = `${type}-sketch-item-${i}`;
-        exemplarCanvas.id = `${type}-sketch-canvas-${i}`;
-        newElem.querySelector("h3").innerHTML = `${type}${i}`;
-
-        if (userSketch) {
-            stopButton.style.display = "none";
-            loader.style.display = "none";
-            removeButton.addEventListener("click", () => {
-                newElem.remove();
-            });
-        } else {
-            stopButton.addEventListener("click", () => {
-                loader.classList.remove("button-animation");
-                loader.classList.remove("fa-spinner");
-                loader.classList.add("fa-check");
-                stopButton.style.background = "#f5f5f5";
-                stopButton.style.background = "#d2d2d2";
-
-                sketchController.stopSingle(i);
-            });
-            removeButton.addEventListener("click", () => {
-                newElem.classList.add("inactive-exemplar");
-                sketchController.stopSingle(i);
-            });
-        }
-
-        exemplarCanvas.addEventListener("click", () => {
-            importStaticSketch(i);
-            sketchController.resetMetaControls();
-        });
-
-        // Make draggable
-        newElem.addEventListener(
-            "dragstart",
-            function(e) {
-                e.dataTransfer.setData("text/plain", i);
-            },
-            false
-        );
-    } else {
-        // is default ui
-        newElem.id = `default-sketch-item`;
-        exemplarCanvas.id = `default-canvas`;
-    }
-
-    return newElem;
 };
 
 const setPenMode = (mode, accentTarget) => {
-    let lastPenMode = sketchController.penMode;
+    let lastPenMode = controller.penMode;
     document.querySelectorAll(".pen-mode").forEach((mode) => {
         mode.classList.remove("selected-mode");
         mode.classList.add("simple-hover");
@@ -637,7 +549,7 @@ const setPenMode = (mode, accentTarget) => {
                         penDrop.getBoundingClientRect().left +
                         penDrop.getBoundingClientRect().width / 2 +
                         "px";
-                    setPenMode(sketchController.penDropMode, penDrop);
+                    setPenMode(controller.penDropMode, penDrop);
                 } else {
                     dropdown.style.display = "none";
                 }
@@ -651,7 +563,7 @@ const setPenMode = (mode, accentTarget) => {
                 dropdown.style.display = "none";
             }
             eraseTool.activate();
-            sketchController.penMode = mode;
+            controller.penMode = mode;
             break;
         case "pen":
             let swatches = document.getElementById("swatches");
@@ -670,7 +582,7 @@ const setPenMode = (mode, accentTarget) => {
             }
             dropdown.style.display = "none";
             multiTool.activate();
-            sketchController.penMode = mode;
+            controller.penMode = mode;
             "pen";
             break;
         case "select":
@@ -679,13 +591,13 @@ const setPenMode = (mode, accentTarget) => {
             penDrop.classList.remove("fa-object-group");
             penDrop.classList.add("fa-arrow-pointer");
             multiTool.activate();
-            sketchController.penMode = mode;
-            sketchController.penDropMode = mode;
+            controller.penMode = mode;
+            controller.penDropMode = mode;
             break;
         case "lasso":
             multiTool.activate();
             if (noPrompt()) {
-                sketchController.penMode = lastPenMode;
+                controller.penMode = lastPenMode;
                 openModal({
                     title: "Add a prompt first!",
                     message: "You need a prompt to generate sketches with the region tool.",
@@ -695,43 +607,40 @@ const setPenMode = (mode, accentTarget) => {
                 penDrop.classList.remove("fa-eraser");
                 penDrop.classList.remove("fa-arrow-pointer");
                 penDrop.classList.add("fa-object-group");
-                sketchController.penMode = mode;
-                sketchController.penDropMode = mode;
+                controller.penMode = mode;
+                controller.penDropMode = mode;
             }
             break;
     }
 
-    if (sketchController.penMode !== "select") {
+    if (controller.penMode !== "select") {
         userLayer.getItems().forEach((path) => {
             path.selected = false;
         });
         hideSelectUI();
     }
-    if (
-        sketchController.penMode !== "lasso" &&
-        sketchController.penMode !== "select"
-    ) {
-        sketchController.drawRegion = undefined;
+    if (controller.penMode !== "lasso" && controller.penMode !== "select") {
+        controller.drawRegion = undefined;
         if (regionPath) regionPath.remove();
         penDrop.classList.remove("selected-mode");
     }
 };
 
 const getRGBA = () => {
-    let rgba = sketchController.strokeColor.replace(/[^\d,]/g, "").split(",");
-    rgba[3] = sketchController.opacity;
+    let rgba = controller.strokeColor.replace(/[^\d,]/g, "").split(",");
+    rgba[3] = controller.opacity;
     return `rgba(${rgba.join()})`;
 };
 
 const setLineLabels = (layer) => {
-    let res = sketchController.maxCurves - layer.children.length;
-    sketchController.addLines = res > 0 ? res : 0;
+    let res = controller.maxCurves - layer.children.length;
+    controller.addLines = res > 0 ? res : 0;
     document.getElementById(
         "max-lines"
-    ).innerHTML = `Lines : ${sketchController.maxCurves}`;
+    ).innerHTML = `Lines : ${controller.maxCurves}`;
     document.getElementById(
         "calc-lines"
-    ).innerHTML = `Add : ${sketchController.addLines}`;
+    ).innerHTML = `Add : ${controller.addLines}`;
 };
 
 const createGroup = (items) => {
@@ -739,7 +648,7 @@ const createGroup = (items) => {
     rotateNumber.value = 0;
     scaleSlider.value = 10;
     scaleSlider.value = 10;
-    sketchController.transformGroup = new Group({
+    controller.transformGroup = new Group({
         children: items,
         strokeScaling: false,
         transformContent: false,
@@ -752,7 +661,7 @@ const downloadSketch = () => {
         path.selected = false;
     });
     // Remove the select box
-    sketchController.svg = paper.project.exportSVG({
+    controller.svg = paper.project.exportSVG({
         asString: true,
     });
     logger.event("save-sketch");
@@ -778,10 +687,10 @@ const downloadSketch = () => {
 };
 
 const pauseActiveDrawer = () => {
-    if (sketchController.activeStates.includes(sketchController.drawState)) {
+    if (controller.activeStates.includes(controller.drawState)) {
         // TO DO: check if can just check if clip is drawing.. should work?
         liveCollab = true;
-        sketchController.pause(); //continue on pen up
+        controller.pause(); //continue on pen up
         aiMessage.classList.remove("typed-out");
         aiMessage.innerHTML = `I'mma let you finish...`;
         aiMessage.classList.add("typed-out");

@@ -9,7 +9,8 @@ function dragentercanvas(e) {
 
 function dropCanvas(e) {
     canvas.classList.remove("drop-ready");
-    importStaticSketch(e.dataTransfer.getData("text/plain"));
+    let i = e.dataTransfer.getData("text/plain");
+    controller.sketches[i].import();
 }
 
 function dragleavecanvas(e) {
@@ -37,11 +38,15 @@ function dragleavesketch(e) {
 function dropSketch(e) {
     sketchGrid.classList.remove("drop-ready");
     const sketchCountIndex = e.dataTransfer.getData("text/plain");
-    let dragItem = document.querySelector(`#AI-sketch-item-${sketchCountIndex}`);
-    if (dragItem) {
-        toSketchbook(sketchCountIndex); //backup current
+    if (document.querySelector(`#AI-sketch-item-${sketchCountIndex}`)) {
+        saveStatic(
+            controller.sketches[sketchCountIndex].exportJSON(),
+            controller.sketches[sketchCountIndex].num
+        );
     }
 }
+
+// sketch.saveStatic()
 
 sketchGrid.addEventListener("dragover", dragoverhover);
 // sketchGrid.addEventListener("dragenter", dragentersketches);
@@ -57,9 +62,9 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
 document.querySelectorAll(".swatch").forEach((elem) => {
     elem.addEventListener("click", () => {
         let col = window.getComputedStyle(elem).backgroundColor;
-        sketchController.opacity = 1;
+        controller.opacity = 1;
         opacitySlider.value = 100;
-        sketchController.strokeColor = col;
+        controller.strokeColor = col;
         getSelectedPaths().forEach((path) => (path.strokeColor = col));
         picker.setColor(col);
     });
@@ -71,15 +76,15 @@ document.getElementById("delete").addEventListener("click", () =>
         message: "Are you sure you want to delete your drawing?",
         confirmAction: () => {
             // Save before clearing
-            sketchController.svg = paper.project.exportSVG({
+            controller.svg = paper.project.exportSVG({
                 asString: true,
             });
             logger.event("clear-sketch");
 
-            sketchController.lastPrompt = null;
+            controller.lastPrompt = null;
             userLayer.clear();
             modal.style.display = "none";
-            sketchController.userPaths = [];
+            controller.userPaths = [];
             updateSelectUI();
         },
     })
@@ -98,17 +103,17 @@ deleteHandler.addEventListener("click", (e) => {
 });
 
 copyHandler.addEventListener("click", (e) => {
-    let offset = sketchController.boundingBox.bounds.width;
+    let offset = controller.boundingBox.bounds.width;
     let paths = getSelectedPaths();
     hideSelectUI(false);
     paths.forEach((path) => {
         let duplicate = path.clone();
         duplicate.position.x += offset;
-        sketchController.userPaths.push(duplicate);
+        controller.userPaths.push(duplicate);
         duplicate.selected = true;
     });
 
-    sketchController.svg = paper.project.exportSVG({
+    controller.svg = paper.project.exportSVG({
         asString: true,
     });
     logger.event("duplicate-selection");
@@ -119,10 +124,10 @@ copyHandler.addEventListener("click", (e) => {
 
 // reviseHandler.addEventListener("click", (e) => {
 //     if (
-//         sketchController.drawState === "inactive" ||
-//         sketchController.drawState === "stop"
+//         controller.drawState === "inactive" ||
+//         controller.drawState === "stop"
 //     ) {
-//         sketchController.draw(false, null, true);
+//         controller.draw(false, null, true);
 //     }
 // });
 
@@ -139,8 +144,8 @@ document.getElementById("begin").addEventListener("click", () => {
 });
 
 document.getElementById("undo").addEventListener("click", () => {
-    if (sketchController.stack.undoStack.length > 0) {
-        const lastEvent = sketchController.stack.undoStack.pop();
+    if (controller.stack.undoStack.length > 0) {
+        const lastEvent = controller.stack.undoStack.pop();
         if (lastEvent.type === "draw-event") {
             let thisPath; //json from redo, otherwise path
             try {
@@ -150,7 +155,7 @@ document.getElementById("undo").addEventListener("click", () => {
                 thisPath = lastEvent.data;
             }
             let copy = thisPath.exportJSON();
-            sketchController.stack.redoStack.push({
+            controller.stack.redoStack.push({
                 type: "draw-event",
                 data: copy,
             }); //so remove does not remove reference
@@ -167,7 +172,7 @@ document.getElementById("undo").addEventListener("click", () => {
                 );
                 addedGroup.remove();
             }
-            sketchController.stack.redoStack.push({
+            controller.stack.redoStack.push({
                 type: "delete-event",
                 data: afterDelete, //use ref
             });
@@ -176,31 +181,31 @@ document.getElementById("undo").addEventListener("click", () => {
             let afterErase = userLayer.exportJSON();
             userLayer.clear();
             userLayer.importJSON(lastEvent.data);
-            sketchController.stack.redoStack.push({
+            controller.stack.redoStack.push({
                 type: "erase-event",
                 data: afterErase, //use ref
             });
         }
 
-        sketchController.svg = paper.project.exportSVG({
+        controller.svg = paper.project.exportSVG({
             asString: true,
         });
         logger.event("undo-" + lastEvent.type);
     }
 });
 document.getElementById("redo").addEventListener("click", () => {
-    if (sketchController.stack.redoStack.length > 0) {
-        const lastEvent = sketchController.stack.redoStack.pop();
+    if (controller.stack.redoStack.length > 0) {
+        const lastEvent = controller.stack.redoStack.pop();
         if (lastEvent.type === "draw-event") {
             let item = new Path();
             item.importJSON(lastEvent.data);
-            sketchController.stack.undoStack.push(lastEvent);
+            controller.stack.undoStack.push(lastEvent);
         }
         if (lastEvent.type === "delete-event") {
             let beforeDelete = userLayer.exportJSON();
             userLayer.clear();
             userLayer.importJSON(lastEvent.data);
-            sketchController.stack.undoStack.push({
+            controller.stack.undoStack.push({
                 type: "delete-event",
                 data: beforeDelete, //use ref
             });
@@ -209,13 +214,13 @@ document.getElementById("redo").addEventListener("click", () => {
             let beforeErase = userLayer.exportJSON();
             userLayer.clear();
             userLayer.importJSON(lastEvent.data);
-            sketchController.stack.undoStack.push({
+            controller.stack.undoStack.push({
                 type: "erase-event",
                 data: beforeErase, //use ref
             });
         }
 
-        sketchController.svg = paper.project.exportSVG({
+        controller.svg = paper.project.exportSVG({
             asString: true,
         });
         logger.event("redo-" + lastEvent.type);
@@ -230,26 +235,26 @@ document.getElementById("width-slider").oninput = function() {
 };
 
 rotateSlider.oninput = function() {
-    rotateSelectGroup(sketchController.transformGroup, this.value);
+    rotateSelectGroup(controller.transformGroup, this.value);
 };
 
 scaleSlider.oninput = function() {
-    scaleSelectGroup(sketchController.transformGroup, this.value / 5);
+    scaleSelectGroup(controller.transformGroup, this.value / 5);
 };
 
 rotateNumber.oninput = function() {
-    rotateSelectGroup(sketchController.transformGroup, this.value);
+    rotateSelectGroup(controller.transformGroup, this.value);
 };
 
 scaleNumber.oninput = function() {
-    scaleSelectGroup(sketchController.transformGroup, this.value / 5);
+    scaleSelectGroup(controller.transformGroup, this.value / 5);
 };
 
 opacitySlider.oninput = function() {
-    sketchController.opacity = this.value / 100;
+    controller.opacity = this.value / 100;
 
-    if (sketchController.transformGroup) {
-        sketchController.transformGroup.children.forEach(
+    if (controller.transformGroup) {
+        controller.transformGroup.children.forEach(
             (child) => (child.opacity = this.value / 100)
         );
     }
@@ -261,7 +266,7 @@ opacitySlider.oninput = function() {
 // document.getElementById("autonomy-slider").oninput = function() {
 //     let val = 11 - this.value;
 //     // 0-10
-//     sketchController.addPaths = val; //used for adding
+//     controller.addPaths = val; //used for adding
 // };
 
 document
@@ -297,11 +302,11 @@ timeKeeper.oninput = function() {
     if (this.value === 0) return; // 0 is pre-generation state
     historyIndex = this.value;
     userLayer.clear();
-    if (sketchController.numTraces > 1) {
+    if (controller.numTraces > 1) {
         showTraceHistoryFrom(historyIndex);
     } else {
-        let stored = sketchController.stack.historyHolder[historyIndex];
-        sketchController.svg = parseFromSvg(
+        let stored = controller.stack.historyHolder[historyIndex];
+        controller.svg = parseFromSvg(
             1,
             stored.svg,
             stored.num,
@@ -309,7 +314,7 @@ timeKeeper.oninput = function() {
             false // don't reapply opacity
         );
     }
-    sketchController.svg = paper.project.exportSVG({
+    controller.svg = paper.project.exportSVG({
         asString: true,
     });
 };
@@ -320,8 +325,8 @@ palette.addEventListener("click", () => {
 });
 
 prompt.addEventListener("input", (e) => {
-    sketchController.prompt = e.target.value;
-    aiMessage.innerHTML = `Sure! I can draw ${sketchController.prompt}...`;
+    controller.prompt = e.target.value;
+    aiMessage.innerHTML = `Sure! I can draw ${controller.prompt}...`;
     document
         .querySelectorAll(".inactive-section")
         .forEach((elem) => elem.classList.remove("inactive-section"));
@@ -329,7 +334,7 @@ prompt.addEventListener("input", (e) => {
 
 document.getElementById("draw").addEventListener("click", () => {
     if (socketConnected) {
-        sketchController.draw();
+        controller.draw();
     }
 });
 
@@ -338,37 +343,35 @@ document.getElementById("inspire").addEventListener("click", () => {
         if (noPrompt()) {
             openModal({
                 title: "Type a prompt first!",
-                message: "You need a target for AI exemplars.",
+                message: "You need a target for AI sketchs.",
             });
             return;
         } else {
-            // TO DO: Clean up old scopes (now unused) // sketchController.inspireScopes
-            const total =
-                sketchController.sketchScopeIndex + Math.floor(Math.random() * 5);
+            // TO DO: Clean up old scopes (now unused) // controller.inspireScopes
+            const total = controller.sketchScopeIndex + Math.floor(Math.random() * 5);
             for (let i = 0; i < 4; i++) {
                 explorer.removeChild(explorer.firstChild);
-                if (sketchController.sketchScopeIndex > total) {
-                    let newElem = newSketchUI(defaults, false);
-                    sketchController.inspireScopes.push(
-                        sketchController.sketchScopeIndex
-                    );
+                if (controller.sketchScopeIndex > total) {
+                    let sketch = new Sketch(null, defaults, controller.userPaths.length);
+                    let newElem = sketch.renderMini();
+                    controller.inspireScopes.push(controller.sketchScopeIndex);
                     explorer.appendChild(newElem);
-                    newElem.classList.add("inactive-exemplar");
+                    newElem.classList.add("inactive-sketch");
                 } else {
-                    let newElem = newSketchUI(
-                        exemplarScope,
-                        false,
-                        sketchController.sketchScopeIndex
+                    let sketch = new Sketch(
+                        controller.sketchScopeIndex,
+                        sketchScope,
+                        controller.userPaths.length, //based on current
+                        "AI"
                     );
-                    sketchController.inspireScopes.push(
-                        sketchController.sketchScopeIndex
-                    );
+                    let newElem = sketch.renderMini();
+                    controller.inspireScopes.push(controller.sketchScopeIndex);
                     explorer.appendChild(newElem);
-                    sketchController.newExploreSketch(sketchController.sketchScopeIndex);
-                    sketchController.sketchScopeIndex += 1;
+                    controller.newExploreSketch(controller.sketchScopeIndex);
+                    controller.sketchScopeIndex += 1;
                 }
             }
-            sketchController.clipDrawing = true;
+            controller.clipDrawing = true;
             setActionUI("explore");
         }
     }
@@ -377,20 +380,20 @@ document.getElementById("inspire").addEventListener("click", () => {
 stopButton.addEventListener("click", () => {
     if (socketConnected) {
         if (
-            sketchController.drawState === "drawing" ||
-            sketchController.drawState === "continuing"
+            controller.drawState === "drawing" ||
+            controller.drawState === "continuing"
         ) {
-            sketchController.stop(); //flag
-            sketchController.clipDrawing = false;
+            controller.stop(); //flag
+            controller.clipDrawing = false;
         } else if (
-            sketchController.drawState === "explore" ||
-            sketchController.drawState === "continue-explore"
+            controller.drawState === "explore" ||
+            controller.drawState === "continue-explore"
         ) {
             aiMessage.innerHTML = "All done! What should we draw next?";
             aiMessage.classList.add("typed-out");
             setActionUI("stopSingle");
             killExploratorySketches();
-            sketchController.clipDrawing = false;
+            controller.clipDrawing = false;
         }
     }
 });
@@ -398,21 +401,21 @@ stopButton.addEventListener("click", () => {
 document.getElementById("prune").addEventListener("click", () => {
     if (socketConnected) {
         if (
-            sketchController.drawState === "stop" ||
-            sketchController.drawState === "stop-prune"
+            controller.drawState === "stop" ||
+            controller.drawState === "stop-prune"
         ) {
             // after  draw
-            sketchController.prune();
+            controller.prune();
         }
     }
 });
 
 document.getElementById("go-back").addEventListener("click", () => {
-    if (sketchController.drawState === "stop") {
-        let stored = sketchController.stack.historyHolder[1];
+    if (controller.drawState === "stop") {
+        let stored = controller.stack.historyHolder[1];
         timeKeeper.value = 1;
         parseFromSvg(1, stored.svg, stored.num, userLayer);
-        sketchController.svg = paper.project.exportSVG({
+        controller.svg = paper.project.exportSVG({
             asString: true,
         });
     }
@@ -540,34 +543,34 @@ document.getElementById("scrapbook").addEventListener("click", () => {
 // });
 
 document.getElementById("save-sketch").addEventListener("click", () => {
-    toSketchbook();
+    saveStatic(extractMainSketch(), controller.userPaths.length);
     logger.event("to-sketchbook");
 });
 
 const autoButton = document.getElementById("autodraw-button");
 autoButton.addEventListener("click", () => {
-    if (sketchController.doneSketching !== null) {
-        sketchController.doneSketching = null; // never add
+    if (controller.doneSketching !== null) {
+        controller.doneSketching = null; // never add
         autoButton.innerHTML = "Solo draw";
     } else {
         autoButton.innerHTML = "Collab draw!";
-        sketchController.doneSketching = 500;
+        controller.doneSketching = 500;
     }
     autoButton.classList.toggle("inactive-pill");
 });
 
 // document.getElementById("show-all-paths").addEventListener("click", () => {
-//     sketchController.showAllLines = !sketchController.showAllLines;
+//     controller.showAllLines = !controller.showAllLines;
 //     document.getElementById("show-all-paths").classList.toggle("inactive-pill");
 // });
 
 document.getElementById("num-squiggles").oninput = function() {
-    sketchController.maxCurves = parseInt(this.value);
+    controller.maxCurves = parseInt(this.value);
     setLineLabels(userLayer);
 };
 
 document.getElementById("num-traces").oninput = function() {
-    sketchController.numTraces = parseInt(this.value);
+    controller.numTraces = parseInt(this.value);
 };
 
 document.getElementById("overwrite").addEventListener("click", () => {
@@ -581,30 +584,30 @@ document.getElementById("overwrite").addEventListener("click", () => {
 });
 
 const respectSlider = document.getElementById("respect-slider");
-let lastFixation = sketchController.useFixation;
+let lastFixation = controller.useFixation;
 
 respectSlider.oninput = function() {
-    sketchController.useFixation = parseInt(this.value);
-    let msg = sketchController.useFixation > 2 ? "More" : "Less";
+    controller.useFixation = parseInt(this.value);
+    let msg = controller.useFixation > 2 ? "More" : "Less";
     document.getElementById("fix-label").innerHTML = msg;
 };
 
 respectSlider.onmousedown = () => {
     pauseActiveDrawer();
-    lastFixation = sketchController.useFixation;
+    lastFixation = controller.useFixation;
 };
 
 respectSlider.onmouseup = () => {
     if (liveCollab) {
-        if (sketchController.useFixation !== lastFixation) {
-            sketchController.continueSketch();
+        if (controller.useFixation !== lastFixation) {
+            controller.continueSketch();
         }
         liveCollab = false;
     }
 };
 
 // document.getElementById("set-background").onclick = function() {
-//     canvas.style.backgroundColor = sketchController.strokeColor;
+//     canvas.style.backgroundColor = controller.strokeColor;
 // };
 
 // document.getElementById("moodboard-cross").addEventListener("click", () => {
@@ -637,14 +640,14 @@ if (!useAI) {
 
     var loadedPartial = userLayer.importSVG(partial);
     loadedPartial.set({
-        opacity: sketchController.opacity,
+        opacity: controller.opacity,
         strokeCap: "round",
         strokeJoin: "round",
     });
     loadedPartial.getItems().forEach((item) => {
         if (item instanceof Path) {
             let newElem = userLayer.addChild(item.clone());
-            sketchController.userPaths.push(newElem);
+            controller.userPaths.push(newElem);
         }
     });
     loadedPartial.remove();
@@ -652,7 +655,7 @@ if (!useAI) {
 
     scaleGroup(userLayer, scaleTo);
 
-    sketchController.svg = paper.project.exportSVG({
+    controller.svg = paper.project.exportSVG({
         asString: true,
     });
 }
@@ -666,11 +669,11 @@ const picker = new Picker({
     editorFormat: "hex", // or 'rgb', 'hsl'
 });
 
-picker.setColor(sketchController.strokeColor);
+picker.setColor(controller.strokeColor);
 picker.onChange = (color) => {
-    sketchController.strokeColor = color.rgbaString;
+    controller.strokeColor = color.rgbaString;
     getSelectedPaths().forEach(
-        (item) => (item.strokeColor = sketchController.strokeColor)
+        (item) => (item.strokeColor = controller.strokeColor)
     );
     let rgba = getRGBA();
     document.getElementById("pen-color").style.background = rgba;
@@ -684,9 +687,10 @@ setActionUI("inactive");
 const defaults = new PaperScope();
 defaults.activate();
 for (let i = 0; i < 4; i++) {
-    let newElem = newSketchUI(defaults, false);
-    // sketchController.sketchScopeIndex += 1; //remove later
-    newElem.classList.add("inactive-exemplar");
+    let sketch = new Sketch(null, defaults, null);
+    let newElem = sketch.renderMini();
+    // controller.sketchScopeIndex += 1; //remove later
+    newElem.classList.add("inactive-sketch");
     document.getElementById("explore-sketches").appendChild(newElem);
 }
 

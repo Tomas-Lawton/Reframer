@@ -5,9 +5,9 @@ let sketchTimer;
 multiTool.onMouseDown = function(event) {
     // refactor for multitouch
     clearTimeout(sketchTimer);
-    // sketchController.resetMetaControls();
+    // controller.resetMetaControls();
 
-    switch (sketchController.penMode) {
+    switch (controller.penMode) {
         case "select":
             console.log(userLayer);
 
@@ -21,12 +21,12 @@ multiTool.onMouseDown = function(event) {
 
             // TO change to simple hit test
             let isInBounds = null;
-            if (sketchController.boundingBox) {
+            if (controller.boundingBox) {
                 isInBounds =
-                    event.point.x > sketchController.boundingBox.bounds.left &&
-                    event.point.x < sketchController.boundingBox.bounds.right &&
-                    event.point.y > sketchController.boundingBox.bounds.top &&
-                    event.point.y < sketchController.boundingBox.bounds.bottom;
+                    event.point.x > controller.boundingBox.bounds.left &&
+                    event.point.x < controller.boundingBox.bounds.right &&
+                    event.point.y > controller.boundingBox.bounds.top &&
+                    event.point.y < controller.boundingBox.bounds.bottom;
             }
 
             // DESELECT
@@ -38,30 +38,30 @@ multiTool.onMouseDown = function(event) {
                     path.selected = false;
                 });
 
-                if (sketchController.transformGroup !== null) {
-                    sketchController.transformGroup.remove();
-                    sketchController.transformGroup = null;
+                if (controller.transformGroup !== null) {
+                    controller.transformGroup.remove();
+                    controller.transformGroup = null;
                 }
 
                 // Update
-                sketchController.svg = paper.project.exportSVG({
+                controller.svg = paper.project.exportSVG({
                     asString: true,
                 });
                 setLineLabels(userLayer);
 
                 // Continue
                 if (liveCollab) {
-                    sketchController.continueSketch();
+                    controller.continueSketch();
                     liveCollab = false;
                 }
-                sketchController.selectBox = new Rectangle(event.point);
+                controller.selectBox = new Rectangle(event.point);
             }
 
             if (hitResult) {
                 pauseActiveDrawer();
 
                 // got path
-                if (sketchController.boundingBox) {
+                if (controller.boundingBox) {
                     hideSelectUI();
                 }
                 unpackGroup();
@@ -77,9 +77,9 @@ multiTool.onMouseDown = function(event) {
             pauseActiveDrawer();
 
             myPath = new Path({
-                strokeColor: sketchController.strokeColor,
-                strokeWidth: sketchController.strokeWidth,
-                opacity: sketchController.opacity,
+                strokeColor: controller.strokeColor,
+                strokeWidth: controller.strokeWidth,
+                opacity: controller.opacity,
                 strokeCap: "round",
                 strokeJoin: "round",
             });
@@ -90,44 +90,44 @@ multiTool.onMouseDown = function(event) {
             }); //make a segment on touch down (one point)
             break;
         case "lasso":
-            sketchController.drawRegion = new Rectangle(event.point);
+            controller.drawRegion = new Rectangle(event.point);
             break;
     }
 };
 
 multiTool.onMouseDrag = function(event) {
-    switch (sketchController.penMode) {
+    switch (controller.penMode) {
         case "pen":
             myPath.add(event.point);
             myPath.smooth();
             break;
         case "select":
-            if (sketchController.boundingBox) {
+            if (controller.boundingBox) {
                 //moving box
-                if (sketchController.boundingBox.data.state === "moving") {
+                if (controller.boundingBox.data.state === "moving") {
                     const selectedPaths = getSelectedPaths(); // all selected
                     selectedPaths[0].children.forEach((path) => {
                         path.position.x += event.delta.x;
                         path.position.y += event.delta.y;
-                        sketchController.userPaths = sketchController.userPaths.filter(
+                        controller.userPaths = controller.userPaths.filter(
                             (item) => item !== path
                         ); //remove ref
-                        sketchController.userPaths.push(path);
+                        controller.userPaths.push(path);
                         path.opacity = 1;
                     });
-                    sketchController.boundingBox.position.x += event.delta.x;
-                    sketchController.boundingBox.position.y += event.delta.y;
+                    controller.boundingBox.position.x += event.delta.x;
+                    controller.boundingBox.position.y += event.delta.y;
                     updateSelectUI();
                 }
-            } else if (sketchController.selectBox !== undefined) {
+            } else if (controller.selectBox !== undefined) {
                 //creating box
                 pauseActiveDrawer();
-                sketchController.selectBox.width += event.delta.x;
-                sketchController.selectBox.height += event.delta.y;
+                controller.selectBox.width += event.delta.x;
+                controller.selectBox.height += event.delta.y;
                 if (selectBox) {
                     selectBox.remove();
                 } // redraw //REFACTOR
-                selectBox = new Path.Rectangle(sketchController.selectBox);
+                selectBox = new Path.Rectangle(controller.selectBox);
                 selectBox.set({
                     fillColor: "#f5f5f5",
                     opacity: 0.4,
@@ -137,10 +137,10 @@ multiTool.onMouseDrag = function(event) {
             }
             break;
         case "lasso":
-            sketchController.drawRegion.width += event.delta.x;
-            sketchController.drawRegion.height += event.delta.y;
+            controller.drawRegion.width += event.delta.x;
+            controller.drawRegion.height += event.delta.y;
             if (regionPath !== undefined) regionPath.remove(); // redraw //REFACTOR
-            regionPath = new Path.Rectangle(sketchController.drawRegion);
+            regionPath = new Path.Rectangle(controller.drawRegion);
             regionPath.set({
                 // fillColor: "#e9e9ff",
                 fillColor: "#f5f5f5",
@@ -155,19 +155,19 @@ multiTool.onMouseDrag = function(event) {
 
 multiTool.onMouseUp = function() {
     // so the latest sketch is available to the drawer
-    sketchController.svg = paper.project.exportSVG({
+    controller.svg = paper.project.exportSVG({
         asString: true,
     });
 
-    switch (sketchController.penMode) {
+    switch (controller.penMode) {
         case "select":
             if (selectBox) {
                 //moving selection
                 let items = userLayer.getItems({ inside: selectBox.bounds });
                 items.pop().remove();
                 items.forEach((item) => (item.selected = true));
-                if (sketchController.selectBox) {
-                    sketchController.selectBox = null;
+                if (controller.selectBox) {
+                    controller.selectBox = null;
                     selectBox.remove();
                     selectBox = null;
                 }
@@ -179,75 +179,75 @@ multiTool.onMouseUp = function() {
                 updateSelectUI();
             }
             // console.log("LAYER ", userLayer.children);
-            // console.log("Ref: ", sketchController.userPaths);
+            // console.log("Ref: ", controller.userPaths);
             break;
         case "pen":
             myPath.simplify();
             // sendPaths();
-            sketchController.stack.undoStack.push({
+            controller.stack.undoStack.push({
                 type: "draw-event",
                 data: myPath,
             });
 
-            sketchController.svg = paper.project.exportSVG({
+            controller.svg = paper.project.exportSVG({
                 asString: true,
             });
 
-            sketchController.userPaths.push(myPath);
+            controller.userPaths.push(myPath);
 
             if (liveCollab) {
-                sketchController.continueSketch();
+                controller.continueSketch();
                 liveCollab = false;
             } else {
                 //just drawing
                 if (!noPrompt() &&
-                    sketchController.doneSketching !== null &&
+                    controller.doneSketching !== null &&
                     socketConnected
                 ) {
                     clearTimeout(sketchTimer);
-                    sketchTimer = setTimeout(userStuck, sketchController.doneSketching);
+                    sketchTimer = setTimeout(userStuck, controller.doneSketching);
 
                     function userStuck() {
-                        sketchController.draw();
+                        controller.draw();
                     }
                 }
             }
-            sketchController.svg = paper.project.exportSVG({
+            controller.svg = paper.project.exportSVG({
                 asString: true,
             });
             setLineLabels(userLayer);
             break;
         case "lasso":
             if (socketConnected) {
-                sketchController.resetSketch(); //reset since not continuing
-                sketchController.draw(true);
-                sketchController.clipDrawing = true;
+                controller.resetSketch(); //reset since not continuing
+                controller.draw(true);
+                controller.clipDrawing = true;
                 regionPath.remove();
             }
-            sketchController.svg = paper.project.exportSVG({
+            controller.svg = paper.project.exportSVG({
                 asString: true,
             });
             setLineLabels(userLayer);
             break;
     }
     // remove??
-    if (sketchController.boundingBox) {
-        sketchController.boundingBox.data.state = "moving";
+    if (controller.boundingBox) {
+        controller.boundingBox.data.state = "moving";
     }
 
-    logger.event(sketchController.penMode + "-up");
+    logger.event(controller.penMode + "-up");
 };
 
 eraseTool.onMouseDown = function(event) {
     pauseActiveDrawer();
-    // sketchController.resetMetaControls();
+    // controller.resetMetaControls();
 
-    sketchController.stack.undoStack.push({
+    controller.stack.undoStack.push({
         type: "erase-event",
         data: userLayer.exportJSON(),
     });
     erasorPath = new Path({
-        strokeWidth: sketchController.strokeWidth * 5,
+        strokeWidth: controller.strokeWidth * 5,
         strokeCap: "round",
         strokeJoin: "round",
         opacity: 0.85,
@@ -270,7 +270,7 @@ eraseTool.onMouseDrag = function(event) {
 
 eraseTool.onMouseUp = function(event) {
     erasorPath.simplify();
-    const eraseRadius = (sketchController.strokeWidth * 5) / 2;
+    const eraseRadius = (controller.strokeWidth * 5) / 2;
     const outerPath = OffsetUtils.offsetPath(erasorPath, eraseRadius);
     const innerPath = OffsetUtils.offsetPath(erasorPath, -eraseRadius);
     erasorPath.remove();
@@ -313,14 +313,14 @@ eraseTool.onMouseUp = function(event) {
             erasorItem.parent.insertChildren(erasorItem.index, splitPaths);
             let newList = [];
             let foundUserPath = false;
-            for (let i = 0; i < sketchController.userPaths.length; i++) {
-                if (sketchController.userPaths[i] === erasorItem) {
+            for (let i = 0; i < controller.userPaths.length; i++) {
+                if (controller.userPaths[i] === erasorItem) {
                     splitPaths.forEach((newPath) => {
                         newList.push(newPath); // replace
                     });
                     foundUserPath = true;
                 } else {
-                    newList.push(sketchController.userPaths[i]);
+                    newList.push(controller.userPaths[i]);
                 }
             }
             if (!foundUserPath) {
@@ -332,29 +332,29 @@ eraseTool.onMouseUp = function(event) {
                 });
             }
 
-            sketchController.userPaths = newList;
+            controller.userPaths = newList;
             erasorItem.remove();
             result.remove(); //remove the compound paths
         } else {
             // don't split
             if (result.length === 0) {
-                sketchController.userPaths = sketchController.userPaths.filter(
+                controller.userPaths = controller.userPaths.filter(
                     (ref) => ref !== erasorItem
                 ); //remove ref
                 erasorItem.remove();
             } else {
-                sketchController.userPaths = sketchController.userPaths.filter(
+                controller.userPaths = controller.userPaths.filter(
                     (ref) => ref !== erasorItem
                 );
                 erasorItem.replaceWith(result); //replace
-                sketchController.userPaths.push(result); //replace
+                controller.userPaths.push(result); //replace
             }
         }
     });
     userLayer.addChildren(tmpGroup.removeChildren());
     mask.remove();
 
-    sketchController.svg = paper.project.exportSVG({
+    controller.svg = paper.project.exportSVG({
         asString: true,
     });
     setLineLabels(userLayer);
@@ -362,7 +362,7 @@ eraseTool.onMouseUp = function(event) {
     logger.event("erase-up");
 
     if (liveCollab) {
-        sketchController.continueSketch();
+        controller.continueSketch();
         liveCollab = false;
     }
 };

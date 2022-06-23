@@ -81,7 +81,7 @@ let liveCollab = false;
 let allowOverwrite = true;
 let myPath, erasePath, regionPath, tmpGroup, mask, selectBox;
 
-const exemplarTemplate = document.getElementById("exemplar-template");
+const sketchTemplate = document.getElementById("sketch-template");
 
 const padding = parseInt(
     window
@@ -93,11 +93,11 @@ const containerRect = document
     .getElementById("contain-canvas")
     .getBoundingClientRect();
 
-const exemplarSize =
-    document.querySelectorAll("div#exemplar-grid")[0].offsetWidth / 2 - 5;
-const reusableExemplar = exemplarTemplate.cloneNode(true); //clone to use
-exemplarTemplate.remove();
-// console.log(exemplarSize);
+const sketchSize =
+    document.querySelectorAll("div#sketch-grid")[0].offsetWidth / 2 - 5;
+const reusableExemplar = sketchTemplate.cloneNode(true); //clone to use
+sketchTemplate.remove();
+// console.log(sketchSize);
 
 if (containerRect.width > window.innerHeight) {
     canvas.width = window.innerHeight - padding * 2;
@@ -107,13 +107,13 @@ if (containerRect.width > window.innerHeight) {
     canvas.width = containerRect.width - padding * 2;
 }
 
-const scaleRatio = canvas.width / exemplarSize;
+const scaleRatio = canvas.width / sketchSize;
 
 // Paper Setup
 paper.install(window);
 const scope = new PaperScope();
-const exemplarScope = new PaperScope();
-exemplarScope.activate();
+const sketchScope = new PaperScope();
+sketchScope.activate();
 scope.setup(canvas);
 scope.activate();
 

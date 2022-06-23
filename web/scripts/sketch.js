@@ -6,7 +6,7 @@ class SimpleStack {
     }
 }
 
-class SketchHandler {
+class Controller {
     // Maintains a logical state for sending over WS
     constructor() {
         this.drawState;
@@ -18,7 +18,7 @@ class SketchHandler {
         }); //for svg parsing
         this.frameSize = canvas.getBoundingClientRect().width;
         this.inspireScopes = [];
-        this.staticScopes = [];
+        this.sketches = {};
 
         // Defaults
         this.strokeColor = "rgb(24,24,24)";
@@ -140,7 +140,7 @@ class SketchHandler {
         if (!this.clipDrawing) {
             this.clipDrawing = true;
             this.targetDrawing = false;
-            sketchController.linesDisabled = disableLines;
+            controller.linesDisabled = disableLines;
             this.svg = this.sortPaths();
             setLineLabels(userLayer);
             document.getElementById("calc-lines").innerHTML = `Add : 0`;
@@ -163,18 +163,18 @@ class SketchHandler {
     }
     newExploreSketch(sketchCountIndex) {
         if (!this.clipDrawing) {
-            if (!exemplarSize) {
-                console.error("exemplars not found");
+            if (!sketchSize) {
+                console.error("sketchs not found");
             }
             this.targetDrawing = true;
             setLineLabels(userLayer);
             document.getElementById("calc-lines").innerHTML = `Add : 0`;
 
             this.updateDrawer({
-                status: "add_new_exemplar",
+                status: "add_new_sketch",
                 svg: this.svg,
                 hasRegion: false,
-                frameSize: exemplarSize,
+                frameSize: sketchSize,
                 prompt: this.prompt,
                 lines: this.addLines,
                 sketchScopeIndex: sketchCountIndex,
@@ -198,7 +198,7 @@ class SketchHandler {
                 //                 svg: this.svg,
                 //                 frameSize: this.frameSize, //can remove?
                 //                 fixation: this.useFixation,
-                //                 sketchScopeIndex: sketchController.inspireScopes[i],
+                //                 sketchScopeIndex: controller.inspireScopes[i],
                 //             });
                 //             setActionUI("continue-explore");
                 //         } catch (e) {
@@ -263,4 +263,130 @@ class SketchHandler {
     }
 }
 
-sketchController = new SketchHandler();
+controller = new Controller();
+
+class Sketch {
+    constructor(i = null, scope, userPaths, type = "default") {
+        this.i = i;
+        this.userPaths = userPaths;
+        this.useScope = scope;
+        this.type = type; //U or AI or Main?
+        this.svg; //sorted already
+        this.elem; //DOM elem
+
+        controller.sketches[this.i] = this;
+        console.log("Created: ", this.i);
+    }
+    renderMini() {
+        let domIdx = this.i;
+
+        let newElem = sketchTemplate.cloneNode(reusableExemplar);
+        newElem.style.visibility = "initial";
+
+        let sketchCanvas = newElem.querySelector("canvas");
+        sketchCanvas.width = sketchSize;
+        sketchCanvas.height = sketchSize;
+        this.useScope.setup(sketchCanvas);
+
+        if (domIdx !== null) {
+            let removeButton = newElem.querySelector(".fa-minus");
+            let stopButton = newElem.querySelector(".fa-stop");
+            let loader = newElem.querySelector(".card-loading");
+
+            newElem.id = `${this.type}-sketch-item-${domIdx}`;
+            sketchCanvas.id = `${this.type}-sketch-canvas-${domIdx}`;
+            newElem.querySelector("h3").innerHTML = `${this.type}${domIdx}`;
+
+            if (this.type === "U") {
+                stopButton.style.display = "none";
+                loader.style.display = "none";
+                removeButton.addEventListener("click", () => {
+                    newElem.remove();
+                });
+            } else {
+                stopButton.addEventListener("click", () => {
+                    loader.classList.remove("button-animation");
+                    loader.classList.remove("fa-spinner");
+                    loader.classList.add("fa-check");
+                    stopButton.style.background = "#f5f5f5";
+                    stopButton.style.background = "#d2d2d2";
+
+                    controller.stopSingle(domIdx);
+                });
+                removeButton.addEventListener("click", () => {
+                    newElem.classList.add("inactive-sketch");
+                    controller.stopSingle(domIdx);
+                });
+            }
+
+            sketchCanvas.addEventListener("click", () => {
+                this.import();
+                controller.resetMetaControls();
+            });
+            // Make draggable
+            newElem.addEventListener(
+                "dragstart",
+                function(e) {
+                    e.dataTransfer.setData("text/plain", domIdx);
+                },
+                false
+            );
+        } else {
+            newElem.id = `default-sketch-item`;
+            sketchCanvas.id = `default-canvas`;
+        }
+
+        this.elem = newElem;
+        return this.elem;
+    }
+    import () {
+        let i = this.i;
+        if (allowOverwrite) {
+            openModal({
+                title: "Overwriting Canvas",
+                message: "Import into the main canvas? Contents will be saved.",
+                confirmAction: () => {
+                    pauseActiveDrawer();
+                    saveStatic(extractMainSketch(), controller.userPaths.length);
+                    toMainSketch(i, true); //overwrite
+                },
+            });
+        } else {
+            pauseActiveDrawer();
+            saveStatic(extractMainSketch(), controller.userPaths.length);
+            toMainSketch(i, false); //copy traces
+        }
+    }
+    extractJSON() {
+        let i = this.i;
+        let copy = sketchScope.projects[i].activeLayer.clone({
+            insert: false,
+        });
+        copy.getItems().forEach((path) => {
+            path.selected = false;
+        });
+        return copy.exportJSON();
+    }
+
+    updateSVG() {
+        // set svg data
+        // parsefromSVG here????
+    }
+    importToMain() {
+        //
+    }
+    exportToStatic() {
+        //
+    }
+    save() {
+        //
+    }
+    remove() {
+        // delete
+    }
+    stop() {
+        // tell controll to stop this i
+    }
+}
+
+// mainSketch = new Sketch(null, scope, 0, "Main");
