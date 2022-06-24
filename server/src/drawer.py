@@ -64,7 +64,6 @@ class CICADA:
         self.num_user_paths = None
 
     def set_text_features(self, text_features, neg_text_features=[]):
-        print('\n\n tfs',text_features,'\n\n')
         self.text_features = text_features
         self.neg_text_features = neg_text_features
         logging.info("Updated CLIP prompt features")
@@ -406,17 +405,13 @@ class CICADA:
         if svg_string is not None:
             with open('data/interface_paths.svg', 'w') as f:
                 f.write(svg_string)
-        print('aslndasdsaonsdondoansaosnfsoain',prompt)
         prompt_features = self.clip_interface.encode_text_classes(prompt)
-        print('aslndasdsaonsdondoansaosnfsoain',prompt_features)
         try:
             self.reset()
             logging.info("Starting clip drawer")
             prompt_features = self.clip_interface.encode_text_classes([prompt])
-            # neg_prompt_features = self.clip_interface.encode_text_classes(neg_prompt)
-            neg_prompt_features=[]
+            neg_prompt_features = self.clip_interface.encode_text_classes(neg_prompt)
             self.set_text_features(prompt_features, neg_prompt_features)
-            print('aslndasdsaonsdondoansaosnfsoain', prompt_features)
         except Exception as e:
             logging.error(e)
             logging.error("Failed to encode features in clip")
