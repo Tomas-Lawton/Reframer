@@ -6,6 +6,7 @@ import logging
 from util.clip_utility import get_noun_data
 import numpy as np
 
+device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 class Clip_Instance:
     """Init clip, then configure the classifier type, then set the required img/class/prompt parameters"""
@@ -107,7 +108,7 @@ class Clip_Instance:
         tokens = []
         if token_list != []:
             try:
-                tokens = clip.tokenize(token_list)
+                tokens = clip.tokenize(token_list).to(device)
             except Exception as e:
                 logging.error(e)
                 logging.error(f"Failed to tokenize: {token_list}")
