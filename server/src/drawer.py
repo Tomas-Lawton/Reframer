@@ -32,7 +32,7 @@ class CICADA:
         self.canvas_h = 224
         self.canvas_w = 224
         # Algorithm parameters
-        self.num_iter = 1001
+        self.num_iter = 2001
         self.w_points = 0.01
         self.w_colors = 0.1
         self.w_widths = 0.01
@@ -465,8 +465,8 @@ class CICADA:
         while self.is_running and self.iteration < self.num_iter:
             try:
                 self.run_epoch()
-                # if self.iteration % self.refresh_rate == 0:
-                await self.render_and_save(self.iteration, self.losses['global'])
+                if self.iteration % self.refresh_rate == 0:
+                    await self.render_and_save(self.iteration, self.losses['global'])
             except Exception as e:
                 logging.info("Iteration failed on: ", self.sketch_reference_index)
                 await self.stop()

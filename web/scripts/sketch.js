@@ -273,7 +273,8 @@ class Sketch {
         this.useLayer.insertChildren(g.index, g.removeChildren());
         mainSketch.userPathList = [];
         this.useLayer.getItems().forEach((path, i) => {
-            i < n ? mainSketch.userPathList.push(path) : a && (path.opacity *= 0.5);
+            i < n && mainSketch.userPathList.push(path)
+            // i < n ? mainSketch.userPathList.push(path) : a && (path.opacity *= 0.5);
         });
         return svg;
     }

@@ -96,16 +96,12 @@ class Clip_Instance:
         tokens = []
         if token_list != []:
             try:
-                # tokens = clip.tokenize(token_list).to(device)
-                tokens = clip.tokenize(token_list)
-                tokens.to(device)
+                tokens = clip.tokenize(token_list).to(device)
             except Exception as e:
                 logging.error(e)
                 logging.error(f"Failed to tokenize: {token_list}")
         if tokens == []:
             return tokens
-        # if self.device == 'cuda:0':
-        # tokens = tokens.to('cuda:0')
         with torch.no_grad():
             text_features = self.model.encode_text(tokens)  # normalise
             return text_features / text_features.norm(dim=-1, keepdim=True)

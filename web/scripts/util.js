@@ -272,9 +272,11 @@ const loadResponse = (result) => {
 
         // Prune Main
         if (controller.drawState == "pruning") {
+            incrementHistory();
             updateMainSketch(result);
             setActionUI("stop-prune");
             controller.clipDrawing = false; //single update
+            incrementHistory();
         }
     }
 };
