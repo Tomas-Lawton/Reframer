@@ -405,6 +405,7 @@ class CICADA:
         if svg_string is not None:
             with open('data/interface_paths.svg', 'w') as f:
                 f.write(svg_string)
+        prompt_features = self.clip_interface.encode_text_classes(prompt)
         try:
             self.reset()
             logging.info("Starting clip drawer")
