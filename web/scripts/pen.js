@@ -226,7 +226,7 @@ multiTool.onMouseUp = function() {
             break;
         case "lasso":
             if (socketConnected) {
-                controller.resetSketch(); //reset since not continuing
+                controller.resetMetaControls(); //reset since not continuing
                 controller.draw(true);
                 controller.clipDrawing = true;
                 regionPath.remove();
