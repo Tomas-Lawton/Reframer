@@ -24,19 +24,7 @@ class Clip_Instance:
         assert tv >= 10701, "PyTorch 1.7.1 or later is required"
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        # logging.info(f"These clip models are available: \n{clip.available_models()}")
         self.model, self.preprocess = clip.load('ViT-B/32', self.device, jit=False)
-        input_resolution = self.model.visual.input_resolution
-        context_length = self.model.context_length
-        vocab_size = self.model.vocab_size
-
-        # logging.info(
-        #     f"Model parameters: {np.sum([int(np.prod(p.shape)) for p in self.model.parameters()]):,}"
-        # )
-        # logging.info(f"Input resolution: {input_resolution}")
-        # logging.info(f"Context length: {context_length}")
-        # logging.info(f"Vocab size: {vocab_size}")
-
         self.preprocess
         logging.info("Model ready")
         Clip_Instance.__instance == self
@@ -108,7 +96,9 @@ class Clip_Instance:
         tokens = []
         if token_list != []:
             try:
-                tokens = clip.tokenize(token_list).to(device)
+                # tokens = clip.tokenize(token_list).to(device)
+                tokens = clip.tokenize(token_list)
+                tokens.to(device)
             except Exception as e:
                 logging.error(e)
                 logging.error(f"Failed to tokenize: {token_list}")

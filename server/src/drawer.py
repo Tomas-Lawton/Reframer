@@ -395,7 +395,6 @@ class CICADA:
         """Use current paths with the given (possibly different) prompt to generate options"""
         logging.info("Updating...")
         prompt = data["data"]["prompt"]
-        neg_prompt = []
         svg_string = data["data"]["svg"]
         region = data["data"]["region"]
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
@@ -410,7 +409,7 @@ class CICADA:
             self.reset()
             logging.info("Starting clip drawer")
             prompt_features = self.clip_interface.encode_text_classes([prompt])
-            neg_prompt_features = self.clip_interface.encode_text_classes(neg_prompt)
+            neg_prompt_features = self.clip_interface.encode_text_classes([])
             self.set_text_features(prompt_features, neg_prompt_features)
         except Exception as e:
             logging.error(e)
