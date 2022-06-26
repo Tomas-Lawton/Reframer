@@ -242,6 +242,7 @@ const getRGBA = () => {
 
 const setLineLabels = (layer) => {
     let res = controller.maxCurves - layer.children.length;
+    console.log(res);
     controller.addLines = res > 0 ? res : 0;
     document.getElementById(
         "max-lines"

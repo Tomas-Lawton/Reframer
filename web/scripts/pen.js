@@ -180,7 +180,8 @@ sketchTool.onMouseUp = function() {
                 //after moving
                 //moving selection
                 let items = userLayer.getItems({ inside: selectBox.bounds });
-                items.pop().remove();
+                let rect = items.pop();
+                if (rect) rect.remove(); // can be undefined if flat box
                 items.forEach((item) => (item.selected = true));
                 if (controller.selectBox) {
                     controller.selectBox = null;
