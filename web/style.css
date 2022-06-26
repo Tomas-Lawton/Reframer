@@ -457,7 +457,8 @@ hr {
     padding: 0.4em;
     transition: 0.5s;
     border-radius: 0.5em;
-    margin: 0.2em 0 0.3em 0;
+    /* margin: 0.2em 0 0.3em 0; */
+    margin: 0.2em 0.2em 0.4em 0.2em;
 }
 
 
@@ -668,10 +669,23 @@ hr {
     margin-left: 10px;
 }
 
+#message {
+    color: #7b66ff;
+    text-align: center;
+    margin: 1em 0;
+    display: flex;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    width: 100%;
+}
+
 #prompt-input {
     border-radius: 3.5em;
     display: flex;
-    padding: 0.6em;
+    /* padding: 0.6em; */
+    padding: 1.6em;
     font-size: 1em;
     align-items: center;
     color: white;
@@ -681,9 +695,11 @@ hr {
     margin: 0 0 1em 0;
     background: #f5f5f5;
     /* background: #f3f1ff; */
+    /* background: #f3f1ff; */
+    /* color: #7b66ff; */
     font-weight: 500;
     pointer-events: all;
-    box-shadow: inset 2px 4px 10px rgb(0 0 0 / 8%);
+    /* box-shadow: inset 2px 4px 10px rgb(0 0 0 / 8%); */
 }
 
 textarea:focus,
@@ -713,8 +729,10 @@ input:focus {
     /* background: #7b66ff; */
     background: #f5f5f5;
     /* background: #f3f1ff; */
-    color: #7b66ff;
+    /* color: #7b66ff; */
     padding-left: 0.8em;
+    /* background: #f3f1ff; */
+    color: #7b66ff;
 }
 
 .typed-out {
@@ -1027,7 +1045,8 @@ input[type="number"] {
     right: 0;
     position: absolute;
     /* display: flex; */
-    justify-content: center;
+    /* justify-content: center; */
+    justify-content: space-evenly;
     display: none;
     display: flex;
     top: 1em;

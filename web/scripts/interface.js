@@ -65,6 +65,7 @@ document.querySelectorAll(".swatch").forEach((elem) => {
         controller.strokeColor = col;
         getSelectedPaths().forEach((path) => (path.strokeColor = col));
         picker.setColor(col);
+        setPenMode("pen", pen);
     });
 });
 
@@ -336,11 +337,14 @@ palette.addEventListener("click", () => {
 });
 
 prompt.addEventListener("input", (e) => {
-    controller.prompt = e.target.value;
-    aiMessage.innerHTML = `Sure! I can draw ${controller.prompt}...`;
-    document
-        .querySelectorAll(".inactive-section")
-        .forEach((elem) => elem.classList.remove("inactive-section"));
+    controller.prompt = e.target.value.toLowerCase();
+    if (controller.prompt === "") {
+        aiMessage.innerHTML = ` What are we drawing?`;
+        controllerUI.forEach((elem) => elem.classList.add("inactive-section"));
+    } else {
+        aiMessage.innerHTML = `Ok, ${controller.prompt}.`;
+        controllerUI.forEach((elem) => elem.classList.remove("inactive-section"));
+    }
 });
 
 document.getElementById("draw").addEventListener("click", () => {
@@ -444,7 +448,7 @@ document.getElementById("random-prompt").addEventListener("click", () => {
         promptList[Math.floor(Math.random() * promptList.length)].toLowerCase();
     prompt.value = randomPrompt;
     controller.prompt = randomPrompt;
-    aiMessage.innerHTML = `Sure! I can draw ${randomPrompt}...`;
+    aiMessage.innerHTML = `Ok, ${randomPrompt}.`;
     document
         .querySelectorAll(".inactive-section")
         .forEach((elem) => elem.classList.remove("inactive-section"));

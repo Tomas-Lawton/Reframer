@@ -98,7 +98,7 @@ class Clip_Instance:
             try:
                 # tokens = clip.tokenize(token_list).to(device)
                 tokens = clip.tokenize(token_list)
-                tokens.to(device)
+                tokens = tokens.to(self.device)
             except Exception as e:
                 logging.error(e)
                 logging.error(f"Failed to tokenize: {token_list}")

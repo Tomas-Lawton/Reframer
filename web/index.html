@@ -100,23 +100,10 @@
 
         <div class="ai-ui content-margin" id="ai-view">
             <div id="ai-content">
-                <div class="tab-info flex">
-                    <div>
-                        <h1 class="panel-title">
-                            Sketch-bot
-                        </h1>
-                        <h2 class="panel-subtitle">What shall we draw together?</h2>
-                    </div>
-                </div>
 
-                <div id="spinner">
-                    <i class="fa-solid fa-spinner button-animation " id="loading"></i>
-                </div>
 
-                <div id="prompt-input">
-                    <input type="text" id="messageText" placeholder="A majestic rainbow unicorn..." />
-                    <i class="fas fa-lightbulb" id="random-prompt"></i>
-                </div>
+
+
 
                 <!-- <div class="panel-section">
                     <div class="inactive-section slider-block" id="add-refine">
@@ -129,62 +116,96 @@
                 </div> -->
 
 
+
                 <div class="panel-section">
                     <div class="flex">
-                        <h1 class="panel-title">
-                            Action
+                        <h1 class="panel-title" id="message">
+                            What are we drawing?
                         </h1>
+
+
                         <!-- Change text to Draw some -->
                         <!-- <p class="pill" id="show-all-paths">Draw all</p> -->
                     </div>
                     <!-- <hr /> -->
 
-                    <div class="inactive-section" id="set-modes">
+                    <!-- <h2 class="panel-subtitle" id="message">What are we drawing?</h2> -->
 
-                        <div class="ai-action" id="draw">
-                            <i class="fa-solid fa-robot fa-fw"></i>
-                            <p>Draw!</p>
-                        </div>
-                        <!-- <div class="ai-action" id="refine">
-                            <i class="fa-solid fa-down-left-and-up-right-to-center fa-fw"></i>
-                            <p>Refine</p>
-                        </div> -->
-                        <div class="ai-action" id="inspire">
-                            <i class="fa-solid fa-lightbulb fa-fw"></i>
-                            <p>Inspire</p>
-                        </div>
 
-                        <!-- <div class="ai-action" id="generate">
-                            <i class="fa-solid fa-lightbulb fa-fw"></i>
-                            <p>Brainstorm</p>
-                        </div>-->
+                    <div id="prompt-input">
+                        <input type="text" id="messageText" placeholder="A majestic rainbow unicorn..." />
+                        <i class="fas fa-lightbulb" id="random-prompt"></i>
+                    </div>
 
-                        <div class="ai-action inactive-action" id="prune">
-                            <i class="fa-solid fa-broom fa-fw" id="clean-icon"></i>
-                            <p>Clean up</p>
-                        </div>
 
-                        <div class="ai-action inactive-action" id="stop">
-                            <i class="fa-solid fa-stop fa-fw" id="stop-icon"></i>
-                            <p id="stop-text">Stop</p>
-                        </div>
-
-                        <div class="ai-action inactive-action" id="redraw">
-                            <i class="fa-solid fa-repeat fa-fw"></i>
-                            <p>Try again</p>
-                        </div>
+                    <div id="spinner">
+                        <i class="fa-solid fa-spinner button-animation " id="loading"></i>
                     </div>
                 </div>
 
 
-                <div class="panel-section">
-                    <div class="flex">
-                        <h1 class="panel-title">
-                            Behaviour
-                        </h1>
-                        <p class="pill inactive-pill" id="autodraw-button">Solo draw</p>
+
+            </div>
+
+
+
+
+            <div class="panel-section">
+                <div class="flex">
+                    <h1 class="panel-title">
+                        Action
+                    </h1>
+                    <!-- Change text to Draw some -->
+                    <!-- <p class="pill" id="show-all-paths">Draw all</p> -->
+                </div>
+                <!-- <hr /> -->
+
+                <div class="inactive-section" id="set-modes">
+
+                    <div class="ai-action" id="draw">
+                        <i class="fa-solid fa-robot fa-fw"></i>
+                        <p>Draw!</p>
                     </div>
-                    <!-- 
+                    <!-- <div class="ai-action" id="refine">
+                            <i class="fa-solid fa-down-left-and-up-right-to-center fa-fw"></i>
+                            <p>Refine</p>
+                        </div> -->
+                    <div class="ai-action" id="inspire">
+                        <i class="fa-solid fa-lightbulb fa-fw"></i>
+                        <p>Inspire</p>
+                    </div>
+
+                    <!-- <div class="ai-action" id="generate">
+                            <i class="fa-solid fa-lightbulb fa-fw"></i>
+                            <p>Brainstorm</p>
+                        </div>-->
+
+                    <div class="ai-action inactive-action" id="prune">
+                        <i class="fa-solid fa-broom fa-fw" id="clean-icon"></i>
+                        <p>Clean up</p>
+                    </div>
+
+                    <div class="ai-action inactive-action" id="stop">
+                        <i class="fa-solid fa-stop fa-fw" id="stop-icon"></i>
+                        <p id="stop-text">Stop</p>
+                    </div>
+
+                    <div class="ai-action inactive-action" id="redraw">
+                        <i class="fa-solid fa-repeat fa-fw"></i>
+                        <p>Try again</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="panel-section">
+                <div class="flex">
+                    <h1 class="panel-title">
+                        Behaviour
+                    </h1>
+                    <p class="pill inactive-pill" id="autodraw-button">Solo draw</p>
+                </div>
+                <!-- 
                     <div class="inactive-section slider-block">
                         <div class="flex">
                             <p class="slider-label" id="max-lines">Max lines: </p>
@@ -193,73 +214,73 @@
                         <input id="num-squiggles" type="range" min="0" value="32" max="150">
                     </div> -->
 
-                    <div class="inactive-section slider-block" id="respect-block">
-                        <div id="control-lines">
-                            <div class="flex">
-                                <p class="slider-label" id="max-lines">Lines: </p>
-                                <p class="slider-label" id="calc-lines">Add: </p>
-                            </div>
-                            <input id="num-squiggles" type="range" min="0" value="32" max="150">
-                        </div>
-
+                <div class="inactive-section slider-block" id="respect-block">
+                    <div id="control-lines">
                         <div class="flex">
-                            <p class="slider-label">Respect</p>
-                            <p class="slider-label" id="fix-label">More</p>
+                            <p class="slider-label" id="max-lines">Lines: </p>
+                            <p class="slider-label" id="calc-lines">Add: </p>
                         </div>
-                        <input type="range" id="respect-slider" value="3" min="0" max="4">
+                        <input id="num-squiggles" type="range" min="0" value="32" max="150">
                     </div>
 
-                    <!-- <p class="slider-label" id="speed-text">Change User Strokes</p>
+                    <div class="flex">
+                        <p class="slider-label">Respect</p>
+                        <p class="slider-label" id="fix-label">More</p>
+                    </div>
+                    <input type="range" id="respect-slider" value="3" min="0" max="4">
+                </div>
+
+                <!-- <p class="slider-label" id="speed-text">Change User Strokes</p>
                     <input type="range" id="respect-slider" value="1" min="1" max="11"> -->
 
-                    <!-- <hr /> -->
-                    <!-- <div id="add-refine">
+                <!-- <hr /> -->
+                <!-- <div id="add-refine">
                         <div class="flex">
                             <p class="slider-label">Adding</p>
                             <p class="slider-label">Refining</p>
                         </div>
                         <input type="range" id="autonomy-slider" value="6" min="1" max="11">
                     </div> -->
-                </div>
-
             </div>
+
         </div>
+    </div>
 
-        <div class="content-margin" id="style-view">
-            <div id="style-content">
-                <div class="tab-info">
-                    <div>
-                        <h1 class="panel-title">Styles</h1>
-                        <h2 class="panel-subtitle">Colors and Transforms</h2>
-                    </div>
+    <div class="content-margin" id="style-view">
+        <div id="style-content">
+            <div class="tab-info">
+                <div>
+                    <h1 class="panel-title">Styles</h1>
+                    <h2 class="panel-subtitle">Colors and Transforms</h2>
                 </div>
-
-                <div id="picker-ui">
-                    <div id="color-picker"></div>
-                </div>
-
-                <div class="slider-block">
-                    <div class="flex">
-                        <p class="slider-label">Opacity</p>
-                    </div>
-                    <input type="range" id="opacity-slider" value="75" min="0" max="100">
-
-                    <div class="flex">
-                        <p class="slider-label">Stroke</p>
-                    </div>
-                    <input type="range" id="width-slider" value="12" min="1" max="48">
-                </div>
-
-                <div id="art-control-final">
-                    <div id="stroke-dot">
-                        <div id="point-size"></div>
-                    </div>
-                    <div id="pen-color" class="off-black"></div>
-                </div>
-
-                <!-- <p id="set-background">Set background</p> -->
             </div>
+
+            <div id="picker-ui">
+                <div id="color-picker"></div>
+            </div>
+
+            <div class="slider-block">
+                <div class="flex">
+                    <p class="slider-label">Opacity</p>
+                </div>
+                <input type="range" id="opacity-slider" value="75" min="0" max="100">
+
+                <div class="flex">
+                    <p class="slider-label">Stroke</p>
+                </div>
+                <input type="range" id="width-slider" value="12" min="1" max="48">
+            </div>
+
+            <div id="art-control-final">
+                <div id="stroke-dot">
+                    <div id="point-size"></div>
+                </div>
+                <div id="pen-color" class="off-black"></div>
+            </div>
+
+            <!-- <p id="set-background">Set background</p> -->
         </div>
+    </div>
     </div>
 
 

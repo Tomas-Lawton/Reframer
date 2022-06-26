@@ -69,12 +69,14 @@ const stopButton = document.getElementById("stop");
 const buttonPanel = document.querySelector(".top-action");
 const dropdown = document.getElementById("pen-dropdown");
 const penDrop = document.getElementById("pen-drop");
-const aiMessage = document.querySelector("#ai-content .panel-subtitle");
+const aiMessage = document.getElementById("message");
 const sketchContainer = document.getElementById("canvas-drop");
 const staticSketches = document.getElementById("static-sketches");
 const explorer = document.getElementById("explore-sketches");
 const sketchGrid = document.getElementById("grid-container");
 const pen = document.getElementById("pen");
+
+const controllerUI = document.querySelectorAll(".inactive-section");
 
 // Utility
 let liveCollab = false;

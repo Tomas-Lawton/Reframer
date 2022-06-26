@@ -89,7 +89,7 @@ const setActionUI = (state) => {
             document.getElementById("explore-margin").style.display = "flex";
             // document.getElementById("inspire").classList.add("active");
         } else if (state == "continuing" || state == "continue-explore") {
-            aiMessage.innerHTML = `Nice, I'll make that it into ${controller.prompt}.`;
+            aiMessage.innerHTML = `I'll make that it into ${controller.prompt}.`;
         }
         aiMessage.classList.add("typed-out");
 
