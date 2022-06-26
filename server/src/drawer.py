@@ -71,21 +71,16 @@ class CICADA:
 
     def extract_paths(self, region=None):
         use_region = region['activate']
-        try:
-            (
-                self.path_list,
-                self.user_canvas_w,
-                self.user_canvas_h,
-                self.resizeScaleFactor,
-                normaliseScaleFactor,
-            ) = parse_svg('data/interface_paths.svg', use_region)
+        (
+            self.path_list,
+            self.user_canvas_w,
+            self.user_canvas_h,
+            self.resizeScaleFactor,
+            normaliseScaleFactor,
+        ) = parse_svg('data/interface_paths.svg', use_region)
 
-            if use_region:
-                self.drawing_area = calculate_draw_region(region, normaliseScaleFactor)
-            logging.info("Parsed SVG")
-        except Exception as e:
-            logging.error(e)
-            logging.error("SVG Parsing failed")
+        if use_region:
+            self.drawing_area = calculate_draw_region(region, normaliseScaleFactor)
 
     def initialise_without_treebranch(self):
         user_sketch = UserSketch(self.path_list, self.canvas_w, self.canvas_h)
@@ -419,13 +414,6 @@ class CICADA:
         self.num_paths = data["data"]["random_curves"]
         self.extract_paths(region)
         logging.info("Got features")
-        return self.activate()
-
-    def redraw(self):
-        """Use original paths with origional prompt to try new options from same settings"""
-        logging.info("Starting redraw")
-        self.extract_paths(self.last_region)
-        self.iteration = 0
         return self.activate()
 
     def continue_update_sketch(self, data, restart=False):
