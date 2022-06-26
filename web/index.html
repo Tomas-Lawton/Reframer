@@ -74,7 +74,7 @@
     <div class="top-action" id="pen-controls">
         <i class="fa-solid fa-arrow-pointer fa-fw simple-hover pen-mode" id="pen-drop"></i>
         <i class="fa-solid fa-pen fa-fw pen-mode selected-mode" id="pen"></i>
-        <i class="fa-solid fa-eraser fa-fw pen-mode" id="erase"></i>
+        <i class="fa-solid fa-eraser fa-fw pen-mode simple-hover" id="erase"></i>
         <i class="fa-solid fa-sliders fa-fw panel-open" id="palette"></i>
         <i class="fa-solid fa-rotate-left fa-fw simple-hover" id="undo"></i>
         <i class="fa-solid fa-rotate-right fa-fw simple-hover" id="redo"></i>
@@ -100,6 +100,14 @@
 
         <div class="ai-ui content-margin" id="ai-view">
             <div id="ai-content">
+                <div class="tab-info">
+                    <div>
+                        <h1 class="panel-title">AI Panel</h1>
+                        <h2 class="panel-subtitle">Colors and Transforms</h2>
+                    </div>
+                </div>
+
+
                 <div class="panel-section">
                     <div class="flex">
                         <h1 class="panel-title" id="message">
@@ -147,8 +155,6 @@
                     </div>
                 </div>
             </div>
-
-
             <div class="panel-section">
                 <div class="flex">
                     <h1 class="panel-title">
@@ -208,13 +214,10 @@
             <!-- <p id="set-background">Set background</p> -->
         </div>
     </div>
-    </div>
-
 
     <div class="ai-ui" id="explore-margin">
         <div id="explore-sketches"></div>
         <div id="explorer-buttons">
-
             <p class="pill" id="empty">Empty</p>
             <p class="pill" id="overwrite">Overwrite</p>
             <p class="pill" id="close-explorer">Close <i class="fa-solid fa-xmark"></i></p>
@@ -270,6 +273,7 @@
         <div class="purple swatch hide-swatch"></div>
         <div class="off-black swatch"></div>
         <div class="white swatch hide-swatch"></div>
+        <!-- <i class="fas fa-fw fa-eye-dropper simple-hover pen-mode" id="dropper"></i> -->
 
         <div id="points">
             <div class="center">
@@ -294,7 +298,17 @@
                             <i class="basic-grey fa-solid fa-trash fa-fw"></i>
                         </div>
                     </div>
-                    <div id="duplicate-handler" class="select-ui">
+                    <div id="toBack" class="select-ui">
+                        <div>
+                            <i class="fa-solid fa-arrow-down-short-wide"></i>
+                        </div>
+                    </div>
+                    <div id="moveUp" class="select-ui">
+                        <div>
+                            <i class="fa-solid fa-arrow-up-short-wide"></i>
+                        </div>
+                    </div>
+                    <div id="copy-handler" class="select-ui">
                         <div>
                             <i class="basic-grey fa-solid fa-copy fa-fw"></i>
                         </div>

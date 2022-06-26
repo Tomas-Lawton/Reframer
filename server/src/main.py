@@ -125,7 +125,7 @@ else:
 
                 if data["status"] == "prune":
                     main_sketch.prune()
-                    await main_sketch.render(main_sketch.iteration, main_sketch.losses["global"], True)
+                    await main_sketch.update(main_sketch.iteration, main_sketch.losses["global"], True)
 
                 if data["status"] == "stop_single_sketch":
                     for drawer in exemplar_drawers:

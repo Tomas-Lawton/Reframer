@@ -406,11 +406,18 @@ hr {
     flex-flow: wrap;
 }
 
+#dropper {
+    /* padding: 0 0.4em 0 0.3em; */
+    padding: 0.4em;
+    border-radius: 1.5em;
+    /* color: rgb(117, 117, 117); */
+    color: #363636;
+}
+
 #points {
     padding: 0 0.5em;
-    margin: 0 0 0 0.5em;
     display: flex;
-    border-left: grey 1px solid;
+    /* border-left: grey 1px solid; */
     /* width: 100%; */
 }
 
@@ -990,6 +997,7 @@ input:focus {
 
 .selected-mode {
     background-color: #7b66ff;
+    color: white;
 }
 
 .selected-mode:hover {

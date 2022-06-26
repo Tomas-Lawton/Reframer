@@ -102,18 +102,26 @@ deleteHandler.addEventListener("click", (e) => {
 });
 
 copyHandler.addEventListener("click", (e) => {
-    // const group = getSelectedPaths()[0];
-    // // group.getItems((child) => {
-    // //     const newChild = child.clone();
-    // //     mainSketch.userPathList.push(newChild);
-    // // });
-    // group.clone();
-    // mainSketch.svg = paper.project.exportSVG({
-    //     asString: true,
-    // });
-    // logger.event("duplicate-selection");
-    // fitToSelection(getSelectedPaths(), "moving");
-    // updateSelectUI();
+    if (controller.boundingBox) {
+        controller.boundingBox.remove();
+        controller.boundingBox = null;
+    }
+    let copy = controller.transformGroup.clone();
+    let inserted = mainSketch.useLayer.insertChildren(
+        copy.index,
+        copy.removeChildren()
+    );
+    controller.transformGroup.selected = false; //deselect og
+    ungroup();
+    inserted.forEach((pathCopy) => mainSketch.userPathList.push(pathCopy)); //save to user paths
+    createGroup(inserted);
+    fitToSelection(getSelectedPaths(), "moving");
+    updateSelectUI();
+
+    mainSketch.svg = paper.project.exportSVG({
+        asString: true,
+    });
+    logger.event("copy-selection");
 });
 
 document.getElementById("begin").addEventListener("click", () => {
@@ -380,8 +388,13 @@ stopButton.addEventListener("click", () => {
     if (socket) {
         if (
             controller.drawState === "drawing" ||
-            controller.drawState === "continuing"
+            controller.drawState === "continuing" ||
+            controller.drawState === "pause"
         ) {
+            if (controller.drawState === "pause") {
+                liveCollab = false;
+            }
+
             controller.stop(); //flag
             controller.clipDrawing = false;
         } else if (
@@ -395,6 +408,18 @@ stopButton.addEventListener("click", () => {
             controller.clipDrawing = false;
         }
     }
+});
+
+sendToBack.addEventListener("click", () => {
+    controller.transformGroup.sendToBack();
+    controller.boundingBox.sendToBack();
+});
+
+moveUp.addEventListener("click", () => {
+    let thisItem = controller.transformGroup;
+    mainSketch.useLayer.insertChild(thisItem.index + 1, thisItem);
+    // thisItem.insertAbove(thisItem);
+    controller.boundingBox.insertBelow(thisItem);
 });
 
 document.getElementById("prune").addEventListener("click", () => {

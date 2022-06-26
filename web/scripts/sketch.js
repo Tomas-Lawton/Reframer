@@ -129,10 +129,7 @@ class Controller {
                 fixation: this.useFixation,
                 userPaths: mainSketch.userPathList.length,
             });
-            console.log(userLayer);
-            console.log(mainSketch.userPathList.length);
             this.step = 0;
-            this.clipDrawing = true;
             setActionUI("drawing");
         } else {
             throw new Error("Can't continue if already running");

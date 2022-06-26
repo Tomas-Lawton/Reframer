@@ -1,16 +1,11 @@
-// REFACTOR into single tool
-// refactor for multitouch
-
+// Does it work for multitouch?
 let sketchTimer;
 
 sketchTool.onMouseDown = function(event) {
     clearTimeout(sketchTimer);
-    // controller.resetMetaControls();
 
     switch (controller.penMode) {
         case "select":
-            console.log(userLayer);
-
             path = null;
             let hitResult = paper.project.hitTest(event.point, {
                 segments: true,
@@ -49,8 +44,6 @@ sketchTool.onMouseDown = function(event) {
                     asString: true,
                 });
                 setLineLabels(userLayer);
-
-                // Continue
                 if (liveCollab) {
                     controller.continueSketch();
                     liveCollab = false;
@@ -114,6 +107,22 @@ sketchTool.onMouseDown = function(event) {
                 blendMode: "source-over",
             });
             break;
+        case "dropper":
+            console.log("test");
+            // const raster = mainSketch.useLayer.rasterize();
+            // raster.position.x += 100;
+
+            // let col = raster.getPixel(event.point);
+            // console.log(col);
+            // controller.strokeColor = col;
+            // picker.setColor(col);
+
+            // // raster.remove();
+
+            // var rectangle = new Rectangle(new Point(20, 20), new Size(60, 60));
+            // var cornerSize = new Size(10, 10);
+            // var path = new Path.Rectangle(rectangle, cornerSize);
+            // path.fillColor = col;
     }
 };
 
@@ -133,6 +142,13 @@ sketchTool.onMouseDrag = function(event) {
                     controller.transformGroup.position.y += event.delta.y;
                     controller.boundingBox.position.x += event.delta.x;
                     controller.boundingBox.position.y += event.delta.y;
+                    controller.transformGroup.children.forEach((path) => {
+                        mainSketch.userPathList = mainSketch.userPathList.filter(
+                            (item) => item !== path
+                        ); //remove old ref
+                        mainSketch.userPathList.push(path);
+                        path.opacity = 1;
+                    });
                     updateSelectUI();
                 }
             } else if (controller.selectBox !== undefined) {
@@ -214,12 +230,37 @@ sketchTool.onMouseUp = function() {
                 data: penPath,
             });
             mainSketch.userPathList.push(penPath);
+
+            // Update
+            mainSketch.svg = paper.project.exportSVG({
+                asString: true,
+            });
+            setLineLabels(userLayer);
+            if (liveCollab) {
+                controller.continueSketch();
+                liveCollab = false;
+            } else if (!noPrompt() && controller.doneSketching !== null && socket) {
+                //stopped with collab draw
+                {
+                    clearTimeout(sketchTimer);
+                    sketchTimer = setTimeout(() => {
+                        setActionUI("drawing");
+                        controller.draw();
+                        let time = (Math.floor(Math.random() * 5) + 5) * 1000;
+                        setTimeout(() => {
+                            console.log("drawing for: ", time);
+                            controller.stop();
+                            controller.clipDrawing = false;
+                        }, time);
+                    }, controller.doneSketching);
+                }
+            }
+
             break;
         case "lasso":
             if (socket) {
                 controller.resetMetaControls(); //reset since not continuing
                 controller.draw(true);
-                controller.clipDrawing = true;
                 regionPath.remove();
             }
             break;
@@ -319,6 +360,16 @@ sketchTool.onMouseUp = function() {
                     }
                 });
             }
+
+            // Update
+            mainSketch.svg = paper.project.exportSVG({
+                asString: true,
+            });
+            setLineLabels(userLayer);
+            if (liveCollab) {
+                controller.continueSketch();
+                liveCollab = false;
+            }
             break;
     }
 
@@ -330,30 +381,6 @@ sketchTool.onMouseUp = function() {
     logger.event(controller.penMode + "-up");
 
     console.log(userLayer);
-
-    // Continue
-    if (liveCollab) {
-        controller.continueSketch();
-        liveCollab = false;
-    } else if (!noPrompt() && controller.doneSketching !== null && socket) {
-        //stopped with collab draw
-        {
-            clearTimeout(sketchTimer);
-            sketchTimer = setTimeout(() => {
-                setActionUI("drawing");
-                controller.draw();
-                controller.clipDrawing = true;
-
-                let time = (Math.floor(Math.random() * 5) + 5) * 1000;
-                setTimeout(() => {
-                    console.log("drawing for: ", time);
-                    controller.stop();
-                    controller.clipDrawing = false;
-                }, time);
-            }, controller.doneSketching);
-        }
-    }
-
     console.log(mainSketch.userPathList);
 };
 
@@ -438,6 +465,9 @@ const setPenMode = (mode, accentTarget) => {
                 controller.penDropMode = mode;
             }
             break;
+        case "dropper":
+            controller.penMode = mode;
+            document.getElementById("dropper").style.color = "#ffffff";
     }
 
     if (controller.penMode !== "select") {
@@ -451,4 +481,8 @@ const setPenMode = (mode, accentTarget) => {
         if (regionPath) regionPath.remove();
         penDrop.classList.remove("selected-mode");
     }
+    // if (controller.penMode !== "dropper") {
+    // document.getElementById("dropper").style.color = "#363636";
+    // REMOVE LISTENR
+    // }
 };

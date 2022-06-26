@@ -125,8 +125,8 @@ const hideSelectUI = (includeTransform = true) => {
         transformControl.style.display = "none";
     }
     deleteHandler.style.display = "none";
-    // initialiseHandler.style.display = "none";
-    // reviseHandler.style.display = "none";
+    sendToBack.style.display = "none";
+    moveUp.style.display = "none";
     copyHandler.style.display = "none";
 };
 
@@ -145,26 +145,23 @@ const updateRectBounds = (from, to) => {
 const updateSelectPosition = () => {
     let uiOffset = deleteHandler.getBoundingClientRect().height / 2 + 5;
     deleteHandler.style.left = controller.boundingBox.bounds.topRight.x + "px";
-    // reviseHandler.style.left =
-    //     controller.boundingBox.bounds.topLeft.x + "px";
     deleteHandler.style.top = controller.boundingBox.bounds.top - uiOffset + "px";
-    // reviseHandler.style.top =
-    //     controller.boundingBox.bounds.top - uiOffset + "px";
 
-    // initialiseHandler.style.left =
-    //     controller.boundingBox.bounds.topRight.x + "px";
+    copyHandler.style.top = controller.boundingBox.bounds.top - uiOffset + "px";
     copyHandler.style.left = controller.boundingBox.bounds.topLeft.x + "px";
-    // initialiseHandler.style.top =
-    //     controller.boundingBox.bounds.bottom + uiOffset + "px";
-    copyHandler.style.top =
-        controller.boundingBox.bounds.bottom + uiOffset + "px";
+
+    moveUp.style.left = controller.boundingBox.bounds.topLeft.x + "px";
+    moveUp.style.top = controller.boundingBox.bounds.bottom + uiOffset + "px";
+
+    sendToBack.style.top = controller.boundingBox.bounds.bottom + uiOffset + "px";
+    sendToBack.style.left = controller.boundingBox.bounds.topRight.x + "px";
 };
 
 const updateSelectUI = () => {
     if (controller.boundingBox && getSelectedPaths().length) {
         deleteHandler.style.display = "block";
-        // initialiseHandler.style.display = "block";
-        // reviseHandler.style.display = "block";
+        sendToBack.style.display = "block";
+        moveUp.style.display = "block";
         copyHandler.style.display = "block";
         transformControl.style.display = "flex";
         updateSelectPosition();

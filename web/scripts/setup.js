@@ -33,24 +33,6 @@ if (useAI) {
 
 // Sketching UI
 const canvas = document.getElementById("canvas");
-
-// Actions
-const actionControls = document.querySelectorAll(".ai-action");
-const aiCard = document.getElementById("describe-card");
-
-// Select UI
-const deleteHandler = document.getElementById("delete-handler");
-const rotateSlider = document.getElementById("rotate-slider");
-const copyHandler = document.getElementById("duplicate-handler");
-// const reviseHandler = document.getElementById("revise-handler");
-const rotateNumber = document.getElementById("rotate-number");
-const scaleSlider = document.getElementById("scale-slider");
-const scaleNumber = document.getElementById("scale-number");
-
-// Change to revise
-// const initialiseHandler = document.getElementById("initialise-handler");
-const transformControl = document.getElementById("transform-ui");
-
 // General UI
 const prompt = document.getElementById("messageText");
 const promptInput = document.getElementById("prompt-input");
@@ -75,6 +57,19 @@ const staticSketches = document.getElementById("static-sketches");
 const explorer = document.getElementById("explore-sketches");
 const sketchGrid = document.getElementById("grid-container");
 const pen = document.getElementById("pen");
+// Actions
+const actionControls = document.querySelectorAll(".ai-action");
+const aiCard = document.getElementById("describe-card");
+// Transform UI
+const deleteHandler = document.getElementById("delete-handler");
+const rotateSlider = document.getElementById("rotate-slider");
+const copyHandler = document.getElementById("copy-handler");
+const rotateNumber = document.getElementById("rotate-number");
+const scaleSlider = document.getElementById("scale-slider");
+const scaleNumber = document.getElementById("scale-number");
+const moveUp = document.getElementById("moveUp");
+const sendToBack = document.getElementById("toBack");
+const transformControl = document.getElementById("transform-ui");
 
 const controllerUI = document.querySelectorAll(".inactive-section");
 
