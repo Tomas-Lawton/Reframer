@@ -31,9 +31,10 @@ multiTool.onMouseDown = function(event) {
 
             // DESELECT
             if ((!hitResult && !isInBounds) || (!hitResult && isInBounds == null)) {
-                hideSelectUI();
                 // Clean up group
-                unpackGroup();
+                ungroup();
+                hideSelectUI();
+
                 userLayer.getItems().forEach((path) => {
                     path.selected = false;
                 });
@@ -59,12 +60,9 @@ multiTool.onMouseDown = function(event) {
 
             if (hitResult) {
                 pauseActiveDrawer();
+                ungroup();
+                hideSelectUI();
 
-                // got path
-                if (controller.boundingBox) {
-                    hideSelectUI();
-                }
-                unpackGroup();
                 path = hitResult.item;
                 path.selected = true;
                 let items = getSelectedPaths();
@@ -105,18 +103,27 @@ multiTool.onMouseDrag = function(event) {
             if (controller.boundingBox) {
                 //moving box
                 if (controller.boundingBox.data.state === "moving") {
-                    const selectedPaths = getSelectedPaths(); // all selected
-                    selectedPaths[0].children.forEach((path) => {
-                        path.position.x += event.delta.x;
-                        path.position.y += event.delta.y;
-                        mainSketch.userPathList = mainSketch.userPathList.filter(
-                            (item) => item !== path
-                        ); //remove ref
-                        mainSketch.userPathList.push(path);
-                        path.opacity = 1;
-                    });
+                    controller.transformGroup.position.x += event.delta.x;
+                    controller.transformGroup.position.y += event.delta.y;
                     controller.boundingBox.position.x += event.delta.x;
                     controller.boundingBox.position.y += event.delta.y;
+
+                    // const selectedPaths = getSelectedPaths(); // all selected
+                    // selectedPaths[0].children.forEach((path) => {
+                    //     // path.applyMatrix = false; //temp to apply transfrom to children
+                    //     path.position.x += event.delta.x;
+                    //     path.position.y += event.delta.y;
+                    //     mainSketch.userPathList = mainSketch.userPathList.filter(
+                    //         (item) => item !== path
+                    //     ); //remove ref
+                    //     mainSketch.userPathList.push(path);
+                    //     path.opacity = 1;
+                    // });
+
+                    // controller.boundingBox.position.x += event.delta.x;
+                    // controller.boundingBox.position.y += event.delta.y;
+                    // controller.transformGroup.applyMatrix = true; //set back for rotation/scale
+
                     updateSelectUI();
                 }
             } else if (controller.selectBox !== undefined) {

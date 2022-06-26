@@ -32,9 +32,9 @@ const setPointSize = (s) => {
     );
 };
 
-const unpackGroup = () => {
+const ungroup = () => {
     if (controller.transformGroup !== null) {
-        controller.transformGroup.applyMatrix = true; // apply group rotation/scale to children on unpack
+        controller.transformGroup.applyMatrix = true; // apply group rotation/scale to children on unpack (position was applied with applyMatrix false)
         userLayer.insertChildren(
             controller.transformGroup.index,
             controller.transformGroup.removeChildren()
@@ -118,7 +118,7 @@ const openModal = (data) => {
 const deletePath = () => {
     // Save
     hideSelectUI();
-    unpackGroup();
+    ungroup();
     let g = getSelectedPaths();
     g.forEach((path) => {
         path.selected = false;
@@ -134,7 +134,7 @@ const deletePath = () => {
     );
     g.forEach((path) => path.remove());
 
-    // Save again
+    // Save new SVG
     mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });

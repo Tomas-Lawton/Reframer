@@ -581,7 +581,7 @@ document.getElementById("scrapbook").addEventListener("click", () => {
 
 document.getElementById("save-sketch").addEventListener("click", () => {
     console.log(mainSketch.userPathList);
-    unpackGroup();
+    ungroup();
     hideSelectUI();
     // mainSketch.load(1, mainSketch.sortPaths(), mainSketch.num, false);
     mainSketch.sortPaths();

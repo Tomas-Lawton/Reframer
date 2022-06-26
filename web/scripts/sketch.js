@@ -119,9 +119,8 @@ class Controller {
             this.clipDrawing = true;
             this.targetDrawing = false;
             controller.linesDisabled = disableLines;
-            mainSketch.svg = mainSketch.sortPaths();
-            setLineLabels(userLayer);
-            document.getElementById("calc-lines").innerHTML = `Add : 0`;
+
+            this.prepare();
 
             this.updateDrawer({
                 status: "draw",
@@ -145,8 +144,8 @@ class Controller {
                 console.error("sketchs not found");
             }
             this.targetDrawing = true;
-            setLineLabels(userLayer);
-            document.getElementById("calc-lines").innerHTML = `Add : 0`;
+
+            this.prepare();
 
             this.updateDrawer({
                 status: "add_new_sketch",
@@ -185,9 +184,7 @@ class Controller {
                 //     });
             } else {
                 try {
-                    mainSketch.svg = mainSketch.sortPaths();
-                    setLineLabels(userLayer);
-                    document.getElementById("calc-lines").innerHTML = `Add : 0`;
+                    this.prepare();
 
                     this.updateDrawer({
                         status: "continue_sketch",
@@ -208,7 +205,9 @@ class Controller {
     prune() {
         if (!this.clipDrawing) {
             this.clipDrawing = true;
-            mainSketch.svg = mainSketch.sortPaths();
+
+            this.prepare();
+
             this.updateDrawer({
                 status: "prune",
             });
@@ -230,6 +229,14 @@ class Controller {
             sketchScopeIndex: i,
         });
     }
+    prepare() {
+        // make sure correct
+        ungroup();
+        hideSelectUI();
+        mainSketch.svg = mainSketch.sortPaths();
+        setLineLabels(userLayer);
+        document.getElementById("calc-lines").innerHTML = `Add : 0`;
+    }
     resetMetaControls() {
         document.getElementById("prune").classList.add("inactive-action");
         console.log("clear");
@@ -245,37 +252,41 @@ controller = new Controller();
 
 class Sketch {
     constructor(i = null, scope, num, type = "default") {
-            this.i = i;
-            this.num = num;
-            this.useScope = scope;
-            this.type = type; //U or AI or Main?
-            this.svg; //sorted already
-            this.elem; //DOM elem
-            this.userPathList = [];
-            this.useLayer;
+        this.i = i;
+        this.num = num;
+        this.useScope = scope;
+        this.type = type; //U or AI or Main?
+        this.svg; //sorted already
+        this.elem; //DOM elem
+        this.userPathList = [];
+        this.useLayer;
 
-            controller.sketches[this.i] = this;
-            // console.log("Created: ", this.i);
+        controller.sketches[this.i] = this;
+        // console.log("Created: ", this.i);
 
-            if (type === "main") {
-                this.frameSize = canvas.getBoundingClientRect().width;
-            } else {
-                this.frameSize = sketchSize;
-            }
+        if (type === "main") {
+            this.frameSize = canvas.getBoundingClientRect().width;
+        } else {
+            this.frameSize = sketchSize;
         }
-        // TO DO: Add svg arr
+    }
     load(s, svg, n, a = true) {
+        //+ SVG Arr
         if (svg === "" || svg === undefined) return;
         this.svg = svg;
         this.useLayer.clear();
         let g = this.useLayer.importSVG(svg).children[0];
-        scaleGroup(g, s);
-        this.useLayer.insertChildren(g.index, g.removeChildren());
-        mainSketch.userPathList = [];
-        this.useLayer.getItems().forEach((path, i) => {
-            i < n ? mainSketch.userPathList.push(path) : a && (path.opacity *= 0.5);
-        });
-        return svg;
+        try {
+            scaleGroup(g, s);
+            this.useLayer.insertChildren(g.index, g.removeChildren());
+            mainSketch.userPathList = [];
+            this.useLayer.getItems().forEach((path, i) => {
+                i < n ? mainSketch.userPathList.push(path) : a && (path.opacity *= 0.5);
+            });
+            return svg;
+        } catch (e) {
+            console.log(userLayer);
+        }
     }
     sortPaths() {
         // add paths to userPathList not just num so can be used by any instance
@@ -411,7 +422,7 @@ class Sketch {
                     controller.stop();
                     controller.clipDrawing = false;
                     // pauseActiveDrawer();
-                    unpackGroup();
+                    ungroup();
                     hideSelectUI();
                     this.saveStatic(
                         overwriting.extractScaledJSON(1 / scaleRatio),
@@ -428,7 +439,7 @@ class Sketch {
                 message: "Import into the main canvas? Sketch will be saved.",
                 confirmAction: () => {
                     // pauseActiveDrawer();
-                    unpackGroup();
+                    ungroup();
                     hideSelectUI();
                     this.saveStatic(
                         overwriting.extractScaledJSON(1 / scaleRatio),
@@ -441,7 +452,7 @@ class Sketch {
             });
         } else {
             // pauseActiveDrawer();
-            unpackGroup();
+            ungroup();
             hideSelectUI();
             this.saveStatic(
                 overwriting.extractScaledJSON(1 / scaleRatio),
