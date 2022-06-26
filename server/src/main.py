@@ -147,9 +147,6 @@ else:
 
                 if data["status"] == "stop":
                     await main.stop()
-                    # for drawer in exemplar_drawers:
-                    #     logging.info("Pausing Brainstorm")
-                    #     await drawer.stop()  # don't del because may restart
 
         except WebSocketDisconnect:
             stop_all(exemplar_drawers, main)
