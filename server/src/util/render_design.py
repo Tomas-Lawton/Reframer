@@ -85,15 +85,6 @@ class UserSketch:
             ) * (1 - img[:, :, 3:4])
             img = img[:, :, :3].unsqueeze(0).permute(0, 3, 1, 2)
 
-
-        # pydiffvg.save_svg(
-        #     f"results/test_0.svg",
-        #     canvas_width,
-        #     canvas_height,
-        #     shapes,
-        #     shape_groups,
-        # )
-
         self.shapes = shapes
         self.shape_groups = shape_groups
         self.img = img

@@ -69,23 +69,18 @@ class CICADA:
         logging.info("Updated CLIP prompt features")
         return
 
-    def parse_svg(self, region=None):
+    def extract_paths(self, region=None):
         use_region = region['activate']
-        try:
-            (
-                self.path_list,
-                self.user_canvas_w,
-                self.user_canvas_h,
-                self.resizeScaleFactor,
-                normaliseScaleFactor,
-            ) = parse_svg('data/interface_paths.svg', use_region)
+        (
+            self.path_list,
+            self.user_canvas_w,
+            self.user_canvas_h,
+            self.resizeScaleFactor,
+            normaliseScaleFactor,
+        ) = parse_svg('data/interface_paths.svg', use_region)
 
-            if use_region:
-                self.drawing_area = calculate_draw_region(region, normaliseScaleFactor)
-            logging.info("Parsed SVG")
-        except Exception as e:
-            logging.error(e)
-            logging.error("SVG Parsing failed")
+        if use_region:
+            self.drawing_area = calculate_draw_region(region, normaliseScaleFactor)
 
     def initialise_without_treebranch(self):
         user_sketch = UserSketch(self.path_list, self.canvas_w, self.canvas_h)
@@ -417,7 +412,7 @@ class CICADA:
 
         self.last_region = region
         self.num_paths = data["data"]["random_curves"]
-        self.parse_svg(region)
+        self.extract_paths(region)
         logging.info("Got features")
         return self.activate()
 
@@ -432,7 +427,7 @@ class CICADA:
             with open('data/interface_paths.svg', 'w') as f:
                 f.write(svg_string)
 
-        self.parse_svg(self.last_region)
+        self.extract_paths(self.last_region)
 
         try:
             self.num_user_paths = int(data["data"]["num_user_paths"])
