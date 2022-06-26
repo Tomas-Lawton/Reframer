@@ -312,9 +312,6 @@ timeKeeper.oninput = function() {
             false // don't reapply opacity
         );
     }
-    mainSketch.svg = paper.project.exportSVG({
-        asString: true,
-    });
 };
 
 palette.addEventListener("click", () => {
@@ -487,6 +484,7 @@ controlPanel.onmousedown = (e) => {
             pos4 > bounds.bottom
         ) {
             document.onmouseup = closeDragElement;
+            console.log("cliekced");
             document.onmousemove = (e) => elementDrag(e, controlPanel);
         }
     }

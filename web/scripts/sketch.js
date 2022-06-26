@@ -261,12 +261,12 @@ class Sketch {
         // console.log("Created: ", this.i);
 
         if (type === "main") {
-            this.frameSize = canvas.getBoundingClientRect().width;
+            this.frameSize = frame;
         } else {
             this.frameSize = sketchSize;
         }
     }
-    load(s, svg, n, a = true) {
+    load(s, svg, n, a = true, o = false) {
         //+ SVG Arr
         if (svg === "" || svg === undefined) return;
         this.svg = svg;
@@ -274,10 +274,15 @@ class Sketch {
         let imported = this.useLayer.importSVG(svg);
         let g = imported.children[0];
         let scaledGroup = scaleGroup(g, s);
+        // if (o) {
+        //     scaledGroup.position.x += offX;
+        //     scaledGroup.position.y += offY;
+        // }
         this.useLayer.insertChildren(
             scaledGroup.index,
             scaledGroup.removeChildren()
         );
+        scaledGroup.remove();
         imported.remove();
         mainSketch.userPathList = [];
         this.useLayer.getItems().forEach((path, i) => {

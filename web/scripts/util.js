@@ -187,20 +187,17 @@ const incrementHistory = () => {
 
 const updateMain = (result) => {
     incrementHistory();
-    // To do change this so it is just max num controller.traces
-    console.log(mainSketch.userPathList.length);
     if (controller.numTraces > 1) {
         showTraceHistoryFrom(controller.stack.historyHolder.length - 1);
     } else {
         controller.lastRender = mainSketch.load(
-            userLayer.view.viewSize.width / 224,
+            frame / 224,
             result.svg,
-            mainSketch.userPathList.length
+            mainSketch.userPathList.length,
+            true,
+            true
         );
-
-        mainSketch.svg = paper.project.exportSVG({
-            asString: true,
-        });
+        mainSketch.svg = mainSketch.useLayer.exportSVG();
     }
     // calcRollingLoss();
 };

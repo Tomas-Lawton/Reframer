@@ -27,7 +27,7 @@ if (useAI) {
     };
 } else {
     document.getElementById("partial-message").style.display = "block";
-    document.getElementById("ai-view").style.display = "none";
+    document.getElementById("ai-content").style.display = "none";
     document.getElementById("tabs").remove();
 }
 
@@ -105,9 +105,15 @@ if (containerRect.width > window.innerHeight) {
 }
 
 // canvas.width = window.innerWidth;
-// canvas.height = window.innerHeight;
+// canvas.width = window.innerHeight;
 
-const scaleRatio = canvas.width / sketchSize;
+const frame = Math.min(canvas.width, canvas.height);
+const offset = frame / 2;
+// const offX = Math.max(0, canvas.width - canvas.height) / 2;
+// const offY = Math.max(0, canvas.height - canvas.width) / 2;
+// const offY = 0;
+// const offX = (canvas.width - canvas.height) / 2;
+const scaleRatio = frame / sketchSize;
 
 // Paper Setup
 paper.install(window);

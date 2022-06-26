@@ -120,7 +120,7 @@ def parse_svg(path_to_svg_file, with_selection):
     try:
         width = float(parent_svg['attributes']['width'])
         height = float(parent_svg['attributes']['height'])
-        frame_size = max(width, height)
+        frame_size = min(width, height)
         normaliseScaleFactor = 1 / frame_size
         resizeScaleFactor = 224 / frame_size
     except Exception as e:
