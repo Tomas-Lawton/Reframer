@@ -138,7 +138,7 @@ else:
 
                 if data["status"] == "prune":
                     artefact_drawer.prune()
-                    await artefact_drawer.render_and_save(artefact_drawer.iteration, artefact_drawer.losses["global"], True)
+                    await artefact_drawer.render(artefact_drawer.iteration, artefact_drawer.losses["global"], True)
 
                 if data["status"] == "stop_single_sketch":
                     for drawer in exemplar_drawers:

@@ -354,7 +354,7 @@ class CICADA:
         logging.info(f"Completed run {t} in drawer {str(self.sketch_reference_index)}")
         self.iteration += 1
 
-    async def render_and_save(self, t, loss, pruning=False):
+    async def render(self, t, loss, pruning=False):
         status = str(self.sketch_reference_index)
         if pruning:
             status="pruning"
@@ -466,7 +466,7 @@ class CICADA:
             try:
                 self.run_epoch()
                 # if self.iteration % self.refresh_rate == 0:
-                await self.render_and_save(self.iteration, self.losses['global'])
+                await self.render(self.iteration, self.losses['global'])
             except Exception as e:
                 logging.info("Iteration failed on: ", self.sketch_reference_index)
                 await self.stop()
