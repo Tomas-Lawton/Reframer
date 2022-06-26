@@ -90,7 +90,7 @@ else:
         except Exception as e:
             logging.error("Bad socket")
 
-        main = CICADA(clip_class, websocket)
+        main_sketch = CICADA(clip_class, websocket)
 
         try:
             while True:
@@ -99,16 +99,16 @@ else:
                     logging.info(data)
                 except RuntimeError:
                     logging.warning("Unexpected json received by socket")
-                    await main.stop()
-                    del main
+                    await main_sketch.stop()
+                    del main_sketch
                     for drawer in exemplar_drawers:
                         logging.info("Suspend Brainstorm")
                         await drawer.stop()
                         del drawer
 
                 if data["status"] == "draw":
-                    main.setup_draw(data)
-                    main.run_async()
+                    main_sketch.setup_draw(data)
+                    main_sketch.run_async()
 
                 if data["status"] == "add_new_sketch":
                     new_exemplar = CICADA(
@@ -120,8 +120,8 @@ else:
                     new_exemplar.run_async()
 
                 if data["status"] == "continue_sketch":
-                    main.continue_update_sketch(data)
-                    main.run_async()
+                    main_sketch.continue_update_sketch(data)
+                    main_sketch.run_async()
 
                 if data["status"] == "continue_single_sketch":
                     for drawer in exemplar_drawers:
@@ -133,8 +133,8 @@ else:
                             drawer.run_async()
 
                 if data["status"] == "prune":
-                    main.prune()
-                    await main.render(main.iteration, main.losses["global"], True)
+                    main_sketch.prune()
+                    await main_sketch.render(main_sketch.iteration, main_sketch.losses["global"], True)
 
                 if data["status"] == "stop_single_sketch":
                     for drawer in exemplar_drawers:
@@ -146,13 +146,13 @@ else:
                             del drawer
 
                 if data["status"] == "stop":
-                    await main.stop()
+                    await main_sketch.stop()
 
         except WebSocketDisconnect:
-            stop_all(exemplar_drawers, main)
+            stop_all(exemplar_drawers, main_sketch)
             logging.info("Client disconnected")
         except KeyboardInterrupt:
-            stop_all(exemplar_drawers, main)
+            stop_all(exemplar_drawers, main_sketch)
             logging.info("Client killed")
 
 
