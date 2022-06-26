@@ -107,7 +107,7 @@ else:
                         del drawer
 
                 if data["status"] == "draw":
-                    main_sketch.setup_draw(data)
+                    main_sketch.draw(data)
                     main_sketch.run_async()
 
                 if data["status"] == "add_new_sketch":
@@ -116,21 +116,12 @@ else:
                     )
                     exemplar_drawers.append(new_exemplar)
                     new_exemplar.frame_size = data["data"]['frame_size']
-                    new_exemplar.setup_draw(data)
+                    new_exemplar.draw(data)
                     new_exemplar.run_async()
 
                 if data["status"] == "continue_sketch":
                     main_sketch.continue_update_sketch(data)
                     main_sketch.run_async()
-
-                if data["status"] == "continue_single_sketch":
-                    for drawer in exemplar_drawers:
-                        if (
-                            drawer.sketch_reference_index
-                            == data["data"]['sketch_index']
-                        ):
-                            drawer.continue_update_sketch(data, True)
-                            drawer.run_async()
 
                 if data["status"] == "prune":
                     main_sketch.prune()

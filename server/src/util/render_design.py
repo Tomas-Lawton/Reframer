@@ -2,9 +2,10 @@ import pydiffvg
 import torch
 import random
 import copy
-
+import logging
 
 def calculate_draw_region(region, normaliseScaleFactor):
+    logging.info("Using region")
     leftX = min(
         float(region['x1']) * normaliseScaleFactor,
         float(region['x2']) * normaliseScaleFactor,
@@ -28,18 +29,6 @@ def calculate_draw_region(region, normaliseScaleFactor):
         'y0': bottomY,
         'y1': topY,
     }
-
-
-def rescale_constants(shapes, groups, scale_ratio):
-    """Scale up points since they are absolute positioned."""
-    # breaks!!!!!
-    shapes_copy = copy.deepcopy(shapes)
-    shape_groups_copy = copy.deepcopy(groups)
-    for path in shapes_copy:
-        path.points = torch.div(path.points, scale_ratio)
-        path.stroke_width = torch.div(path.stroke_width, scale_ratio)
-    return shapes_copy, shape_groups_copy
-
 
 class UserSketch:
     def __init__(self, path_list, canvas_height, canvas_width):
@@ -108,6 +97,7 @@ def treebranch_initialization(
     num_paths,
     canvas_width,
     canvas_height,
+    use_paths,
     drawing_area={'x0': 0, 'x1': 1, 'y0': 0, 'y1': 1},
     partition={'K1': 0.25, 'K2': 0.5, 'K3': 0.25},
 ):
@@ -123,9 +113,8 @@ def treebranch_initialization(
     y0 = drawing_area['y0']
     y1 = drawing_area['y1']
 
-    # Get all endpoints within drawing region
     starting_points = []
-    for path in path_list:
+    for path in path_list[0:use_paths]: #user paths only
         for k in range(path.path.size(0)):
             if k % 3 == 0:
                 if (x0 < path.path[k, 0] < x1) and (y0 < (1 - path.path[k, 1]) < y1):

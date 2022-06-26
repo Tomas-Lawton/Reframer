@@ -181,7 +181,9 @@ sketchTool.onMouseUp = function() {
                 //moving selection
                 let items = userLayer.getItems({ inside: selectBox.bounds });
                 let rect = items.pop();
-                if (rect) rect.remove(); // can be undefined if flat box
+                if (rect) {
+                    rect.remove(); // can be undefined if flat box
+                }
                 items.forEach((item) => (item.selected = true));
                 if (controller.selectBox) {
                     controller.selectBox = null;
@@ -189,7 +191,6 @@ sketchTool.onMouseUp = function() {
                     selectBox = null;
                 }
                 let path = fitToSelection(items, "moving"); //try update
-
                 // IS THIS STILL NEEDED?
                 if (!getSelectedPaths().length) {
                     path.remove();
@@ -212,6 +213,7 @@ sketchTool.onMouseUp = function() {
                 type: "draw-event",
                 data: penPath,
             });
+            mainSketch.userPathList.push(penPath);
             break;
         case "lasso":
             if (socket) {
@@ -307,12 +309,16 @@ sketchTool.onMouseUp = function() {
 
             let added = userLayer.addChildren(tmpGroup.removeChildren());
             mask.remove();
-            //remove 0 length paths
-            added.forEach((path) => {
-                if (!path.segments.length) {
-                    path.remove();
-                }
-            });
+
+            if (added.length) {
+                added.forEach((item) => {
+                    if (item instanceof Group) {
+                        if (!item.segments.length) {
+                            item.remove();
+                        }
+                    }
+                });
+            }
             break;
     }
 
@@ -347,6 +353,8 @@ sketchTool.onMouseUp = function() {
             }, controller.doneSketching);
         }
     }
+
+    console.log(mainSketch.userPathList);
 };
 
 const setPenMode = (mode, accentTarget) => {

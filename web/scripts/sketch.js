@@ -106,7 +106,7 @@ class Controller {
         console.log(res);
         ws.send(JSON.stringify(res));
     }
-    draw(withRegion = false, svg = null, disableLines = false) {
+    draw(withRegion = false, svg = null) {
         if (noPrompt()) {
             openModal({
                 title: "Type a prompt first!",
@@ -118,8 +118,6 @@ class Controller {
         if (!this.clipDrawing) {
             this.clipDrawing = true;
             this.targetDrawing = false;
-            controller.linesDisabled = disableLines;
-
             this.prepare();
             this.updateDrawer({
                 status: "draw",
@@ -127,12 +125,15 @@ class Controller {
                 hasRegion: withRegion,
                 frameSize: mainSketch.frameSize,
                 prompt: this.prompt,
-                lines: disableLines ? 0 : this.initRandomCurves ? this.addLines : 0, //adding
+                lines: this.initRandomCurves ? this.addLines : 0, //adding
                 fixation: this.useFixation,
+                userPaths: mainSketch.userPathList.length,
             });
+            console.log(userLayer);
+            console.log(mainSketch.userPathList.length);
             this.step = 0;
             this.clipDrawing = true;
-            setActionUI(disableLines ? "refining" : "drawing");
+            setActionUI("drawing");
         } else {
             throw new Error("Can't continue if already running");
         }
@@ -154,6 +155,7 @@ class Controller {
                 lines: this.addLines,
                 sketchScopeIndex: sketchCountIndex,
                 fixation: this.useFixation,
+                userPaths: mainSketch.userPathList.length,
             });
         }
     }
@@ -272,18 +274,19 @@ class Sketch {
         if (svg === "" || svg === undefined) return;
         this.svg = svg;
         this.useLayer.clear();
-        let g = this.useLayer.importSVG(svg).children[0];
-        try {
-            scaleGroup(g, s);
-            this.useLayer.insertChildren(g.index, g.removeChildren());
-            mainSketch.userPathList = [];
-            this.useLayer.getItems().forEach((path, i) => {
-                i < n ? mainSketch.userPathList.push(path) : a && (path.opacity *= 0.5);
-            });
-            return svg;
-        } catch (e) {
-            console.log(userLayer);
-        }
+        let imported = this.useLayer.importSVG(svg);
+        let g = imported.children[0];
+        let scaledGroup = scaleGroup(g, s);
+        this.useLayer.insertChildren(
+            scaledGroup.index,
+            scaledGroup.removeChildren()
+        );
+        imported.remove();
+        mainSketch.userPathList = [];
+        this.useLayer.getItems().forEach((path, i) => {
+            i < n ? mainSketch.userPathList.push(path) : a && (path.opacity *= 0.5);
+        });
+        return svg;
     }
     sortPaths() {
         console.log("sorting");

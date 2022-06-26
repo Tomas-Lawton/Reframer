@@ -4,7 +4,7 @@ import pydiffvg
 from util.processing import get_augment_trans
 from util.loss import CLIPConvLoss2
 from util.utils import area_mask, use_penalisation, k_max_elements
-from util.render_design import rescale_constants, calculate_draw_region, UserSketch
+from util.render_design import calculate_draw_region, UserSketch
 from util.render_design import add_shape_groups, treebranch_initialization
 from util.clip_utility import get_noun_data, parse_svg, shapes2paths
 
@@ -69,18 +69,17 @@ class CICADA:
         logging.info("Updated CLIP prompt features")
         return
 
-    def extract_paths(self, region=None):
-        use_region = region['activate']
+    def extract_sketch(self):
         (
             self.path_list,
             self.user_canvas_w,
             self.user_canvas_h,
             self.resizeScaleFactor,
             normaliseScaleFactor,
-        ) = parse_svg('data/interface_paths.svg', use_region)
+        ) = parse_svg('data/interface_paths.svg', self.region["activate"])
 
-        if use_region:
-            self.drawing_area = calculate_draw_region(region, normaliseScaleFactor)
+        if self.region['activate']:
+            self.drawing_area = calculate_draw_region(self.region, normaliseScaleFactor)
 
     def initialise_without_treebranch(self):
         user_sketch = UserSketch(self.path_list, self.canvas_w, self.canvas_h)
@@ -91,7 +90,7 @@ class CICADA:
         self.user_sketch = user_sketch
         logging.info("Initialised shapes")
 
-    def update_user_paths(self):
+    def include_agent_strokes(self):
         for i, path in enumerate(self.path_list):
             if i < self.num_user_paths:
                 path.is_tied = True
@@ -100,13 +99,16 @@ class CICADA:
 
     def activate_without_curves(self):
         self.is_active = True
-        self.update_user_paths()
+        self.extract_sketch()
+        self.include_agent_strokes()
         self.initialise_without_treebranch()
         self.initialize_variables()
         self.initialize_optimizer()
 
     def activate(self):
         self.is_active = True
+        self.extract_sketch()
+        self.include_agent_strokes()
         self.initialize_shapes()
         self.initialize_variables()
         self.initialize_optimizer()
@@ -118,6 +120,7 @@ class CICADA:
             self.num_paths,
             self.canvas_w,
             self.canvas_h,
+            self.num_user_paths,
             self.drawing_area,
         )
         try:
@@ -356,8 +359,6 @@ class CICADA:
         if self.sketch_reference_index is not None:
             self.resizeScaleFactor = 224 / self.frame_size
 
-        # render_shapes, render_shape_groups = rescale_constants(self.shapes, self.shape_groups, self.resizeScaleFactor)
-
         pydiffvg.save_svg(
             f"results/output-{str(self.sketch_reference_index)}.svg",
             self.user_canvas_w,
@@ -377,74 +378,47 @@ class CICADA:
             "loss": str(loss.item()),
             "sketch_index": self.sketch_reference_index,
         }
+
         try:
-            logging.info("Sending...")
             await self.socket.send_json(result)
             logging.info(f"Finished update for {self.sketch_reference_index}")
-            self.last_result = result  # only for continue
         except Exception as e:
             logging.error("Failed sending WS response")
             pass
 
-    def setup_draw(self, data):
-        """Use current paths with the given (possibly different) prompt to generate options"""
+    def draw(self, data):
         logging.info("Updating...")
-        prompt = data["data"]["prompt"]
-        svg_string = data["data"]["svg"]
-        region = data["data"]["region"]
+        self.reset() # is this needed?
+        self.num_paths = data["data"]["random_curves"]
+        self.region = data["data"]["region"]
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
-            data["data"]["fixation"]
-        )
-        self.clip_interface.positive = prompt
-        if svg_string is not None:
-            with open('data/interface_paths.svg', 'w') as f:
-                f.write(svg_string)
-        prompt_features = self.clip_interface.encode_text_classes(prompt)
+            data["data"]["fixation"])
+        self.num_user_paths = int(data["data"]["num_user_paths"])
+
+        #TO DO: remove svg
+        with open('data/interface_paths.svg', 'w') as f:
+            f.write(data["data"]["svg"])
+
         try:
-            self.reset()
-            logging.info("Starting clip drawer")
-            prompt_features = self.clip_interface.encode_text_classes([prompt])
-            neg_prompt_features = self.clip_interface.encode_text_classes([])
+            prompt_features = self.clip_interface.encode_text_classes([data["data"]["prompt"]])
+            neg_prompt_features = self.clip_interface.encode_text_classes([]) #empty currently
             self.set_text_features(prompt_features, neg_prompt_features)
         except Exception as e:
-            logging.error(e)
             logging.error("Failed to encode features in clip")
 
-        self.last_region = region
-        self.num_paths = data["data"]["random_curves"]
-        self.extract_paths(region)
-        logging.info("Got features")
-        return self.activate()
+        self.activate()
 
-    def continue_update_sketch(self, data, restart=False):
-        """Keep the last drawer running"""
-        logging.info("Adding sketch changes...")
-
-        svg_string = data["data"]["svg"]
-
-        if svg_string is not None:
-            logging.info("Updating sketch")
-            with open('data/interface_paths.svg', 'w') as f:
-                f.write(svg_string)
-
-        self.extract_paths(self.last_region)
-
-        try:
-            self.num_user_paths = int(data["data"]["num_user_paths"])
-        except Exception as e:
-            logging.error("Must include number of user paths")
-
+    def continue_update_sketch(self, data):
+        logging.info("Adding changes...")
+        self.num_user_paths = int(data["data"]["num_user_paths"])
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
-            data["data"]["fixation"]
-        )
+            data["data"]["fixation"])
+        with open('data/interface_paths.svg', 'w') as f:
+            f.write(data["data"]["svg"])
 
-        if restart:
-            return self.activate()
-        else:
-            return self.activate_without_curves()
+        self.activate_without_curves()
 
     async def stop(self):
-        # check the socket is still open before sending stop
         logging.info(f"Stopping... {self.sketch_reference_index}")
         self.is_running = False
         # await self.socket.send_json({"status": "stop"})
@@ -453,8 +427,11 @@ class CICADA:
         while self.is_running and self.iteration < self.num_iter:
             try:
                 self.run_epoch()
-                # if self.iteration % self.refresh_rate == 0:
-                await self.update(self.iteration, self.losses['global'])
+                if self.device == "cuda:0":
+                    if self.iteration % self.refresh_rate == 0:
+                        await self.update(self.iteration, self.losses['global'])
+                else: 
+                    await self.update(self.iteration, self.losses['global'])
             except Exception as e:
                 logging.info("Iteration failed on: ", self.sketch_reference_index)
                 await self.stop()
