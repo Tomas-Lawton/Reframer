@@ -69,7 +69,7 @@ class CICADA:
         logging.info("Updated CLIP prompt features")
         return
 
-    def parse_svg(self, region=None):
+    def extract_paths(self, region=None):
         use_region = region['activate']
         try:
             (
@@ -354,7 +354,7 @@ class CICADA:
         logging.info(f"Completed run {t} in drawer {str(self.sketch_reference_index)}")
         self.iteration += 1
 
-    async def render_and_save(self, t, loss, pruning=False):
+    async def render(self, t, loss, pruning=False):
         status = str(self.sketch_reference_index)
         if pruning:
             status="pruning"
@@ -417,14 +417,14 @@ class CICADA:
 
         self.last_region = region
         self.num_paths = data["data"]["random_curves"]
-        self.parse_svg(region)
+        self.extract_paths(region)
         logging.info("Got features")
         return self.activate()
 
     def redraw(self):
         """Use original paths with origional prompt to try new options from same settings"""
         logging.info("Starting redraw")
-        self.parse_svg(self.last_region)
+        self.extract_paths(self.last_region)
         self.iteration = 0
         return self.activate()
 
@@ -439,7 +439,7 @@ class CICADA:
             with open('data/interface_paths.svg', 'w') as f:
                 f.write(svg_string)
 
-        self.parse_svg(self.last_region)
+        self.extract_paths(self.last_region)
 
         try:
             self.num_user_paths = int(data["data"]["num_user_paths"])
@@ -466,7 +466,7 @@ class CICADA:
             try:
                 self.run_epoch()
                 # if self.iteration % self.refresh_rate == 0:
-                await self.render_and_save(self.iteration, self.losses['global'])
+                await self.render(self.iteration, self.losses['global'])
             except Exception as e:
                 logging.info("Iteration failed on: ", self.sketch_reference_index)
                 await self.stop()
