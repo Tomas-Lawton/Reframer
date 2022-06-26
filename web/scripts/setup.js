@@ -7,7 +7,7 @@ const http = "http://";
 const base = "localhost:8000";
 
 const useAI = true;
-let socketConnected = false;
+let socket = false;
 
 if (useAI) {
     document
@@ -22,7 +22,7 @@ if (useAI) {
     };
     ws.onopen = (event) => {
         console.log("Connected AI Socket\n" + event);
-        socketConnected = true;
+        socket = true;
         // alert("Connected");
     };
 } else {
@@ -108,6 +108,9 @@ if (containerRect.width > window.innerHeight) {
     canvas.height = containerRect.width - padding * 2;
     canvas.width = containerRect.width - padding * 2;
 }
+
+// canvas.width = window.innerWidth;
+// canvas.height = window.innerHeight;
 
 const scaleRatio = canvas.width / sketchSize;
 

@@ -1,9 +1,9 @@
-//TODO Combine multitool and erasor into single tool
+// REFACTOR into single tool
+// refactor for multitouch
 
 let sketchTimer;
 
 multiTool.onMouseDown = function(event) {
-    // refactor for multitouch
     clearTimeout(sketchTimer);
     // controller.resetMetaControls();
 
@@ -207,10 +207,7 @@ multiTool.onMouseUp = function() {
                 liveCollab = false;
             } else {
                 //just drawing
-                if (!noPrompt() &&
-                    controller.doneSketching !== null &&
-                    socketConnected
-                ) {
+                if (!noPrompt() && controller.doneSketching !== null && socket) {
                     clearTimeout(sketchTimer);
                     sketchTimer = setTimeout(() => {
                         setActionUI("drawing");
@@ -232,7 +229,7 @@ multiTool.onMouseUp = function() {
             setLineLabels(userLayer);
             break;
         case "lasso":
-            if (socketConnected) {
+            if (socket) {
                 controller.resetMetaControls(); //reset since not continuing
                 controller.draw(true);
                 controller.clipDrawing = true;
@@ -378,5 +375,105 @@ eraseTool.onMouseUp = function(event) {
     if (liveCollab) {
         controller.continueSketch();
         liveCollab = false;
+    }
+};
+
+const setPenMode = (mode, accentTarget) => {
+    let lastPenMode = controller.penMode;
+    document.querySelectorAll(".pen-mode").forEach((mode) => {
+        mode.classList.remove("selected-mode");
+        mode.classList.add("simple-hover");
+    });
+
+    if (accentTarget) {
+        accentTarget.classList.add("selected-mode");
+        accentTarget.classList.remove("simple-hover");
+    }
+    switch (mode) {
+        case "pen-drop":
+            if (useAI) {
+                if (dropdown.style.display !== "flex") {
+                    dropdown.style.display = "flex";
+                    dropdown.style.top =
+                        buttonPanel.getBoundingClientRect().bottom + "px";
+                    dropdown.style.left =
+                        penDrop.getBoundingClientRect().left +
+                        penDrop.getBoundingClientRect().width / 2 +
+                        "px";
+                    setPenMode(controller.penDropMode, penDrop);
+                } else {
+                    dropdown.style.display = "none";
+                }
+            } else {
+                setPenMode("select", penDrop);
+            }
+
+            break;
+        case "erase":
+            if (useAI) {
+                dropdown.style.display = "none";
+            }
+            eraseTool.activate();
+            controller.penMode = mode;
+            break;
+        case "pen":
+            let swatches = document.getElementById("swatches");
+
+            if (window.innerWidth < 700) {
+                if (swatches.style.display !== "flex") {
+                    swatches.style.display = "flex";
+                    swatches.style.top =
+                        document.getElementById("pen-controls").getBoundingClientRect()
+                        .bottom +
+                        5 +
+                        "px";
+                } else {
+                    swatches.style.display = "none";
+                }
+            }
+            dropdown.style.display = "none";
+            multiTool.activate();
+            controller.penMode = mode;
+            "pen";
+            break;
+        case "select":
+            penDrop.classList.add("selected-mode");
+            penDrop.classList.remove("fa-eraser");
+            penDrop.classList.remove("fa-object-group");
+            penDrop.classList.add("fa-arrow-pointer");
+            multiTool.activate();
+            controller.penMode = mode;
+            controller.penDropMode = mode;
+            break;
+        case "lasso":
+            multiTool.activate();
+            if (noPrompt()) {
+                controller.penMode = lastPenMode;
+                openModal({
+                    title: "Add a prompt first!",
+                    message: "You need a prompt to generate sketches with the region tool.",
+                    confirmAction: () => (controlPanel.style.display = "flex"),
+                });
+            } else {
+                penDrop.classList.add("selected-mode");
+                penDrop.classList.remove("fa-eraser");
+                penDrop.classList.remove("fa-arrow-pointer");
+                penDrop.classList.add("fa-object-group");
+                controller.penMode = mode;
+                controller.penDropMode = mode;
+            }
+            break;
+    }
+
+    if (controller.penMode !== "select") {
+        userLayer.getItems().forEach((path) => {
+            path.selected = false;
+        });
+        hideSelectUI();
+    }
+    if (controller.penMode !== "lasso" && controller.penMode !== "select") {
+        controller.drawRegion = undefined;
+        if (regionPath) regionPath.remove();
+        penDrop.classList.remove("selected-mode");
     }
 };

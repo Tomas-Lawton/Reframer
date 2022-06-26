@@ -121,14 +121,13 @@ class Controller {
             controller.linesDisabled = disableLines;
 
             this.prepare();
-
             this.updateDrawer({
                 status: "draw",
                 svg: svg || mainSketch.svg,
                 hasRegion: withRegion,
                 frameSize: mainSketch.frameSize,
                 prompt: this.prompt,
-                lines: disableLines ? 0 : this.initRandomCurves ? this.addLines : 0,
+                lines: disableLines ? 0 : this.initRandomCurves ? this.addLines : 0, //adding
                 fixation: this.useFixation,
             });
             this.step = 0;
@@ -146,7 +145,6 @@ class Controller {
             this.targetDrawing = true;
 
             this.prepare();
-
             this.updateDrawer({
                 status: "add_new_sketch",
                 svg: mainSketch.svg,
@@ -185,7 +183,6 @@ class Controller {
             } else {
                 try {
                     this.prepare();
-
                     this.updateDrawer({
                         status: "continue_sketch",
                         svg: mainSketch.svg,

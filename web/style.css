@@ -1108,7 +1108,6 @@ input[type="number"] {
     /* background: white; */
     top: 5em;
     left: 2em;
-    display: flex;
     /* width: 85%; */
     max-width: initial;
     left: 50%;
@@ -1120,6 +1119,7 @@ input[type="number"] {
     /* width: 85%; */
     max-width: 350px;
     width: 100%;
+    display: flex;
 }
 
 #sketchbook-panel {

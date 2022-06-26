@@ -181,3 +181,38 @@ const pauseActiveDrawer = () => {
         aiMessage.classList.add("typed-out");
     }
 };
+
+const openModal = (data) => {
+    if (data.hasOwnProperty("ui")) {
+        modalContent.innerHTML = null;
+        data.ui.style.display = "flex";
+        modalContent.appendChild(data.ui);
+    } else {
+        if (modalContent.firstChild) {
+            modalContent.firstChild.style.display = "none";
+            document.body.appendChild(modalContent.firstChild); //store on body
+        }
+        modalContent.innerHTML = null;
+    }
+
+    let cancel = () =>
+        data.hasOwnProperty("cancelAction") ?
+        data.cancelAction() :
+        (modal.style.display = "none");
+    let confirm = () =>
+        data.hasOwnProperty("confirmAction") ?
+        data.confirmAction() :
+        (modal.style.display = "none");
+    let close = () => cancel();
+
+    document.getElementById("modal-title").innerHTML = data.title;
+    document.getElementById("modal-message").innerHTML = data.message;
+
+    document.getElementById("cancel-modal").onclick = () => cancel();
+    document.getElementById("modal-cross").onclick = () => close();
+    document.getElementById("confirm-modal").onclick = () => {
+        confirm();
+        close();
+    };
+    modal.style.display = "block";
+};
