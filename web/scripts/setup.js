@@ -81,7 +81,7 @@ const controllerUI = document.querySelectorAll(".inactive-section");
 // Utility
 let liveCollab = false;
 let allowOverwrite = true;
-let myPath, erasePath, regionPath, tmpGroup, mask, selectBox;
+let penPath, erasePath, regionPath, tmpGroup, mask, selectBox;
 
 const sketchTemplate = document.getElementById("sketch-template");
 
@@ -122,13 +122,9 @@ sketchScope.activate();
 scope.setup(canvas);
 scope.activate();
 
-const userLayer = new Layer(); //for drawing + erase mask
-const multiTool = new Tool();
-const eraseTool = new Tool();
-
-// timeKeeper.style.width = "0";
-multiTool.minDistance = 5;
-eraseTool.minDistance = 10;
+const userLayer = new Layer();
+const sketchTool = new Tool();
+sketchTool.minDistance = 5;
 
 const maxPointSize = 47.99;
 document.getElementById("width-slider").setAttribute("max", maxPointSize);

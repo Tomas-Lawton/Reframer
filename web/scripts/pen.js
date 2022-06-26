@@ -3,7 +3,7 @@
 
 let sketchTimer;
 
-multiTool.onMouseDown = function(event) {
+sketchTool.onMouseDown = function(event) {
     clearTimeout(sketchTimer);
     // controller.resetMetaControls();
 
@@ -74,15 +74,15 @@ multiTool.onMouseDown = function(event) {
         case "pen":
             pauseActiveDrawer();
 
-            myPath = new Path({
+            penPath = new Path({
                 strokeColor: controller.strokeColor,
                 strokeWidth: controller.strokeWidth,
                 opacity: controller.opacity,
                 strokeCap: "round",
                 strokeJoin: "round",
             });
-            myPath.add(event.point);
-            myPath.add({
+            penPath.add(event.point);
+            penPath.add({
                 ...event.point,
                 x: event.point.x + 0.001,
             }); //make a segment on touch down (one point)
@@ -90,40 +90,49 @@ multiTool.onMouseDown = function(event) {
         case "lasso":
             controller.drawRegion = new Rectangle(event.point);
             break;
+        case "erase":
+            pauseActiveDrawer();
+            // controller.resetMetaControls();
+            controller.stack.undoStack.push({
+                type: "erase-event",
+                data: userLayer.exportJSON(),
+            });
+            erasorPath = new Path({
+                strokeWidth: controller.strokeWidth * 5,
+                strokeCap: "round",
+                strokeJoin: "round",
+                opacity: 0.85,
+                strokeColor: "rgb(255,0, 0)",
+            });
+            tmpGroup = new Group({
+                children: userLayer.removeChildren(),
+                blendMode: "source-out",
+                insert: false,
+            });
+            mask = new Group({
+                children: [erasorPath, tmpGroup],
+                blendMode: "source-over",
+            });
+            break;
     }
 };
 
-multiTool.onMouseDrag = function(event) {
+sketchTool.onMouseDrag = function(event) {
     switch (controller.penMode) {
         case "pen":
-            myPath.add(event.point);
-            myPath.smooth();
+            penPath.add(event.point);
+            // penPath.smooth();
+            break;
+        case "erase":
+            erasorPath.add(event.point);
             break;
         case "select":
             if (controller.boundingBox) {
-                //moving box
                 if (controller.boundingBox.data.state === "moving") {
                     controller.transformGroup.position.x += event.delta.x;
                     controller.transformGroup.position.y += event.delta.y;
                     controller.boundingBox.position.x += event.delta.x;
                     controller.boundingBox.position.y += event.delta.y;
-
-                    // const selectedPaths = getSelectedPaths(); // all selected
-                    // selectedPaths[0].children.forEach((path) => {
-                    //     // path.applyMatrix = false; //temp to apply transfrom to children
-                    //     path.position.x += event.delta.x;
-                    //     path.position.y += event.delta.y;
-                    //     mainSketch.userPathList = mainSketch.userPathList.filter(
-                    //         (item) => item !== path
-                    //     ); //remove ref
-                    //     mainSketch.userPathList.push(path);
-                    //     path.opacity = 1;
-                    // });
-
-                    // controller.boundingBox.position.x += event.delta.x;
-                    // controller.boundingBox.position.y += event.delta.y;
-                    // controller.transformGroup.applyMatrix = true; //set back for rotation/scale
-
                     updateSelectUI();
                 }
             } else if (controller.selectBox !== undefined) {
@@ -155,12 +164,11 @@ multiTool.onMouseDrag = function(event) {
                 strokeColor: "#7b66ff",
                 selected: true,
             });
-            // Start draw
             break;
     }
 };
 
-multiTool.onMouseUp = function() {
+sketchTool.onMouseUp = function() {
     // so the latest sketch is available to the drawer
     mainSketch.svg = paper.project.exportSVG({
         asString: true,
@@ -169,6 +177,7 @@ multiTool.onMouseUp = function() {
     switch (controller.penMode) {
         case "select":
             if (selectBox) {
+                //after moving
                 //moving selection
                 let items = userLayer.getItems({ inside: selectBox.bounds });
                 items.pop().remove();
@@ -179,54 +188,29 @@ multiTool.onMouseUp = function() {
                     selectBox = null;
                 }
                 let path = fitToSelection(items, "moving"); //try update
+
+                // IS THIS STILL NEEDED?
                 if (!getSelectedPaths().length) {
                     path.remove();
                 }
                 createGroup(items); //transformGroup
                 updateSelectUI();
             }
-            // console.log("LAYER ", userLayer.children);
-            // console.log("Ref: ", mainSketch.userPathList);
-            break;
-        case "pen":
-            myPath.simplify();
-            // sendPaths();
-            controller.stack.undoStack.push({
-                type: "draw-event",
-                data: myPath,
-            });
-
-            mainSketch.svg = paper.project.exportSVG({
-                asString: true,
-            });
-
-            mainSketch.userPathList.push(myPath);
-
-            if (liveCollab) {
-                controller.continueSketch();
-                liveCollab = false;
-            } else {
-                //just drawing
-                if (!noPrompt() && controller.doneSketching !== null && socket) {
-                    clearTimeout(sketchTimer);
-                    sketchTimer = setTimeout(() => {
-                        setActionUI("drawing");
-                        controller.draw();
-                        controller.clipDrawing = true;
-
-                        let time = (Math.floor(Math.random() * 5) + 5) * 1000;
-                        setTimeout(() => {
-                            console.log("drawing for: ", time);
-                            controller.stop();
-                            controller.clipDrawing = false;
-                        }, time);
-                    }, controller.doneSketching);
+            if (controller.boundingBox) {
+                //after dragging
+                if (!getSelectedPaths().length) {
+                    ungroup();
+                } else {
+                    controller.boundingBox.data.state = "moving";
                 }
             }
-            mainSketch.svg = paper.project.exportSVG({
-                asString: true,
+            break;
+        case "pen":
+            penPath.simplify();
+            controller.stack.undoStack.push({
+                type: "draw-event",
+                data: penPath,
             });
-            setLineLabels(userLayer);
             break;
         case "lasso":
             if (socket) {
@@ -235,146 +219,132 @@ multiTool.onMouseUp = function() {
                 controller.clipDrawing = true;
                 regionPath.remove();
             }
-            mainSketch.svg = paper.project.exportSVG({
-                asString: true,
+            break;
+        case "erase":
+            erasorPath.simplify();
+            const eraseRadius = (controller.strokeWidth * 5) / 2;
+            const outerPath = OffsetUtils.offsetPath(erasorPath, eraseRadius);
+            const innerPath = OffsetUtils.offsetPath(erasorPath, -eraseRadius);
+            erasorPath.remove();
+            outerPath.insert = false;
+            innerPath.insert = false;
+            innerPath.reverse();
+            let deleteShape = new Path({
+                closed: true,
+                insert: false,
             });
-            setLineLabels(userLayer);
+            deleteShape.addSegments(outerPath.segments);
+            deleteShape.addSegments(innerPath.segments);
+            const endCaps = new CompoundPath({
+                children: [
+                    new Path.Circle({
+                        center: erasorPath.firstSegment.point,
+                        radius: eraseRadius,
+                    }),
+                    new Path.Circle({
+                        center: erasorPath.lastSegment.point,
+                        radius: eraseRadius,
+                    }),
+                ],
+                insert: false,
+            });
+            deleteShape = deleteShape.unite(endCaps);
+            deleteShape.simplify();
+
+            const erasorItems = tmpGroup.getItems({
+                overlapping: deleteShape.bounds,
+            });
+            erasorItems.forEach(function(erasorItem) {
+                const result = erasorItem.subtract(deleteShape, {
+                    trace: false,
+                    insert: false,
+                });
+                if (result.children) {
+                    //split path
+                    let splitPaths = result.removeChildren();
+                    erasorItem.parent.insertChildren(erasorItem.index, splitPaths);
+                    let newList = [];
+                    let foundUserPath = false;
+                    for (let i = 0; i < mainSketch.userPathList.length; i++) {
+                        if (mainSketch.userPathList[i] === erasorItem) {
+                            splitPaths.forEach((newPath) => {
+                                newList.push(newPath); // replace
+                            });
+                            foundUserPath = true;
+                        } else {
+                            newList.push(mainSketch.userPathList[i]);
+                        }
+                    }
+                    if (!foundUserPath) {
+                        //ai erasorItem
+                        splitPaths.forEach((newPath) => {
+                            newPath.opacity = 1;
+                            newPath.strokeColor.alpha = 1;
+                            newList.push(newPath);
+                        });
+                    }
+
+                    mainSketch.userPathList = newList;
+                    erasorItem.remove();
+                    result.remove(); //remove the compound paths
+                } else {
+                    // don't split
+                    if (result.length === 0) {
+                        mainSketch.userPathList = mainSketch.userPathList.filter(
+                            (ref) => ref !== erasorItem
+                        ); //remove ref
+                        erasorItem.remove();
+                    } else {
+                        mainSketch.userPathList = mainSketch.userPathList.filter(
+                            (ref) => ref !== erasorItem
+                        );
+                        erasorItem.replaceWith(result); //replace
+                        mainSketch.userPathList.push(result); //replace
+                    }
+                }
+            });
+
+            let added = userLayer.addChildren(tmpGroup.removeChildren());
+            mask.remove();
+            //remove 0 length paths
+            added.forEach((path) => {
+                if (!path.segments.length) {
+                    path.remove();
+                }
+            });
             break;
     }
-    // remove??
-    if (controller.boundingBox) {
-        controller.boundingBox.data.state = "moving";
-    }
 
-    logger.event(controller.penMode + "-up");
-};
-
-eraseTool.onMouseDown = function(event) {
-    pauseActiveDrawer();
-    // controller.resetMetaControls();
-
-    controller.stack.undoStack.push({
-        type: "erase-event",
-        data: userLayer.exportJSON(),
-    });
-    erasorPath = new Path({
-        strokeWidth: controller.strokeWidth * 5,
-        strokeCap: "round",
-        strokeJoin: "round",
-        opacity: 0.85,
-        strokeColor: "rgb(255,0, 0)",
-    });
-    tmpGroup = new Group({
-        children: userLayer.removeChildren(),
-        blendMode: "source-out",
-        insert: false,
-    });
-    mask = new Group({
-        children: [erasorPath, tmpGroup],
-        blendMode: "source-over",
-    });
-};
-
-eraseTool.onMouseDrag = function(event) {
-    erasorPath.add(event.point);
-};
-
-eraseTool.onMouseUp = function(event) {
-    erasorPath.simplify();
-    const eraseRadius = (controller.strokeWidth * 5) / 2;
-    const outerPath = OffsetUtils.offsetPath(erasorPath, eraseRadius);
-    const innerPath = OffsetUtils.offsetPath(erasorPath, -eraseRadius);
-    erasorPath.remove();
-    outerPath.insert = false;
-    innerPath.insert = false;
-    innerPath.reverse();
-    let deleteShape = new Path({
-        closed: true,
-        insert: false,
-    });
-    deleteShape.addSegments(outerPath.segments);
-    deleteShape.addSegments(innerPath.segments);
-    const endCaps = new CompoundPath({
-        children: [
-            new Path.Circle({
-                center: erasorPath.firstSegment.point,
-                radius: eraseRadius,
-            }),
-            new Path.Circle({
-                center: erasorPath.lastSegment.point,
-                radius: eraseRadius,
-            }),
-        ],
-        insert: false,
-    });
-    deleteShape = deleteShape.unite(endCaps);
-    deleteShape.simplify();
-
-    const erasorItems = tmpGroup.getItems({
-        overlapping: deleteShape.bounds,
-    });
-    erasorItems.forEach(function(erasorItem) {
-        const result = erasorItem.subtract(deleteShape, {
-            trace: false,
-            insert: false,
-        });
-        if (result.children) {
-            //split path
-            let splitPaths = result.removeChildren();
-            erasorItem.parent.insertChildren(erasorItem.index, splitPaths);
-            let newList = [];
-            let foundUserPath = false;
-            for (let i = 0; i < mainSketch.userPathList.length; i++) {
-                if (mainSketch.userPathList[i] === erasorItem) {
-                    splitPaths.forEach((newPath) => {
-                        newList.push(newPath); // replace
-                    });
-                    foundUserPath = true;
-                } else {
-                    newList.push(mainSketch.userPathList[i]);
-                }
-            }
-            if (!foundUserPath) {
-                //ai erasorItem
-                splitPaths.forEach((newPath) => {
-                    newPath.opacity = 1;
-                    newPath.strokeColor.alpha = 1;
-                    newList.push(newPath);
-                });
-            }
-
-            mainSketch.userPathList = newList;
-            erasorItem.remove();
-            result.remove(); //remove the compound paths
-        } else {
-            // don't split
-            if (result.length === 0) {
-                mainSketch.userPathList = mainSketch.userPathList.filter(
-                    (ref) => ref !== erasorItem
-                ); //remove ref
-                erasorItem.remove();
-            } else {
-                mainSketch.userPathList = mainSketch.userPathList.filter(
-                    (ref) => ref !== erasorItem
-                );
-                erasorItem.replaceWith(result); //replace
-                mainSketch.userPathList.push(result); //replace
-            }
-        }
-    });
-    userLayer.addChildren(tmpGroup.removeChildren());
-    mask.remove();
-
+    // Save
     mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
     setLineLabels(userLayer);
+    logger.event(controller.penMode + "-up");
 
-    logger.event("erase-up");
+    console.log(userLayer);
 
+    // Continue
     if (liveCollab) {
         controller.continueSketch();
         liveCollab = false;
+    } else if (!noPrompt() && controller.doneSketching !== null && socket) {
+        //stopped with collab draw
+        {
+            clearTimeout(sketchTimer);
+            sketchTimer = setTimeout(() => {
+                setActionUI("drawing");
+                controller.draw();
+                controller.clipDrawing = true;
+
+                let time = (Math.floor(Math.random() * 5) + 5) * 1000;
+                setTimeout(() => {
+                    console.log("drawing for: ", time);
+                    controller.stop();
+                    controller.clipDrawing = false;
+                }, time);
+            }, controller.doneSketching);
+        }
     }
 };
 
@@ -413,7 +383,6 @@ const setPenMode = (mode, accentTarget) => {
             if (useAI) {
                 dropdown.style.display = "none";
             }
-            eraseTool.activate();
             controller.penMode = mode;
             break;
         case "pen":
@@ -432,7 +401,6 @@ const setPenMode = (mode, accentTarget) => {
                 }
             }
             dropdown.style.display = "none";
-            multiTool.activate();
             controller.penMode = mode;
             "pen";
             break;
@@ -441,12 +409,10 @@ const setPenMode = (mode, accentTarget) => {
             penDrop.classList.remove("fa-eraser");
             penDrop.classList.remove("fa-object-group");
             penDrop.classList.add("fa-arrow-pointer");
-            multiTool.activate();
             controller.penMode = mode;
             controller.penDropMode = mode;
             break;
         case "lasso":
-            multiTool.activate();
             if (noPrompt()) {
                 controller.penMode = lastPenMode;
                 openModal({

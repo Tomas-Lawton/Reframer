@@ -286,6 +286,7 @@ class Sketch {
         }
     }
     sortPaths() {
+        console.log("sorting");
         // add paths to userPathList not just num so can be used by any instance
         let sorted = [...this.userPathList];
         this.useLayer.getItems().forEach((item) => {
