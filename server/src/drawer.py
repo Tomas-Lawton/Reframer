@@ -421,13 +421,6 @@ class CICADA:
         logging.info("Got features")
         return self.activate()
 
-    def redraw(self):
-        """Use original paths with origional prompt to try new options from same settings"""
-        logging.info("Starting redraw")
-        self.parse_svg(self.last_region)
-        self.iteration = 0
-        return self.activate()
-
     def continue_update_sketch(self, data, restart=False):
         """Keep the last drawer running"""
         logging.info("Adding sketch changes...")

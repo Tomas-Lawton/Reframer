@@ -90,7 +90,7 @@ else:
         except Exception as e:
             logging.error("Bad socket")
 
-        artefact_drawer = CICADA(clip_class, websocket)
+        main = CICADA(clip_class, websocket)
 
         try:
             while True:
@@ -99,20 +99,16 @@ else:
                     logging.info(data)
                 except RuntimeError:
                     logging.warning("Unexpected json received by socket")
-                    await artefact_drawer.stop()
-                    del artefact_drawer
+                    await main.stop()
+                    del main
                     for drawer in exemplar_drawers:
                         logging.info("Suspend Brainstorm")
                         await drawer.stop()
                         del drawer
 
                 if data["status"] == "draw":
-                    artefact_drawer.setup_draw(data)
-                    artefact_drawer.run_async()
-
-                if data["status"] == "redraw":
-                    artefact_drawer.redraw()
-                    artefact_drawer.run_async()
+                    main.setup_draw(data)
+                    main.run_async()
 
                 if data["status"] == "add_new_sketch":
                     new_exemplar = CICADA(
@@ -124,8 +120,8 @@ else:
                     new_exemplar.run_async()
 
                 if data["status"] == "continue_sketch":
-                    artefact_drawer.continue_update_sketch(data)
-                    artefact_drawer.run_async()
+                    main.continue_update_sketch(data)
+                    main.run_async()
 
                 if data["status"] == "continue_single_sketch":
                     for drawer in exemplar_drawers:
@@ -137,8 +133,8 @@ else:
                             drawer.run_async()
 
                 if data["status"] == "prune":
-                    artefact_drawer.prune()
-                    await artefact_drawer.render(artefact_drawer.iteration, artefact_drawer.losses["global"], True)
+                    main.prune()
+                    await main.render(main.iteration, main.losses["global"], True)
 
                 if data["status"] == "stop_single_sketch":
                     for drawer in exemplar_drawers:
@@ -150,16 +146,16 @@ else:
                             del drawer
 
                 if data["status"] == "stop":
-                    await artefact_drawer.stop()
+                    await main.stop()
                     # for drawer in exemplar_drawers:
                     #     logging.info("Pausing Brainstorm")
                     #     await drawer.stop()  # don't del because may restart
 
         except WebSocketDisconnect:
-            stop_all(exemplar_drawers, artefact_drawer)
+            stop_all(exemplar_drawers, main)
             logging.info("Client disconnected")
         except KeyboardInterrupt:
-            stop_all(exemplar_drawers, artefact_drawer)
+            stop_all(exemplar_drawers, main)
             logging.info("Client killed")
 
 
