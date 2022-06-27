@@ -229,6 +229,7 @@ const loadResponse = (result) => {
             updateMain(result);
             setActionUI("stop-prune");
             controller.clipDrawing = false; //single update
+            incrementHistory();
         }
     }
 };

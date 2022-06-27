@@ -466,7 +466,6 @@ controlPanel.onmousedown = (e) => {
                 if (tab.classList.contains("active-tab")) {
                     if (tab.id === "collab-tab") {
                         content = document.getElementById("ai-content");
-                        console.log('test')
                     } else {
                         content = document.getElementById("style-content");
                     }
@@ -478,7 +477,6 @@ controlPanel.onmousedown = (e) => {
         e = e || window.event;
         pos3 = e.clientX;
         pos4 = e.clientY;
-        console.log(pos3 > bounds.left)
         if (
             pos3 < bounds.left ||
             pos3 > bounds.right ||
@@ -486,7 +484,6 @@ controlPanel.onmousedown = (e) => {
             pos4 > bounds.bottom
         ) {
             document.onmouseup = closeDragElement;
-            console.log("test2");
             document.onmousemove = (e) => elementDrag(e, controlPanel);
         }
     }
