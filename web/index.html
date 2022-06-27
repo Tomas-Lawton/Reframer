@@ -74,7 +74,7 @@
     <div class="top-action" id="pen-controls">
         <i class="fa-solid fa-arrow-pointer fa-fw simple-hover pen-mode" id="pen-drop"></i>
         <i class="fa-solid fa-pen fa-fw pen-mode selected-mode" id="pen"></i>
-        <i class="fa-solid fa-eraser fa-fw pen-mode" id="erase"></i>
+        <i class="fa-solid fa-eraser fa-fw pen-mode simple-hover" id="erase"></i>
         <i class="fa-solid fa-sliders fa-fw panel-open" id="palette"></i>
         <i class="fa-solid fa-rotate-left fa-fw simple-hover" id="undo"></i>
         <i class="fa-solid fa-rotate-right fa-fw simple-hover" id="redo"></i>
@@ -84,7 +84,7 @@
         <i class="fa-solid fa-book fa-fw" id="scrapbook"></i>
         <i class="fa-solid fa-trash fa-fw" id="delete"></i>
         <i class="fa-solid fa-save fa-fw" id="save"></i>
-        <!-- <i class="fa-solid fa-cog fa-fw" id="settin    gs"></i> -->
+        <!-- <i class="fa-solid fa-cog fa-fw" id="settings"></i> -->
     </div>
     <!-- <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i> -->
 
@@ -98,36 +98,30 @@
             </div>
         </div>
 
-        <div class="ai-ui content-margin" id="ai-view">
+        <div class="ai-ui content-margin" id="ai-content">
             <div id="ai-content">
-                <div class="tab-info flex">
+                <div class="tab-info">
                     <div>
-                        <h1 class="panel-title">
-                            Sketch-bot
+                        <h1 class="panel-title">AI Panel</h1>
+                        <h2 class="panel-subtitle">Colors and Transforms</h2>
+                    </div>
+                </div>
+
+
+                <div class="panel-section">
+                    <div class="flex">
+                        <h1 class="panel-title" id="message">
+                            What are we drawing?
                         </h1>
-                        <h2 class="panel-subtitle">What shall we draw together?</h2>
+                    </div>
+                    <div id="prompt-input">
+                        <input type="text" id="messageText" placeholder="A majestic rainbow unicorn..." />
+                        <i class="fas fa-lightbulb" id="random-prompt"></i>
+                    </div>
+                    <div id="spinner">
+                        <i class="fa-solid fa-spinner button-animation " id="loading"></i>
                     </div>
                 </div>
-
-                <div id="spinner">
-                    <i class="fa-solid fa-spinner button-animation " id="loading"></i>
-                </div>
-
-                <div id="prompt-input">
-                    <input type="text" id="messageText" placeholder="A majestic rainbow unicorn..." />
-                    <i class="fas fa-lightbulb" id="random-prompt"></i>
-                </div>
-
-                <!-- <div class="panel-section">
-                    <div class="inactive-section slider-block" id="add-refine">
-                        <div class="flex">
-                            <p class="slider-label">Adding</p>
-                            <p class="slider-label">Refining</p>
-                        </div>
-                        <input type="range" id="autonomy-slider" value="6" min="1" max="11">
-                    </div>
-                </div> -->
-
 
                 <div class="panel-section">
                     <div class="flex">
@@ -137,46 +131,29 @@
                         <!-- Change text to Draw some -->
                         <!-- <p class="pill" id="show-all-paths">Draw all</p> -->
                     </div>
-                    <!-- <hr /> -->
-
                     <div class="inactive-section" id="set-modes">
-
                         <div class="ai-action" id="draw">
                             <i class="fa-solid fa-robot fa-fw"></i>
                             <p>Draw!</p>
                         </div>
-                        <!-- <div class="ai-action" id="refine">
-                            <i class="fa-solid fa-down-left-and-up-right-to-center fa-fw"></i>
-                            <p>Refine</p>
-                        </div> -->
                         <div class="ai-action" id="inspire">
                             <i class="fa-solid fa-lightbulb fa-fw"></i>
                             <p>Inspire</p>
                         </div>
-
-                        <!-- <div class="ai-action" id="generate">
-                            <i class="fa-solid fa-lightbulb fa-fw"></i>
-                            <p>Brainstorm</p>
-                        </div>-->
-
                         <div class="ai-action inactive-action" id="prune">
                             <i class="fa-solid fa-broom fa-fw" id="clean-icon"></i>
                             <p>Clean up</p>
                         </div>
-
                         <div class="ai-action inactive-action" id="stop">
                             <i class="fa-solid fa-stop fa-fw" id="stop-icon"></i>
                             <p id="stop-text">Stop</p>
                         </div>
-
                         <div class="ai-action inactive-action" id="redraw">
                             <i class="fa-solid fa-repeat fa-fw"></i>
                             <p>Try again</p>
                         </div>
                     </div>
                 </div>
-
-
                 <div class="panel-section">
                     <div class="flex">
                         <h1 class="panel-title">
@@ -184,15 +161,6 @@
                         </h1>
                         <p class="pill inactive-pill" id="autodraw-button">Solo draw</p>
                     </div>
-                    <!-- 
-                    <div class="inactive-section slider-block">
-                        <div class="flex">
-                            <p class="slider-label" id="max-lines">Max lines: </p>
-                            <p class="slider-label" id="calc-lines">Adding: </p>
-                        </div>
-                        <input id="num-squiggles" type="range" min="0" value="32" max="150">
-                    </div> -->
-
                     <div class="inactive-section slider-block" id="respect-block">
                         <div id="control-lines">
                             <div class="flex">
@@ -201,29 +169,16 @@
                             </div>
                             <input id="num-squiggles" type="range" min="0" value="32" max="150">
                         </div>
-
                         <div class="flex">
                             <p class="slider-label">Respect</p>
                             <p class="slider-label" id="fix-label">More</p>
                         </div>
                         <input type="range" id="respect-slider" value="3" min="0" max="4">
                     </div>
-
-                    <!-- <p class="slider-label" id="speed-text">Change User Strokes</p>
-                    <input type="range" id="respect-slider" value="1" min="1" max="11"> -->
-
-                    <!-- <hr /> -->
-                    <!-- <div id="add-refine">
-                        <div class="flex">
-                            <p class="slider-label">Adding</p>
-                            <p class="slider-label">Refining</p>
-                        </div>
-                        <input type="range" id="autonomy-slider" value="6" min="1" max="11">
-                    </div> -->
                 </div>
-
             </div>
         </div>
+
 
         <div class="content-margin" id="style-view">
             <div id="style-content">
@@ -256,7 +211,6 @@
                     </div>
                     <div id="pen-color" class="off-black"></div>
                 </div>
-
                 <!-- <p id="set-background">Set background</p> -->
             </div>
         </div>
@@ -266,7 +220,6 @@
     <div class="ai-ui" id="explore-margin">
         <div id="explore-sketches"></div>
         <div id="explorer-buttons">
-
             <p class="pill" id="empty">Empty</p>
             <p class="pill" id="overwrite">Overwrite</p>
             <p class="pill" id="close-explorer">Close <i class="fa-solid fa-xmark"></i></p>
@@ -286,16 +239,6 @@
                                 <h2 class="panel-subtitle">Save sketches for later!</h2>
                             </div>
                         </div>
-
-                        <!-- <div id="inspire">
-                            <i class="fa-solid fa-lightbulb fa-fw add-sketch"></i>
-                        </div> -->
-
-                        <!-- <label class="switch">
-                            <input type="checkbox">
-                            <span class="slider round"></span>
-                        </label> -->
-
                     </div>
                     <div class="basic-background" id="grid-container">
                         <div id="sketch-grid">
@@ -332,6 +275,7 @@
         <div class="purple swatch hide-swatch"></div>
         <div class="off-black swatch"></div>
         <div class="white swatch hide-swatch"></div>
+        <!-- <i class="fas fa-fw fa-eye-dropper simple-hover pen-mode" id="dropper"></i> -->
 
         <div id="points">
             <div class="center">
@@ -344,7 +288,6 @@
                 <div class="circle" id="circle-large"></div>
             </div>
         </div>
-
     </div>
 
     <div id="content">
@@ -352,28 +295,26 @@
             <div id="contain-canvas">
                 <div class="canvas-standard-drop" id="canvas-drop">
                     <h2 id="partial-message">Draw a drawing of a oubwego</h2>
-
                     <div id="delete-handler" class="select-ui">
                         <div>
                             <i class="basic-grey fa-solid fa-trash fa-fw"></i>
                         </div>
                     </div>
-                    <!-- <div id="revise-handler" class="select-ui">
+                    <div id="toBack" class="select-ui">
                         <div>
-                            <i class="basic-grey fa-arrows-to-circle fa-fw"></i>
+                            <i class="fa-solid fa-arrow-down-short-wide"></i>
                         </div>
-                    </div> -->
-                    <div id="duplicate-handler" class="select-ui">
+                    </div>
+                    <div id="moveUp" class="select-ui">
+                        <div>
+                            <i class="fa-solid fa-arrow-up-short-wide"></i>
+                        </div>
+                    </div>
+                    <div id="copy-handler" class="select-ui">
                         <div>
                             <i class="basic-grey fa-solid fa-copy fa-fw"></i>
                         </div>
                     </div>
-                    <!-- <div id="initialise-handler" class="select-ui">
-                        <div>
-                            <i class="basic-grey fa-solid fa-user-minus fa-fw"></i>
-                        </div>
-                    </div> -->
-
                     <div id="transform-ui" style="display: none">
                         <div class="transformer">
                             <div class="flex">
@@ -394,7 +335,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div id="history-block">
                         <div id="refine-controls">
                             <div id="go-back">
@@ -412,7 +352,6 @@
             </div>
         </div>
     </div>
-
     <!-- <i class="fa-solid fa-download" id="upload"></i> -->
 </body>
 

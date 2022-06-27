@@ -89,7 +89,7 @@ const setActionUI = (state) => {
             document.getElementById("explore-margin").style.display = "flex";
             // document.getElementById("inspire").classList.add("active");
         } else if (state == "continuing" || state == "continue-explore") {
-            aiMessage.innerHTML = `Nice, I'll make that it into ${controller.prompt}.`;
+            aiMessage.innerHTML = `I'll make that it into ${controller.prompt}.`;
         }
         aiMessage.classList.add("typed-out");
 
@@ -125,8 +125,8 @@ const hideSelectUI = (includeTransform = true) => {
         transformControl.style.display = "none";
     }
     deleteHandler.style.display = "none";
-    // initialiseHandler.style.display = "none";
-    // reviseHandler.style.display = "none";
+    sendToBack.style.display = "none";
+    moveUp.style.display = "none";
     copyHandler.style.display = "none";
 };
 
@@ -145,26 +145,23 @@ const updateRectBounds = (from, to) => {
 const updateSelectPosition = () => {
     let uiOffset = deleteHandler.getBoundingClientRect().height / 2 + 5;
     deleteHandler.style.left = controller.boundingBox.bounds.topRight.x + "px";
-    // reviseHandler.style.left =
-    //     controller.boundingBox.bounds.topLeft.x + "px";
     deleteHandler.style.top = controller.boundingBox.bounds.top - uiOffset + "px";
-    // reviseHandler.style.top =
-    //     controller.boundingBox.bounds.top - uiOffset + "px";
 
-    // initialiseHandler.style.left =
-    //     controller.boundingBox.bounds.topRight.x + "px";
+    copyHandler.style.top = controller.boundingBox.bounds.top - uiOffset + "px";
     copyHandler.style.left = controller.boundingBox.bounds.topLeft.x + "px";
-    // initialiseHandler.style.top =
-    //     controller.boundingBox.bounds.bottom + uiOffset + "px";
-    copyHandler.style.top =
-        controller.boundingBox.bounds.bottom + uiOffset + "px";
+
+    moveUp.style.left = controller.boundingBox.bounds.topLeft.x + "px";
+    moveUp.style.top = controller.boundingBox.bounds.bottom + uiOffset + "px";
+
+    sendToBack.style.top = controller.boundingBox.bounds.bottom + uiOffset + "px";
+    sendToBack.style.left = controller.boundingBox.bounds.topRight.x + "px";
 };
 
 const updateSelectUI = () => {
     if (controller.boundingBox && getSelectedPaths().length) {
         deleteHandler.style.display = "block";
-        // initialiseHandler.style.display = "block";
-        // reviseHandler.style.display = "block";
+        sendToBack.style.display = "block";
+        moveUp.style.display = "block";
         copyHandler.style.display = "block";
         transformControl.style.display = "flex";
         updateSelectPosition();
@@ -180,4 +177,39 @@ const pauseActiveDrawer = () => {
         aiMessage.innerHTML = `I'mma let you finish...`;
         aiMessage.classList.add("typed-out");
     }
+};
+
+const openModal = (data) => {
+    if (data.hasOwnProperty("ui")) {
+        modalContent.innerHTML = null;
+        data.ui.style.display = "flex";
+        modalContent.appendChild(data.ui);
+    } else {
+        if (modalContent.firstChild) {
+            modalContent.firstChild.style.display = "none";
+            document.body.appendChild(modalContent.firstChild); //store on body
+        }
+        modalContent.innerHTML = null;
+    }
+
+    let cancel = () =>
+        data.hasOwnProperty("cancelAction") ?
+        data.cancelAction() :
+        (modal.style.display = "none");
+    let confirm = () =>
+        data.hasOwnProperty("confirmAction") ?
+        data.confirmAction() :
+        (modal.style.display = "none");
+    let close = () => cancel();
+
+    document.getElementById("modal-title").innerHTML = data.title;
+    document.getElementById("modal-message").innerHTML = data.message;
+
+    document.getElementById("cancel-modal").onclick = () => cancel();
+    document.getElementById("modal-cross").onclick = () => close();
+    document.getElementById("confirm-modal").onclick = () => {
+        confirm();
+        close();
+    };
+    modal.style.display = "block";
 };

@@ -7,7 +7,7 @@ const http = "http://";
 const base = "localhost:8000";
 
 const useAI = true;
-let socketConnected = false;
+let socket = false;
 
 if (useAI) {
     document
@@ -22,35 +22,17 @@ if (useAI) {
     };
     ws.onopen = (event) => {
         console.log("Connected AI Socket\n" + event);
-        socketConnected = true;
+        socket = true;
         // alert("Connected");
     };
 } else {
     document.getElementById("partial-message").style.display = "block";
-    document.getElementById("ai-view").style.display = "none";
+    document.getElementById("ai-content").style.display = "none";
     document.getElementById("tabs").remove();
 }
 
 // Sketching UI
 const canvas = document.getElementById("canvas");
-
-// Actions
-const actionControls = document.querySelectorAll(".ai-action");
-const aiCard = document.getElementById("describe-card");
-
-// Select UI
-const deleteHandler = document.getElementById("delete-handler");
-const rotateSlider = document.getElementById("rotate-slider");
-const copyHandler = document.getElementById("duplicate-handler");
-// const reviseHandler = document.getElementById("revise-handler");
-const rotateNumber = document.getElementById("rotate-number");
-const scaleSlider = document.getElementById("scale-slider");
-const scaleNumber = document.getElementById("scale-number");
-
-// Change to revise
-// const initialiseHandler = document.getElementById("initialise-handler");
-const transformControl = document.getElementById("transform-ui");
-
 // General UI
 const prompt = document.getElementById("messageText");
 const promptInput = document.getElementById("prompt-input");
@@ -69,17 +51,32 @@ const stopButton = document.getElementById("stop");
 const buttonPanel = document.querySelector(".top-action");
 const dropdown = document.getElementById("pen-dropdown");
 const penDrop = document.getElementById("pen-drop");
-const aiMessage = document.querySelector("#ai-content .panel-subtitle");
+const aiMessage = document.getElementById("message");
 const sketchContainer = document.getElementById("canvas-drop");
 const staticSketches = document.getElementById("static-sketches");
 const explorer = document.getElementById("explore-sketches");
 const sketchGrid = document.getElementById("grid-container");
 const pen = document.getElementById("pen");
+// Actions
+const actionControls = document.querySelectorAll(".ai-action");
+const aiCard = document.getElementById("describe-card");
+// Transform UI
+const deleteHandler = document.getElementById("delete-handler");
+const rotateSlider = document.getElementById("rotate-slider");
+const copyHandler = document.getElementById("copy-handler");
+const rotateNumber = document.getElementById("rotate-number");
+const scaleSlider = document.getElementById("scale-slider");
+const scaleNumber = document.getElementById("scale-number");
+const moveUp = document.getElementById("moveUp");
+const sendToBack = document.getElementById("toBack");
+const transformControl = document.getElementById("transform-ui");
+
+const controllerUI = document.querySelectorAll(".inactive-section");
 
 // Utility
 let liveCollab = false;
 let allowOverwrite = true;
-let myPath, erasePath, regionPath, tmpGroup, mask, selectBox;
+let penPath, erasePath, regionPath, tmpGroup, mask, selectBox;
 
 const sketchTemplate = document.getElementById("sketch-template");
 
@@ -107,7 +104,16 @@ if (containerRect.width > window.innerHeight) {
     canvas.width = containerRect.width - padding * 2;
 }
 
-const scaleRatio = canvas.width / sketchSize;
+// canvas.width = window.innerWidth;
+// canvas.width = window.innerHeight;
+
+const frame = Math.min(canvas.width, canvas.height);
+const offset = frame / 2;
+// const offX = Math.max(0, canvas.width - canvas.height) / 2;
+// const offY = Math.max(0, canvas.height - canvas.width) / 2;
+// const offY = 0;
+// const offX = (canvas.width - canvas.height) / 2;
+const scaleRatio = frame / sketchSize;
 
 // Paper Setup
 paper.install(window);
@@ -117,13 +123,9 @@ sketchScope.activate();
 scope.setup(canvas);
 scope.activate();
 
-const userLayer = new Layer(); //for drawing + erase mask
-const multiTool = new Tool();
-const eraseTool = new Tool();
-
-// timeKeeper.style.width = "0";
-multiTool.minDistance = 5;
-eraseTool.minDistance = 10;
+const userLayer = new Layer();
+const sketchTool = new Tool();
+sketchTool.minDistance = 5;
 
 const maxPointSize = 47.99;
 document.getElementById("width-slider").setAttribute("max", maxPointSize);

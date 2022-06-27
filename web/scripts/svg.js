@@ -63,7 +63,7 @@ const partialSketches = [
        d="m 0.36515271,0.54233273 c 0.15081827,0.020399 0.26368659,0.003993 0.2900115,-0.0777128"
        style="fill:none;stroke:#661815;stroke-width:0.05;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
 </svg>`,
-        "A red chair.",
+        "A red chair",
     ],
     [
         `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -401,7 +401,7 @@ const partialSketches = [
       d="m 0.34339757,0.61693 c 0.17713564,0.0661 0.32660183,0.0375 0.33890086,0.0328"
       style="fill:none;fill-opacity:1;stroke:#d74619;stroke-width:0.03618045;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
 </svg>`,
-        "A drawing of a pot.",
+        "A drawing of a pot",
     ],
     [
         `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -510,7 +510,7 @@ const partialSketches = [
          id="path563-1-2" />
     </svg>    
     `,
-        "A blue dress.",
+        "A blue dress",
     ],
     [
         `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -569,7 +569,7 @@ const partialSketches = [
      d="m 0.11328802,0.55373989 c 0.0134924,0.0578248 0.011565,0.0742085 0.0221662,0.0828821 0.0106012,0.008674 0.19274936,0.0289124 0.37682496,0.026985 0.1840756,-0.001928 0.35465865,-0.0106012 0.3642962,-0.0202386 0.009637,-0.009638 0.0192748,-0.0655349 0.0289124,-0.11372222"
      id="path939-9-3" />
 </svg>`,
-        "A drawing of a boat.",
+        "A drawing of a boat",
     ],
     [
         `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -627,7 +627,7 @@ const partialSketches = [
      d="m 0.38135594,0.71610169 c 0.0902544,0.0114404 0.10168584,-9.7287e-4 0.10588061,-0.005168"
      style="opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.02645833;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
 </svg>`,
-        "A drawing of a hat.",
+        "A drawing of a hat",
     ],
     [
         `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -700,7 +700,7 @@ const partialSketches = [
              inkscape:connector-curvature="0" />
         </svg>
         `,
-        "A drawing of a lamp.",
+        "A drawing of a lamp",
     ],
     [
         `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -774,7 +774,7 @@ const partialSketches = [
              id="path51870-3" />
         </svg>
         `,
-        "A bust.",
+        "A bust",
     ],
     [
         `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -840,6 +840,6 @@ const partialSketches = [
          id="path24733" />
     </svg>
     `,
-        "A high-heel shoe.",
+        "A high-heel shoe",
     ],
 ];

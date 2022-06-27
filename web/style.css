@@ -406,11 +406,18 @@ hr {
     flex-flow: wrap;
 }
 
+#dropper {
+    /* padding: 0 0.4em 0 0.3em; */
+    padding: 0.4em;
+    border-radius: 1.5em;
+    /* color: rgb(117, 117, 117); */
+    color: #363636;
+}
+
 #points {
     padding: 0 0.5em;
-    margin: 0 0 0 0.5em;
     display: flex;
-    border-left: grey 1px solid;
+    /* border-left: grey 1px solid; */
     /* width: 100%; */
 }
 
@@ -457,7 +464,8 @@ hr {
     padding: 0.4em;
     transition: 0.5s;
     border-radius: 0.5em;
-    margin: 0.2em 0 0.3em 0;
+    /* margin: 0.2em 0 0.3em 0; */
+    margin: 0.2em 0.2em 0.4em 0.2em;
 }
 
 
@@ -668,10 +676,23 @@ hr {
     margin-left: 10px;
 }
 
+#message {
+    color: #7b66ff;
+    text-align: center;
+    margin: 1em 0;
+    display: flex;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    width: 100%;
+}
+
 #prompt-input {
     border-radius: 3.5em;
     display: flex;
-    padding: 0.6em;
+    /* padding: 0.6em; */
+    padding: 1.6em;
     font-size: 1em;
     align-items: center;
     color: white;
@@ -681,9 +702,11 @@ hr {
     margin: 0 0 1em 0;
     background: #f5f5f5;
     /* background: #f3f1ff; */
+    /* background: #f3f1ff; */
+    /* color: #7b66ff; */
     font-weight: 500;
     pointer-events: all;
-    box-shadow: inset 2px 4px 10px rgb(0 0 0 / 8%);
+    /* box-shadow: inset 2px 4px 10px rgb(0 0 0 / 8%); */
 }
 
 textarea:focus,
@@ -713,8 +736,10 @@ input:focus {
     /* background: #7b66ff; */
     background: #f5f5f5;
     /* background: #f3f1ff; */
-    color: #7b66ff;
+    /* color: #7b66ff; */
     padding-left: 0.8em;
+    /* background: #f3f1ff; */
+    color: #7b66ff;
 }
 
 .typed-out {
@@ -972,6 +997,7 @@ input:focus {
 
 .selected-mode {
     background-color: #7b66ff;
+    color: white;
 }
 
 .selected-mode:hover {
@@ -1027,7 +1053,8 @@ input[type="number"] {
     right: 0;
     position: absolute;
     /* display: flex; */
-    justify-content: center;
+    /* justify-content: center; */
+    justify-content: space-evenly;
     display: none;
     display: flex;
     top: 1em;
@@ -1084,12 +1111,12 @@ input[type="number"] {
     position: absolute;
     z-index: 11;
     flex-direction: column;
-    box-shadow: 10px 5px 15px rgb(28 28 28 / 20%);
+    /* box-shadow: 10px 5px 15px rgb(28 28 28 / 20%); */
+    box-shadow: 0px 5px 20px rgb(28 28 28 / 15%);
     border-radius: 2em;
     /* background: white; */
     top: 5em;
     left: 2em;
-    display: flex;
     /* width: 85%; */
     max-width: initial;
     left: 50%;
@@ -1101,6 +1128,7 @@ input[type="number"] {
     /* width: 85%; */
     max-width: 350px;
     width: 100%;
+    display: flex;
 }
 
 #sketchbook-panel {

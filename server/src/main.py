@@ -90,7 +90,7 @@ else:
         except Exception as e:
             logging.error("Bad socket")
 
-        artefact_drawer = CICADA(clip_class, websocket)
+        main_sketch = CICADA(clip_class, websocket)
 
         try:
             while True:
@@ -99,20 +99,16 @@ else:
                     logging.info(data)
                 except RuntimeError:
                     logging.warning("Unexpected json received by socket")
-                    await artefact_drawer.stop()
-                    del artefact_drawer
+                    await main_sketch.stop()
+                    del main_sketch
                     for drawer in exemplar_drawers:
                         logging.info("Suspend Brainstorm")
                         await drawer.stop()
                         del drawer
 
                 if data["status"] == "draw":
-                    artefact_drawer.setup_draw(data)
-                    artefact_drawer.run_async()
-
-                if data["status"] == "redraw":
-                    artefact_drawer.redraw()
-                    artefact_drawer.run_async()
+                    main_sketch.draw(data)
+                    main_sketch.run_async()
 
                 if data["status"] == "add_new_sketch":
                     new_exemplar = CICADA(
@@ -120,25 +116,16 @@ else:
                     )
                     exemplar_drawers.append(new_exemplar)
                     new_exemplar.frame_size = data["data"]['frame_size']
-                    new_exemplar.setup_draw(data)
+                    new_exemplar.draw(data)
                     new_exemplar.run_async()
 
                 if data["status"] == "continue_sketch":
-                    artefact_drawer.continue_update_sketch(data)
-                    artefact_drawer.run_async()
-
-                if data["status"] == "continue_single_sketch":
-                    for drawer in exemplar_drawers:
-                        if (
-                            drawer.sketch_reference_index
-                            == data["data"]['sketch_index']
-                        ):
-                            drawer.continue_update_sketch(data, True)
-                            drawer.run_async()
+                    main_sketch.continue_update_sketch(data)
+                    main_sketch.run_async()
 
                 if data["status"] == "prune":
-                    artefact_drawer.prune()
-                    await artefact_drawer.render_and_save(artefact_drawer.iteration, artefact_drawer.losses["global"], True)
+                    main_sketch.prune()
+                    await main_sketch.update(main_sketch.iteration, main_sketch.losses["global"], True)
 
                 if data["status"] == "stop_single_sketch":
                     for drawer in exemplar_drawers:
@@ -150,16 +137,13 @@ else:
                             del drawer
 
                 if data["status"] == "stop":
-                    await artefact_drawer.stop()
-                    # for drawer in exemplar_drawers:
-                    #     logging.info("Pausing Brainstorm")
-                    #     await drawer.stop()  # don't del because may restart
+                    await main_sketch.stop()
 
         except WebSocketDisconnect:
-            stop_all(exemplar_drawers, artefact_drawer)
+            stop_all(exemplar_drawers, main_sketch)
             logging.info("Client disconnected")
         except KeyboardInterrupt:
-            stop_all(exemplar_drawers, artefact_drawer)
+            stop_all(exemplar_drawers, main_sketch)
             logging.info("Client killed")
 
 

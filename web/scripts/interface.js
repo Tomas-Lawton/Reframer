@@ -65,6 +65,7 @@ document.querySelectorAll(".swatch").forEach((elem) => {
         controller.strokeColor = col;
         getSelectedPaths().forEach((path) => (path.strokeColor = col));
         picker.setColor(col);
+        setPenMode("pen", pen);
     });
 });
 
@@ -101,36 +102,27 @@ deleteHandler.addEventListener("click", (e) => {
 });
 
 copyHandler.addEventListener("click", (e) => {
-    // const group = getSelectedPaths()[0];
-    // // group.getItems((child) => {
-    // //     const newChild = child.clone();
-    // //     mainSketch.userPathList.push(newChild);
-    // // });
-    // group.clone();
-    // mainSketch.svg = paper.project.exportSVG({
-    //     asString: true,
-    // });
-    // logger.event("duplicate-selection");
-    // fitToSelection(getSelectedPaths(), "moving");
-    // updateSelectUI();
+    if (controller.boundingBox) {
+        controller.boundingBox.remove();
+        controller.boundingBox = null;
+    }
+    let copy = controller.transformGroup.clone();
+    let inserted = mainSketch.useLayer.insertChildren(
+        copy.index,
+        copy.removeChildren()
+    );
+    controller.transformGroup.selected = false; //deselect og
+    ungroup();
+    inserted.forEach((pathCopy) => mainSketch.userPathList.push(pathCopy)); //save to user paths
+    createGroup(inserted);
+    fitToSelection(getSelectedPaths(), "moving");
+    updateSelectUI();
+
+    mainSketch.svg = paper.project.exportSVG({
+        asString: true,
+    });
+    logger.event("copy-selection");
 });
-
-// reviseHandler.addEventListener("click", (e) => {
-//     if (
-//         controller.drawState === "inactive" ||
-//         controller.drawState === "stop"
-//     ) {
-//         controller.draw(false, null, true);
-//     }
-// });
-
-// initialiseHandler.addEventListener("click", (e) => {
-//     const remove = userLayer.getItems().filter((path) => !path.selected);
-//     remove.forEach((item) => item.remove());
-//     let items = getSelectedPaths();
-//     fitToSelection(items, "moving");
-//     updateSelectUI();
-// });
 
 document.getElementById("begin").addEventListener("click", () => {
     document.getElementById("sliding-overlay").style.bottom = "100%";
@@ -220,7 +212,7 @@ document.getElementById("redo").addEventListener("click", () => {
     }
 });
 document.getElementById("save").addEventListener("click", () => {
-    downloadSketch();
+    download();
 });
 
 document.getElementById("width-slider").oninput = function() {
@@ -256,12 +248,6 @@ opacitySlider.oninput = function() {
     document.getElementById("point-size").style.background = rgba;
 };
 
-// document.getElementById("autonomy-slider").oninput = function() {
-//     let val = 11 - this.value;
-//     // 0-10
-//     controller.addPaths = val; //used for adding
-// };
-
 document
     .getElementById("circle-small")
     .parentElement.addEventListener("click", (e) => {
@@ -286,6 +272,7 @@ document
 document.getElementById("close-explorer").addEventListener("click", (e) => {
     showHide(document.getElementById("explore-margin"));
 });
+
 document.getElementById("empty").addEventListener("click", (e) => {
     aiMessage.innerHTML = "All done! What should we draw next?";
     aiMessage.classList.add("typed-out");
@@ -325,9 +312,6 @@ timeKeeper.oninput = function() {
             false // don't reapply opacity
         );
     }
-    mainSketch.svg = paper.project.exportSVG({
-        asString: true,
-    });
 };
 
 palette.addEventListener("click", () => {
@@ -336,21 +320,24 @@ palette.addEventListener("click", () => {
 });
 
 prompt.addEventListener("input", (e) => {
-    controller.prompt = e.target.value;
-    aiMessage.innerHTML = `Sure! I can draw ${controller.prompt}...`;
-    document
-        .querySelectorAll(".inactive-section")
-        .forEach((elem) => elem.classList.remove("inactive-section"));
+    controller.prompt = e.target.value.toLowerCase();
+    if (controller.prompt === "") {
+        aiMessage.innerHTML = ` What are we drawing?`;
+        controllerUI.forEach((elem) => elem.classList.add("inactive-section"));
+    } else {
+        aiMessage.innerHTML = `Ok, ${controller.prompt}.`;
+        controllerUI.forEach((elem) => elem.classList.remove("inactive-section"));
+    }
 });
 
 document.getElementById("draw").addEventListener("click", () => {
-    if (socketConnected) {
+    if (socket) {
         controller.draw();
     }
 });
 
 document.getElementById("inspire").addEventListener("click", () => {
-    if (socketConnected) {
+    if (socket) {
         if (noPrompt()) {
             openModal({
                 title: "Type a prompt first!",
@@ -395,11 +382,16 @@ document.getElementById("inspire").addEventListener("click", () => {
 });
 
 stopButton.addEventListener("click", () => {
-    if (socketConnected) {
+    if (socket) {
         if (
             controller.drawState === "drawing" ||
-            controller.drawState === "continuing"
+            controller.drawState === "continuing" ||
+            controller.drawState === "pause"
         ) {
+            if (controller.drawState === "pause") {
+                liveCollab = false;
+            }
+
             controller.stop(); //flag
             controller.clipDrawing = false;
         } else if (
@@ -415,8 +407,20 @@ stopButton.addEventListener("click", () => {
     }
 });
 
+sendToBack.addEventListener("click", () => {
+    controller.transformGroup.sendToBack();
+    controller.boundingBox.sendToBack();
+});
+
+moveUp.addEventListener("click", () => {
+    let thisItem = controller.transformGroup;
+    mainSketch.useLayer.insertChild(thisItem.index + 1, thisItem);
+    // thisItem.insertAbove(thisItem);
+    controller.boundingBox.insertBelow(thisItem);
+});
+
 document.getElementById("prune").addEventListener("click", () => {
-    if (socketConnected) {
+    if (socket) {
         if (
             controller.drawState === "stop" ||
             controller.drawState === "stop-prune"
@@ -444,7 +448,7 @@ document.getElementById("random-prompt").addEventListener("click", () => {
         promptList[Math.floor(Math.random() * promptList.length)].toLowerCase();
     prompt.value = randomPrompt;
     controller.prompt = randomPrompt;
-    aiMessage.innerHTML = `Sure! I can draw ${randomPrompt}...`;
+    aiMessage.innerHTML = `Ok, ${randomPrompt}.`;
     document
         .querySelectorAll(".inactive-section")
         .forEach((elem) => elem.classList.remove("inactive-section"));
@@ -480,6 +484,7 @@ controlPanel.onmousedown = (e) => {
             pos4 > bounds.bottom
         ) {
             document.onmouseup = closeDragElement;
+            console.log("cliekced");
             document.onmousemove = (e) => elementDrag(e, controlPanel);
         }
     }
@@ -577,7 +582,7 @@ document.getElementById("scrapbook").addEventListener("click", () => {
 
 document.getElementById("save-sketch").addEventListener("click", () => {
     console.log(mainSketch.userPathList);
-    unpackGroup();
+    ungroup();
     hideSelectUI();
     // mainSketch.load(1, mainSketch.sortPaths(), mainSketch.num, false);
     mainSketch.sortPaths();
@@ -730,13 +735,6 @@ for (let i = 0; i < 4; i++) {
 // sketchBook.style.left =
 //     window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";
 sketchBook.style.display = "none";
-// controlPanel.style.left = 5 + "px";
-// controlPanel.style.display = "none";
-// if (window.innerWidth < 700) {
-//     document
-//         .getElementById("content")
-//         .appendChild(document.getElementById("style-content"));
-// }
 
 if (window.innerWidth <= 700 || window.innerWidth >= 1000) {
     document
@@ -753,11 +751,11 @@ if (window.innerWidth <= 700) {
     document.getElementById("top-action-right").prepend(saveText);
 
     document.getElementById("save").removeEventListener("click", () => {
-        downloadSketch();
+        download();
     });
     document
         .getElementById("save")
         .parentElement.addEventListener("click", () => {
-            downloadSketch();
+            download();
         });
 }

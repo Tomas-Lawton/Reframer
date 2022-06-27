@@ -91,7 +91,7 @@ def parse_local_svg(path_to_svg_file):
     return path_list
 
 
-def parse_svg(path_to_svg_file, skip_box_select=False):
+def parse_svg(path_to_svg_file, with_selection):
     try:
         paths, attributes = svg2paths(path_to_svg_file)
         path_list = []
@@ -120,7 +120,7 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
     try:
         width = float(parent_svg['attributes']['width'])
         height = float(parent_svg['attributes']['height'])
-        frame_size = max(width, height)
+        frame_size = min(width, height)
         normaliseScaleFactor = 1 / frame_size
         resizeScaleFactor = 224 / frame_size
     except Exception as e:
@@ -130,56 +130,38 @@ def parse_svg(path_to_svg_file, skip_box_select=False):
     count = 0
     num_paths = len(attributes)
     for att in attributes:
-        if skip_box_select and count == num_paths - 1:
-            continue
 
         num_segments = len(att['d'].split(',')) // 3
-
-        if num_segments == 0:
+        if num_segments == 0 or (with_selection and count == num_paths - 1):
             continue
 
-        # could refactor now local file is seperate function
         stroke_width = 15
         color_code = '#000000'
         opacity = 1
-        try:
-            if 'stroke' in att:
-                color_code = str(att['stroke'])
-            else:
-                color_code = str(path_group['attributes']['stroke'])
-        except Exception as e:
-            logging.error(e)
-            logging.error("Couldn't parse stroke")
 
-        try:
-            if 'stroke-width' in att:
-                stroke_width = float(att['stroke-width']) * normaliseScaleFactor
-            else:
-                stroke_width = (
-                    float(path_group['attributes']['stroke-width'])
-                    * normaliseScaleFactor
-                )
-        except Exception as e:
-            logging.error(e)
-            logging.error("Couldn't parse stroke width")
-            # if 'stroke-opacity' in att:
-            # opacity = float(att['stroke-opacity'])
+        if 'stroke' in att:
+            color_code = str(att['stroke'])
+        else:
+            color_code = str(path_group['attributes']['stroke'])
 
-        try:
-            if 'stroke-opacity' in att:
-                opacity = float(att['stroke-opacity'])
-            elif 'opacity' in att:
-                opacity = float(att['opacity'])
-            elif 'opacity' in path_group['attributes']:
-                opacity = str(path_group['attributes']['stroke-opacity'])
-            elif 'stroke-opacity' in path_group['attributes']:
-                opacity = str(path_group['attributes']['stroke-opacity'])
-            else:
-                opacity = 1
+        if 'stroke-width' in att:
+            stroke_width = float(att['stroke-width']) * normaliseScaleFactor
+        else:
+            stroke_width = (
+                float(path_group['attributes']['stroke-width'])
+                * normaliseScaleFactor
+            )
 
-        except Exception as e:
-            logging.error(e)
-            logging.error("Couldn't parse stroke opacity")
+        if 'stroke-opacity' in att:
+            opacity = float(att['stroke-opacity'])
+        elif 'opacity' in att:
+            opacity = float(att['opacity'])
+        elif 'opacity' in path_group['attributes']:
+            opacity = str(path_group['attributes']['stroke-opacity'])
+        elif 'stroke-opacity' in path_group['attributes']:
+            opacity = str(path_group['attributes']['stroke-opacity'])
+        else:
+            opacity = 1
 
         color = get_color(color_code, opacity)
 
