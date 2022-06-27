@@ -171,7 +171,7 @@ const updateSelectUI = () => {
 const pauseActiveDrawer = () => {
     if (controller.activeStates.includes(controller.drawState)) {
         // TO DO: check if can just check if clip is drawing.. should work?
-        liveCollab = true;
+        controller.liveCollab = true;
         controller.pause(); //continue on pen up
         aiMessage.classList.remove("typed-out");
         aiMessage.innerHTML = `I'mma let you finish...`;

@@ -389,7 +389,7 @@ stopButton.addEventListener("click", () => {
             controller.drawState === "pause"
         ) {
             if (controller.drawState === "pause") {
-                liveCollab = false;
+                controller.liveCollab = false;
             }
 
             controller.stop(); //flag
@@ -620,13 +620,13 @@ document.getElementById("num-traces").oninput = function() {
 };
 
 document.getElementById("overwrite").addEventListener("click", () => {
-    if (allowOverwrite) {
+    if (controller.allowOverwrite) {
         document.getElementById("overwrite").innerHTML = "Copy";
     } else {
         document.getElementById("overwrite").innerHTML = "Overwrite";
     }
     document.getElementById("overwrite").classList.toggle("inactive-pill");
-    allowOverwrite = !allowOverwrite;
+    controller.allowOverwrite = !controller.allowOverwrite;
 });
 
 const respectSlider = document.getElementById("respect-slider");
@@ -644,11 +644,11 @@ respectSlider.onmousedown = () => {
 };
 
 respectSlider.onmouseup = () => {
-    if (liveCollab) {
+    if (controller.liveCollab) {
         if (controller.useFixation !== lastFixation) {
             controller.continueSketch();
         }
-        liveCollab = false;
+        controller.liveCollab = false;
     }
 };
 

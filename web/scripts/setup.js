@@ -72,12 +72,6 @@ const sendToBack = document.getElementById("toBack");
 const transformControl = document.getElementById("transform-ui");
 
 const controllerUI = document.querySelectorAll(".inactive-section");
-
-// Utility
-let liveCollab = false;
-let allowOverwrite = true;
-let penPath, erasePath, regionPath, tmpGroup, mask, selectBox;
-
 const sketchTemplate = document.getElementById("sketch-template");
 
 const padding = parseInt(

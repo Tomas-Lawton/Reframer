@@ -61,6 +61,9 @@ class Controller {
         this.addLines = 0;
         this.numTraces = 1;
 
+        this.liveCollab = false;
+        this.allowOverwrite = true;
+
         // Undo/redo stack
         this.stack = new SimpleStack();
     }
@@ -437,7 +440,7 @@ class Sketch {
                     this.overwrite(overwriting, clone, newNum, scaleRatio);
                 },
             });
-        } else if (allowOverwrite) {
+        } else if (controller.allowOverwrite) {
             openModal({
                 title: "Overwriting Canvas",
                 message: "Import into the main canvas? Sketch will be saved.",

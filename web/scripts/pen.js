@@ -1,5 +1,5 @@
-// Does it work for multitouch?
-let sketchTimer;
+let sketchTimer,penPath, erasePath, regionPath, tmpGroup, mask, selectBox, firstPoint;
+
 
 sketchTool.onMouseDown = function(event) {
     clearTimeout(sketchTimer);
@@ -44,9 +44,9 @@ sketchTool.onMouseDown = function(event) {
                     asString: true,
                 });
                 setLineLabels(userLayer);
-                if (liveCollab) {
+                if (controller.liveCollab) {
                     controller.continueSketch();
-                    liveCollab = false;
+                    controller.liveCollab = false;
                 }
                 controller.selectBox = new Rectangle(event.point);
             }
@@ -74,7 +74,7 @@ sketchTool.onMouseDown = function(event) {
                 strokeCap: "round",
                 strokeJoin: "round",
             });
-            penPath.add(event.point);
+            firstPoint = penPath.add(event.point);
             penPath.add({
                 ...event.point,
                 x: event.point.x + 0.001,
@@ -225,6 +225,9 @@ sketchTool.onMouseUp = function() {
             break;
         case "pen":
             penPath.simplify();
+            if(firstPoint) {
+                firstPoint.remove();
+            }
             controller.stack.undoStack.push({
                 type: "draw-event",
                 data: penPath,
@@ -236,9 +239,9 @@ sketchTool.onMouseUp = function() {
                 asString: true,
             });
             setLineLabels(userLayer);
-            if (liveCollab) {
+            if (controller.liveCollab) {
                 controller.continueSketch();
-                liveCollab = false;
+                controller.liveCollab = false;
             } else if (!noPrompt() && controller.doneSketching !== null && socket) {
                 //stopped with collab draw
                 {
@@ -366,9 +369,9 @@ sketchTool.onMouseUp = function() {
                 asString: true,
             });
             setLineLabels(userLayer);
-            if (liveCollab) {
+            if (controller.liveCollab) {
                 controller.continueSketch();
-                liveCollab = false;
+                controller.liveCollab = false;
             }
             break;
     }

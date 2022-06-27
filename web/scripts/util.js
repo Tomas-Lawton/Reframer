@@ -118,9 +118,9 @@ const deletePath = () => {
         asString: true,
     });
 
-    if (liveCollab) {
+    if (controller.liveCollab) {
         controller.continueSketch();
-        liveCollab = false;
+        controller.liveCollab = false;
     }
     logger.event("deleted-path");
 };
