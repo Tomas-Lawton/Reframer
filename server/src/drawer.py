@@ -63,12 +63,6 @@ class CICADA:
         self.iteration = 0
         self.num_user_paths = None
 
-    def set_text_features(self, text_features, neg_text_features=[]):
-        self.text_features = text_features
-        self.neg_text_features = neg_text_features
-        logging.info("Updated CLIP prompt features")
-        return
-
     def extract_sketch(self):
         (
             self.path_list,
@@ -100,7 +94,7 @@ class CICADA:
     def activate_without_curves(self):
         self.is_active = True
         self.extract_sketch()
-        self.include_agent_strokes()
+        # self.include_agent_strokes()
         self.initialise_without_treebranch()
         self.initialize_variables()
         self.initialize_optimizer()
@@ -108,7 +102,7 @@ class CICADA:
     def activate(self):
         self.is_active = True
         self.extract_sketch()
-        self.include_agent_strokes()
+        # self.include_agent_strokes()
         self.initialize_shapes()
         self.initialize_variables()
         self.initialize_optimizer()
@@ -352,7 +346,7 @@ class CICADA:
         logging.info(f"Completed run {t} in drawer {str(self.sketch_reference_index)}")
         self.iteration += 1
 
-    async def update(self, t, loss, pruning=False):
+    async def render_client(self, t, loss, pruning=False):
         status = str(self.sketch_reference_index)
         if pruning:
             status="pruning"
@@ -389,24 +383,16 @@ class CICADA:
     def draw(self, data):
         logging.info("Updating...")
         self.reset() # is this needed?
-        self.num_paths = data["data"]["random_curves"]
-        self.region = data["data"]["region"]
-        self.w_points, self.w_colors, self.w_widths = use_penalisation(
-            data["data"]["fixation"])
-        self.num_user_paths = int(data["data"]["num_user_paths"])
-
-        #TO DO: remove svg
         with open('data/interface_paths.svg', 'w') as f:
             f.write(data["data"]["svg"])
 
-        try:
-            prompt_features = self.clip_interface.encode_text_classes([data["data"]["prompt"]])
-            neg_prompt_features = self.clip_interface.encode_text_classes([]) #empty currently
-            self.set_text_features(prompt_features, neg_prompt_features)
-        except Exception as e:
-            logging.error("Failed to encode features in clip")
-
-        self.activate()
+        self.num_paths = data["data"]["random_curves"]
+        self.region = data["data"]["region"]
+        # self.w_points, self.w_colors, self.w_widths = use_penalisation(
+        #     data["data"]["fixation"])
+        # self.num_user_paths = int(data["data"]["num_user_paths"])
+        self.text_features = self.clip_interface.encode_text_classes([data["data"]["prompt"]])
+        self.neg_text_features = self.clip_interface.encode_text_classes([]) #empty currently
 
     def continue_update_sketch(self, data):
         logging.info("Adding changes...")
@@ -415,8 +401,6 @@ class CICADA:
             data["data"]["fixation"])
         with open('data/interface_paths.svg', 'w') as f:
             f.write(data["data"]["svg"])
-
-        self.activate_without_curves()
 
     async def stop(self):
         logging.info(f"Stopping... {self.sketch_reference_index}")
@@ -428,10 +412,10 @@ class CICADA:
             try:
                 self.run_epoch()
                 if self.device == "cpu":
-                    await self.update(self.iteration, self.losses['global'])
+                    await self.render_client(self.iteration, self.losses['global'])
                 else: 
                     if self.iteration % self.refresh_rate == 0:
-                        await self.update(self.iteration, self.losses['global'])
+                        await self.render_client(self.iteration, self.losses['global'])
             except Exception as e:
                 logging.info("Iteration failed on: ", self.sketch_reference_index)
                 await self.stop()

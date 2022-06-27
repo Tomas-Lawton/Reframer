@@ -108,6 +108,7 @@ else:
 
                 if data["status"] == "draw":
                     main_sketch.draw(data)
+                    main_sketch.activate()
                     main_sketch.run_async()
 
                 if data["status"] == "add_new_sketch":
@@ -117,15 +118,17 @@ else:
                     exemplar_drawers.append(new_exemplar)
                     new_exemplar.frame_size = data["data"]['frame_size']
                     new_exemplar.draw(data)
+                    main_sketch.activate()
                     new_exemplar.run_async()
 
                 if data["status"] == "continue_sketch":
                     main_sketch.continue_update_sketch(data)
+                    main_sketch.activate_without_curves()
                     main_sketch.run_async()
 
                 if data["status"] == "prune":
                     main_sketch.prune()
-                    await main_sketch.update(main_sketch.iteration, main_sketch.losses["global"], True)
+                    await main_sketch.render_client(main_sketch.iteration, main_sketch.losses["global"], True)
 
                 if data["status"] == "stop_single_sketch":
                     for drawer in exemplar_drawers:
