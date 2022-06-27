@@ -129,11 +129,7 @@ else:
 
                 if data["status"] == "prune":
                     main_sketch.prune()
-                    await main_sketch.render_client(main_sketch.iteration, main_sketch.losses["global"], builder, True)
-                    time_str = (datetime.datetime.today() + datetime.timedelta(hours=11)).strftime(
-                    "%Y_%m_%d_%H_%M_%S"
-                    )
-                    builder.build_gif("results/GIF-" + time_str)
+                    await main_sketch.render_client(main_sketch.iteration, main_sketch.losses["global"], True)
 
                 if data["status"] == "stop_single_sketch":
                     for drawer in exemplar_drawers:

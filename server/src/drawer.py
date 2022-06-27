@@ -384,9 +384,6 @@ class CICADA:
     def draw(self, data):
         logging.info("Updating...")
         self.reset() # is this needed?
-        with open('data/interface_paths.svg', 'w') as f:
-            f.write(data["data"]["svg"])
-
         self.num_paths = data["data"]["random_curves"]
         self.region = data["data"]["region"]
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
@@ -394,6 +391,8 @@ class CICADA:
         self.num_user_paths = int(data["data"]["num_user_paths"])
         self.text_features = self.clip_interface.encode_text_classes([data["data"]["prompt"]])
         self.neg_text_features = self.clip_interface.encode_text_classes([]) #empty currently
+        with open('data/interface_paths.svg', 'w') as f:
+            f.write(data["data"]["svg"])
 
     def continue_update_sketch(self, data):
         logging.info("Adding changes...")
@@ -413,11 +412,11 @@ class CICADA:
         while self.is_running and self.iteration < self.num_iter:
             try:
                 self.run_epoch()
-                if self.device == "cpu":
-                    await self.render_client(self.iteration, self.losses['global'])
-                else: 
-                    if self.iteration % self.refresh_rate == 0:
-                        await self.render_client(self.iteration, self.losses['global'])
+                # if self.device == "cpu":
+                await self.render_client(self.iteration, self.losses['global'])
+                # else: 
+                #     if self.iteration % self.refresh_rate == 0:
+                #         await self.render_client(self.iteration, self.losses['global'])
             except Exception as e:
                 logging.info("Iteration failed on: ", self.sketch_reference_index)
                 await self.stop()
