@@ -1361,6 +1361,11 @@ input[type="number"] {
     font-size: 1.8rem;
 }
 
+.tab-info .pill {
+    background: none;
+    border: 2px solid #7b66ff;
+}
+
 .button-animation {
     -webkit-animation: spin 2s infinite linear;
 }
@@ -1604,6 +1609,10 @@ input[type="number"] {
     background: #f5f5f5;
     color: rgb(117, 117, 117);
     box-shadow: inset 2px 4px 10px rgb(0 0 0 / 8%);
+}
+
+.tab-info .inactive-pill {
+    border: 2px solid rgb(117, 117, 117);
 }
 
 .inactive-top-action {

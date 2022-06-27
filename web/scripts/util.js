@@ -187,18 +187,18 @@ const incrementHistory = () => {
 
 const updateMain = (result) => {
     incrementHistory();
-    if (controller.numTraces > 1) {
-        showTraceHistoryFrom(controller.stack.historyHolder.length - 1);
-    } else {
-        controller.lastRender = mainSketch.load(
-            frame / 224,
-            result.svg,
-            mainSketch.userPathList.length,
-            true,
-            true
-        );
-        mainSketch.svg = mainSketch.useLayer.exportSVG();
-    }
+    // if (controller.numTraces > 1) {
+    //     showTraceHistoryFrom(controller.stack.historyHolder.length - 1);
+    // } else {
+    controller.lastRender = mainSketch.load(
+        frame / 224,
+        result.svg,
+        mainSketch.userPathList.length,
+        true,
+        true
+    );
+    mainSketch.svg = mainSketch.useLayer.exportSVG();
+    // }
     // calcRollingLoss();
 };
 
