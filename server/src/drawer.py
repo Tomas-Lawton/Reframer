@@ -10,6 +10,7 @@ from util.clip_utility import get_noun_data, parse_svg, shapes2paths
 
 import logging
 import asyncio
+import datetime
 
 
 class CICADA:
@@ -406,6 +407,7 @@ class CICADA:
         logging.info(f"Stopping... {self.sketch_reference_index}")
         self.is_running = False
         # await self.socket.send_json({"status": "stop"})
+
 
     async def loop(self):
         while self.is_running and self.iteration < self.num_iter:

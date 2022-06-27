@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-
+import imageio
 
 def save_data(save_path, name, params):
     with open(save_path + name + '.txt', 'w') as f:
@@ -47,6 +47,17 @@ def get_nouns():
     nouns = nouns.split(" ")
     noun_prompts = ["a drawing of a " + x for x in nouns]
     return nouns, noun_prompts
+
+
+class GifBuilder:
+    def __init__(self):
+        self.images = []
+
+    def add(self, img):
+        self.images.append((1080 * img).detach().type(torch.ByteTensor))
+
+    def build_gif(self, path):
+        imageio.mimsave(f'{path}_movie.gif', self.images, format="GIF", duration=10)
 
 
 # Print iterations progress

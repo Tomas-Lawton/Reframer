@@ -10,6 +10,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from drawer import CICADA
 from clip_instance import Clip_Instance
 
+
 # TO DO add environment var to set log mode
 logging.basicConfig(
     level=logging.DEBUG,
@@ -128,7 +129,11 @@ else:
 
                 if data["status"] == "prune":
                     main_sketch.prune()
-                    await main_sketch.render_client(main_sketch.iteration, main_sketch.losses["global"], True)
+                    await main_sketch.render_client(main_sketch.iteration, main_sketch.losses["global"], builder, True)
+                    time_str = (datetime.datetime.today() + datetime.timedelta(hours=11)).strftime(
+                    "%Y_%m_%d_%H_%M_%S"
+                    )
+                    builder.build_gif("results/GIF-" + time_str)
 
                 if data["status"] == "stop_single_sketch":
                     for drawer in exemplar_drawers:
