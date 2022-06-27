@@ -224,10 +224,11 @@ sketchTool.onMouseUp = function() {
             }
             break;
         case "pen":
-            penPath.simplify();
             if(firstPoint) {
                 firstPoint.remove();
             }
+            penPath.simplify();
+
             controller.stack.undoStack.push({
                 type: "draw-event",
                 data: penPath,
@@ -247,7 +248,6 @@ sketchTool.onMouseUp = function() {
                 {
                     clearTimeout(sketchTimer);
                     sketchTimer = setTimeout(() => {
-                        setActionUI("drawing");
                         controller.draw();
                         let time = (Math.floor(Math.random() * 5) + 5) * 1000;
                         setTimeout(() => {

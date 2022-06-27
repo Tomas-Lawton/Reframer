@@ -94,7 +94,7 @@ class CICADA:
     def activate_without_curves(self):
         self.is_active = True
         self.extract_sketch()
-        # self.include_agent_strokes()
+        self.include_agent_strokes()
         self.initialise_without_treebranch()
         self.initialize_variables()
         self.initialize_optimizer()
@@ -102,7 +102,7 @@ class CICADA:
     def activate(self):
         self.is_active = True
         self.extract_sketch()
-        # self.include_agent_strokes()
+        self.include_agent_strokes()
         self.initialize_shapes()
         self.initialize_variables()
         self.initialize_optimizer()
@@ -388,9 +388,9 @@ class CICADA:
 
         self.num_paths = data["data"]["random_curves"]
         self.region = data["data"]["region"]
-        # self.w_points, self.w_colors, self.w_widths = use_penalisation(
-        #     data["data"]["fixation"])
-        # self.num_user_paths = int(data["data"]["num_user_paths"])
+        self.w_points, self.w_colors, self.w_widths = use_penalisation(
+            data["data"]["fixation"])
+        self.num_user_paths = int(data["data"]["num_user_paths"])
         self.text_features = self.clip_interface.encode_text_classes([data["data"]["prompt"]])
         self.neg_text_features = self.clip_interface.encode_text_classes([]) #empty currently
 
