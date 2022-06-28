@@ -109,16 +109,14 @@ const isDeselect = (e, hitResult) => {
     return (!hitResult && !isInBounds) || (!hitResult && isInBounds == null);
 };
 
-const deletePath = () => {
+const deleteItems = () => {
     // Save
     let selectedPaths = ungroup();
     selectedPaths.forEach((path) => {
         path.selected = false;
     });
-    controller.stack.undoStack.push({
-        type: "delete-event",
-        data: userLayer.exportJSON(),
-    });
+
+    sketchHistory.pushUndo();
 
     // Delete
     mainSketch.userPathList = mainSketch.userPathList.filter(
@@ -139,14 +137,14 @@ const deletePath = () => {
 };
 
 const getHistoryBatch = (maxSize, startIdx) => {
-    let len = controller.stack.historyHolder.length;
+    let len = sketchHistory.historyHolder.length;
     if (len <= 1) return null;
     let traceList = [];
     let batchSize = Math.min(maxSize, startIdx); // not first item
 
     for (let i = 0; i < batchSize; i++) {
         // num traces
-        traceList.push(controller.stack.historyHolder[startIdx - i - 1]);
+        traceList.push(sketchHistory.historyHolder[startIdx - i - 1]);
     }
     return traceList;
 };
@@ -154,7 +152,7 @@ const getHistoryBatch = (maxSize, startIdx) => {
 const calcRollingLoss = () => {
     const items = getHistoryBatch(
         setTraces.value,
-        controller.stack.historyHolder.length - 1
+        sketchHistory.historyHolder.length - 1
     );
     if (items) {
         const sum = items.reduce(
@@ -166,6 +164,7 @@ const calcRollingLoss = () => {
     }
 };
 
+// TO DO make worker with new loader
 const showTraceHistoryFrom = (fromIndex) => {
     const items = getHistoryBatch(controller.numTraces, fromIndex);
     if (items) {
@@ -173,14 +172,14 @@ const showTraceHistoryFrom = (fromIndex) => {
         let refList = [];
         for (let stored of items) {
             userLayer.importSVG(stored.svg);
-            refList.push(mainSketch.load(1, stored.svg, stored.num));
+            // refList.push(mainSketch.load(1, stored.svg, stored.num));
         }
         controller.traces = refList;
     }
 };
 
 const incrementHistory = () => {
-    controller.stack.historyHolder.push({
+    sketchHistory.historyHolder.push({
         svg: mainSketch.svg,
         num: mainSketch.userPathList.length,
     });
@@ -256,7 +255,7 @@ const loadResponse = (result) => {
             updateMain(result);
             setActionUI("stop-prune");
             controller.clipDrawing = false; //single update
-            incrementHistory();
+            incrementHistory(); //still sorted
         }
     }
 };
@@ -264,16 +263,15 @@ const loadResponse = (result) => {
 const updateMain = (result) => {
     incrementHistory();
     // if (controller.numTraces > 1) {
-    //     showTraceHistoryFrom(controller.stack.historyHolder.length - 1);
+    //     showTraceHistoryFrom(sketchHistory.historyHolder.length - 1);
     // } else {
-    controller.lastRender = mainSketch.load(
+    mainSketch.load(
         frame / 224,
         result.svg,
         mainSketch.userPathList.length,
         true,
         true
     );
-    mainSketch.svg = mainSketch.useLayer.exportSVG();
     // }
     // calcRollingLoss();
 };

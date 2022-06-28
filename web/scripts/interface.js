@@ -92,13 +92,13 @@ document.getElementById("delete").addEventListener("click", () =>
 document.body.addEventListener("keydown", function(event) {
     if (document.activeElement !== prompt) {
         if (event.key == "Delete" || event.key == "Backspace") {
-            deletePath();
+            deleteItems();
         }
     }
 });
 
 deleteHandler.addEventListener("click", (e) => {
-    deletePath();
+    deleteItems();
 });
 
 copyHandler.addEventListener("click", (e) => {
@@ -131,88 +131,13 @@ document.getElementById("begin").addEventListener("click", () => {
 });
 
 document.getElementById("undo").addEventListener("click", () => {
-    if (controller.stack.undoStack.length > 0) {
-        const lastEvent = controller.stack.undoStack.pop();
-        if (lastEvent.type === "draw-event") {
-            let thisPath; //json from redo, otherwise path
-            try {
-                let temp = new Path();
-                thisPath = temp.importJSON(lastEvent.data);
-            } catch (e) {
-                thisPath = lastEvent.data;
-            }
-            let copy = thisPath.exportJSON();
-            controller.stack.redoStack.push({
-                type: "draw-event",
-                data: copy,
-            }); //so remove does not remove reference
-            thisPath.remove();
-        }
-        if (lastEvent.type === "delete-event") {
-            let afterDelete = userLayer.exportJSON();
-            userLayer.clear();
-            userLayer.importJSON(lastEvent.data);
-            let addedGroup = userLayer.lastChild;
-            if (addedGroup instanceof Group) {
-                addedGroup.children.forEach((child) =>
-                    userLayer.addChild(child.clone())
-                );
-                addedGroup.remove();
-            }
-            controller.stack.redoStack.push({
-                type: "delete-event",
-                data: afterDelete, //use ref
-            });
-        }
-        if (lastEvent.type === "erase-event") {
-            let afterErase = userLayer.exportJSON();
-            userLayer.clear();
-            userLayer.importJSON(lastEvent.data);
-            controller.stack.redoStack.push({
-                type: "erase-event",
-                data: afterErase, //use ref
-            });
-        }
-
-        mainSketch.svg = paper.project.exportSVG({
-            asString: true,
-        });
-        logger.event("undo-" + lastEvent.type);
-    }
+    sketchHistory.undo();
 });
+
 document.getElementById("redo").addEventListener("click", () => {
-    if (controller.stack.redoStack.length > 0) {
-        const lastEvent = controller.stack.redoStack.pop();
-        if (lastEvent.type === "draw-event") {
-            let item = new Path();
-            item.importJSON(lastEvent.data);
-            controller.stack.undoStack.push(lastEvent);
-        }
-        if (lastEvent.type === "delete-event") {
-            let beforeDelete = userLayer.exportJSON();
-            userLayer.clear();
-            userLayer.importJSON(lastEvent.data);
-            controller.stack.undoStack.push({
-                type: "delete-event",
-                data: beforeDelete, //use ref
-            });
-        }
-        if (lastEvent.type === "erase-event") {
-            let beforeErase = userLayer.exportJSON();
-            userLayer.clear();
-            userLayer.importJSON(lastEvent.data);
-            controller.stack.undoStack.push({
-                type: "erase-event",
-                data: beforeErase, //use ref
-            });
-        }
-
-        mainSketch.svg = paper.project.exportSVG({
-            asString: true,
-        });
-        logger.event("redo-" + lastEvent.type);
-    }
+    sketchHistory.redo();
 });
+
 document.getElementById("save").addEventListener("click", () => {
     download();
 });
@@ -306,8 +231,8 @@ timeKeeper.oninput = function() {
     if (controller.numTraces > 1) {
         showTraceHistoryFrom(historyIndex);
     } else {
-        let stored = controller.stack.historyHolder[historyIndex];
-        mainSketch.svg = mainSketch.load(
+        let stored = sketchHistory.historyHolder[historyIndex];
+        mainSketch.load(
             1,
             stored.svg,
             stored.num,
@@ -435,13 +360,11 @@ document.getElementById("prune").addEventListener("click", () => {
 
 document.getElementById("go-back").addEventListener("click", () => {
     if (controller.drawState === "stop") {
+        mainSketch.arrange();
         incrementHistory();
-        let stored = controller.stack.historyHolder[1];
+        let stored = sketchHistory.historyHolder[1];
         timeKeeper.value = 1;
         mainSketch.load(1, stored.svg, stored.num);
-        mainSketch.svg = paper.project.exportSVG({
-            asString: true,
-        });
     }
 });
 
@@ -588,8 +511,7 @@ document.getElementById("save-sketch").addEventListener("click", () => {
         path.selected = false;
     });
 
-    // mainSketch.load(1, mainSketch.sortPaths(), mainSketch.num, false);
-    mainSketch.sortPaths();
+    mainSketch.arrange();
     mainSketch.saveStatic(
         mainSketch.extractScaledJSON(1 / scaleRatio), //adds as backup
         mainSketch.userPathList.length

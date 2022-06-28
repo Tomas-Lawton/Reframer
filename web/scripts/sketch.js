@@ -1,9 +1,74 @@
-class SimpleStack {
-    constructor() {
+class SketchHistory {
+    constructor(s) {
         this.undoStack = [];
         this.redoStack = [];
         this.historyHolder = [{ svg: "", num: 0 }];
+        this.sketch = s;
     }
+    pushUndo() {
+        //TO DO FIX LATER
+        // this.sketch.arrange();
+        // TO DO REMOVE
+        this.sketch.userPathList = [];
+        //
+        this.undoStack.push({
+            svg: this.sketch.useLayer.project.exportSVG({
+                asString: true,
+            }),
+            num: this.sketch.userPathList.length,
+        });
+
+        this.undoStack.length > 0 ?
+            (document.getElementById("undo").style.color = "#ffffff") :
+            (document.getElementById("undo").style.color = "#757575");
+    }
+    pushRedo() {
+        //TO DO FIX LATER
+        // this.sketch.arrange();
+        // TO DO REMOVE
+        this.sketch.userPathList = [];
+        //
+        this.redoStack.push({
+            svg: this.sketch.useLayer.project.exportSVG({
+                asString: true,
+            }),
+            num: this.sketch.userPathList.length,
+        });
+
+        this.redoStack.length > 0 ?
+            (document.getElementById("redo").style.color = "#ffffff") :
+            (document.getElementById("redo").style.color = "#757575");
+    }
+    undo() {
+        if (this.undoStack.length > 0) {
+            let last = this.undoStack.pop();
+            this.pushRedo();
+            this.sketch.useLayer.clear();
+            this.sketch.load(1, last.svg, last.num);
+            logger.event("undo");
+
+            this.undoStack.length === 0 &&
+                (document.getElementById("undo").style.color = "#757575");
+        }
+    }
+    redo() {
+        if (this.redoStack.length > 0) {
+            let last = this.redoStack.pop();
+            this.pushUndo();
+            this.sketch.useLayer.clear();
+            this.sketch.load(1, last.svg, last.num);
+            logger.event("redo");
+
+            this.redoStack.length === 0 &&
+                (document.getElementById("redo").style.color = "#757575");
+        }
+    }
+    clear() {
+        this.undoStack = [];
+        this.redoStack = [];
+    }
+
+    // To Do: Move time slider logic here I think
 }
 
 class Controller {
@@ -43,7 +108,6 @@ class Controller {
         // User Initialised
         this.drawRegion = null;
         this.selectionBox = null;
-        this.lastRender = null;
         this.lastPrompt = null;
         this.isFirstIteration = null;
         this.lastRollingLoss = null;
@@ -63,9 +127,6 @@ class Controller {
 
         this.liveCollab = false;
         this.allowOverwrite = true;
-
-        // Undo/redo stack
-        this.stack = new SimpleStack();
     }
     updateDrawer({
         status,
@@ -166,7 +227,7 @@ class Controller {
             if (this.targetDrawing) {
                 //     explorer.childNodes.forEach((child, i) => {
                 //         try {
-                //             mainSketch.sortPaths();
+                //             mainSketch.arrange();
                 //             // TO DO CHANGE
                 //             setLineLabels(userLayer);
                 //             document.getElementById("calc-lines").innerHTML = `Add : 0`;
@@ -229,12 +290,13 @@ class Controller {
         });
     }
     prepare() {
+        sketchHistory.clear();
         // make sure correct
         ungroup();
         mainSketch.useLayer.getItems().forEach((path) => {
             path.selected = false;
         });
-        mainSketch.svg = mainSketch.sortPaths();
+        mainSketch.arrange();
         setLineLabels(userLayer);
         document.getElementById("calc-lines").innerHTML = `Add : 0`;
     }
@@ -274,10 +336,12 @@ class Sketch {
     load(s, svg, n, a = true, o = false) {
         //+ SVG Arr
         if (svg === "" || svg === undefined) return;
-        this.svg = svg;
         this.useLayer.clear();
         let imported = this.useLayer.importSVG(svg);
         let g = imported.children[0];
+        if (!(g instanceof Group)) {
+            g = imported;
+        }
         let scaledGroup = scaleGroup(g, s);
         // if (o) {
         //     scaledGroup.position.x += offX;
@@ -289,16 +353,16 @@ class Sketch {
         );
         scaledGroup.remove();
         imported.remove();
-        mainSketch.userPathList = [];
+        this.userPathList = [];
         this.useLayer.getItems().forEach((path, i) => {
-            i < n && mainSketch.userPathList.push(path);
+            i < n && this.userPathList.push(path);
             // i < n ? mainSketch.userPathList.push(path) : a && (path.opacity *= 0.5);
         });
-        return svg;
+        this.svg = this.useLayer.project.exportSVG({
+            asString: true,
+        });
     }
-    sortPaths() {
-        console.log("sorting");
-        // add paths to userPathList not just num so can be used by any instance
+    arrange() {
         let sorted = [...this.userPathList];
         this.useLayer.getItems().forEach((item) => {
             if (!this.userPathList.includes(item)) {
@@ -307,9 +371,7 @@ class Sketch {
             item.remove(); //preserves reference
         });
         sorted.forEach((elem) => this.useLayer.addChild(elem));
-        // console.log(mainSketch.userPathList);
-        // console.log(sorted);
-        return paper.project.exportSVG({
+        this.svg = this.useLayer.project.exportSVG({
             asString: true,
         });
     }
@@ -471,8 +533,7 @@ class Sketch {
             const clone = controller.sketches[i].useLayer.clone();
             const newNum = controller.sketches[i].num;
             this.add(overwriting, clone, newNum, scaleRatio);
-            // this.sortPaths(); // finally, move user paths back down (optional)
-            // console.log(this.userPathList);
+            // this.arrange(); // finally, move user paths back down (optional)
         }
     }
     clone() {
@@ -517,3 +578,5 @@ mainSketch.svg = paper.project.exportSVG({
 }); //for svg parsing
 mainSketch.useLayer = userLayer;
 // console.log(userLayer);
+
+sketchHistory = new SketchHistory(mainSketch);

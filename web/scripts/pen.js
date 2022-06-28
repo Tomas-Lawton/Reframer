@@ -10,6 +10,7 @@ let sketchTimer,
 
 sketchTool.onMouseDown = function(event) {
     clearTimeout(sketchTimer);
+    sketchHistory.pushUndo();
 
     switch (controller.penMode) {
         case "select":
@@ -77,11 +78,7 @@ sketchTool.onMouseDown = function(event) {
             break;
         case "erase":
             pauseActiveDrawer();
-            // controller.resetMetaControls();
-            controller.stack.undoStack.push({
-                type: "erase-event",
-                data: userLayer.exportJSON(),
-            });
+
             erasorPath = new Path({
                 strokeWidth: controller.strokeWidth * 5,
                 strokeCap: "round",
@@ -226,10 +223,6 @@ sketchTool.onMouseUp = function() {
             }
             penPath.simplify();
 
-            controller.stack.undoStack.push({
-                type: "draw-event",
-                data: penPath,
-            });
             mainSketch.userPathList.push(penPath);
 
             // Update

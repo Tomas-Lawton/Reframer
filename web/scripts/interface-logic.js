@@ -99,7 +99,7 @@ const setActionUI = (state) => {
         aiMessage.classList.add("typed-out");
         drawingFinished();
         if (
-            controller.stack.historyHolder.length > 1 //first elem empty
+            sketchHistory.historyHolder.length > 1 //first elem empty
         ) {
             document.getElementById("history-block").style.display = "flex";
         }
