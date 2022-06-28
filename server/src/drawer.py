@@ -58,13 +58,21 @@ class CICADA:
         self.clipConvLoss = CLIPConvLoss2(self.device)
         return
 
-    def reset(self):
-        self.text_features = []
-        self.neg_text_features = []
-        self.iteration = 0
-        self.num_user_paths = None
+    def extract_points(self):
+        # print("PARSE HERE")
+        # print(self.sketch_json)
 
-    def extract_sketch(self):
+        #To Do: refactor
+        # self.user_canvas_w = self.frame_size
+        # self.user_canvas_h = self.frame_size
+
+        # self.normaliseScaleFactor = 1 / self.frame_size
+        # self.resizeScaleFactor = 224 / self.frame_size
+
+        # Iterate json of paths
+        # set
+        # self.path_list
+
         (
             self.path_list,
             self.user_canvas_w,
@@ -76,6 +84,14 @@ class CICADA:
         if self.region['activate']:
             self.drawing_area = calculate_draw_region(self.region, normaliseScaleFactor)
 
+        # Construct a list of paths
+        # Change to use tie thingo.
+        for i, path in enumerate(self.path_list):
+            if i < self.num_user_paths:
+                path.is_tied = True
+            else:
+                path.is_tied = False
+
     def initialise_without_treebranch(self):
         user_sketch = UserSketch(self.path_list, self.canvas_w, self.canvas_h)
         self.shapes = user_sketch.shapes
@@ -85,25 +101,20 @@ class CICADA:
         self.user_sketch = user_sketch
         logging.info("Initialised shapes")
 
-    def include_agent_strokes(self):
-        for i, path in enumerate(self.path_list):
-            if i < self.num_user_paths:
-                path.is_tied = True
-            else:
-                path.is_tied = False
 
     def activate_without_curves(self):
         self.is_active = True
-        self.extract_sketch()
-        self.include_agent_strokes()
+        # extract points should create the list of paths and tie if tie is true in list AI paths have tie set to false.
+
+        self.extract_points()
+
         self.initialise_without_treebranch()
         self.initialize_variables()
         self.initialize_optimizer()
 
     def activate(self):
         self.is_active = True
-        self.extract_sketch()
-        self.include_agent_strokes()
+        self.extract_points()
         self.initialize_shapes()
         self.initialize_variables()
         self.initialize_optimizer()
@@ -383,7 +394,8 @@ class CICADA:
 
     def draw(self, data):
         logging.info("Updating...")
-        self.reset() # is this needed?
+        self.iteration = 0
+        self.frame_size = data["data"]['frame_size']
         self.num_paths = data["data"]["random_curves"]
         self.region = data["data"]["region"]
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
@@ -391,6 +403,7 @@ class CICADA:
         self.num_user_paths = int(data["data"]["num_user_paths"])
         self.text_features = self.clip_interface.encode_text_classes([data["data"]["prompt"]])
         self.neg_text_features = self.clip_interface.encode_text_classes([]) #empty currently
+        # self.sketch_json = data["data"]["svg"]
         with open('data/interface_paths.svg', 'w') as f:
             f.write(data["data"]["svg"])
 

@@ -117,7 +117,6 @@ else:
                         clip_class, websocket, data["data"]["sketch_index"]
                     )
                     exemplar_drawers.append(new_exemplar)
-                    new_exemplar.frame_size = data["data"]['frame_size']
                     new_exemplar.draw(data)
                     main_sketch.activate()
                     new_exemplar.run_async()

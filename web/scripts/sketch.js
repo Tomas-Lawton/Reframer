@@ -186,6 +186,7 @@ class Controller {
             this.updateDrawer({
                 status: "draw",
                 svg: svg || mainSketch.svg,
+                // svg: mainSketch.useLayer.project.exportJSON(), //test
                 hasRegion: withRegion,
                 frameSize: mainSketch.frameSize,
                 prompt: this.prompt,
@@ -296,8 +297,9 @@ class Controller {
         mainSketch.useLayer.getItems().forEach((path) => {
             path.selected = false;
         });
+        // to do REMOVE
         mainSketch.arrange();
-        setLineLabels(userLayer);
+        setLineLabels(mainSketch.useLayer);
         document.getElementById("calc-lines").innerHTML = `Add : 0`;
     }
     resetMetaControls() {

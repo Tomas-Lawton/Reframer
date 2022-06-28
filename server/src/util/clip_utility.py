@@ -190,6 +190,7 @@ def parse_svg(path_to_svg_file, with_selection):
             start_y = round(float(x0[1]) / height, 5)
             x0 = [start_x, start_y]
             path = [x0] + points_array
+            print(path)
             path_list.append(data_to_tensor(color, stroke_width, path, num_segments))
         except Exception as e:
             logging.error(e)
