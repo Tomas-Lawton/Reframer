@@ -5,7 +5,8 @@ let sketchTimer,
     tmpGroup,
     mask,
     selectBox,
-    firstPoint;
+    firstPoint,
+    firstErasePoint;
 
 sketchTool.onMouseDown = function(event) {
     clearTimeout(sketchTimer);
@@ -88,6 +89,11 @@ sketchTool.onMouseDown = function(event) {
                 opacity: 0.85,
                 strokeColor: "rgb(255,0, 0)",
             });
+            firstErasePoint = erasorPath.add(event.point);
+            erasorPath.add({
+                ...event.point,
+                x: event.point.x + 0.001,
+            }); //make a segment on touch down (one point)
             tmpGroup = new Group({
                 children: userLayer.removeChildren(),
                 blendMode: "source-out",
@@ -259,6 +265,9 @@ sketchTool.onMouseUp = function() {
             }
             break;
         case "erase":
+            if (firstErasePoint && erasorPath.segments.length > 2) {
+                firstErasePoint.remove();
+            }
             erasorPath.simplify();
             const eraseRadius = (controller.strokeWidth * 5) / 2;
             const outerPath = OffsetUtils.offsetPath(erasorPath, eraseRadius);
