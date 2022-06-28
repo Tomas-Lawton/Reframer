@@ -6,7 +6,7 @@ from util.loss import CLIPConvLoss2
 from util.utils import area_mask, use_penalisation, k_max_elements
 from util.render_design import calculate_draw_region, UserSketch
 from util.render_design import add_shape_groups, treebranch_initialization
-from util.clip_utility import get_noun_data, parse_svg, shapes2paths
+from util.clip_utility import get_noun_data, parse_svg, shapes2paths, data_to_tensor
 
 import logging
 import asyncio
@@ -59,30 +59,53 @@ class CICADA:
         return
 
     def extract_points(self):
-        # print("PARSE HERE")
+        print("PARSE HERE")
         # print(self.sketch_json)
 
         #To Do: refactor
-        # self.user_canvas_w = self.frame_size
-        # self.user_canvas_h = self.frame_size
+        self.user_canvas_w = self.frame_size
+        self.user_canvas_h = self.frame_size
 
-        # self.normaliseScaleFactor = 1 / self.frame_size
-        # self.resizeScaleFactor = 224 / self.frame_size
+        self.normaliseScaleFactor = 1 / self.frame_size
+        self.resizeScaleFactor = 224 / self.frame_size
 
-        # Iterate json of paths
-        # set
-        # self.path_list
+        self.path_list = []
+        for path in self.sketch: 
+            try:
+                points = []
+                spaced_data = path['path_data'].split('c')
+                x0 = spaced_data[0][1:].split(',')  # only thing different is M instead of m
+                curve_list = [
+                    spaced_data.split(' ') for spaced_data in spaced_data[1:]
+                ]  # exclude move to
+                point_list = []
+                for curve in curve_list:
+                    for i in range(3):
+                        point_list.append(curve[i])
+                tuple_array = [
+                    tuple.split(',') for tuple in point_list
+                ]  # split each curve by spaces, then comma for points
+                points_array = [
+                    [
+                        round(float(x) * self.normaliseScaleFactor, 5),
+                        round(float(y) * self.normaliseScaleFactor, 5),
+                    ]
+                    for [x, y] in tuple_array
+                ]
+                start_x = round(float(x0[0]) / self.user_canvas_w, 5)
+                start_y = round(float(x0[1]) / self.user_canvas_h, 5)
+                x0 = [start_x, start_y]
+                points = [x0] + points_array
+                print(points)
+            except Exception as e:
+                logging.error(e)
+                logging.error("Unexpected paths in canvas")            
 
-        (
-            self.path_list,
-            self.user_canvas_w,
-            self.user_canvas_h,
-            self.resizeScaleFactor,
-            normaliseScaleFactor,
-        ) = parse_svg('data/interface_paths.svg', self.region["activate"])
+                self.path_list.append(data_to_tensor(path['color'], path['stroke_width'], points, path['stroke_width'], path['tie']))
+                print('added path')
 
         if self.region['activate']:
-            self.drawing_area = calculate_draw_region(self.region, normaliseScaleFactor)
+            self.drawing_area = calculate_draw_region(self.region, self.normaliseScaleFactor)
 
         # Construct a list of paths
         # Change to use tie thingo.
@@ -403,9 +426,9 @@ class CICADA:
         self.num_user_paths = int(data["data"]["num_user_paths"])
         self.text_features = self.clip_interface.encode_text_classes([data["data"]["prompt"]])
         self.neg_text_features = self.clip_interface.encode_text_classes([]) #empty currently
-        # self.sketch_json = data["data"]["svg"]
-        with open('data/interface_paths.svg', 'w') as f:
-            f.write(data["data"]["svg"])
+        self.sketch = data["data"]["sketch"]
+        # with open('data/interface_paths.svg', 'w') as f:
+        #     f.write(data["data"]["svg"])
 
     def continue_update_sketch(self, data):
         logging.info("Adding changes...")

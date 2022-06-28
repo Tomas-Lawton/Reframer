@@ -130,7 +130,8 @@ class Controller {
     }
     updateDrawer({
         status,
-        svg,
+        // svg,
+        sketch,
         hasRegion,
         frameSize,
         prompt,
@@ -147,7 +148,8 @@ class Controller {
             status: status,
             data: {
                 prompt: prompt,
-                svg: svg,
+                // svg: svg,
+                sketch,
                 random_curves: lines,
                 frame_size: frameSize,
                 fixation: fixation,
@@ -185,8 +187,9 @@ class Controller {
             this.prepare();
             this.updateDrawer({
                 status: "draw",
-                svg: svg || mainSketch.svg,
+                // svg: svg || mainSketch.svg,
                 // svg: mainSketch.useLayer.project.exportJSON(), //test
+                sketch: mainSketch.sketch,
                 hasRegion: withRegion,
                 frameSize: mainSketch.frameSize,
                 prompt: this.prompt,
@@ -297,8 +300,11 @@ class Controller {
         mainSketch.useLayer.getItems().forEach((path) => {
             path.selected = false;
         });
+
         // to do REMOVE
-        mainSketch.arrange();
+        // mainSketch.arrange();
+        mainSketch.buildSketch();
+
         setLineLabels(mainSketch.useLayer);
         document.getElementById("calc-lines").innerHTML = `Add : 0`;
     }
@@ -355,9 +361,11 @@ class Sketch {
         );
         scaledGroup.remove();
         imported.remove();
-        this.userPathList = [];
+
+        // TO DO ADD BACK
+        // this.userPathList = [];
         this.useLayer.getItems().forEach((path, i) => {
-            i < n && this.userPathList.push(path);
+            // i < n && this.userPathList.push(path);
             // i < n ? mainSketch.userPathList.push(path) : a && (path.opacity *= 0.5);
         });
         this.svg = this.useLayer.project.exportSVG({
@@ -571,6 +579,26 @@ class Sketch {
         newElem.classList.add("bounce");
         document.getElementById("sketch-grid").prepend(newElem);
         controller.sketchScopeIndex += 1;
+    }
+    buildSketch() {
+        let pathList = [];
+        console.log(this.useLayer.children);
+        this.useLayer.getItems((path) =>
+            pathList.push({
+                color: [
+                    path.strokeColor.red,
+                    path.strokeColor.green,
+                    path.strokeColor.blue,
+                    path.strokeColor.alpha,
+                ],
+                stroke_width: path.strokeWidth,
+                path_data: path.pathData,
+                num_segments: path.segments.length,
+                tie: this.userPathList.includes(path),
+            })
+        );
+        this.sketch = pathList;
+        console.log(pathList);
     }
 }
 

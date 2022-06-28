@@ -44,7 +44,7 @@ def get_color(code, opacity):
     return color
 
 
-def data_to_tensor(color, stroke_width, path, num_segments):
+def data_to_tensor(color, stroke_width, path, num_segments, tie):
     color = torch.tensor(color)
     stroke_width = torch.tensor(stroke_width)
     v0 = torch.tensor([0, 0])
@@ -53,7 +53,7 @@ def data_to_tensor(color, stroke_width, path, num_segments):
         path[k, :] += v0
         if k % 3 == 0:
             v0 = path[k, :]
-    return DrawingPath(path, color, stroke_width, num_segments, True)
+    return DrawingPath(path, color, stroke_width, num_segments, tie)
 
 
 def parse_local_svg(path_to_svg_file):
