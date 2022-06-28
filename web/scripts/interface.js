@@ -111,7 +111,9 @@ copyHandler.addEventListener("click", (e) => {
         copy.index,
         copy.removeChildren()
     );
+    copy.remove();
     controller.transformGroup.selected = false; //deselect og
+
     ungroup();
     inserted.forEach((pathCopy) => mainSketch.userPathList.push(pathCopy)); //save to user paths
     createGroup(inserted);
@@ -582,7 +584,10 @@ document.getElementById("scrapbook").addEventListener("click", () => {
 document.getElementById("save-sketch").addEventListener("click", () => {
     console.log(mainSketch.userPathList);
     ungroup();
-    hideSelectUI();
+    mainSketch.useLayer.getItems().forEach((path) => {
+        path.selected = false;
+    });
+
     // mainSketch.load(1, mainSketch.sortPaths(), mainSketch.num, false);
     mainSketch.sortPaths();
     mainSketch.saveStatic(

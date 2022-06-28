@@ -231,7 +231,9 @@ class Controller {
     prepare() {
         // make sure correct
         ungroup();
-        hideSelectUI();
+        mainSketch.useLayer.getItems().forEach((path) => {
+            path.selected = false;
+        });
         mainSketch.svg = mainSketch.sortPaths();
         setLineLabels(userLayer);
         document.getElementById("calc-lines").innerHTML = `Add : 0`;
@@ -289,7 +291,7 @@ class Sketch {
         imported.remove();
         mainSketch.userPathList = [];
         this.useLayer.getItems().forEach((path, i) => {
-            i < n && mainSketch.userPathList.push(path)
+            i < n && mainSketch.userPathList.push(path);
             // i < n ? mainSketch.userPathList.push(path) : a && (path.opacity *= 0.5);
         });
         return svg;
@@ -430,7 +432,6 @@ class Sketch {
                     controller.clipDrawing = false;
                     // pauseActiveDrawer();
                     ungroup();
-                    hideSelectUI();
                     this.saveStatic(
                         overwriting.extractScaledJSON(1 / scaleRatio),
                         overwriting.userPathList.length
@@ -446,8 +447,7 @@ class Sketch {
                 message: "Import into the main canvas? Sketch will be saved.",
                 confirmAction: () => {
                     // pauseActiveDrawer();
-                    ungroup();
-                    hideSelectUI();
+                    ungroup(); //remove first even tho deleted
                     this.saveStatic(
                         overwriting.extractScaledJSON(1 / scaleRatio),
                         overwriting.userPathList.length
@@ -459,8 +459,11 @@ class Sketch {
             });
         } else {
             // pauseActiveDrawer();
-            ungroup();
-            hideSelectUI();
+            ungroup(); //could stay selected but something happens to position when dragging
+            mainSketch.useLayer.getItems().forEach((path) => {
+                path.selected = false;
+            });
+
             this.saveStatic(
                 overwriting.extractScaledJSON(1 / scaleRatio),
                 overwriting.userPathList.length

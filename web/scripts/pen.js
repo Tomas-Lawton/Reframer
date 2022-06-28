@@ -13,30 +13,16 @@ sketchTool.onMouseDown = function(event) {
     switch (controller.penMode) {
         case "select":
             path = null;
-            let hitResult = paper.project.hitTest(event.point, {
+            let hitResult = mainSketch.useLayer.hitTest(event.point, {
                 segments: true,
                 stroke: true,
                 fill: true,
                 tolerance: 4,
             });
 
-            // TO change to simple hit test
-            let isInBounds = null;
-            if (controller.boundingBox) {
-                isInBounds =
-                    event.point.x > controller.boundingBox.bounds.left &&
-                    event.point.x < controller.boundingBox.bounds.right &&
-                    event.point.y > controller.boundingBox.bounds.top &&
-                    event.point.y < controller.boundingBox.bounds.bottom;
-            }
-
-            // DESELECT
-            if ((!hitResult && !isInBounds) || (!hitResult && isInBounds == null)) {
-                // Clean up group
+            if (isDeselect(event, hitResult)) {
                 ungroup();
-                hideSelectUI();
-
-                userLayer.getItems().forEach((path) => {
+                mainSketch.useLayer.getItems().forEach((path) => {
                     path.selected = false;
                 });
 
@@ -49,7 +35,7 @@ sketchTool.onMouseDown = function(event) {
                 mainSketch.svg = paper.project.exportSVG({
                     asString: true,
                 });
-                setLineLabels(userLayer);
+                setLineLabels(mainSketch.useLayer);
                 if (controller.liveCollab) {
                     controller.continueSketch();
                     controller.liveCollab = false;
@@ -60,7 +46,6 @@ sketchTool.onMouseDown = function(event) {
             if (hitResult) {
                 pauseActiveDrawer();
                 ungroup();
-                hideSelectUI();
 
                 path = hitResult.item;
                 path.selected = true;
@@ -221,7 +206,7 @@ sketchTool.onMouseUp = function() {
                 updateSelectUI();
             }
             if (controller.boundingBox) {
-                //after dragging
+                //after creating selection by dragging
                 if (!getSelectedPaths().length) {
                     ungroup();
                 } else {
@@ -480,10 +465,10 @@ const setPenMode = (mode, accentTarget) => {
     }
 
     if (controller.penMode !== "select") {
+        ungroup();
         userLayer.getItems().forEach((path) => {
             path.selected = false;
         });
-        hideSelectUI();
     }
     if (controller.penMode !== "lasso" && controller.penMode !== "select") {
         controller.drawRegion = undefined;

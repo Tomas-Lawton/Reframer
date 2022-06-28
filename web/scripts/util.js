@@ -48,15 +48,16 @@ const setPointSize = (s) => {
 };
 
 const ungroup = () => {
+    let selected;
     if (controller.transformGroup !== null) {
         controller.transformGroup.applyMatrix = true;
-        userLayer.insertChildren(
-            controller.transformGroup.index,
-            controller.transformGroup.removeChildren()
-        );
+        selected = controller.transformGroup.removeChildren();
+        userLayer.insertChildren(controller.transformGroup.index, selected);
         controller.transformGroup.remove();
         controller.transformGroup = null;
     }
+    hideSelectUI();
+    return selected;
 };
 
 //TODO: Add stroke width so no overflow over bounds?
@@ -95,12 +96,23 @@ const noPrompt = () =>
 //     controller.buttonControlLeft = !controller.buttonControlLeft;
 // };
 
+const isDeselect = (e, hitResult) => {
+    // TO change to simple hit test
+    let isInBounds = null;
+    if (controller.boundingBox) {
+        isInBounds =
+            e.point.x > controller.boundingBox.bounds.left &&
+            e.point.x < controller.boundingBox.bounds.right &&
+            e.point.y > controller.boundingBox.bounds.top &&
+            e.point.y < controller.boundingBox.bounds.bottom;
+    }
+    return (!hitResult && !isInBounds) || (!hitResult && isInBounds == null);
+};
+
 const deletePath = () => {
     // Save
-    hideSelectUI();
-    ungroup();
-    let g = getSelectedPaths();
-    g.forEach((path) => {
+    let selectedPaths = ungroup();
+    selectedPaths.forEach((path) => {
         path.selected = false;
     });
     controller.stack.undoStack.push({
@@ -110,9 +122,9 @@ const deletePath = () => {
 
     // Delete
     mainSketch.userPathList = mainSketch.userPathList.filter(
-        (ref) => !g.includes(ref)
+        (ref) => !selectedPaths.includes(ref)
     );
-    g.forEach((path) => path.remove());
+    selectedPaths.forEach((path) => path.remove());
 
     // Save new SVG
     mainSketch.svg = paper.project.exportSVG({
