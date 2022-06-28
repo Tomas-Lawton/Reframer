@@ -1,10 +1,4 @@
 import torch
-import clip
-from svgpathtools import svg2paths
-from svgelements import *
-from PIL import ImageColor
-import logging
-
 
 class DrawingPath:
     def __init__(self, path, color, width, num_segments, is_tied):
@@ -35,15 +29,6 @@ def get_noun_data():
     # return ["a drawing of a " + x for x in nouns[0::100]]
 
 
-def get_color(code, opacity):
-    color = [0, 0, 0, 1]
-    rgb = ImageColor.getrgb(code)
-    for i, val in enumerate(rgb):
-        color[i] = float(val / 256)
-    color[3] = opacity
-    return color
-
-
 def data_to_tensor(color, stroke_width, path, num_segments, tie):
     color = torch.tensor(color)
     stroke_width = torch.tensor(stroke_width)
@@ -54,151 +39,6 @@ def data_to_tensor(color, stroke_width, path, num_segments, tie):
         if k % 3 == 0:
             v0 = path[k, :]
     return DrawingPath(path, color, stroke_width, num_segments, tie)
-
-
-def parse_local_svg(path_to_svg_file):
-    paths, attributes = svg2paths(path_to_svg_file)
-    path_list = []
-    for att in attributes:
-        stroke_width = 15
-        color_code = '#000000'
-        opacity = 1
-        style = att['style'].split(';')
-        for x in style:
-            if len(x) >= 13:
-                if x[:13] == 'stroke-width:':
-                    stroke_width = float(x[13:])
-            if len(x) >= 15:
-                if x[:15] == 'stroke-opacity:':
-                    opacity = float(x[15:])
-            if len(x) >= 8:
-                if x[:7] == 'stroke:':
-                    color_code = str(x[7:])
-
-        color = get_color(color_code, opacity)
-        num_segments = len(att['d'].split(',')) // 3
-
-        path = []
-        [x_a, x_b] = att['d'].split('c')
-        x0 = [float(x) for x in x_a[2:].split(',')]
-        points = [xx.split(',') for xx in x_b[1:].split(' ')]
-        points = [[float(x), float(y)] for [x, y] in points]
-        path = [x0] + points
-
-        path_list.append(data_to_tensor(color, stroke_width, path, num_segments))
-
-    logging.info(f"Returning list of paths: \n {path_list}")
-    return path_list
-
-
-def parse_svg(path_to_svg_file, with_selection):
-    try:
-        paths, attributes = svg2paths(path_to_svg_file)
-        path_list = []
-        parsed_svg = SVG.parse(path_to_svg_file)  # access <g> tag for non-path styles
-        elements_list = list(parsed_svg.elements())
-    except Exception as e:
-        logging.error(e)
-        logging.error("Couldn't read svg file")
-    path_group = {}
-    parent_svg = {}
-
-    for element in elements_list:
-        try:
-            if element.values['tag'] == 'g':
-                path_group = element.values
-                continue
-        except (KeyError, AttributeError):
-            pass
-        try:
-            if element.values['tag'] == 'svg':
-                parent_svg = element.values
-                continue
-        except (KeyError, AttributeError):
-            pass
-
-    try:
-        width = float(parent_svg['attributes']['width'])
-        height = float(parent_svg['attributes']['height'])
-        frame_size = min(width, height)
-        normaliseScaleFactor = 1 / frame_size
-        resizeScaleFactor = 224 / frame_size
-    except Exception as e:
-        logging.error(e)
-        logging.error("Couldn't parse SVG Parent")
-
-    count = 0
-    num_paths = len(attributes)
-    for att in attributes:
-
-        num_segments = len(att['d'].split(',')) // 3
-        if num_segments == 0 or (with_selection and count == num_paths - 1):
-            continue
-
-        stroke_width = 15
-        color_code = '#000000'
-        opacity = 1
-
-        if 'stroke' in att:
-            color_code = str(att['stroke'])
-        else:
-            color_code = str(path_group['attributes']['stroke'])
-
-        if 'stroke-width' in att:
-            stroke_width = float(att['stroke-width']) * normaliseScaleFactor
-        else:
-            stroke_width = (
-                float(path_group['attributes']['stroke-width'])
-                * normaliseScaleFactor
-            )
-
-        if 'stroke-opacity' in att:
-            opacity = float(att['stroke-opacity'])
-        elif 'opacity' in att:
-            opacity = float(att['opacity'])
-        elif 'opacity' in path_group['attributes']:
-            opacity = str(path_group['attributes']['stroke-opacity'])
-        elif 'stroke-opacity' in path_group['attributes']:
-            opacity = str(path_group['attributes']['stroke-opacity'])
-        else:
-            opacity = 1
-
-        color = get_color(color_code, opacity)
-
-        try:
-            path = []
-            spaced_data = att['d'].split('c')
-            x0 = spaced_data[0][1:].split(',')  # only thing different is M instead of m
-            curve_list = [
-                spaced_data.split(' ') for spaced_data in spaced_data[1:]
-            ]  # exclude move to
-            point_list = []
-            for curve in curve_list:
-                for i in range(3):
-                    point_list.append(curve[i])
-            tuple_array = [
-                tuple.split(',') for tuple in point_list
-            ]  # split each curve by path spaces, then comma for points
-            points_array = [
-                [
-                    round(float(x) * normaliseScaleFactor, 5),
-                    round(float(y) * normaliseScaleFactor, 5),
-                ]
-                for [x, y] in tuple_array
-            ]
-            start_x = round(float(x0[0]) / width, 5)
-            start_y = round(float(x0[1]) / height, 5)
-            x0 = [start_x, start_y]
-            path = [x0] + points_array
-            print(path)
-            path_list.append(data_to_tensor(color, stroke_width, path, num_segments))
-        except Exception as e:
-            logging.error(e)
-            logging.error("Unexpected paths in canvas")
-        count += 1
-
-    logging.info(f"Returning list of paths: \n {path_list}")
-    return path_list, width, height, resizeScaleFactor, normaliseScaleFactor
 
 
 def save_data(time_str, draw_class):

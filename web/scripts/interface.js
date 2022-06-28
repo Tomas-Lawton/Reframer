@@ -107,7 +107,7 @@ copyHandler.addEventListener("click", (e) => {
         controller.boundingBox = null;
     }
     let copy = controller.transformGroup.clone();
-    let inserted = mainSketch.useLayer.insertChildren(
+    let inserted = mainSketch.sketchLayer.insertChildren(
         copy.index,
         copy.removeChildren()
     );
@@ -341,7 +341,7 @@ sendToBack.addEventListener("click", () => {
 
 moveUp.addEventListener("click", () => {
     let thisItem = controller.transformGroup;
-    mainSketch.useLayer.insertChild(thisItem.index + 1, thisItem);
+    mainSketch.sketchLayer.insertChild(thisItem.index + 1, thisItem);
     // thisItem.insertAbove(thisItem);
     controller.boundingBox.insertBelow(thisItem);
 });
@@ -507,7 +507,7 @@ document.getElementById("scrapbook").addEventListener("click", () => {
 document.getElementById("save-sketch").addEventListener("click", () => {
     console.log(mainSketch.userPathList);
     ungroup();
-    mainSketch.useLayer.getItems().forEach((path) => {
+    mainSketch.sketchLayer.getItems().forEach((path) => {
         path.selected = false;
     });
 

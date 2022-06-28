@@ -15,7 +15,7 @@ sketchTool.onMouseDown = function(event) {
     switch (controller.penMode) {
         case "select":
             path = null;
-            let hitResult = mainSketch.useLayer.hitTest(event.point, {
+            let hitResult = mainSketch.sketchLayer.hitTest(event.point, {
                 segments: true,
                 stroke: true,
                 fill: true,
@@ -24,7 +24,7 @@ sketchTool.onMouseDown = function(event) {
 
             if (isDeselect(event, hitResult)) {
                 ungroup();
-                mainSketch.useLayer.getItems().forEach((path) => {
+                mainSketch.sketchLayer.getItems().forEach((path) => {
                     path.selected = false;
                 });
 
@@ -37,7 +37,7 @@ sketchTool.onMouseDown = function(event) {
                 mainSketch.svg = paper.project.exportSVG({
                     asString: true,
                 });
-                setLineLabels(mainSketch.useLayer);
+                setLineLabels(mainSketch.sketchLayer);
                 if (controller.liveCollab) {
                     controller.continueSketch();
                     controller.liveCollab = false;
@@ -103,7 +103,7 @@ sketchTool.onMouseDown = function(event) {
             break;
         case "dropper":
             console.log("test");
-            // const raster = mainSketch.useLayer.rasterize();
+            // const raster = mainSketch.sketchLayer.rasterize();
             // raster.position.x += 100;
 
             // let col = raster.getPixel(event.point);

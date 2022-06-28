@@ -70,7 +70,7 @@ async def home():
     return {"hello", "world"}
 
 
-def stop_all(d, a):
+def kill(d, a):
     a.is_running = False
     for drawer in d:
         drawer.is_running = False
@@ -109,7 +109,7 @@ else:
 
                 if data["status"] == "draw":
                     main_sketch.draw(data)
-                    main_sketch.activate()
+                    main_sketch.activate(True)
                     main_sketch.run_async()
 
                 if data["status"] == "add_new_sketch":
@@ -118,12 +118,12 @@ else:
                     )
                     exemplar_drawers.append(new_exemplar)
                     new_exemplar.draw(data)
-                    main_sketch.activate()
+                    main_sketch.activate(True)
                     new_exemplar.run_async()
 
                 if data["status"] == "continue_sketch":
                     main_sketch.continue_update_sketch(data)
-                    main_sketch.activate_without_curves()
+                    main_sketch.activate(False)
                     main_sketch.run_async()
 
                 if data["status"] == "prune":
@@ -143,10 +143,10 @@ else:
                     await main_sketch.stop()
 
         except WebSocketDisconnect:
-            stop_all(exemplar_drawers, main_sketch)
+            kill(exemplar_drawers, main_sketch)
             logging.info("Client disconnected")
         except KeyboardInterrupt:
-            stop_all(exemplar_drawers, main_sketch)
+            kill(exemplar_drawers, main_sketch)
             logging.info("Client killed")
 
 

@@ -6,7 +6,7 @@ from util.loss import CLIPConvLoss2
 from util.utils import area_mask, use_penalisation, k_max_elements
 from util.render_design import calculate_draw_region, UserSketch
 from util.render_design import add_shape_groups, treebranch_initialization
-from util.clip_utility import get_noun_data, parse_svg, shapes2paths, data_to_tensor
+from util.clip_utility import get_noun_data, shapes2paths, data_to_tensor
 
 import logging
 import asyncio
@@ -59,8 +59,7 @@ class CICADA:
         return
 
     def extract_points(self):
-        print("PARSE HERE")
-        # print(self.sketch_json)
+        # To Do: now fix pruning since the path list is now incorrect
 
         #To Do: refactor
         self.user_canvas_w = self.frame_size
@@ -71,98 +70,74 @@ class CICADA:
 
         self.path_list = []
         for path in self.sketch: 
-            try:
-                points = []
-                spaced_data = path['path_data'].split('c')
-                x0 = spaced_data[0][1:].split(',')  # only thing different is M instead of m
-                curve_list = [
-                    spaced_data.split(' ') for spaced_data in spaced_data[1:]
-                ]  # exclude move to
-                point_list = []
-                for curve in curve_list:
-                    for i in range(3):
-                        point_list.append(curve[i])
-                tuple_array = [
-                    tuple.split(',') for tuple in point_list
-                ]  # split each curve by spaces, then comma for points
-                points_array = [
-                    [
-                        round(float(x) * self.normaliseScaleFactor, 5),
-                        round(float(y) * self.normaliseScaleFactor, 5),
-                    ]
-                    for [x, y] in tuple_array
+            points = []
+            num_segments = len(path['path_data'].split(',')) // 3
+            spaced_data = path['path_data'].split('c')
+            x0 = spaced_data[0][1:].split(',')  # only thing different is M instead of m
+            curve_list = [
+                spaced_data.split(' ') for spaced_data in spaced_data[1:]
+            ]  # exclude move to
+            point_list = []
+            for curve in curve_list:
+                for i in range(3):
+                    point_list.append(curve[i])
+            tuple_array = [
+                tuple.split(',') for tuple in point_list
+            ]  # split each curve by spaces, then comma for points
+            points_array = [
+                [
+                    round(float(x) * self.normaliseScaleFactor, 5),
+                    round(float(y) * self.normaliseScaleFactor, 5),
                 ]
-                start_x = round(float(x0[0]) / self.user_canvas_w, 5)
-                start_y = round(float(x0[1]) / self.user_canvas_h, 5)
-                x0 = [start_x, start_y]
-                points = [x0] + points_array
-                print(points)
-            except Exception as e:
-                logging.error(e)
-                logging.error("Unexpected paths in canvas")            
+                for [x, y] in tuple_array
+            ]
+            start_x = round(float(x0[0]) / self.user_canvas_w, 5)
+            start_y = round(float(x0[1]) / self.user_canvas_h, 5)
+            x0 = [start_x, start_y]
+            points = [x0] + points_array
 
-                self.path_list.append(data_to_tensor(path['color'], path['stroke_width'], points, path['stroke_width'], path['tie']))
-                print('added path')
+            if len(points) > 0:
+                self.path_list.append(data_to_tensor(path["color"], float(path['stroke_width'] * self.normaliseScaleFactor), points, num_segments, True)) #add tie
 
         if self.region['activate']:
             self.drawing_area = calculate_draw_region(self.region, self.normaliseScaleFactor)
 
-        # Construct a list of paths
-        # Change to use tie thingo.
-        for i, path in enumerate(self.path_list):
-            if i < self.num_user_paths:
-                path.is_tied = True
-            else:
-                path.is_tied = False
+    def activate(self, add_curves):
+        self.is_active = True
+        self.extract_points()
+        self.initialize_shapes(add_curves)
+        self.initialize_variables()
+        self.initialize_optimizer()
 
-    def initialise_without_treebranch(self):
+
+    def initialize_shapes(self, add_curves):
         user_sketch = UserSketch(self.path_list, self.canvas_w, self.canvas_h)
-        self.shapes = user_sketch.shapes
-        self.shape_groups = user_sketch.shape_groups
+        if add_curves:
+            shapes_rnd, shape_groups_rnd = treebranch_initialization(
+                self.path_list,
+                self.num_paths,
+                self.canvas_w,
+                self.canvas_h,
+                self.num_user_paths,
+                self.drawing_area,
+            )
+            try:
+                self.path_list += shapes2paths(shapes_rnd, shape_groups_rnd, False)
+            except Exception as e:
+                logging.error("Problem adding to the path list")
+
+            self.shapes = user_sketch.shapes + shapes_rnd
+            self.shape_groups = add_shape_groups(user_sketch.shape_groups, shape_groups_rnd)
+        else:
+            self.shapes = user_sketch.shapes
+            self.shape_groups = user_sketch.shape_groups
+
         self.num_sketch_paths = len(user_sketch.shapes)
         self.augment_trans = get_augment_trans(self.canvas_w, self.normalize_clip)
         self.user_sketch = user_sketch
         logging.info("Initialised shapes")
 
-
-    def activate_without_curves(self):
-        self.is_active = True
-        # extract points should create the list of paths and tie if tie is true in list AI paths have tie set to false.
-
-        self.extract_points()
-
-        self.initialise_without_treebranch()
-        self.initialize_variables()
-        self.initialize_optimizer()
-
-    def activate(self):
-        self.is_active = True
-        self.extract_points()
-        self.initialize_shapes()
-        self.initialize_variables()
-        self.initialize_optimizer()
-
-    def initialize_shapes(self):
-        user_sketch = UserSketch(self.path_list, self.canvas_w, self.canvas_h)
-        shapes_rnd, shape_groups_rnd = treebranch_initialization(
-            self.path_list,
-            self.num_paths,
-            self.canvas_w,
-            self.canvas_h,
-            self.num_user_paths,
-            self.drawing_area,
-        )
-        try:
-            self.path_list += shapes2paths(shapes_rnd, shape_groups_rnd, False)
-        except Exception as e:
-            logging.error("Problem adding to the path list")
-
-        self.shapes = user_sketch.shapes + shapes_rnd
-        self.shape_groups = add_shape_groups(user_sketch.shape_groups, shape_groups_rnd)
-        self.num_sketch_paths = len(user_sketch.shapes)
-        self.augment_trans = get_augment_trans(self.canvas_w, self.normalize_clip)
-        self.user_sketch = user_sketch
-        logging.info("Initialised shapes")
+            
 
     def initialize_variables(self):
         self.points_vars = []
@@ -418,7 +393,7 @@ class CICADA:
     def draw(self, data):
         logging.info("Updating...")
         self.iteration = 0
-        self.frame_size = data["data"]['frame_size']
+        self.frame_size = data["data"]["frame_size"]
         self.num_paths = data["data"]["random_curves"]
         self.region = data["data"]["region"]
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
@@ -427,16 +402,14 @@ class CICADA:
         self.text_features = self.clip_interface.encode_text_classes([data["data"]["prompt"]])
         self.neg_text_features = self.clip_interface.encode_text_classes([]) #empty currently
         self.sketch = data["data"]["sketch"]
-        # with open('data/interface_paths.svg', 'w') as f:
-        #     f.write(data["data"]["svg"])
 
     def continue_update_sketch(self, data):
         logging.info("Adding changes...")
         self.num_user_paths = int(data["data"]["num_user_paths"])
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
             data["data"]["fixation"])
-        with open('data/interface_paths.svg', 'w') as f:
-            f.write(data["data"]["svg"])
+        self.sketch = data["data"]["sketch"]
+
 
     async def stop(self):
         logging.info(f"Stopping... {self.sketch_reference_index}")
