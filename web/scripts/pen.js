@@ -1,5 +1,11 @@
-let sketchTimer,penPath, erasePath, regionPath, tmpGroup, mask, selectBox, firstPoint;
-
+let sketchTimer,
+    penPath,
+    erasePath,
+    regionPath,
+    tmpGroup,
+    mask,
+    selectBox,
+    firstPoint;
 
 sketchTool.onMouseDown = function(event) {
     clearTimeout(sketchTimer);
@@ -224,7 +230,7 @@ sketchTool.onMouseUp = function() {
             }
             break;
         case "pen":
-            if(firstPoint) {
+            if (firstPoint && penPath.segments.length > 2) {
                 firstPoint.remove();
             }
             penPath.simplify();

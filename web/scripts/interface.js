@@ -220,19 +220,19 @@ document.getElementById("width-slider").oninput = function() {
 };
 
 rotateSlider.oninput = function() {
-    rotateSelectGroup(controller.transformGroup, this.value);
+    transformGroup(controller.transformGroup, "rotation", this.value);
 };
 
 scaleSlider.oninput = function() {
-    scaleSelectGroup(controller.transformGroup, this.value / 5);
+    transformGroup(controller.transformGroup, "scaling", this.value / 5);
 };
 
 rotateNumber.oninput = function() {
-    rotateSelectGroup(controller.transformGroup, this.value);
+    transformGroup(controller.transformGroup, "rotation", this.value);
 };
 
 scaleNumber.oninput = function() {
-    scaleSelectGroup(controller.transformGroup, this.value / 5);
+    transformGroup(controller.transformGroup, "scaling", this.value / 5);
 };
 
 opacitySlider.oninput = function() {
@@ -470,7 +470,7 @@ controlPanel.onmousedown = (e) => {
                         content = document.getElementById("style-content");
                     }
                 }
-            });    
+            });
         }
 
         let bounds = content.getBoundingClientRect();

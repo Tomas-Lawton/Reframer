@@ -213,3 +213,29 @@ const openModal = (data) => {
     };
     modal.style.display = "block";
 };
+
+const showHide = (item) => {
+    if (item.style.display === "flex" || item.style.display === "") {
+        item.style.display = "none";
+    } else {
+        item.style.display = "flex";
+    }
+};
+
+const setLineLabels = (layer) => {
+    let res = controller.maxCurves - layer.children.length;
+    controller.addLines = res > 0 ? res : 0;
+    document.getElementById(
+        "max-lines"
+    ).innerHTML = `Lines : ${controller.maxCurves}`;
+    document.getElementById(
+        "calc-lines"
+    ).innerHTML = `Add : ${controller.addLines}`;
+};
+
+const setDefaultTransform = () => {
+    rotateSlider.value = 0;
+    rotateNumber.value = 0;
+    scaleSlider.value = 10;
+    scaleSlider.value = 10;
+};

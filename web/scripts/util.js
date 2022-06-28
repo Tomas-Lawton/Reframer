@@ -12,16 +12,17 @@ if (useAI) {
     };
 }
 
-const scaleSelectGroup = (g, s) => {
-    g.scaling = s;
-    hideSelectUI(false);
-    let items = getSelectedPaths();
-    fitToSelection(items, "scaling");
-    updateSelectUI();
+const createGroup = (items) => {
+    setDefaultTransform();
+    controller.transformGroup = new Group({
+        children: items,
+        strokeScaling: false,
+        transformContent: false,
+    });
 };
 
-const rotateSelectGroup = (g, r) => {
-    g.rotation = r;
+const transformGroup = (g, t, a) => {
+    g[t] = a;
     hideSelectUI(false);
     let items = getSelectedPaths();
     fitToSelection(items, "rotating");
@@ -58,11 +59,11 @@ const ungroup = () => {
     }
 };
 
+//TODO: Add stroke width so no overflow over bounds?
 const fitToSelection = (items, state) => {
     let bbox = items.reduce((bbox, item) => {
         return !bbox ? item.bounds : bbox.unite(item.bounds);
     }, null);
-    // Add stroke width so no overflow over bounds?
     // Also shouldn't set the boundingBox, should set boundingBox.bounds ???
     controller.boundingBox = new Path.Rectangle(bbox);
     controller.boundingBox.sendToBack();
@@ -125,14 +126,6 @@ const deletePath = () => {
     logger.event("deleted-path");
 };
 
-const showHide = (item) => {
-    if (item.style.display === "flex" || item.style.display === "") {
-        item.style.display = "none";
-    } else {
-        item.style.display = "flex";
-    }
-};
-
 const getHistoryBatch = (maxSize, startIdx) => {
     let len = controller.stack.historyHolder.length;
     if (len <= 1) return null;
@@ -185,21 +178,43 @@ const incrementHistory = () => {
     controller.step += 1;
 };
 
-const updateMain = (result) => {
-    incrementHistory();
-    // if (controller.numTraces > 1) {
-    //     showTraceHistoryFrom(controller.stack.historyHolder.length - 1);
-    // } else {
-    controller.lastRender = mainSketch.load(
-        frame / 224,
-        result.svg,
-        mainSketch.userPathList.length,
-        true,
-        true
-    );
-    mainSketch.svg = mainSketch.useLayer.exportSVG();
-    // }
-    // calcRollingLoss();
+const getRGBA = () => {
+    let rgba = controller.strokeColor.replace(/[^\d,]/g, "").split(",");
+    rgba[3] = controller.opacity;
+    return `rgba(${rgba.join()})`;
+};
+
+const download = () => {
+    // REMOVE REFs to select box
+    // to do: refactor these.
+    userLayer.getItems().forEach((path) => {
+        path.selected = false;
+    });
+
+    canvas.toBlob((blob) => {
+        let url = window.URL || window.webkitURL;
+        let link = url.createObjectURL(blob);
+        let isIE = false || !!document.documentMode;
+        if (isIE) {
+            window.navigator.msSaveBlob(blob, fileName);
+        } else {
+            let a = document.createElement("a");
+            a.setAttribute("download", "sketch.png");
+            a.setAttribute("href", link);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    });
+
+    mainSketch.svg = paper.project.exportSVG({
+        asString: true,
+    });
+    logger.event("save-sketch");
+
+    if (!useAI) {
+        location.reload();
+    }
 };
 
 const loadResponse = (result) => {
@@ -234,64 +249,19 @@ const loadResponse = (result) => {
     }
 };
 
-const getRGBA = () => {
-    let rgba = controller.strokeColor.replace(/[^\d,]/g, "").split(",");
-    rgba[3] = controller.opacity;
-    return `rgba(${rgba.join()})`;
-};
-
-const setLineLabels = (layer) => {
-    let res = controller.maxCurves - layer.children.length;
-    controller.addLines = res > 0 ? res : 0;
-    document.getElementById(
-        "max-lines"
-    ).innerHTML = `Lines : ${controller.maxCurves}`;
-    document.getElementById(
-        "calc-lines"
-    ).innerHTML = `Add : ${controller.addLines}`;
-};
-
-const createGroup = (items) => {
-    rotateSlider.value = 0;
-    rotateNumber.value = 0;
-    scaleSlider.value = 10;
-    scaleSlider.value = 10;
-    controller.transformGroup = new Group({
-        children: items,
-        strokeScaling: false,
-        transformContent: false,
-    });
-};
-
-const download = () => {
-    // REMOVE REFs to select box
-    // to do: refactor these.
-    userLayer.getItems().forEach((path) => {
-        path.selected = false;
-    });
-
-    canvas.toBlob((blob) => {
-        let url = window.URL || window.webkitURL;
-        let link = url.createObjectURL(blob);
-        let isIE = false || !!document.documentMode;
-        if (isIE) {
-            window.navigator.msSaveBlob(blob, fileName);
-        } else {
-            let a = document.createElement("a");
-            a.setAttribute("download", "sketch.png");
-            a.setAttribute("href", link);
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-    });
-
-    mainSketch.svg = paper.project.exportSVG({
-        asString: true,
-    });
-    logger.event("save-sketch");
-
-    if (!useAI) {
-        location.reload();
-    }
+const updateMain = (result) => {
+    incrementHistory();
+    // if (controller.numTraces > 1) {
+    //     showTraceHistoryFrom(controller.stack.historyHolder.length - 1);
+    // } else {
+    controller.lastRender = mainSketch.load(
+        frame / 224,
+        result.svg,
+        mainSketch.userPathList.length,
+        true,
+        true
+    );
+    mainSketch.svg = mainSketch.useLayer.exportSVG();
+    // }
+    // calcRollingLoss();
 };
