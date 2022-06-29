@@ -369,37 +369,21 @@ class CICADA:
         if self.sketch_reference_index is not None:
             self.resizeScaleFactor = 224 / self.frame_size
 
-        # pydiffvg.save_svg(
-        #     f"results/output-{str(self.sketch_reference_index)}.svg",
-        #     self.user_canvas_w,
-        #     self.user_canvas_h,
-        #     self.shapes,
-        #     self.shape_groups,
-        # )
+        pydiffvg.save_svg(
+            f"results/output-{str(self.sketch_reference_index)}.svg",
+            self.user_canvas_w,
+            self.user_canvas_h,
+            self.shapes,
+            self.shape_groups,
+        )
 
-        # svg = ""
-        # with open(f"results/output-{str(self.sketch_reference_index)}.svg", "r") as f:
-        #     svg = f.read()
-
-
-        # extract paths
-        # print(self.p)
-        # print()
-
-
-
-        for path in self.shapes:
-            print(path.stroke_width)
-            print(path.stroke_color)
-        for group in self.shape_groups:
-            group.stroke_color.data.clamp_(0.0, 1.0)
-        
-
-        # result_paths
+        svg = ""
+        with open(f"results/output-{str(self.sketch_reference_index)}.svg", "r") as f:
+            svg = f.read()
 
         result = {
             "status": status,
-            # "svg": svg,
+            "svg": svg,
             "shapes": self.shapes,
             "groups": self.shape_groups,
             "iterations": t,
