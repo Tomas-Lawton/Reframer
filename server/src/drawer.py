@@ -4,14 +4,13 @@ import pydiffvg
 from util.processing import get_augment_trans
 from util.loss import CLIPConvLoss2
 from util.utils import area_mask, use_penalisation, k_max_elements
-from util.render_design import calculate_draw_region, UserSketch
-from util.render_design import add_shape_groups, treebranch_initialization
-from util.clip_utility import get_noun_data, shapes2paths, data_to_tensor
+from util.render_design import calculate_draw_region
+from util.render_design import add_shape_groups
+from util.clip_utility import get_noun_data, data_to_tensor
 
 import logging
 import asyncio
-import datetime
-
+from sketch import Sketch
 
 class CICADA:
     def __init__(self, clip, websocket, sketch_reference_index=None):
@@ -19,7 +18,7 @@ class CICADA:
 
         self.clip_interface = clip
         self.model = clip.model
-        self.sketch_reference_index = sketch_reference_index
+        self.sketch_data_reference_index = sketch_reference_index
         # self.nouns_features = noun_features
         self.socket = websocket
         self.is_running = False
@@ -51,6 +50,8 @@ class CICADA:
         self.refresh_rate = 10
         self.num_user_paths = None  # add AI paths
         # Configure rasterisor
+        self.augment_trans = get_augment_trans(self.canvas_w, self.normalize_clip)
+
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         pydiffvg.set_print_timing(False)
         pydiffvg.set_use_gpu(torch.cuda.is_available())
@@ -59,17 +60,8 @@ class CICADA:
         return
 
     def extract_points(self):
-        # To Do: now fix pruning since the path list is now incorrect
-
-        #To Do: refactor
-        self.user_canvas_w = self.frame_size
-        self.user_canvas_h = self.frame_size
-
-        self.normaliseScaleFactor = 1 / self.frame_size
-        self.resizeScaleFactor = 224 / self.frame_size
-
-        self.path_list = []
-        for path in self.sketch: 
+        path_list = []
+        for path in self.sketch_data: 
             points = []
             num_segments = len(path['path_data'].split(',')) // 3
             spaced_data = path['path_data'].split('c')
@@ -97,66 +89,36 @@ class CICADA:
             points = [x0] + points_array
 
             if len(points) > 0:
-                self.path_list.append(data_to_tensor(path["color"], float(path['stroke_width'] * self.normaliseScaleFactor), points, num_segments, path["color"])) #add tie
-
-        if self.region['activate']:
-            self.drawing_area = calculate_draw_region(self.region, self.normaliseScaleFactor)
+                path_list.append(data_to_tensor(path["color"], float(path['stroke_width'] * self.normaliseScaleFactor), points, num_segments, True)) #add tiepath["tie"]
+        return path_list
 
     def activate(self, add_curves):
         self.is_active = True
-        self.extract_points()
-        self.initialize_shapes(add_curves)
-        self.initialize_variables()
-        self.initialize_optimizer()
-
-
-    def initialize_shapes(self, add_curves):
-        user_sketch = UserSketch(self.path_list, self.canvas_w, self.canvas_h)
+        paths = self.extract_points()
+        self.drawing = Sketch(self.frame_size, self.frame_size)
+        self.drawing.add_paths(paths)
         if add_curves:
-            shapes_rnd, shape_groups_rnd = treebranch_initialization(
-                self.path_list,
-                self.num_paths,
-                self.canvas_w,
-                self.canvas_h,
-                self.num_user_paths,
-                self.drawing_area,
-            )
-            try:
-                self.path_list += shapes2paths(shapes_rnd, shape_groups_rnd, False)
-            except Exception as e:
-                logging.error("Problem adding to the path list")
+            self.drawing.add_random_shapes(self.num_paths)
 
-            self.shapes = user_sketch.shapes + shapes_rnd
-            self.shape_groups = add_shape_groups(user_sketch.shape_groups, shape_groups_rnd)
-        else:
-            self.shapes = user_sketch.shapes
-            self.shape_groups = user_sketch.shape_groups
-
-        self.num_sketch_paths = len(user_sketch.shapes)
-        self.augment_trans = get_augment_trans(self.canvas_w, self.normalize_clip)
-        self.user_sketch = user_sketch
-        logging.info("Initialised shapes")
-
-            
+        self.initialize_variables()
+        self.initialize_optimizer()            
 
     def initialize_variables(self):
         self.points_vars = []
         self.stroke_width_vars = []
         self.color_vars = []
-        for path in self.shapes:
-            path.points.requires_grad = True
-            self.points_vars.append(path.points)
-            path.stroke_width.requires_grad = True
-            self.stroke_width_vars.append(path.stroke_width)
-        for group in self.shape_groups:
-            group.stroke_color.requires_grad = True
-            self.color_vars.append(group.stroke_color)
+        for trace in self.drawing.traces:
+            trace.shape.points.requires_grad = True
+            self.points_vars.append(trace.shape.points)
+            trace.shape.stroke_width.requires_grad = True
+            self.stroke_width_vars.append(trace.shape.stroke_width)
+            trace.shape_group.stroke_color.requires_grad = True
+            self.color_vars.append(trace.shape_group.stroke_color)
 
         self.render = pydiffvg.RenderFunction.apply
         self.mask = area_mask(self.canvas_w, self.canvas_h, self.drawing_area).to(
             self.device
         )
-        self.user_sketch.init_vars()
         self.points_vars0 = copy.deepcopy(self.points_vars)
         self.stroke_width_vars0 = copy.deepcopy(self.stroke_width_vars)
         self.color_vars0 = copy.deepcopy(self.color_vars)
@@ -164,7 +126,7 @@ class CICADA:
             self.points_vars0[k].requires_grad = False
             self.stroke_width_vars0[k].requires_grad = False
             self.color_vars0[k].requires_grad = False
-        self.img0 = copy.deepcopy(self.user_sketch.img)
+        self.img0 = copy.copy(self.drawing.img.detach())
         logging.info("Initialised vars")
 
     def initialize_optimizer(self):
@@ -173,7 +135,10 @@ class CICADA:
         self.color_optim = torch.optim.Adam(self.color_vars, lr=0.02)
         logging.info("Initialised Optimisers")
 
-    def build_img(self, shapes, shape_groups, t):
+    def build_img(self, t, shapes=None, shape_groups=None):
+        if not shapes:
+            shapes = [trace.shape for trace in self.drawing.traces]
+            shape_groups = [trace.shape_group for trace in self.drawing.traces]
         scene_args = pydiffvg.RenderFunction.serialize_scene(
             self.canvas_w, self.canvas_h, shapes, shape_groups
         )
@@ -191,7 +156,7 @@ class CICADA:
             # Get points of tied traces
             tied_points = []
             for p, path in enumerate(self.path_list):
-                if path.is_tied:
+                if path.is_fixed:
                     tied_points += [
                         x.unsqueeze(0)
                         for i, x in enumerate(self.shapes[p].points)
@@ -203,7 +168,7 @@ class CICADA:
             if tied_points:
                 tied_points = torch.cat(tied_points, 0)
                 for p, path in enumerate(self.path_list):
-                    if path.is_tied:
+                    if path.is_fixed:
                         dists.append(-1000)
                     else:
                         points = [
@@ -222,7 +187,7 @@ class CICADA:
             # Compute losses
             losses = []
             for p, path in enumerate(self.path_list):
-                if path.is_tied:
+                if path.is_fixed:
                     losses.append(1000)
                 else:
                     # Compute the loss if we take out the k-th path
@@ -268,13 +233,13 @@ class CICADA:
 
     def run_epoch(self):
         t = self.iteration
-        logging.info(f"Starting run {t} in drawer {str(self.sketch_reference_index)}")
+        logging.info(f"Starting run {t} in drawer {str(self.sketch_data_reference_index)}")
 
         self.points_optim.zero_grad()
         self.width_optim.zero_grad()
         self.color_optim.zero_grad()
 
-        img = self.build_img(self.shapes, self.shape_groups, t)
+        img = self.build_img(t)
 
         img_loss = (
             torch.norm((img - self.img0) * self.mask)
@@ -321,7 +286,7 @@ class CICADA:
         colors_loss = 0
 
         for k in range(len(self.points_vars0)):
-            if self.path_list[k].is_tied:
+            if self.path_list[k].is_fixed:
                 points_loss += torch.norm(self.points_vars[k] - self.points_vars0[k])
                 colors_loss += torch.norm(self.color_vars[k] - self.color_vars0[k])
                 widths_loss += torch.norm(
@@ -359,18 +324,18 @@ class CICADA:
             # 'geometric': geo_loss,
         }
 
-        logging.info(f"Completed run {t} in drawer {str(self.sketch_reference_index)}")
+        logging.info(f"Completed run {t} in drawer {str(self.sketch_data_reference_index)}")
         self.iteration += 1
 
     async def render_client(self, t, loss, pruning=False):
-        status = str(self.sketch_reference_index)
+        status = str(self.sketch_data_reference_index)
         if pruning:
             status="pruning"
-        if self.sketch_reference_index is not None:
+        if self.sketch_data_reference_index is not None:
             self.resizeScaleFactor = 224 / self.frame_size
 
         pydiffvg.save_svg(
-            f"results/output-{str(self.sketch_reference_index)}.svg",
+            f"results/output-{str(self.sketch_data_reference_index)}.svg",
             self.user_canvas_w,
             self.user_canvas_h,
             self.shapes,
@@ -378,7 +343,7 @@ class CICADA:
         )
 
         svg = ""
-        with open(f"results/output-{str(self.sketch_reference_index)}.svg", "r") as f:
+        with open(f"results/output-{str(self.sketch_data_reference_index)}.svg", "r") as f:
             svg = f.read()
 
         result = {
@@ -386,12 +351,12 @@ class CICADA:
             "svg": svg,
             "iterations": t,
             "loss": str(loss.item()),
-            "sketch_index": self.sketch_reference_index,
+            "sketch_index": self.sketch_data_reference_index,
         }
 
         try:
             await self.socket.send_json(result)
-            logging.info(f"Finished update for {self.sketch_reference_index}")
+            logging.info(f"Finished update for {self.sketch_data_reference_index}")
         except Exception as e:
             logging.error("Failed sending WS response")
             pass
@@ -401,7 +366,7 @@ class CICADA:
         self.iteration = 0
         self.frame_size = data["data"]["frame_size"]
         self.num_paths = data["data"]["random_curves"]
-        self.sketch = data["data"]["sketch"]
+        self.sketch_data = data["data"]["sketch"]
         self.region = data["data"]["region"]
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
             data["data"]["fixation"])
@@ -410,16 +375,24 @@ class CICADA:
         # self.negative_text_features = self.clip_interface.encode_text_classes(["Written words.", "Text."])
         self.negative_text_features = self.clip_interface.encode_text_classes(["text and written words."])
 
+        self.user_canvas_w = self.frame_size
+        self.user_canvas_h = self.frame_size
+        self.normaliseScaleFactor = 1 / self.frame_size
+        self.resizeScaleFactor = 224 / self.frame_size
+
+        if self.region['activate']:
+            self.drawing_area = calculate_draw_region(self.region, self.normaliseScaleFactor)
+
     def continue_update_sketch(self, data):
         logging.info("Adding changes...")
         self.num_user_paths = int(data["data"]["num_user_paths"])
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
             data["data"]["fixation"])
-        self.sketch = data["data"]["sketch"]
+        self.sketch_data = data["data"]["sketch"]
 
 
     async def stop(self):
-        logging.info(f"Stopping... {self.sketch_reference_index}")
+        logging.info(f"Stopping... {self.sketch_data_reference_index}")
         self.is_running = False
 
 
@@ -433,7 +406,7 @@ class CICADA:
                 #     if self.iteration % self.refresh_rate == 0:
                 #         await self.render_client(self.iteration, self.losses['global'])
             except Exception as e:
-                logging.info("Iteration failed on: ", self.sketch_reference_index)
+                logging.info("Iteration failed on: ", self.sketch_data_reference_index)
                 await self.stop()
 
     def run_async(self):

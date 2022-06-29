@@ -1,12 +1,12 @@
 import torch
 
 class DrawingPath:
-    def __init__(self, path, color, width, num_segments, is_tied):
+    def __init__(self, path, color, width, num_segments, is_fixed):
         self.path = path
         self.color = color
         self.width = width
         self.num_segments = num_segments
-        self.is_tied = is_tied
+        self.is_fixed = is_fixed
 
 
 def shapes2paths(shapes, shape_groups, tie):
