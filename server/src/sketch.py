@@ -12,6 +12,8 @@ class Trace:
 class Sketch:
     def __init__(self, w, h):
         self.traces = []
+        #to do refactor in v2
+        self.fixed_list = []
         self.img = None
         self.drawing_area = {'x0': 0.0, 'x1': 1.0, 'y0': 0.0, 'y1': 1.0}
         self.canvas_width = w
@@ -50,6 +52,7 @@ class Sketch:
             )
             shape_groups.append(shape_group)
             self.traces.append(Trace(shape, shape_group, is_fixed))
+            self.fixed_list.append(is_fixed.item())
 
         if not path_list:
             self.img = torch.ones(
@@ -73,6 +76,7 @@ class Sketch:
         for k in range(len(shapes)):
             shape_groups[k].shape_ids = torch.tensor([k + N])
             self.traces.append(Trace(shapes[k], shape_groups[k], fixed))
+            self.fixed_list.append(False)
 
         self.render_img()
 

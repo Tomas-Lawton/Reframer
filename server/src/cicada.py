@@ -299,19 +299,20 @@ class CICADA:
         with open(f"results/output-{str(self.index)}.svg", "r") as f:
             svg = f.read()
 
+        result = {
+            "status": status,
+            "svg": svg,
+            "iterations": t,
+            "loss": str(loss.item()),
+            "fixed": self.drawing.fixed_list
+        }
         try:
-            # To Do add fixed: Boolean list
-            await self.ws.send_json({
-                "status": status,
-                "svg": svg,
-                "iterations": t,
-                "loss": str(loss.item()),
-                "sketch_index": self.index,
-            })
+            await self.ws.send_json(result)
 
             logging.info(f"Finished update for {self.index}")
         except Exception as e:
             logging.error("Failed sending WS response")
+            logging.info(result)
             pass
 
     def draw(self, data):
