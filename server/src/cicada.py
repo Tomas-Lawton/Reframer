@@ -4,61 +4,41 @@ import pydiffvg
 from util.processing import get_augment_trans
 from util.loss import CLIPConvLoss2
 from util.utils import area_mask, use_penalisation, k_min_elements
-from util.render_design import calculate_draw_region
-from util.clip_utility import get_noun_data, data_to_tensor
+from util.clip_utility import  data_to_tensor
 
+import clip
 import logging
 import asyncio
 from sketch import Sketch
 from constants import *
 
 class CICADA:
-    def __init__(self, clip, websocket, sketch_reference_index=None):
+    def __init__(self, websocket, device, model, index=None):
         """These inputs are defaults and can have methods for setting them after the inital start up"""
-        # REFACTOR THIS WAY DOWN
-
-        self.clip_interface = clip
-        self.model = clip.model
-        self.sketch_data_reference_index = sketch_reference_index
-        # self.nouns_features = noun_features
-        self.socket = websocket
-        self.is_running = False
-        self.nouns = get_noun_data()
-        self.is_initialised = False
-        self.use_neg_prompts = True
-        self.normalize_clip = True
-        # Canvas parameters
-        self.num_paths = 50
-        self.max_width = 5
-        self.canvas_h = 224
-        self.canvas_w = 224
-        # Algorithm parameters
-        self.num_iter = 2001
+        self.index = index
+        self.ws = websocket
+        self.device = device
+        self.model = model
+        # self.clipConvLoss = CLIPConvLoss2(self.device)
+        self.augment_trans = get_augment_trans(canvas_w, normalize_clip)
+        
+        # Variables
+        self.iteration = 0
         self.w_points = 0.01
         self.w_colors = 0.1
         self.w_widths = 0.01
         self.w_img = 0.01
         self.w_full_img = 0.001
-        self.w_geo = 10
-        self.drawing_area = {'x0': 0.0, 'x1': 1.0, 'y0': 0.0, 'y1': 1.0}
-        self.prune_places = [round(self.num_iter * (k + 1) * 0.8 / 1) for k in range(1)]
-        self.p0 = 0.4
-        self.prune_ratio = self.p0 / len(self.prune_places)
-        self.iteration = 0
-        self.num_augs = 4
-        self.update_frequency = 1  # remove?
-        self.frame_size = None
-        self.refresh_rate = 10
-        self.num_user_paths = None  # add AI paths
-        # Configure rasterisor
-        self.augment_trans = get_augment_trans(self.canvas_w, self.normalize_clip)
+        prune_places = [round(num_iter * (k + 1) * 0.8 / 1) for k in range(1)]
+        self.prune_ratio = p0 / len(prune_places)
 
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        pydiffvg.set_print_timing(False)
-        pydiffvg.set_use_gpu(torch.cuda.is_available())
-        pydiffvg.set_device(self.device)
-        self.clipConvLoss = CLIPConvLoss2(self.device)
-        return
+    def encode_text_classes(self, token_list):
+        if token_list == []:
+            return token_list
+        tokens = clip.tokenize(token_list).to(self.device)
+        with torch.no_grad():
+            features = self.model.encode_text(tokens)  # normalise
+            return features / features.norm(dim=-1, keepdim=True)
 
     def extract_points(self):
         path_list = []
@@ -98,11 +78,11 @@ class CICADA:
         self.is_active = True
         paths = self.extract_points()
         # Move this ?
-        self.drawing = Sketch(self.canvas_w, self.canvas_h)
+        self.drawing = Sketch(canvas_w, canvas_h)
         self.drawing.add_paths(paths)
         if add_curves:
             self.drawing.add_random_shapes(self.num_paths)
-
+        self.drawing.update_region(self.region)
         self.initialize_variables()
         self.initialize_optimizer()            
 
@@ -119,7 +99,7 @@ class CICADA:
             self.color_vars.append(trace.shape_group.stroke_color)
 
         self.render = pydiffvg.RenderFunction.apply
-        self.mask = area_mask(self.canvas_w, self.canvas_h, self.drawing_area).to(
+        self.mask = area_mask(canvas_w, canvas_h, self.drawing.drawing_area).to(
             self.device
         )
         self.points_vars0 = copy.deepcopy(self.points_vars)
@@ -143,9 +123,9 @@ class CICADA:
             shapes = [trace.shape for trace in self.drawing.traces]
             shape_groups = [trace.shape_group for trace in self.drawing.traces]
         scene_args = pydiffvg.RenderFunction.serialize_scene(
-            self.canvas_w, self.canvas_h, shapes, shape_groups
+            canvas_w, canvas_h, shapes, shape_groups
         )
-        img = self.render(self.canvas_w, self.canvas_h, 2, 2, t, None, *scene_args)
+        img = self.render(canvas_w, canvas_h, 2, 2, t, None, *scene_args)
         img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(
             img.shape[0], img.shape[1], 3, device=pydiffvg.get_device()
         ) * (1 - img[:, :, 3:4])
@@ -179,7 +159,7 @@ class CICADA:
             loss -= torch.cosine_similarity(
                 self.text_features, img_features[n : n + 1], dim=1
             )
-            if self.use_neg_prompts:
+            if use_neg_prompts:
                 loss += (
                     -torch.cosine_similarity(
                         self.negative_text_features, img_features[n : n + 1], dim=1 #allow multiple
@@ -277,12 +257,12 @@ class CICADA:
                     shapes, shape_groups = self.drawing.all_shapes_but_kth(n)
                     img = self.build_img(5, shapes, shape_groups)
                     img_augs = []
-                    for n in range(self.num_augs):
+                    for n in range(num_augs):
                         img_augs.append(self.augment_trans(img))
                     im_batch = torch.cat(img_augs)
                     img_features = self.model.encode_image(im_batch)
                     loss = 0
-                    for n in range(self.num_augs):
+                    for n in range(num_augs):
                         loss -= torch.cosine_similarity(
                             self.text_features, img_features[n : n + 1], dim=1
                         )
@@ -300,18 +280,15 @@ class CICADA:
         self.initialize_variables()
 
     async def render_client(self, t, loss, pruning=False):
-        status = str(self.sketch_data_reference_index)
+        status = str(self.index)
         if pruning:
             status="pruning"
-        if self.sketch_data_reference_index is not None:
-            self.resizeScaleFactor = 224 / self.frame_size
-
 
         shapes = [trace.shape for trace in self.drawing.traces]
         shape_groups = [trace.shape_group for trace in self.drawing.traces]
 
         pydiffvg.save_svg(
-            f"results/output-{str(self.sketch_data_reference_index)}.svg",
+            f"results/output-{str(self.index)}.svg",
             self.user_canvas_w,
             self.user_canvas_h,
             shapes,
@@ -319,24 +296,24 @@ class CICADA:
         )
 
         svg = ""
-        with open(f"results/output-{str(self.sketch_data_reference_index)}.svg", "r") as f:
+        with open(f"results/output-{str(self.index)}.svg", "r") as f:
             svg = f.read()
 
         result = {
             "status": status,
             "svg": svg,
-            "shapes": self.shapes,
-            "groups": self.shape_groups,
+            # "shapes": shapes,
+            # "groups": shape_groups,
             "iterations": t,
             "loss": str(loss.item()),
-            "sketch_index": self.sketch_data_reference_index,
+            "sketch_index": self.index,
         }
 
         print(result)
 
         try:
             await self.socket.send_json(result)
-            logging.info(f"Finished update for {self.sketch_data_reference_index}")
+            logging.info(f"Finished update for {self.index}")
         except Exception as e:
             logging.error("Failed sending WS response")
             pass
@@ -351,17 +328,14 @@ class CICADA:
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
             data["data"]["fixation"])
         self.num_user_paths = int(data["data"]["num_user_paths"])
-        self.text_features = self.clip_interface.encode_text_classes([data["data"]["prompt"]])
+        self.text_features = self.encode_text_classes([data["data"]["prompt"]])
         # self.negative_text_features = self.clip_interface.encode_text_classes(["Written words.", "Text."])
-        self.negative_text_features = self.clip_interface.encode_text_classes(["text and written words."])
+        self.negative_text_features = self.encode_text_classes(["text and written words."])
 
         self.user_canvas_w = self.frame_size
         self.user_canvas_h = self.frame_size
         self.normaliseScaleFactor = 1 / self.frame_size
         self.resizeScaleFactor = 224 / self.frame_size
-
-        if self.region['activate']:
-            self.drawing_area = calculate_draw_region(self.region, self.normaliseScaleFactor)
 
 
     def continue_update_sketch(self, data):
@@ -373,22 +347,22 @@ class CICADA:
 
 
     async def stop(self):
-        logging.info(f"Stopping... {self.sketch_data_reference_index}")
+        logging.info(f"Stopping... {self.index}")
         self.is_running = False
 
 
     async def loop(self):
-        while self.is_running and self.iteration < self.num_iter:
+        while self.is_running and self.iteration < num_iter:
             try:
                 self.run_epoch(self.iteration)
                 self.iteration += 1
                 # if self.device == "cpu":
                 await self.render_client(self.iteration, self.losses['global'])
                 # else: 
-                #     if self.iteration % self.refresh_rate == 0:
+                #     if self.iteration % refresh_rate == 0:
                 #         await self.render_client(self.iteration, self.losses['global'])
             except Exception as e:
-                logging.info("Iteration failed on: ", self.sketch_data_reference_index)
+                logging.info("Iteration failed on: ", self.index)
                 await self.stop()
 
     def run_async(self):

@@ -1,6 +1,6 @@
 import torch
 import pydiffvg
-from util.render_design import treebranch_initialization
+from util.render_design import treebranch_initialization, calculate_draw_region
 
 class Trace:
     def __init__(self, shape, shape_group, is_fixed):
@@ -16,6 +16,12 @@ class Sketch:
         self.drawing_area = {'x0': 0.0, 'x1': 1.0, 'y0': 0.0, 'y1': 1.0}
         self.canvas_width = w
         self.canvas_height = h
+
+    def update_region(self, data):
+        if data['activate']:
+            self.drawing_area = calculate_draw_region(data, self.normaliseScaleFactor)
+        else:
+            self.drawing_area = {'x0': 0.0, 'x1': 1.0, 'y0': 0.0, 'y1': 1.0}
 
     def add_paths(self, path_list):
         shapes = []

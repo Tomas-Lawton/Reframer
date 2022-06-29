@@ -7,9 +7,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
-from drawer import CICADA
-from clip_instance import Clip_Instance
-
+from cicada import CICADA
+import torch
+import clip
+import pydiffvg
 
 # TO DO add environment var to set log mode
 logging.basicConfig(
@@ -76,13 +77,10 @@ def kill(d, a):
         drawer.is_running = False
         del drawer
 
-
 if not os.environ.get('CONNECTAI') == "True":
     logging.info("Running without AI")
 else:
     logging.info("Establishing Connection...")
-    clip_class = Clip_Instance()
-    exemplar_drawers = []
 
     @app.websocket_route("/ws")
     async def websocket_endpoint(websocket: WebSocket):
@@ -91,7 +89,15 @@ else:
         except Exception as e:
             logging.error("Bad socket")
 
-        main_sketch = CICADA(clip_class, websocket)
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        model, preprocess = clip.load('ViT-B/32', device, jit=False)
+        main_sketch = CICADA(websocket, device, model)
+
+        # exemplar_drawers = []
+
+        # pydiffvg.set_print_timing(False)
+        # pydiffvg.set_use_gpu(torch.cuda.is_available())
+        # pydiffvg.set_device(device)
 
         try:
             while True:
@@ -107,48 +113,45 @@ else:
                         await drawer.stop()
                         del drawer
 
-                if data["status"] == "draw":
-                    main_sketch.draw(data)
-                    main_sketch.activate(True)
-                    main_sketch.run_async()
+                # if data["status"] == "draw":
+                #     main_sketch.draw(data)
+                #     main_sketch.activate(True)
+                #     main_sketch.run_async()
 
-                if data["status"] == "add_new_sketch":
-                    new_exemplar = CICADA(
-                        clip_class, websocket, data["data"]["sketch_index"]
-                    )
-                    exemplar_drawers.append(new_exemplar)
-                    new_exemplar.draw(data)
-                    main_sketch.activate(True)
-                    new_exemplar.run_async()
+                # if data["status"] == "add_new_sketch":
+                #     new_exemplar = CICADA(
+                #          websocket, device, model, data["data"]["sketch_index"]
+                #     )
+                #     exemplar_drawers.append(new_exemplar)
+                #     new_exemplar.draw(data)
+                #     main_sketch.activate(True)
+                #     new_exemplar.run_async()
 
-                if data["status"] == "continue_sketch":
-                    main_sketch.continue_update_sketch(data)
-                    main_sketch.activate(False)
-                    main_sketch.run_async()
+                # if data["status"] == "continue_sketch":
+                #     main_sketch.continue_update_sketch(data)
+                #     main_sketch.activate(False)
+                #     main_sketch.run_async()
 
-                if data["status"] == "prune":
-                    main_sketch.prune()
-                    await main_sketch.render_client(main_sketch.iteration, main_sketch.losses["global"], True)
+                # if data["status"] == "prune":
+                #     main_sketch.prune()
+                #     await main_sketch.render_client(main_sketch.iteration, main_sketch.losses["global"], True)
 
-                if data["status"] == "stop_single_sketch":
-                    for drawer in exemplar_drawers:
-                        if (
-                            drawer.sketch_reference_index
-                            == data["data"]['sketch_index']
-                        ):
-                            await drawer.stop()
-                            del drawer
+                # if data["status"] == "stop_single_sketch":
+                #     for drawer in exemplar_drawers:
+                #         if (
+                #             drawer.index
+                #             == data["data"]['sketch_index']
+                #         ):
+                #             await drawer.stop()
+                #             del drawer
 
-                if data["status"] == "stop":
-                    await main_sketch.stop()
-
+                # if data["status"] == "stop":
+                #     await main_sketch.stop()
+        
+        # Use new refactor
         except WebSocketDisconnect:
             kill(exemplar_drawers, main_sketch)
             logging.info("Client disconnected")
-        except KeyboardInterrupt:
-            kill(exemplar_drawers, main_sketch)
-            logging.info("Client killed")
-
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 8000))
