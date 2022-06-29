@@ -95,7 +95,8 @@ class CICADA:
     def activate(self, add_curves):
         self.is_active = True
         paths = self.extract_points()
-        self.drawing = Sketch(self.frame_size, self.frame_size)
+        # Move this ?
+        self.drawing = Sketch(self.canvas_w, self.canvas_h)
         self.drawing.add_paths(paths)
         if add_curves:
             self.drawing.add_random_shapes(self.num_paths)
