@@ -3,6 +3,7 @@ import torch
 import random
 import copy
 import logging
+import numpy as np
 
 def calculate_draw_region(region, normaliseScaleFactor):
     logging.info("Using region")
@@ -114,15 +115,17 @@ def treebranch_initialization(
     y1 = drawing_area['y1']
 
     starting_points = []
-    for path in path_list[0:use_paths]: #user paths only
+    for path in path_list: #user paths only
         for k in range(path.path.size(0)):
             if k % 3 == 0:
                 if (x0 < path.path[k, 0] < x1) and (y0 < (1 - path.path[k, 1]) < y1):
                     starting_points.append(tuple([x.item() for x in path.path[k]]))
-
+    
     # If no endpoints in drawing zone, we make everything random
     K1 = round(partition['K1'] * num_paths) if starting_points else 0
     K2 = round(partition['K2'] * num_paths) if starting_points else 0
+
+    random.shuffle(starting_points)
 
     # Initialize Curves
     shapes = []
@@ -135,7 +138,11 @@ def treebranch_initialization(
         num_control_points = torch.zeros(num_segments, dtype=torch.int32) + 2
         points = []
         if k < K1:
-            p0 = random.choice(starting_points)
+            if k < len(starting_points):
+                p0 = starting_points[k]
+            else:
+                p0 = random.choice(starting_points)
+
         elif k < K2:
             p0 = random.choice(first_endpoints)
         else:
@@ -185,7 +192,7 @@ def treebranch_initialization(
             ),
         )
         shape_groups.append(path_group)
-
+        
     return shapes, shape_groups
 
 

@@ -25,11 +25,11 @@ class CICADA:
         self.is_running = False
         self.nouns = get_noun_data()
         self.is_initialised = False
-        self.use_neg_prompts = False
+        self.use_neg_prompts = True
         self.normalize_clip = True
         # Canvas parameters
         self.num_paths = 50
-        self.max_width = 40
+        self.max_width = 5
         self.canvas_h = 224
         self.canvas_w = 224
         # Algorithm parameters
@@ -168,9 +168,9 @@ class CICADA:
         logging.info("Initialised vars")
 
     def initialize_optimizer(self):
-        self.points_optim = torch.optim.Adam(self.points_vars, lr=0.5)
-        self.width_optim = torch.optim.Adam(self.stroke_width_vars, lr=0.1)
-        self.color_optim = torch.optim.Adam(self.color_vars, lr=0.01)
+        self.points_optim = torch.optim.Adam(self.points_vars, lr=0.2)
+        self.width_optim = torch.optim.Adam(self.stroke_width_vars, lr=0.2)
+        self.color_optim = torch.optim.Adam(self.color_vars, lr=0.02)
         logging.info("Initialised Optimisers")
 
     def build_img(self, shapes, shape_groups, t):
@@ -292,22 +292,28 @@ class CICADA:
         im_batch = torch.cat(img_augs)
         img_features = self.model.encode_image(im_batch)
         for n in range(self.num_augs):
+            # loss -= torch.cosine_similarity(
+            #     self.text_features, img_features, dim=1
+            # )
+            # if self.use_neg_prompts:
+            #     loss += (
+            #         -torch.cosine_similarity(
+            #             self.negative_text_features, img_features, dim=1 #allow multiple
+            #         )
+            #         * 0.3
+            #     )
+
             loss -= torch.cosine_similarity(
                 self.text_features, img_features[n : n + 1], dim=1
             )
             if self.use_neg_prompts:
                 loss += (
-                    torch.cosine_similarity(
-                        self.text_features_neg1, img_features[n : n + 1], dim=1
+                    -torch.cosine_similarity(
+                        self.negative_text_features, img_features[n : n + 1], dim=1 #allow multiple
                     )
                     * 0.3
                 )
-                loss += (
-                    torch.cosine_similarity(
-                        self.text_features_neg2, img_features[n : n + 1], dim=1
-                    )
-                    * 0.3
-                )
+
         self.img_features = img_features
 
         points_loss = 0
@@ -395,13 +401,14 @@ class CICADA:
         self.iteration = 0
         self.frame_size = data["data"]["frame_size"]
         self.num_paths = data["data"]["random_curves"]
+        self.sketch = data["data"]["sketch"]
         self.region = data["data"]["region"]
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
             data["data"]["fixation"])
         self.num_user_paths = int(data["data"]["num_user_paths"])
         self.text_features = self.clip_interface.encode_text_classes([data["data"]["prompt"]])
-        self.neg_text_features = self.clip_interface.encode_text_classes([]) #empty currently
-        self.sketch = data["data"]["sketch"]
+        # self.negative_text_features = self.clip_interface.encode_text_classes(["Written words.", "Text."])
+        self.negative_text_features = self.clip_interface.encode_text_classes(["text and written words."])
 
     def continue_update_sketch(self, data):
         logging.info("Adding changes...")
@@ -414,7 +421,6 @@ class CICADA:
     async def stop(self):
         logging.info(f"Stopping... {self.sketch_reference_index}")
         self.is_running = False
-        # await self.socket.send_json({"status": "stop"})
 
 
     async def loop(self):
