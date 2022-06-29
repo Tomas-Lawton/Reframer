@@ -24,7 +24,7 @@ class Sketch:
             path = dpath.path.detach().clone()
             width = dpath.width.detach().clone()
             color = dpath.color.detach().clone()
-            is_fixed = dpath.is_fixed
+            is_fixed = dpath.is_fixed.detach().clone()
             num_control_points = torch.zeros(dpath.num_segments, dtype=torch.int32) + 2
             points = torch.zeros_like(path)
             stroke_width = width * 100
