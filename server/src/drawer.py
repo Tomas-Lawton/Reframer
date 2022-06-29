@@ -97,7 +97,7 @@ class CICADA:
             points = [x0] + points_array
 
             if len(points) > 0:
-                self.path_list.append(data_to_tensor(path["color"], float(path['stroke_width'] * self.normaliseScaleFactor), points, num_segments, True)) #add tie
+                self.path_list.append(data_to_tensor(path["color"], float(path['stroke_width'] * self.normaliseScaleFactor), points, num_segments, path["color"])) #add tie
 
         if self.region['activate']:
             self.drawing_area = calculate_draw_region(self.region, self.normaliseScaleFactor)

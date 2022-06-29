@@ -165,7 +165,7 @@ sketchTool.onMouseDrag = function(event) {
         case "lasso":
             controller.drawRegion.width += event.delta.x;
             controller.drawRegion.height += event.delta.y;
-            if (regionPath !== undefined) regionPath.remove(); // redraw //REFACTOR
+            if (regionPath !== undefined) regionPath.remove(); //remove old one. maybe could update the old one instead?
             regionPath = new Path.Rectangle(controller.drawRegion);
             regionPath.set({
                 // fillColor: "#e9e9ff",
@@ -252,9 +252,10 @@ sketchTool.onMouseUp = function() {
             break;
         case "lasso":
             if (socket) {
+                regionPath.remove();
                 controller.resetMetaControls(); //reset since not continuing
                 controller.draw(true);
-                regionPath.remove();
+                console.log(userLayer);
             }
             break;
         case "erase":

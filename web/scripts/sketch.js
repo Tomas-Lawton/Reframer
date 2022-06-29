@@ -312,12 +312,11 @@ class Controller {
     }
     resetMetaControls() {
         document.getElementById("prune").classList.add("inactive-action");
-        console.log("clear");
         document.getElementById("history-block").style.display = "none";
         this.step = 0;
         timeKeeper.setAttribute("max", "0");
         timeKeeper.value = "0";
-        this.stack.historyHolder = [{ svg: "", num: 0 }];
+        sketchHistory.historyHolder = [{ svg: "", num: 0 }];
     }
 }
 
@@ -584,10 +583,6 @@ class Sketch {
     }
     buildSketch() {
         let pathList = [];
-        console.log(this.sketchLayer.children);
-        this.sketchLayer.children.forEach((path) =>
-            console.log(this.userPathList.includes(path))
-        );
         this.sketchLayer.getItems((path) =>
             pathList.push({
                 color: path.strokeColor.components.length === 4 ?
