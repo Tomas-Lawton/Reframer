@@ -134,8 +134,8 @@ const updateRectBounds = (from, to) => {
     controller.boundingBox.bounds = new Rectangle(from, to);
     controller.boundingBox.bounds.set({
         fillColor: "#f5f5f5",
-        opacity: 0.4,
         strokeColor: "#7b66ff",
+        opacity: 0.4,
         strokeWidth: 2,
     });
     controller.boundingBox.data.state = "resizing";

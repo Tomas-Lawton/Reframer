@@ -83,7 +83,7 @@ class Controller {
         // Defaults
         this.strokeColor = "rgb(24,24,24)";
         this.strokeWidth = 8;
-        this.opacity = 1;
+        this.alpha = 1;
         this.penMode = "pen";
         this.clipDrawing = false;
         this.maximumTraces = 1; // todo change
@@ -367,7 +367,7 @@ class Sketch {
         // this.userPathList = [];
         this.sketchLayer.getItems().forEach((path, i) => {
             // i < n && this.userPathList.push(path);
-            // i < n ? mainSketch.userPathList.push(path) : a && (path.opacity *= 0.5);
+            // i < n ? mainSketch.userPathList.push(path) : a && (path.color.alpha *= 0.5);
         });
         this.svg = this.sketchLayer.project.exportSVG({
             asString: true,
@@ -488,7 +488,7 @@ class Sketch {
                     overwriting.userPathList.push(item);
                 }
                 // else {
-                //     item.opacity *= 0.5;
+                //     item.color.alpha *= 0.5;
                 // }
             });
         }

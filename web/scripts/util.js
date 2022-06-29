@@ -70,7 +70,7 @@ const fitToSelection = (items, state) => {
     controller.boundingBox.sendToBack();
     controller.boundingBox.set({
         fillColor: "#f5f5f5",
-        opacity: 0.4,
+        // opacity: 0.4,
         strokeColor: "#7b66ff",
         strokeWidth: 2,
     });
@@ -189,9 +189,9 @@ const incrementHistory = () => {
     controller.step += 1;
 };
 
-const getRGBA = () => {
+const getRGBA = (a) => {
     let rgba = controller.strokeColor.replace(/[^\d,]/g, "").split(",");
-    rgba[3] = controller.opacity;
+    rgba[3] = a;
     return `rgba(${rgba.join()})`;
 };
 

@@ -63,10 +63,10 @@ sketchTool.onMouseDown = function(event) {
             penPath = new Path({
                 strokeColor: controller.strokeColor,
                 strokeWidth: controller.strokeWidth,
-                opacity: controller.opacity,
                 strokeCap: "round",
                 strokeJoin: "round",
             });
+            // penPath.color.alpha = controller.alpha;
             firstPoint = penPath.add(event.point);
             penPath.add({
                 ...event.point,
@@ -141,7 +141,7 @@ sketchTool.onMouseDrag = function(event) {
                             (item) => item !== path
                         ); //remove old ref
                         mainSketch.userPathList.push(path);
-                        path.opacity = 1;
+                        // path.strokeColor.alpha = 1;
                     });
                     updateSelectUI();
                 }
@@ -170,7 +170,7 @@ sketchTool.onMouseDrag = function(event) {
             regionPath.set({
                 // fillColor: "#e9e9ff",
                 fillColor: "#f5f5f5",
-                opacity: 0.4,
+                // opacity: 0.4,
                 strokeColor: "#7b66ff",
                 selected: true,
             });
@@ -319,7 +319,6 @@ sketchTool.onMouseUp = function() {
                     if (!foundUserPath) {
                         //ai erasorItem
                         splitPaths.forEach((newPath) => {
-                            newPath.opacity = 1;
                             newPath.strokeColor.alpha = 1;
                             newList.push(newPath);
                         });

@@ -60,8 +60,8 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
 document.querySelectorAll(".swatch").forEach((elem) => {
     elem.addEventListener("click", () => {
         let col = window.getComputedStyle(elem).backgroundColor;
-        controller.opacity = 1;
-        opacitySlider.value = 100;
+        controller.alpha = 1;
+        alphaSlider.value = 100;
         controller.strokeColor = col;
         getSelectedPaths().forEach((path) => (path.strokeColor = col));
         picker.setColor(col);
@@ -162,17 +162,16 @@ scaleNumber.oninput = function() {
     transformGroup(controller.transformGroup, "scaling", this.value / 5);
 };
 
-opacitySlider.oninput = function() {
-    controller.opacity = this.value / 100;
-
-    if (controller.transformGroup) {
-        controller.transformGroup.children.forEach(
-            (child) => (child.opacity = this.value / 100)
-        );
-    }
-    let rgba = getRGBA();
+alphaSlider.oninput = function() {
+    let rgba = getRGBA(this.value / 100);
+    controller.strokeColor = rgba;
     document.getElementById("pen-color").style.background = rgba;
     document.getElementById("point-size").style.background = rgba;
+    if (controller.transformGroup) {
+        controller.transformGroup.children.forEach(
+            (child) => (child.strokeColor = rgba)
+        );
+    }
 };
 
 document
@@ -604,7 +603,7 @@ if (!useAI) {
 
     var loadedPartial = userLayer.importSVG(partial);
     loadedPartial.set({
-        opacity: controller.opacity,
+        // opacity: controller.alpha,
         strokeCap: "round",
         strokeJoin: "round",
     });
@@ -635,13 +634,15 @@ const picker = new Picker({
 
 picker.setColor(controller.strokeColor);
 picker.onChange = (color) => {
+    console.log(color);
     controller.strokeColor = color.rgbaString;
     getSelectedPaths().forEach(
         (item) => (item.strokeColor = controller.strokeColor)
     );
-    let rgba = getRGBA();
-    document.getElementById("pen-color").style.background = rgba;
-    document.getElementById("point-size").style.background = rgba;
+    document.getElementById("pen-color").style.background =
+        controller.strokeColor;
+    document.getElementById("point-size").style.background =
+        controller.strokeColor;
 };
 
 setLineLabels(userLayer);
