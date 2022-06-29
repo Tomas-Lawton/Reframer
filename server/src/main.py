@@ -93,11 +93,11 @@ else:
         model, preprocess = clip.load('ViT-B/32', device, jit=False)
         main_sketch = CICADA(websocket, device, model)
 
-        # exemplar_drawers = []
-
-        # pydiffvg.set_print_timing(False)
-        # pydiffvg.set_use_gpu(torch.cuda.is_available())
-        # pydiffvg.set_device(device)
+        #refactor in mainrefactor branch
+        sketches = []
+        pydiffvg.set_print_timing(False)
+        pydiffvg.set_use_gpu(torch.cuda.is_available())
+        pydiffvg.set_device(device)
 
         try:
             while True:
@@ -108,49 +108,49 @@ else:
                     logging.warning("Unexpected json received by socket")
                     await main_sketch.stop()
                     del main_sketch
-                    for drawer in exemplar_drawers:
+                    for drawer in sketches:
                         logging.info("Suspend Brainstorm")
                         await drawer.stop()
                         del drawer
 
-                # if data["status"] == "draw":
-                #     main_sketch.draw(data)
-                #     main_sketch.activate(True)
-                #     main_sketch.run_async()
+                if data["status"] == "draw":
+                    main_sketch.draw(data)
+                    main_sketch.activate(True)
+                    main_sketch.run_async()
 
-                # if data["status"] == "add_new_sketch":
-                #     new_exemplar = CICADA(
-                #          websocket, device, model, data["data"]["sketch_index"]
-                #     )
-                #     exemplar_drawers.append(new_exemplar)
-                #     new_exemplar.draw(data)
-                #     main_sketch.activate(True)
-                #     new_exemplar.run_async()
+                if data["status"] == "add_new_sketch":
+                    new_exemplar = CICADA(
+                         websocket, device, model, data["data"]["sketch_index"]
+                    )
+                    sketches.append(new_exemplar)
+                    new_exemplar.draw(data)
+                    main_sketch.activate(True)
+                    new_exemplar.run_async()
 
-                # if data["status"] == "continue_sketch":
-                #     main_sketch.continue_update_sketch(data)
-                #     main_sketch.activate(False)
-                #     main_sketch.run_async()
+                if data["status"] == "continue_sketch":
+                    main_sketch.continue_update_sketch(data)
+                    main_sketch.activate(False)
+                    main_sketch.run_async()
 
-                # if data["status"] == "prune":
-                #     main_sketch.prune()
-                #     await main_sketch.render_client(main_sketch.iteration, main_sketch.losses["global"], True)
+                if data["status"] == "prune":
+                    main_sketch.prune()
+                    await main_sketch.render_client(main_sketch.iteration, main_sketch.losses["global"], True)
 
-                # if data["status"] == "stop_single_sketch":
-                #     for drawer in exemplar_drawers:
-                #         if (
-                #             drawer.index
-                #             == data["data"]['sketch_index']
-                #         ):
-                #             await drawer.stop()
-                #             del drawer
+                if data["status"] == "stop_single_sketch":
+                    for drawer in sketches:
+                        if (
+                            drawer.index
+                            == data["data"]['sketch_index']
+                        ):
+                            await drawer.stop()
+                            del drawer
 
-                # if data["status"] == "stop":
-                #     await main_sketch.stop()
+                if data["status"] == "stop":
+                    await main_sketch.stop()
         
         # Use new refactor
         except WebSocketDisconnect:
-            kill(exemplar_drawers, main_sketch)
+            kill(sketches, main_sketch)
             logging.info("Client disconnected")
 
 if __name__ == "__main__":

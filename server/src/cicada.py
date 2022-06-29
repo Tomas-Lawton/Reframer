@@ -299,7 +299,8 @@ class CICADA:
         with open(f"results/output-{str(self.index)}.svg", "r") as f:
             svg = f.read()
 
-        result = {
+        try:
+            await self.socket.send_json({
             "status": status,
             "svg": svg,
             # "shapes": shapes,
@@ -307,12 +308,7 @@ class CICADA:
             "iterations": t,
             "loss": str(loss.item()),
             "sketch_index": self.index,
-        }
-
-        print(result)
-
-        try:
-            await self.socket.send_json(result)
+        })
             logging.info(f"Finished update for {self.index}")
         except Exception as e:
             logging.error("Failed sending WS response")
