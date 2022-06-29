@@ -136,12 +136,9 @@ sketchTool.onMouseDrag = function(event) {
                     controller.transformGroup.position.y += event.delta.y;
                     controller.boundingBox.position.x += event.delta.x;
                     controller.boundingBox.position.y += event.delta.y;
+
                     controller.transformGroup.children.forEach((path) => {
-                        mainSketch.userPathList = mainSketch.userPathList.filter(
-                            (item) => item !== path
-                        ); //remove old ref
-                        mainSketch.userPathList.push(path);
-                        // path.strokeColor.alpha = 1;
+                        path.data.fixed = true;
                     });
                     updateSelectUI();
                 }
@@ -223,8 +220,7 @@ sketchTool.onMouseUp = function() {
             }
             penPath.simplify();
 
-            mainSketch.userPathList.push(penPath);
-
+            penPath.data.fixed = true;
             // Update
             mainSketch.svg = paper.project.exportSVG({
                 asString: true,
@@ -305,41 +301,24 @@ sketchTool.onMouseUp = function() {
                     let splitPaths = result.removeChildren();
                     erasorItem.parent.insertChildren(erasorItem.index, splitPaths);
                     let newList = [];
-                    let foundUserPath = false;
-                    for (let i = 0; i < mainSketch.userPathList.length; i++) {
-                        if (mainSketch.userPathList[i] === erasorItem) {
-                            splitPaths.forEach((newPath) => {
-                                newList.push(newPath); // replace
-                            });
-                            foundUserPath = true;
-                        } else {
-                            newList.push(mainSketch.userPathList[i]);
-                        }
-                    }
-                    if (!foundUserPath) {
-                        //ai erasorItem
-                        splitPaths.forEach((newPath) => {
-                            newPath.strokeColor.alpha = 1;
-                            newList.push(newPath);
-                        });
-                    }
 
-                    mainSketch.userPathList = newList;
+                    splitPaths.forEach((newPath) => {
+                        newList.push(newPath); // replace
+                        if (!newPath.data.fixed === true) {
+                            newPath.strokeColor.alpha = 1;
+                        }
+                        newPath.data.fixed = true;
+                    });
+
                     erasorItem.remove();
                     result.remove(); //remove the compound paths
                 } else {
                     // don't split
                     if (result.length === 0) {
-                        mainSketch.userPathList = mainSketch.userPathList.filter(
-                            (ref) => ref !== erasorItem
-                        ); //remove ref
                         erasorItem.remove();
                     } else {
-                        mainSketch.userPathList = mainSketch.userPathList.filter(
-                            (ref) => ref !== erasorItem
-                        );
                         erasorItem.replaceWith(result); //replace
-                        mainSketch.userPathList.push(result); //replace
+                        result.data.fixed = true;
                     }
                 }
             });
@@ -377,7 +356,6 @@ sketchTool.onMouseUp = function() {
     logger.event(controller.penMode + "-up");
 
     console.log(userLayer);
-    console.log(mainSketch.userPathList);
 };
 
 const setPenMode = (mode, accentTarget) => {

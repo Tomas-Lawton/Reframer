@@ -6,16 +6,11 @@ class SketchHistory {
         this.sketch = s;
     }
     pushUndo() {
-        //TO DO FIX LATER
-        // this.sketch.arrange();
-        // TO DO REMOVE
-        this.sketch.userPathList = [];
-        //
         this.undoStack.push({
             svg: this.sketch.sketchLayer.project.exportSVG({
                 asString: true,
             }),
-            num: this.sketch.userPathList.length,
+            num: 0, // FIXED PATH LIST
         });
 
         this.undoStack.length > 0 ?
@@ -23,16 +18,11 @@ class SketchHistory {
             (document.getElementById("undo").style.color = "#757575");
     }
     pushRedo() {
-        //TO DO FIX LATER
-        // this.sketch.arrange();
-        // TO DO REMOVE
-        this.sketch.userPathList = [];
-        //
         this.redoStack.push({
             svg: this.sketch.sketchLayer.project.exportSVG({
                 asString: true,
             }),
-            num: this.sketch.userPathList.length,
+            num: 0, // FIXED PATH LIST
         });
 
         this.redoStack.length > 0 ?
@@ -44,7 +34,7 @@ class SketchHistory {
             let last = this.undoStack.pop();
             this.pushRedo();
             this.sketch.sketchLayer.clear();
-            this.sketch.load(1, last.svg, last.num);
+            this.sketch.load(1, last.svg, last.num); //change to fixed list
             logger.event("undo");
 
             this.undoStack.length === 0 &&
@@ -56,7 +46,7 @@ class SketchHistory {
             let last = this.redoStack.pop();
             this.pushUndo();
             this.sketch.sketchLayer.clear();
-            this.sketch.load(1, last.svg, last.num);
+            this.sketch.load(1, last.svg, last.num); //change to fixed list
             logger.event("redo");
 
             this.redoStack.length === 0 &&
@@ -196,7 +186,7 @@ class Controller {
                 prompt: this.prompt,
                 lines: this.initRandomCurves ? this.addLines : 0, //adding
                 fixation: this.useFixation,
-                userPaths: mainSketch.userPathList.length,
+                userPaths: 0, // FIXED PATH LIST
             });
             this.step = 0;
             setActionUI("drawing");
@@ -222,7 +212,7 @@ class Controller {
                 lines: this.addLines,
                 sketchScopeIndex: sketchCountIndex,
                 fixation: this.useFixation,
-                userPaths: mainSketch.userPathList.length,
+                userPaths: 0, // FIXED PATH LIST
             });
         }
     }
@@ -258,7 +248,7 @@ class Controller {
                         sketch: mainSketch.sketch,
                         frameSize: mainSketch.frameSize, //can remove?
                         fixation: this.useFixation,
-                        userPaths: mainSketch.userPathList.length,
+                        userPaths: 0, // FIXED PATH LIST
                     });
                     setActionUI("continuing");
                 } catch (e) {
@@ -304,8 +294,6 @@ class Controller {
             path.selected = false;
         });
 
-        // to do REMOVE
-        // mainSketch.arrange();
         mainSketch.buildSketch();
 
         setLineLabels(mainSketch.sketchLayer);
@@ -331,8 +319,9 @@ class Sketch {
         this.type = type; //U or AI or Main?
         this.svg; //sorted already
         this.elem; //DOM elem
-        this.userPathList = [];
         this.sketchLayer;
+
+        // Fixed path list???
 
         controller.sketches[this.i] = this;
         // console.log("Created: ", this.i);
@@ -343,50 +332,50 @@ class Sketch {
             this.frameSize = sketchSize;
         }
     }
-    load(s, svg, n, a = true, o = false) {
-        //+ SVG Arr
-        if (svg === "" || svg === undefined) return;
-        this.sketchLayer.clear();
-        let imported = this.sketchLayer.importSVG(svg);
-        let g = imported.children[0];
-        if (!(g instanceof Group)) {
-            g = imported;
-        }
-        let scaledGroup = scaleGroup(g, s);
-        // if (o) {
-        //     scaledGroup.position.x += offX;
-        //     scaledGroup.position.y += offY;
-        // }
-        this.sketchLayer.insertChildren(
-            scaledGroup.index,
-            scaledGroup.removeChildren()
-        );
-        scaledGroup.remove();
-        imported.remove();
-
-        // TO DO ADD BACK
-        // this.userPathList = [];
-        this.sketchLayer.getItems().forEach((path, i) => {
-            // i < n && this.userPathList.push(path);
-            // i < n ? mainSketch.userPathList.push(path) : a && (path.color.alpha *= 0.5);
-        });
-        this.svg = this.sketchLayer.project.exportSVG({
-            asString: true,
-        });
-    }
-    arrange() {
-        let sorted = [...this.userPathList];
-        this.sketchLayer.getItems().forEach((item) => {
-            if (!this.userPathList.includes(item)) {
-                sorted.push(item);
+    load(s, svg, fixed, a = true, o = false) {
+            //+ SVG Arr
+            if (svg === "" || svg === undefined) return;
+            this.sketchLayer.clear();
+            let imported = this.sketchLayer.importSVG(svg);
+            let g = imported.children[0];
+            if (!(g instanceof Group)) {
+                g = imported;
             }
-            item.remove(); //preserves reference
-        });
-        sorted.forEach((elem) => this.sketchLayer.addChild(elem));
-        this.svg = this.sketchLayer.project.exportSVG({
-            asString: true,
-        });
-    }
+            let scaledGroup = scaleGroup(g, s);
+            // if (o) {
+            //     scaledGroup.position.x += offX;
+            //     scaledGroup.position.y += offY;
+            // }
+            let finalInserted = this.sketchLayer.insertChildren(
+                scaledGroup.index,
+                scaledGroup.removeChildren()
+            );
+            scaledGroup.remove();
+            imported.remove();
+
+            for (let i = 0; i < fixed.length; i++) {
+                finalInserted[i].data.fixed = fixed[i];
+            }
+            // this.sketchLayer.getItems().forEach((path, i) => {
+            //     !path.data.fixed && (path.color.alpha *= 0.5);
+            // });
+            this.svg = this.sketchLayer.project.exportSVG({
+                asString: true,
+            });
+        }
+        // arrange() {
+        //     let sorted = [...this.userPathList];
+        //     this.sketchLayer.getItems().forEach((item) => {
+        //         if (!this.userPathList.includes(item)) {
+        //             sorted.push(item);
+        //         }
+        //         item.remove(); //preserves reference
+        //     });
+        //     sorted.forEach((elem) => this.sketchLayer.addChild(elem));
+        //     this.svg = this.sketchLayer.project.exportSVG({
+        //         asString: true,
+        //     });
+        // }
     renderMini() {
         let domIdx = this.i;
 
@@ -464,16 +453,14 @@ class Sketch {
             0,
             sketch.removeChildren()
         );
-        overwriting.userPathList = [];
 
         if (imported !== null) {
             imported.forEach((item, i) => {
                 if (i < newNum) {
-                    overwriting.userPathList.push(item);
+                    item.fixed = true;
                 }
             });
         }
-        console.log(overwriting.userPathList);
     }
     add(overwriting, sketch, newNum, s) {
         if (!sketch) return;
@@ -486,14 +473,13 @@ class Sketch {
         if (adding !== null) {
             adding.forEach((item, i) => {
                 if (i < newNum) {
-                    overwriting.userPathList.push(item);
+                    item.data.fixed = true;
                 }
                 // else {
                 //     item.color.alpha *= 0.5;
                 // }
             });
         }
-        console.log(overwriting.userPathList);
     }
     import (overwriting) {
         let i = this.i;
@@ -508,7 +494,7 @@ class Sketch {
                     ungroup();
                     this.saveStatic(
                         overwriting.extractScaledJSON(1 / scaleRatio),
-                        overwriting.userPathList.length
+                        0 // FIXED PATH LIST
                     );
                     const clone = controller.sketches[i].sketchLayer.clone();
                     const newNum = controller.sketches[i].num;
@@ -524,7 +510,7 @@ class Sketch {
                     ungroup(); //remove first even tho deleted
                     this.saveStatic(
                         overwriting.extractScaledJSON(1 / scaleRatio),
-                        overwriting.userPathList.length
+                        0 // FIXED PATH LIST
                     );
                     const clone = controller.sketches[i].sketchLayer.clone();
                     const newNum = controller.sketches[i].num;
@@ -540,12 +526,11 @@ class Sketch {
 
             this.saveStatic(
                 overwriting.extractScaledJSON(1 / scaleRatio),
-                overwriting.userPathList.length
+                0 // FIXED PATH LIST
             );
             const clone = controller.sketches[i].sketchLayer.clone();
             const newNum = controller.sketches[i].num;
             this.add(overwriting, clone, newNum, scaleRatio);
-            // this.arrange(); // finally, move user paths back down (optional)
         }
     }
     clone() {
@@ -591,7 +576,7 @@ class Sketch {
                     [...path.strokeColor.components, 1],
                 stroke_width: path.strokeWidth,
                 path_data: path.pathData,
-                tie: this.userPathList.includes(path),
+                fixed_path: path.data.fixed,
             })
         );
         this.sketch = pathList;

@@ -38,6 +38,7 @@ class Sketch:
             stroke_width = width * 100
             points[:, 0] = self.canvas_width * path[:, 0]
             points[:, 1] = self.canvas_height * path[:, 1]
+            # SPLIT PATH HERE?
             shape = pydiffvg.Path(
                 num_control_points=num_control_points,
                 points=points,

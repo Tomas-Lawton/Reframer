@@ -83,7 +83,6 @@ document.getElementById("delete").addEventListener("click", () =>
             controller.lastPrompt = null;
             userLayer.clear();
             modal.style.display = "none";
-            mainSketch.userPathList = [];
             updateSelectUI();
         },
     })
@@ -115,7 +114,7 @@ copyHandler.addEventListener("click", (e) => {
     controller.transformGroup.selected = false; //deselect og
 
     ungroup();
-    inserted.forEach((pathCopy) => mainSketch.userPathList.push(pathCopy)); //save to user paths
+    inserted.forEach((pathCopy) => (pathCopy.data.fixed = true)); //save to user paths
     createGroup(inserted);
     fitToSelection(getSelectedPaths(), "moving");
     updateSelectUI();
@@ -207,7 +206,11 @@ document.getElementById("empty").addEventListener("click", (e) => {
     controller.clipDrawing = false;
     for (let i = 0; i < 4; i++) {
         explorer.removeChild(explorer.firstChild);
-        let sketch = new Sketch(null, defaults, mainSketch.userPathList.length);
+        let sketch = new Sketch(
+            null,
+            defaults,
+            0 // FIXED PATH LIST
+        );
         let newElem = sketch.renderMini();
         controller.inspireScopes.push(controller.sketchScopeIndex);
         explorer.appendChild(newElem);
@@ -281,7 +284,7 @@ document.getElementById("inspire").addEventListener("click", () => {
                     let sketch = new Sketch(
                         null,
                         defaults,
-                        mainSketch.userPathList.length
+                        0 // FIXED PATH LIST
                     );
                     let newElem = sketch.renderMini();
                     controller.inspireScopes.push(controller.sketchScopeIndex);
@@ -291,7 +294,7 @@ document.getElementById("inspire").addEventListener("click", () => {
                     let sketch = new Sketch(
                         controller.sketchScopeIndex,
                         sketchScope,
-                        mainSketch.userPathList.length, //based on current
+                        0, // FIXED PATH LIST
                         "AI"
                     );
                     let newElem = sketch.renderMini();
@@ -359,7 +362,8 @@ document.getElementById("prune").addEventListener("click", () => {
 
 document.getElementById("go-back").addEventListener("click", () => {
     if (controller.drawState === "stop") {
-        mainSketch.arrange();
+        // mainSketch.arrange();
+        // LOAD FIXED PATH LIST ?
         incrementHistory();
         let stored = sketchHistory.historyHolder[1];
         timeKeeper.value = 1;
@@ -504,16 +508,15 @@ document.getElementById("scrapbook").addEventListener("click", () => {
 // });
 
 document.getElementById("save-sketch").addEventListener("click", () => {
-    console.log(mainSketch.userPathList);
     ungroup();
     mainSketch.sketchLayer.getItems().forEach((path) => {
         path.selected = false;
     });
-
-    mainSketch.arrange();
+    // LOAD FIXED PATH LIST ?
+    // mainSketch.arrange();
     mainSketch.saveStatic(
         mainSketch.extractScaledJSON(1 / scaleRatio), //adds as backup
-        mainSketch.userPathList.length
+        0 // FIXED PATH LIST
     );
     logger.event("to-sketchbook");
 });
@@ -610,7 +613,7 @@ if (!useAI) {
     loadedPartial.getItems().forEach((item) => {
         if (item instanceof Path) {
             let newElem = userLayer.addChild(item.clone());
-            mainSketch.userPathList.push(newElem);
+            newElem;
         }
     });
     loadedPartial.remove();

@@ -119,9 +119,6 @@ const deleteItems = () => {
     sketchHistory.pushUndo();
 
     // Delete
-    mainSketch.userPathList = mainSketch.userPathList.filter(
-        (ref) => !selectedPaths.includes(ref)
-    );
     selectedPaths.forEach((path) => path.remove());
 
     // Save new SVG
@@ -181,7 +178,7 @@ const showTraceHistoryFrom = (fromIndex) => {
 const incrementHistory = () => {
     sketchHistory.historyHolder.push({
         svg: mainSketch.svg,
-        num: mainSketch.userPathList.length,
+        num: 0, // FIXED PATH LIST
     });
     timeKeeper.setAttribute("max", String(controller.step + 1));
     timeKeeper.value = String(controller.step + 1);
@@ -245,7 +242,7 @@ const loadResponse = (result) => {
             sketch.load(
                 sketchSize / 224,
                 result.svg,
-                mainSketch.userPathList.length,
+                0, // FIXED PATH LIST
                 sketch.userLayer
             );
         }
@@ -268,7 +265,7 @@ const updateMain = (result) => {
     mainSketch.load(
         frame / 224,
         result.svg,
-        mainSketch.userPathList.length,
+        result.fixed, // FIXED PATH LIST
         true,
         true
     );

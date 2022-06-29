@@ -70,8 +70,8 @@ class CICADA:
             points = [x0] + points_array
 
             if len(points) > 0:
-                path_list.append(data_to_tensor(path["color"], float(path['stroke_width'] * self.normaliseScaleFactor), 
-                    points, num_segments, path["tie"])) #add tiepath["tie"]
+                path_list.append(data_to_tensor(path["color"], float(path["stroke_width"] * self.normaliseScaleFactor), 
+                    points, num_segments, path["fixed_path"]))
         return path_list
 
     def activate(self, add_curves):
