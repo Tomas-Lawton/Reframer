@@ -301,7 +301,7 @@ class CICADA:
 
         try:
             # To Do add fixed: Boolean list
-            await self.socket.send_json({
+            await self.ws.send_json({
                 "status": status,
                 "svg": svg,
                 "iterations": t,
