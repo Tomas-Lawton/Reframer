@@ -29,7 +29,7 @@ class CICADA:
         self.normalize_clip = True
         # Canvas parameters
         self.num_paths = 50
-        self.max_width = 40
+        self.max_width = 5
         self.canvas_h = 224
         self.canvas_w = 224
         # Algorithm parameters
@@ -170,9 +170,9 @@ class CICADA:
         logging.info("Initialised vars")
 
     def initialize_optimizer(self):
-        self.points_optim = torch.optim.Adam(self.points_vars, lr=0.5)
-        self.width_optim = torch.optim.Adam(self.stroke_width_vars, lr=0.1)
-        self.color_optim = torch.optim.Adam(self.color_vars, lr=0.01)
+        self.points_optim = torch.optim.Adam(self.points_vars, lr=0.2)
+        self.width_optim = torch.optim.Adam(self.stroke_width_vars, lr=0.2)
+        self.color_optim = torch.optim.Adam(self.color_vars, lr=0.02)
         logging.info("Initialised Optimisers")
 
     def build_img(self, shapes, shape_groups, t):
@@ -402,7 +402,7 @@ class CICADA:
             data["data"]["fixation"])
         self.num_user_paths = int(data["data"]["num_user_paths"])
         self.text_features = self.clip_interface.encode_text_classes([data["data"]["prompt"]])
-        self.neg_text_features = self.clip_interface.encode_text_classes([]) #empty currently
+        self.neg_text_features = self.clip_interface.encode_text_classes(["Written words.", "Text."]) #empty currently
         # self.sketch_json = data["data"]["svg"]
         with open('data/interface_paths.svg', 'w') as f:
             f.write(data["data"]["svg"])
