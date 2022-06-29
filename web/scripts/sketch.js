@@ -121,7 +121,7 @@ class Controller {
         // Settings panel
         this.useAdvanced = false;
         this.initRandomCurves = true;
-        this.maxCurves = 32;
+        this.maxCurves = 48;
         this.addLines = 0;
         this.numTraces = 1;
 
