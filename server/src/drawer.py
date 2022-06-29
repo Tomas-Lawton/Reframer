@@ -11,10 +11,12 @@ from util.clip_utility import get_noun_data, data_to_tensor
 import logging
 import asyncio
 from sketch import Sketch
+from constants import *
 
 class CICADA:
     def __init__(self, clip, websocket, sketch_reference_index=None):
         """These inputs are defaults and can have methods for setting them after the inital start up"""
+        # REFACTOR THIS WAY DOWN
 
         self.clip_interface = clip
         self.model = clip.model
