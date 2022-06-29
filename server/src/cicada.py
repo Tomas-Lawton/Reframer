@@ -199,7 +199,7 @@ class CICADA:
         self.width_optim.step()
         self.color_optim.step()
         for trace in self.drawing.traces:
-            trace.shape.stroke_width.data.clamp_(1.0, max_width)
+            trace.shape.stroke_width.data.clamp_(.5, max_width) #maybe this should be 1?
             trace.shape_group.stroke_color.data.clamp_(0.0, 1.0)
 
         self.losses = {
