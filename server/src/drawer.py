@@ -97,7 +97,7 @@ class CICADA:
             points = [x0] + points_array
 
             if len(points) > 0:
-                self.path_list.append(data_to_tensor(path["color"], float(path['stroke_width'] * self.normaliseScaleFactor), points, num_segments, path["color"])) #add tie
+                self.path_list.append(data_to_tensor(path["color"], float(path['stroke_width'] * self.normaliseScaleFactor), points, num_segments, path["tie"])) #add tie
 
         if self.region['activate']:
             self.drawing_area = calculate_draw_region(self.region, self.normaliseScaleFactor)
@@ -369,25 +369,45 @@ class CICADA:
         if self.sketch_reference_index is not None:
             self.resizeScaleFactor = 224 / self.frame_size
 
-        pydiffvg.save_svg(
-            f"results/output-{str(self.sketch_reference_index)}.svg",
-            self.user_canvas_w,
-            self.user_canvas_h,
-            self.shapes,
-            self.shape_groups,
-        )
+        # pydiffvg.save_svg(
+        #     f"results/output-{str(self.sketch_reference_index)}.svg",
+        #     self.user_canvas_w,
+        #     self.user_canvas_h,
+        #     self.shapes,
+        #     self.shape_groups,
+        # )
 
-        svg = ""
-        with open(f"results/output-{str(self.sketch_reference_index)}.svg", "r") as f:
-            svg = f.read()
+        # svg = ""
+        # with open(f"results/output-{str(self.sketch_reference_index)}.svg", "r") as f:
+        #     svg = f.read()
+
+
+        # extract paths
+        # print(self.p)
+        # print()
+
+
+
+        for path in self.shapes:
+            print(path.stroke_width)
+            print(path.stroke_color)
+        for group in self.shape_groups:
+            group.stroke_color.data.clamp_(0.0, 1.0)
+        
+
+        # result_paths
 
         result = {
             "status": status,
-            "svg": svg,
+            # "svg": svg,
+            "shapes": self.shapes,
+            "groups": self.shape_groups,
             "iterations": t,
             "loss": str(loss.item()),
             "sketch_index": self.sketch_reference_index,
         }
+
+        print(result)
 
         try:
             await self.socket.send_json(result)
