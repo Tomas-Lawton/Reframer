@@ -287,6 +287,7 @@ class CICADA:
         shapes = [trace.shape for trace in self.drawing.traces]
         shape_groups = [trace.shape_group for trace in self.drawing.traces]
 
+        # Keep for now but remove later
         pydiffvg.save_svg(
             f"results/output-{str(self.index)}.svg",
             self.user_canvas_w,
@@ -294,21 +295,20 @@ class CICADA:
             shapes,
             shape_groups,
         )
-
         svg = ""
         with open(f"results/output-{str(self.index)}.svg", "r") as f:
             svg = f.read()
 
         try:
+            # To Do add fixed: Boolean list
             await self.socket.send_json({
-            "status": status,
-            "svg": svg,
-            # "shapes": shapes,
-            # "groups": shape_groups,
-            "iterations": t,
-            "loss": str(loss.item()),
-            "sketch_index": self.index,
-        })
+                "status": status,
+                "svg": svg,
+                "iterations": t,
+                "loss": str(loss.item()),
+                "sketch_index": self.index,
+            })
+
             logging.info(f"Finished update for {self.index}")
         except Exception as e:
             logging.error("Failed sending WS response")
