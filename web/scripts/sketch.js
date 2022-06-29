@@ -190,6 +190,7 @@ class Controller {
                 // svg: svg || mainSketch.svg,
                 // svg: mainSketch.sketchLayer.project.exportJSON(), //test
                 sketch: mainSketch.sketch,
+                // sketchScopeIndex: "None",
                 hasRegion: withRegion,
                 frameSize: mainSketch.frameSize,
                 prompt: this.prompt,

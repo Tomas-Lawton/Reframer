@@ -94,11 +94,8 @@ class UserSketch:
 
 
 def treebranch_initialization(
-    path_list,
-    num_paths,
-    canvas_width,
-    canvas_height,
-    use_paths,
+    drawing,
+    num_traces,
     drawing_area={'x0': 0, 'x1': 1, 'y0': 0, 'y1': 1},
     partition={'K1': 0.25, 'K2': 0.5, 'K3': 0.25},
 ):
@@ -114,46 +111,69 @@ def treebranch_initialization(
     y0 = drawing_area['y0']
     y1 = drawing_area['y1']
 
+    # Get all endpoints within drawing region
     starting_points = []
-    for path in path_list: #user paths only
-        for k in range(path.path.size(0)):
-            if k % 3 == 0:
-                if (x0 < path.path[k, 0] < x1) and (y0 < (1 - path.path[k, 1]) < y1):
-                    starting_points.append(tuple([x.item() for x in path.path[k]]))
-    
-    # If no endpoints in drawing zone, we make everything random
-    K1 = round(partition['K1'] * num_paths) if starting_points else 0
-    K2 = round(partition['K2'] * num_paths) if starting_points else 0
+    starting_colors = []
 
-    random.shuffle(starting_points)
+    for trace in drawing.traces:
+        # Maybe this is a tensor and I can't enumerate
+        for k, point in enumerate(trace.shape.points):
+            if k % 3 == 0:
+                if (x0 < point[0] / drawing.canvas_width < x1) and (
+                    y0 < (1 - point[1] / drawing.canvas_height) < y1
+                ):
+                    # starting_points.append(tuple([x.item() for x in point]))
+                    starting_points.append(
+                        (
+                            point[0] / drawing.canvas_width,
+                            point[1] / drawing.canvas_height,
+                        )
+                    )
+                    starting_colors.append(trace.shape_group.stroke_color)
+
+    # If no endpoints in drawing zone, we make everything random
+    K1 = round(partition['K1'] * num_traces) if starting_points else 0
+    K2 = round(partition['K2'] * num_traces) if starting_points else 0
 
     # Initialize Curves
     shapes = []
     shape_groups = []
     first_endpoints = []
+    first_colors = []
 
     # Add random curves
-    for k in range(num_paths):
+    for k in range(num_traces):
         num_segments = random.randint(1, 3)
         num_control_points = torch.zeros(num_segments, dtype=torch.int32) + 2
         points = []
         if k < K1:
-            if k < len(starting_points):
-                p0 = starting_points[k]
-            else:
-                p0 = random.choice(starting_points)
-
+            i0 = random.choice(range(len(starting_points)))
+            p0 = starting_points[i0]
+            color = torch.tensor(
+                [
+                    max(0.0, min(1.0, c + 0.3 * (random.random() - 0.5)))
+                    for c in starting_colors[i0]
+                ]
+            )
         elif k < K2:
-            p0 = random.choice(first_endpoints)
+            i0 = random.choice(range(len(first_endpoints)))
+            p0 = first_endpoints[i0]
+            color = torch.tensor(
+                [
+                    max(0.0, min(1.0, c + 0.3 * (random.random() - 0.5)))
+                    for c in first_colors[i0]
+                ]
+            )
         else:
             p0 = (
                 random.random() * (x1 - x0) + x0,
                 random.random() * (y1 - y0) + 1 - y1,
             )
+            color = torch.rand(4)
         points.append(p0)
 
         for j in range(num_segments):
-            radius = 0.1
+            radius = 0.15
             p1 = (
                 p0[0] + radius * (random.random() - 0.5),
                 p0[1] + radius * (random.random() - 0.5),
@@ -173,28 +193,26 @@ def treebranch_initialization(
 
         if k < K1:
             first_endpoints.append(points[-1])
+            first_colors.append(color)
 
         points = torch.tensor(points)
-        points[:, 0] *= canvas_width
-        points[:, 1] *= canvas_height
+        points[:, 0] *= drawing.canvas_width
+        points[:, 1] *= drawing.canvas_height
         path = pydiffvg.Path(
             num_control_points=num_control_points,
             points=points,
-            stroke_width=torch.tensor(1.0),
+            stroke_width=torch.tensor(float(random.randint(1, 10)) / 2),
             is_closed=False,
         )
         shapes.append(path)
         path_group = pydiffvg.ShapeGroup(
             shape_ids=torch.tensor([len(shapes) - 1]),
             fill_color=None,
-            stroke_color=torch.tensor(
-                [random.random(), random.random(), random.random(), random.random()]
-            ),
+            stroke_color=color,
         )
         shape_groups.append(path_group)
-        
-    return shapes, shape_groups
 
+    return shapes, shape_groups
 
 def add_shape_groups(a, b):
     shape_groups = []

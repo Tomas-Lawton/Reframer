@@ -1,12 +1,12 @@
 import torch
 
 class DrawingPath:
-    def __init__(self, path, color, width, num_segments, is_tied):
+    def __init__(self, path, color, width, num_segments, is_fixed):
         self.path = path
         self.color = color
         self.width = width
         self.num_segments = num_segments
-        self.is_tied = is_tied
+        self.is_fixed = is_fixed
 
 
 def shapes2paths(shapes, shape_groups, tie):
@@ -34,6 +34,7 @@ def data_to_tensor(color, stroke_width, path, num_segments, tie):
     stroke_width = torch.tensor(stroke_width)
     v0 = torch.tensor([0, 0])
     path = torch.tensor(path)
+    tie = torch.tensor(tie)
     for k in range(path.size(0)):
         path[k, :] += v0
         if k % 3 == 0:
