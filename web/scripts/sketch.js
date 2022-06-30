@@ -193,7 +193,7 @@ class Controller {
     newExploreSketch(sketchCountIndex) {
         if (!this.clipDrawing) {
             if (!sketchSize) {
-                console.error("sketchs not found");
+                console.error("sketch size not found");
             }
             this.targetDrawing = true;
 
@@ -202,7 +202,7 @@ class Controller {
                 status: "add_new_sketch",
                 sketch: mainSketch.sketch,
                 hasRegion: false,
-                frameSize: sketchSize,
+                frameSize: mainSketch.frameSize,
                 prompt: this.prompt,
                 lines: this.addLines,
                 sketchScopeIndex: sketchCountIndex,
@@ -303,34 +303,28 @@ class Controller {
 controller = new Controller();
 
 class Sketch {
-    constructor(i = null, scope, type = "default") {
+    constructor(i = null, scope, size, type = "default") {
         this.i = i;
         this.useScope = scope;
         this.type = type; //U or AI or Main?
         this.svg; //sorted already
         this.elem; //DOM elem
         this.sketchLayer;
-
+        this.frameSize = size;
         // Fixed path list???
 
         controller.sketches[this.i] = this;
         // console.log("Created: ", this.i);
-
-        if (type === "main") {
-            this.frameSize = frame;
-        } else {
-            this.frameSize = sketchSize;
-        }
     }
     load(s, svg, fixed = null, a = true, o = false) {
             //+ SVG Arr
             if (svg === "" || svg === undefined) return;
             this.sketchLayer.clear();
-            let imported = this.sketchLayer.importSVG(svg);
-            let g = imported.children[0];
-            if (!(g instanceof Group)) {
-                g = imported;
-            }
+            let importGroup = this.sketchLayer.importSVG(svg);
+            let g = importGroup.children[0];
+            // if (!(g instanceof Group)) {
+            //     g = g.children[0];
+            // }
             let scaledGroup = scaleGroup(g, s);
             // if (o) {
             //     scaledGroup.position.x += offX;
@@ -341,7 +335,7 @@ class Sketch {
                 scaledGroup.removeChildren()
             );
             scaledGroup.remove();
-            imported.remove(); // not g
+            importGroup.remove(); // not g
 
             if (fixed !== null) {
                 for (let i = 0; i < fixed.length; i++) {
@@ -419,7 +413,7 @@ class Sketch {
             sketchCanvas.addEventListener("click", () => {
                 // TO DO refactor so class doesn't reference mainSketch???
                 if (mainSketch) {
-                    this.import(mainSketch);
+                    this.importTo(mainSketch);
                 }
                 // controller.resetMetaControls();
             });
@@ -439,25 +433,23 @@ class Sketch {
         this.elem = newElem;
         return this.elem;
     }
-    overwrite(overwriting, fromSketch, s) {
-        if (!fromSketch) return;
-        fromSketch = fromSketch.children[0];
+    overwrite(overwriting, fromLayer, s) {
+        if (!fromLayer) return;
         overwriting.sketchLayer.clear();
-        fromSketch = scaleGroup(fromSketch, s);
-        overwriting.sketchLayer.insertChildren(0, fromSketch.removeChildren());
-        fromSketch.remove();
+        fromLayer = scaleGroup(fromLayer, s);
+        overwriting.sketchLayer.insertChildren(0, fromLayer.removeChildren());
+        fromLayer.remove();
     }
-    add(overwriting, fromSketch, s) {
-        if (!fromSketch) return;
-        fromSketch = fromSketch.children[0];
-        fromSketch = scaleGroup(fromSketch, s);
+    add(overwriting, fromLayer, s) {
+        if (!fromLayer) return;
+        fromLayer = scaleGroup(fromLayer, s);
         overwriting.sketchLayer.insertChildren(
-            fromSketch.index,
-            fromSketch.removeChildren()
+            fromLayer.index,
+            fromLayer.removeChildren()
         );
-        fromSketch.remove();
+        fromLayer.remove();
     }
-    import (overwriting) {
+    importTo(overwriting) {
         let i = this.i;
         if (controller.clipDrawing) {
             openModal({
@@ -468,12 +460,12 @@ class Sketch {
                     controller.clipDrawing = false;
                     // pauseActiveDrawer();
                     ungroup();
-                    this.saveStatic(
-                        overwriting.extractScaledSVG(1 / scaleRatio),
-                        0 // FIXED PATH LIST
-                    );
-                    const clone = controller.sketches[i].sketchLayer.clone();
-                    this.overwrite(overwriting, clone, scaleRatio);
+                    this.saveStatic(overwriting.extractScaledSVG(1 / scaleRatio));
+                    let fromLayer = controller.sketches[i].sketchLayer.clone();
+                    if (fromLayer.firstChild instanceof Group) {
+                        fromLayer = fromLayer.children[0];
+                    }
+                    this.overwrite(overwriting, fromLayer, scaleRatio);
                 },
             });
         } else if (controller.allowOverwrite) {
@@ -483,12 +475,12 @@ class Sketch {
                 confirmAction: () => {
                     // pauseActiveDrawer();
                     ungroup(); //remove first even tho deleted
-                    this.saveStatic(
-                        overwriting.extractScaledSVG(1 / scaleRatio),
-                        0 // FIXED PATH LIST
-                    );
-                    const clone = controller.sketches[i].sketchLayer.clone();
-                    this.overwrite(overwriting, clone, scaleRatio);
+                    this.saveStatic(overwriting.extractScaledSVG(1 / scaleRatio));
+                    let fromLayer = controller.sketches[i].sketchLayer.clone();
+                    if (fromLayer.firstChild instanceof Group) {
+                        fromLayer = fromLayer.children[0];
+                    }
+                    this.overwrite(overwriting, fromLayer, scaleRatio);
                 },
             });
         } else {
@@ -498,12 +490,12 @@ class Sketch {
                 path.selected = false;
             });
 
-            this.saveStatic(
-                overwriting.extractScaledSVG(1 / scaleRatio),
-                0 // FIXED PATH LIST
-            );
-            const clone = controller.sketches[i].sketchLayer.clone();
-            this.add(overwriting, clone, scaleRatio);
+            this.saveStatic(overwriting.extractScaledSVG(1 / scaleRatio));
+            let fromLayer = controller.sketches[i].sketchLayer.clone();
+            if (fromLayer.firstChild instanceof Group) {
+                fromLayer = fromLayer.children[0];
+            }
+            this.add(overwriting, fromLayer, scaleRatio);
         }
     }
     clone() {
@@ -525,9 +517,9 @@ class Sketch {
         scaledSketch.remove();
         return res;
     }
-    saveStatic(sJSON, num) {
+    saveStatic(sJSON) {
         let sketchCountIndex = controller.sketchScopeIndex;
-        let sketch = new Sketch(sketchCountIndex, sketchScope, "U");
+        let sketch = new Sketch(sketchCountIndex, sketchScope, sketchSize, "U");
         let newElem = sketch.renderMini();
         let toCanvas = sketchScope.projects[sketchCountIndex];
         // change to load??
@@ -553,7 +545,7 @@ class Sketch {
     }
 }
 
-mainSketch = new Sketch("main-sketch", scope, "main");
+mainSketch = new Sketch("main-sketch", scope, frame, "main");
 mainSketch.svg = paper.project.exportSVG({
     asString: true,
 }); //for svg parsing

@@ -10,7 +10,8 @@ function dragentercanvas(e) {
 function dropCanvas(e) {
     canvas.classList.remove("drop-ready");
     let i = e.dataTransfer.getData("text/plain");
-    controller.sketches[i].import(mainSketch);
+    // to do switch around mainsketch imports?
+    controller.sketches[i].importTo(mainSketch);
 }
 
 function dragleavecanvas(e) {
@@ -42,7 +43,7 @@ function dropSketch(e) {
     if (document.querySelector(`#AI-sketch-item-${sketchCountIndex}`)) {
         // COME BACK HERE
         let importing = controller.sketches[sketchCountIndex];
-        importing.saveStatic(importing.extractJSON(), importing.num);
+        importing.saveStatic(importing.extractJSON());
     }
 }
 
@@ -213,11 +214,7 @@ document.getElementById("empty").addEventListener("click", (e) => {
     controller.clipDrawing = false;
     for (let i = 0; i < 4; i++) {
         explorer.removeChild(explorer.firstChild);
-        let sketch = new Sketch(
-            null,
-            defaults,
-            0 // FIXED PATH LIST
-        );
+        let sketch = new Sketch(null, defaults, sketchSize);
         let newElem = sketch.renderMini();
         controller.inspireScopes.push(controller.sketchScopeIndex);
         explorer.appendChild(newElem);
@@ -287,7 +284,7 @@ document.getElementById("inspire").addEventListener("click", () => {
             for (let i = 0; i < 4; i++) {
                 explorer.removeChild(explorer.firstChild);
                 if (controller.sketchScopeIndex > total) {
-                    let sketch = new Sketch(null, defaults, "default");
+                    let sketch = new Sketch(null, defaults, sketchSize, "default");
                     let newElem = sketch.renderMini();
                     controller.inspireScopes.push(controller.sketchScopeIndex);
                     explorer.appendChild(newElem);
@@ -296,6 +293,7 @@ document.getElementById("inspire").addEventListener("click", () => {
                     let sketch = new Sketch(
                         controller.sketchScopeIndex,
                         sketchScope,
+                        sketchSize,
                         "AI"
                     );
                     let newElem = sketch.renderMini();
@@ -513,11 +511,9 @@ document.getElementById("save-sketch").addEventListener("click", () => {
     mainSketch.sketchLayer.getItems().forEach((path) => {
         path.selected = false;
     });
-    // LOAD FIXED PATH LIST ?
-    // mainSketch.arrange();
+
     mainSketch.saveStatic(
-        mainSketch.extractScaledSVG(1 / scaleRatio), //adds as backup
-        0 // FIXED PATH LIST
+        mainSketch.extractScaledSVG(1 / scaleRatio) //adds as backup
     );
     logger.event("to-sketchbook");
 });
@@ -646,7 +642,7 @@ setActionUI("inactive");
 const defaults = new PaperScope();
 defaults.activate();
 for (let i = 0; i < 4; i++) {
-    let sketch = new Sketch(null, defaults, null);
+    let sketch = new Sketch(null, defaults, sketchSize);
     let newElem = sketch.renderMini();
     // controller.sketchScopeIndex += 1; //remove later
     newElem.classList.add("inactive-sketch");

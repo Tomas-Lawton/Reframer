@@ -122,10 +122,10 @@ else:
                     new_exemplar = CICADA(
                          websocket, device, model, data["data"]["sketch_index"]
                     )
-                    sketches.append(new_exemplar)
                     new_exemplar.draw(data)
-                    main_sketch.activate(True)
+                    new_exemplar.activate(True)
                     new_exemplar.run_async()
+                    sketches.append(new_exemplar)
 
                 if data["status"] == "continue_sketch":
                     main_sketch.continue_update_sketch(data)

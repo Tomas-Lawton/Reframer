@@ -247,7 +247,7 @@ const loadResponse = (result) => {
         var matches = result.status.match(/\d+/g); //if status is a num
         if (matches != null) {
             if (result.svg === "") return null;
-            let sketch = controller.sketches[int(result.status)];
+            let sketch = controller.sketches[parseInt(result.status)];
             sketch.load(sketchSize / 224, result.svg, result.fixed, sketch.userLayer);
         }
 
