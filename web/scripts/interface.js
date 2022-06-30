@@ -61,7 +61,6 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
 document.querySelectorAll(".swatch").forEach((elem) => {
     elem.addEventListener("click", () => {
         let col = window.getComputedStyle(elem).backgroundColor;
-        controller.alpha = 1;
         alphaSlider.value = 100;
         controller.strokeColor = col;
         getSelectedPaths().forEach((path) => (path.strokeColor = col));
@@ -172,13 +171,7 @@ scaleNumber.oninput = function() {
 alphaSlider.oninput = function() {
     let rgba = getRGBA(this.value / 100);
     controller.strokeColor = rgba;
-    document.getElementById("pen-color").style.background = rgba;
-    document.getElementById("point-size").style.background = rgba;
-    if (controller.transformGroup) {
-        controller.transformGroup.children.forEach(
-            (child) => (child.strokeColor = rgba)
-        );
-    }
+    setThisColor(rgba);
 };
 
 document
@@ -628,8 +621,12 @@ const picker = new Picker({
 
 picker.setColor(controller.strokeColor);
 picker.onChange = (color) => {
-    console.log(color);
     controller.strokeColor = color.rgbaString;
+    // split the rgba and color before setting
+
+    // let alpha = controller.strokeColor.alpha;
+    // getRGBA(alpha);
+
     getSelectedPaths().forEach(
         (item) => (item.strokeColor = controller.strokeColor)
     );

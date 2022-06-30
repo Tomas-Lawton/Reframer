@@ -45,6 +45,16 @@ const drawingFinished = () => {
     inactiveStop();
 };
 
+const setThisColor = (rgba) => {
+    document.getElementById("pen-color").style.background = rgba;
+    document.getElementById("point-size").style.background = rgba;
+    if (controller.transformGroup) {
+        controller.transformGroup.children.forEach(
+            (child) => (child.strokeColor = rgba)
+        );
+    }
+};
+
 const setActionUI = (state) => {
     let lastDrawState = controller.drawState;
     aiMessage.classList.remove("typed-out");

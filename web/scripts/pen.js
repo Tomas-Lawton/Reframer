@@ -15,15 +15,16 @@ sketchTool.onMouseDown = function(event) {
     clearTimeout(sketchTimer);
     sketchHistory.pushUndo();
 
+    let hitResult = mainSketch.sketchLayer.hitTest(event.point, {
+        segments: true,
+        stroke: true,
+        fill: true,
+        tolerance: 4,
+    });
+
     switch (controller.penMode) {
         case "select":
             path = null;
-            let hitResult = mainSketch.sketchLayer.hitTest(event.point, {
-                segments: true,
-                stroke: true,
-                fill: true,
-                tolerance: 4,
-            });
 
             if (isDeselect(event, hitResult)) {
                 ungroup();
@@ -69,7 +70,6 @@ sketchTool.onMouseDown = function(event) {
                 strokeCap: "round",
                 strokeJoin: "round",
             });
-            // penPath.color.alpha = controller.alpha;
             firstPoint = penPath.add(event.point);
             penPath.add({
                 ...event.point,
@@ -105,21 +105,10 @@ sketchTool.onMouseDown = function(event) {
             });
             break;
         case "dropper":
-            console.log("test");
-            // const raster = mainSketch.sketchLayer.rasterize();
-            // raster.position.x += 100;
-
-            // let col = raster.getPixel(event.point);
-            // console.log(col);
-            // controller.strokeColor = col;
-            // picker.setColor(col);
-
-            // // raster.remove();
-
-            // var rectangle = new Rectangle(new Point(20, 20), new Size(60, 60));
-            // var cornerSize = new Size(10, 10);
-            // var path = new Path.Rectangle(rectangle, cornerSize);
-            // path.fillColor = col;
+            let col = hitResult ? hitResult.item.strokeColor._canvasStyle : "#ffffff";
+            controller.strokeColor = col;
+            setThisColor(controller.strokeColor);
+            picker.setColor(controller.strokeColor, true);
     }
 };
 

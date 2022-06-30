@@ -170,7 +170,7 @@ class Controller {
         if (!this.clipDrawing) {
             this.clipDrawing = true;
             this.targetDrawing = false;
-            setPenMode("select", penDrop);
+            // setPenMode("select", penDrop);
             this.prepare();
             this.updateDrawer({
                 status: "draw",
