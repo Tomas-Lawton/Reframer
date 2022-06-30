@@ -336,7 +336,7 @@ class Sketch {
             );
             scaledGroup.remove();
             importGroup.remove(); // not g
-
+            console.log(finalInserted);
             if (fixed !== null) {
                 for (let i = 0; i < fixed.length; i++) {
                     finalInserted[i].data.fixed = fixed[i];

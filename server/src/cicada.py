@@ -80,12 +80,16 @@ class CICADA:
 
         self.is_active = True
         paths = self.extract_points(self.sketch_data)
-        self.drawing.add_paths(paths)
-        if add_curves:
-            self.drawing.add_random_shapes(self.num_paths)
-        self.drawing.update_region(self.region)
-        self.initialize_variables()
-        self.initialize_optimizer()            
+        if len(paths) == 0:
+            # BREAK OUT NO POINTS
+            print("no me gusta")
+        else:
+            self.drawing.add_paths(paths)
+            if add_curves:
+                self.drawing.add_random_shapes(self.num_paths)
+            self.drawing.update_region(self.region)
+            self.initialize_variables()
+            self.initialize_optimizer()            
 
     def initialize_variables(self):
         self.points_vars = []

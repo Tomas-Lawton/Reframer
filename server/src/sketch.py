@@ -109,6 +109,7 @@ class Sketch:
 
     def remove_traces(self, inds):
         self.traces = [self.traces[i] for i in range(len(self.traces)) if i not in inds]
+        self.fixed_list = [self.fixed_list[i] for i in range(len(self.fixed_list)) if i not in inds]
         for k in range(len(self.traces)):
             self.traces[k].shape_group.shape_ids = torch.tensor([k])
 
