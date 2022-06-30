@@ -170,6 +170,7 @@ scaleNumber.oninput = function() {
 
 alphaSlider.oninput = function() {
     let rgba = getRGBA(this.value / 100);
+    controller.alpha = this.value / 100;
     controller.strokeColor = rgba;
     setThisColor(rgba);
 };
@@ -622,18 +623,12 @@ const picker = new Picker({
 picker.setColor(controller.strokeColor);
 picker.onChange = (color) => {
     controller.strokeColor = color.rgbaString;
-    // split the rgba and color before setting
-
-    // let alpha = controller.strokeColor.alpha;
-    // getRGBA(alpha);
+    controller.strokeColor = getRGBA(controller.alpha);
 
     getSelectedPaths().forEach(
         (item) => (item.strokeColor = controller.strokeColor)
     );
-    document.getElementById("pen-color").style.background =
-        controller.strokeColor;
-    document.getElementById("point-size").style.background =
-        controller.strokeColor;
+    setThisColor(controller.strokeColor);
 };
 
 setLineLabels(userLayer);

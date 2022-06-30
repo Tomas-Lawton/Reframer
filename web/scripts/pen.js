@@ -107,6 +107,8 @@ sketchTool.onMouseDown = function(event) {
         case "dropper":
             let col = hitResult ? hitResult.item.strokeColor._canvasStyle : "#ffffff";
             controller.strokeColor = col;
+            controller.alpha = controller.strokeColor.alpha;
+            alphaSlider.value = controller.alpha * 100;
             setThisColor(controller.strokeColor);
             picker.setColor(controller.strokeColor, true);
     }
@@ -143,12 +145,7 @@ sketchTool.onMouseDrag = function(event) {
                     selectBox.remove();
                 } // redraw //REFACTOR
                 selectBox = new Path.Rectangle(controller.selectBox);
-                selectBox.set({
-                    fillColor: "#f5f5f5",
-                    opacity: 0.4,
-                    strokeColor: "#7b66ff",
-                    selected: true,
-                });
+                selectBox.set(rectangleOptions);
             }
             break;
         case "lasso":
@@ -156,13 +153,7 @@ sketchTool.onMouseDrag = function(event) {
             controller.drawRegion.height += event.delta.y;
             if (regionPath !== undefined) regionPath.remove(); //remove old one. maybe could update the old one instead?
             regionPath = new Path.Rectangle(controller.drawRegion);
-            regionPath.set({
-                // fillColor: "#e9e9ff",
-                fillColor: "#f5f5f5",
-                // opacity: 0.4,
-                strokeColor: "#7b66ff",
-                selected: true,
-            });
+            regionPath.set(rectangleOptions);
             break;
     }
 };

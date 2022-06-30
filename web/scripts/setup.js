@@ -126,3 +126,11 @@ const maxPointSize = 47.99;
 document.getElementById("width-slider").setAttribute("max", maxPointSize);
 
 const promptList = partialSketches.map((elem) => elem[1]);
+
+const rectangleOptions = {
+    fillColor: "#f5f5f5",
+    strokeColor: "#7b66ff",
+    opacity: 0.5,
+    strokeWidth: 2,
+    selected: true,
+};

@@ -56,7 +56,6 @@ const setThisColor = (rgba) => {
 };
 
 const setActionUI = (state) => {
-    let lastDrawState = controller.drawState;
     aiMessage.classList.remove("typed-out");
 
     if (state == "pruning") {

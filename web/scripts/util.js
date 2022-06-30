@@ -76,13 +76,8 @@ const fitToSelection = (items, state) => {
     }, null);
     // Also shouldn't set the boundingBox, should set boundingBox.bounds ???
     controller.boundingBox = new Path.Rectangle(bbox);
+    controller.boundingBox.set(rectangleOptions);
     controller.boundingBox.sendToBack();
-    controller.boundingBox.set({
-        fillColor: "#f5f5f5",
-        // opacity: 0.4,
-        strokeColor: "#7b66ff",
-        strokeWidth: 2,
-    });
     controller.boundingBox.data.state = state;
     return controller.boundingBox;
 };
