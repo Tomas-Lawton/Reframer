@@ -313,7 +313,7 @@ class CICADA:
             logging.info(f"Finished update for {self.index}")
         except Exception as e:
             logging.error("Failed sending WS response")
-            logging.info(result)
+            # logging.info(result)
             pass
 
     def draw(self, data):

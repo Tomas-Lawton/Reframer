@@ -78,7 +78,7 @@ def kill(d, a):
         del drawer
 
 if not os.environ.get('CONNECTAI') == "True":
-    logging.info("Running without AI")
+    logging.info("Running without AI\n Connect with CMD: export CONNECTAI=True")
 else:
     logging.info("Establishing Connection...")
 
@@ -113,6 +113,9 @@ else:
                         await drawer.stop()
                         del drawer
 
+                print(data["data"]["sketch_index"])
+                print(type(data["data"]["sketch_index"]))
+
                 if data["status"] == "draw":
                     main_sketch.draw(data)
                     main_sketch.activate(True)
@@ -122,10 +125,11 @@ else:
                     new_exemplar = CICADA(
                          websocket, device, model, data["data"]["sketch_index"]
                     )
+                    sketches.append(new_exemplar)
+
                     new_exemplar.draw(data)
                     new_exemplar.activate(True)
                     new_exemplar.run_async()
-                    sketches.append(new_exemplar)
 
                 if data["status"] == "continue_sketch":
                     main_sketch.continue_update_sketch(data)

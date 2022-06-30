@@ -2,7 +2,6 @@ const killExploratorySketches = () => {
     explorer.childNodes.forEach((child, i) => {
         let stopButton = child.querySelector(".fa-stop");
         let loader = child.querySelector(".card-loading");
-
         loader.classList.remove("button-animation");
         loader.classList.remove("fa-spinner");
         loader.classList.add("fa-check");
@@ -10,6 +9,7 @@ const killExploratorySketches = () => {
         stopButton.style.background = "#d2d2d2";
         controller.stopSingle(controller.inspireScopes[i]);
     });
+    controller.inspireScopes = [];
 };
 
 const redStop = () => {

@@ -131,7 +131,6 @@ class Controller {
         this.isFirstIteration = true; //reset canvas
         this.lastPrompt = prompt;
         const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
-
         const res = {
             status: status,
             data: {
@@ -146,8 +145,7 @@ class Controller {
                     x1: this.drawRegion ? this.drawRegion.x : 0,
                     y1: this.drawRegion ? canvasBounds.height - this.drawRegion.y : 0,
                     x2: this.drawRegion ?
-                        this.drawRegion.x + this.drawRegion.width :
-                        canvasBounds.width,
+                        this.drawRegion.x + this.drawRegion.width : canvasBounds.width,
                     y2: this.drawRegion ?
                         canvasBounds.height - this.drawRegion.y - this.drawRegion.height // use non-web y coords
                         :
@@ -171,6 +169,7 @@ class Controller {
         if (!this.clipDrawing) {
             this.clipDrawing = true;
             this.targetDrawing = false;
+            setPenMode("select", penDrop);
             this.prepare();
             this.updateDrawer({
                 status: "draw",
@@ -532,9 +531,7 @@ class Sketch {
         let pathList = [];
         this.sketchLayer.getItems((path) =>
             pathList.push({
-                color: path.strokeColor.components.length === 4 ?
-                    [...path.strokeColor.components] :
-                    [...path.strokeColor.components, 1],
+                color: path.strokeColor.components.length === 4 ? [...path.strokeColor.components] : [...path.strokeColor.components, 1],
                 stroke_width: path.strokeWidth,
                 path_data: path.pathData,
                 fixed_path: path.data.fixed,
