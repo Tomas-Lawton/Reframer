@@ -38,6 +38,8 @@ class Sketch:
             stroke_width = width * 100
             points[:, 0] = self.canvas_width * path[:, 0]
             points[:, 1] = self.canvas_height * path[:, 1]
+            
+            
             # SPLIT PATH HERE?
             shape = pydiffvg.Path(
                 num_control_points=num_control_points,
@@ -45,12 +47,13 @@ class Sketch:
                 stroke_width=stroke_width,
                 is_closed=False,
             )
-            shapes.append(shape)
             shape_group = pydiffvg.ShapeGroup(
                 shape_ids=torch.tensor([len(shapes) - 1]),
                 fill_color=None,
                 stroke_color=color,
             )
+            
+            shapes.append(shape)
             shape_groups.append(shape_group)
             self.traces.append(Trace(shape, shape_group, is_fixed))
             self.fixed_list.append(is_fixed.item())

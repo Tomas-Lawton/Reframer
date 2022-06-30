@@ -113,9 +113,6 @@ else:
                         await drawer.stop()
                         del drawer
 
-                print(data["data"]["sketch_index"])
-                print(type(data["data"]["sketch_index"]))
-
                 if data["status"] == "draw":
                     main_sketch.draw(data)
                     main_sketch.activate(True)
