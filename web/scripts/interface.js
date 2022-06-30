@@ -237,7 +237,6 @@ timeKeeper.oninput = function() {
         mainSketch.load(
             1,
             stored.svg,
-            stored.num,
             false // don't reapply opacity
         );
     }
@@ -281,11 +280,7 @@ document.getElementById("inspire").addEventListener("click", () => {
             for (let i = 0; i < 4; i++) {
                 explorer.removeChild(explorer.firstChild);
                 if (controller.sketchScopeIndex > total) {
-                    let sketch = new Sketch(
-                        null,
-                        defaults,
-                        0 // FIXED PATH LIST
-                    );
+                    let sketch = new Sketch(null, defaults, "default");
                     let newElem = sketch.renderMini();
                     controller.inspireScopes.push(controller.sketchScopeIndex);
                     explorer.appendChild(newElem);
@@ -294,7 +289,6 @@ document.getElementById("inspire").addEventListener("click", () => {
                     let sketch = new Sketch(
                         controller.sketchScopeIndex,
                         sketchScope,
-                        0, // FIXED PATH LIST
                         "AI"
                     );
                     let newElem = sketch.renderMini();
@@ -367,7 +361,7 @@ document.getElementById("go-back").addEventListener("click", () => {
         incrementHistory();
         let stored = sketchHistory.historyHolder[1];
         timeKeeper.value = 1;
-        mainSketch.load(1, stored.svg, stored.num);
+        mainSketch.load(1, stored.svg);
     }
 });
 
@@ -515,7 +509,7 @@ document.getElementById("save-sketch").addEventListener("click", () => {
     // LOAD FIXED PATH LIST ?
     // mainSketch.arrange();
     mainSketch.saveStatic(
-        mainSketch.extractScaledJSON(1 / scaleRatio), //adds as backup
+        mainSketch.extractScaledSVG(1 / scaleRatio), //adds as backup
         0 // FIXED PATH LIST
     );
     logger.event("to-sketchbook");
@@ -598,29 +592,19 @@ respectSlider.onmouseup = () => {
 if (!useAI) {
     const scaleTo = userLayer.view.viewSize.width;
     const idx = Math.floor(Math.random() * partialSketches.length);
-    // const idx = 5;
-    console.log(idx);
     const partial = partialSketches[idx][0];
     const drawPrompt = partialSketches[idx][1];
     document.getElementById("partial-message").innerHTML = drawPrompt;
+    let loadedPartial = userLayer.importSVG(partial);
 
-    var loadedPartial = userLayer.importSVG(partial);
-    loadedPartial.set({
-        // opacity: controller.alpha,
-        strokeCap: "round",
-        strokeJoin: "round",
-    });
     loadedPartial.getItems().forEach((item) => {
         if (item instanceof Path) {
             let newElem = userLayer.addChild(item.clone());
-            newElem;
+            newElem.data.fixed = true;
         }
     });
     loadedPartial.remove();
-    console.log(userLayer);
-
     scaleGroup(userLayer, scaleTo);
-
     mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });

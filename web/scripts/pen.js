@@ -1,3 +1,4 @@
+// To do clean this up
 let sketchTimer,
     penPath,
     erasePath,
@@ -9,6 +10,8 @@ let sketchTimer,
     firstErasePoint;
 
 sketchTool.onMouseDown = function(event) {
+    console.log(userLayer.children);
+
     clearTimeout(sketchTimer);
     sketchHistory.pushUndo();
 

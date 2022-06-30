@@ -168,7 +168,8 @@ const showTraceHistoryFrom = (fromIndex) => {
         controller.traces = null;
         let refList = [];
         for (let stored of items) {
-            userLayer.importSVG(stored.svg);
+            // TO DO CHANGE??? so fixed paths
+            userLayer.importSVG(stored.svg); //overlay
             // refList.push(mainSketch.load(1, stored.svg, stored.num));
         }
         controller.traces = refList;
@@ -178,7 +179,6 @@ const showTraceHistoryFrom = (fromIndex) => {
 const incrementHistory = () => {
     sketchHistory.historyHolder.push({
         svg: mainSketch.svg,
-        num: 0, // FIXED PATH LIST
     });
     timeKeeper.setAttribute("max", String(controller.step + 1));
     timeKeeper.value = String(controller.step + 1);
@@ -239,12 +239,7 @@ const loadResponse = (result) => {
         if (matches != null) {
             if (result.svg === "") return null;
             let sketch = controller.sketches[int(result.status)];
-            sketch.load(
-                sketchSize / 224,
-                result.svg,
-                0, // FIXED PATH LIST
-                sketch.userLayer
-            );
+            sketch.load(sketchSize / 224, result.svg, result.fixed, sketch.userLayer);
         }
 
         // Prune Main

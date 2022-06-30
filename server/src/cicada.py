@@ -77,6 +77,7 @@ class CICADA:
     def activate(self, add_curves):
         self.is_active = True
         paths = self.extract_points()
+        print(paths)
         # Move this ?
         self.drawing = Sketch(canvas_w, canvas_h)
         self.drawing.add_paths(paths)
@@ -324,7 +325,6 @@ class CICADA:
         self.region = data["data"]["region"]
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
             data["data"]["fixation"])
-        self.num_user_paths = int(data["data"]["num_user_paths"])
         self.text_features = self.encode_text_classes([data["data"]["prompt"]])
         # self.negative_text_features = self.clip_interface.encode_text_classes(["Written words.", "Text."])
         self.negative_text_features = self.encode_text_classes(["text and written words."])
@@ -337,7 +337,6 @@ class CICADA:
 
     def continue_update_sketch(self, data):
         logging.info("Adding changes...")
-        self.num_user_paths = int(data["data"]["num_user_paths"])
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
             data["data"]["fixation"])
         self.sketch_data = data["data"]["sketch"]
