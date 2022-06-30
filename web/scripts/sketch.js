@@ -332,7 +332,6 @@ class Sketch {
             if (!(g instanceof Group)) {
                 g = imported;
             }
-            console.log(g);
             let scaledGroup = scaleGroup(g, s);
             // if (o) {
             //     scaledGroup.position.x += offX;
@@ -343,7 +342,7 @@ class Sketch {
                 scaledGroup.removeChildren()
             );
             scaledGroup.remove();
-            g.remove();
+            imported.remove(); // not g
 
             if (fixed !== null) {
                 for (let i = 0; i < fixed.length; i++) {

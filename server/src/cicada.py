@@ -40,9 +40,9 @@ class CICADA:
             features = self.model.encode_text(tokens)  # normalise
             return features / features.norm(dim=-1, keepdim=True)
 
-    def extract_points(self):
+    def extract_points(self, data):
         path_list = []
-        for path in self.sketch_data: 
+        for path in data: 
             points = []
             num_segments = len(path['path_data'].split(',')) // 3
             spaced_data = path['path_data'].split('c')
@@ -75,11 +75,11 @@ class CICADA:
         return path_list
 
     def activate(self, add_curves):
-        self.is_active = True
-        paths = self.extract_points()
-        print(paths)
         # Move this ?
         self.drawing = Sketch(canvas_w, canvas_h)
+
+        self.is_active = True
+        paths = self.extract_points(self.sketch_data)
         self.drawing.add_paths(paths)
         if add_curves:
             self.drawing.add_random_shapes(self.num_paths)
