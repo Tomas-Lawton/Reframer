@@ -128,6 +128,7 @@ const hideSelectUI = (includeTransform = true) => {
     sendToBack.style.display = "none";
     moveUp.style.display = "none";
     copyHandler.style.display = "none";
+    fixedHandler.style.display = "none";
 };
 
 const updateRectBounds = (from, to) => {
@@ -143,27 +144,46 @@ const updateRectBounds = (from, to) => {
 };
 
 const updateSelectPosition = () => {
-    let uiOffset = deleteHandler.getBoundingClientRect().height / 2 + 5;
+    let center = deleteHandler.getBoundingClientRect().height / 2 + 5;
     deleteHandler.style.left = controller.boundingBox.bounds.topRight.x + "px";
-    deleteHandler.style.top = controller.boundingBox.bounds.top - uiOffset + "px";
+    deleteHandler.style.top = controller.boundingBox.bounds.top - center + "px";
 
-    copyHandler.style.top = controller.boundingBox.bounds.top - uiOffset + "px";
+    copyHandler.style.top = controller.boundingBox.bounds.top - center + "px";
     copyHandler.style.left = controller.boundingBox.bounds.topLeft.x + "px";
 
     moveUp.style.left = controller.boundingBox.bounds.topLeft.x + "px";
-    moveUp.style.top = controller.boundingBox.bounds.bottom + uiOffset + "px";
+    moveUp.style.top = controller.boundingBox.bounds.bottom + center + "px";
 
-    sendToBack.style.top = controller.boundingBox.bounds.bottom + uiOffset + "px";
+    sendToBack.style.top = controller.boundingBox.bounds.bottom + center + "px";
     sendToBack.style.left = controller.boundingBox.bounds.topRight.x + "px";
+
+    fixedHandler.style.top = controller.boundingBox.bounds.top - center + "px";
+    fixedHandler.style.left = controller.boundingBox.bounds.center.x + "px";
+};
+
+const updateFixedUI = () => {
+    let i = fixedHandler.querySelector("i");
+    if (isFixedGroup()) {
+        console.log("fixed");
+        i.classList.add("fa-lock");
+        i.classList.remove("fa-unlock");
+    } else {
+        console.log("unfixed");
+        i.classList.remove("fa-lock");
+        i.classList.add("fa-unlock");
+    }
 };
 
 const updateSelectUI = () => {
     if (controller.boundingBox && getSelectedPaths().length) {
+        // Add parent container
         deleteHandler.style.display = "block";
         sendToBack.style.display = "block";
         moveUp.style.display = "block";
         copyHandler.style.display = "block";
+        fixedHandler.style.display = "block";
         transformControl.style.display = "flex";
+        updateFixedUI();
         updateSelectPosition();
     }
 };

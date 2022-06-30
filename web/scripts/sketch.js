@@ -200,7 +200,6 @@ class Controller {
             this.prepare();
             this.updateDrawer({
                 status: "add_new_sketch",
-                // svg: mainSketch.svg,
                 sketch: mainSketch.sketch,
                 hasRegion: false,
                 frameSize: sketchSize,

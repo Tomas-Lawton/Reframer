@@ -60,6 +60,15 @@ const ungroup = () => {
     return selected;
 };
 
+const isFixedGroup = () =>
+    !controller.transformGroup.children.filter(
+        (item) => !item.data.fixed || item.data.fixed === undefined
+    ).length; //no ai paths
+
+const fixGroup = (b) => {
+    controller.transformGroup.getItems((item) => (item.data.fixed = b));
+};
+
 //TODO: Add stroke width so no overflow over bounds?
 const fitToSelection = (items, state) => {
     let bbox = items.reduce((bbox, item) => {

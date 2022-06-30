@@ -60,11 +60,12 @@ const pen = document.getElementById("pen");
 // Actions
 const actionControls = document.querySelectorAll(".ai-action");
 const aiCard = document.getElementById("describe-card");
-// Transform UI
+// Selected UI
 const deleteHandler = document.getElementById("delete-handler");
 const rotateSlider = document.getElementById("rotate-slider");
 const copyHandler = document.getElementById("copy-handler");
 const rotateNumber = document.getElementById("rotate-number");
+const fixedHandler = document.getElementById("fixed-handler");
 const scaleSlider = document.getElementById("scale-slider");
 const scaleNumber = document.getElementById("scale-number");
 const moveUp = document.getElementById("moveUp");

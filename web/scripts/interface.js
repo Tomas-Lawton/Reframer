@@ -125,6 +125,13 @@ copyHandler.addEventListener("click", (e) => {
     logger.event("copy-selection");
 });
 
+fixedHandler.addEventListener("click", (e) => {
+    let i = fixedHandler.querySelector("i");
+    i.classList.toggle("fa-lock");
+    i.classList.toggle("fa-unlock");
+    isFixedGroup() ? fixGroup(false) : fixGroup(true);
+});
+
 document.getElementById("begin").addEventListener("click", () => {
     document.getElementById("sliding-overlay").style.bottom = "100%";
 });
