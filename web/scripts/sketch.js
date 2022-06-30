@@ -145,7 +145,8 @@ class Controller {
                     x1: this.drawRegion ? this.drawRegion.x : 0,
                     y1: this.drawRegion ? canvasBounds.height - this.drawRegion.y : 0,
                     x2: this.drawRegion ?
-                        this.drawRegion.x + this.drawRegion.width : canvasBounds.width,
+                        this.drawRegion.x + this.drawRegion.width :
+                        canvasBounds.width,
                     y2: this.drawRegion ?
                         canvasBounds.height - this.drawRegion.y - this.drawRegion.height // use non-web y coords
                         :
@@ -364,6 +365,7 @@ class Sketch {
         //     });
         // }
     renderMini() {
+        console.log("Rendering");
         let domIdx = this.i;
 
         let newElem = sketchTemplate.cloneNode(reusableExemplar);
@@ -531,7 +533,9 @@ class Sketch {
         let pathList = [];
         this.sketchLayer.getItems((path) =>
             pathList.push({
-                color: path.strokeColor.components.length === 4 ? [...path.strokeColor.components] : [...path.strokeColor.components, 1],
+                color: path.strokeColor.components.length === 4 ?
+                    [...path.strokeColor.components] :
+                    [...path.strokeColor.components, 1],
                 stroke_width: path.strokeWidth,
                 path_data: path.pathData,
                 fixed_path: path.data.fixed,

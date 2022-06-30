@@ -283,25 +283,29 @@ document.getElementById("inspire").addEventListener("click", () => {
             total = 4;
             for (let i = 0; i < 4; i++) {
                 explorer.removeChild(explorer.firstChild);
-                if (controller.sketchScopeIndex > total) {
-                    let sketch = new Sketch(null, defaults, sketchSize, "default");
-                    let newElem = sketch.renderMini();
-                    controller.inspireScopes.push(controller.sketchScopeIndex);
-                    explorer.appendChild(newElem);
-                    newElem.classList.add("inactive-sketch");
-                } else {
-                    let sketch = new Sketch(
-                        controller.sketchScopeIndex,
-                        sketchScope,
-                        sketchSize,
-                        "AI"
-                    );
-                    let newElem = sketch.renderMini();
-                    controller.inspireScopes.push(controller.sketchScopeIndex);
-                    explorer.appendChild(newElem);
-                    controller.newExploreSketch(controller.sketchScopeIndex);
-                    controller.sketchScopeIndex += 1;
-                }
+            }
+
+            for (let i = 0; i < 4; i++) {
+                // if (controller.sketchScopeIndex > total) {
+                //     let sketch = new Sketch(null, defaults, sketchSize, "default");
+                //     let newElem = sketch.renderMini();
+                //     controller.inspireScopes.push(controller.sketchScopeIndex);
+                //     explorer.appendChild(newElem);
+                //     newElem.classList.add("inactive-sketch");
+                // } else {
+                let sketch = new Sketch(
+                    controller.sketchScopeIndex,
+                    sketchScope,
+                    sketchSize,
+                    "AI"
+                );
+                console.log("here");
+                let newElem = sketch.renderMini();
+                controller.inspireScopes.push(controller.sketchScopeIndex);
+                explorer.appendChild(newElem);
+                controller.newExploreSketch(controller.sketchScopeIndex);
+                controller.sketchScopeIndex += 1;
+                // }
             }
             controller.clipDrawing = true;
             setActionUI("explore");
