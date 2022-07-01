@@ -19,9 +19,9 @@ class Sketch:
         self.canvas_width = w
         self.canvas_height = h
 
-    def update_region(self, data):
+    def update_region(self, data, normaliseScaleFactor):
         if data['activate']:
-            self.drawing_area = calculate_draw_region(data, self.normaliseScaleFactor)
+            self.drawing_area = calculate_draw_region(data, normaliseScaleFactor)
         else:
             self.drawing_area = {'x0': 0.0, 'x1': 1.0, 'y0': 0.0, 'y1': 1.0}
 
@@ -72,6 +72,8 @@ class Sketch:
             self.render_img()
 
     def add_random_shapes(self, num_rnd_traces):
+        # print('\n\n',self.drawing_area)
+        # asdasd
         shapes, shape_groups = treebranch_initialization(
             self,
             num_rnd_traces,

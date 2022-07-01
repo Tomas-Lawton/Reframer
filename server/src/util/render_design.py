@@ -1,3 +1,4 @@
+from turtle import left
 import pydiffvg
 import torch
 import random
@@ -23,7 +24,6 @@ def calculate_draw_region(region, normaliseScaleFactor):
         float(region['y1']) * normaliseScaleFactor,
         float(region['y2']) * normaliseScaleFactor,
     )
-
     return {
         'x0': leftX,
         'x1': rightX,
