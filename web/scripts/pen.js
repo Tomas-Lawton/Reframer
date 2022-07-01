@@ -13,7 +13,6 @@ sketchTool.onMouseDown = function(event) {
     console.log(userLayer.children);
 
     clearTimeout(sketchTimer);
-    sketchHistory.pushUndo();
 
     let hitResult = mainSketch.sketchLayer.hitTest(event.point, {
         segments: true,
@@ -62,6 +61,8 @@ sketchTool.onMouseDown = function(event) {
             }
             break;
         case "pen":
+            sketchHistory.pushUndo();
+
             pauseActiveDrawer();
 
             penPath = new Path({
@@ -80,6 +81,8 @@ sketchTool.onMouseDown = function(event) {
             controller.drawRegion = new Rectangle(event.point);
             break;
         case "erase":
+            sketchHistory.pushUndo();
+
             pauseActiveDrawer();
 
             erasorPath = new Path({
@@ -283,13 +286,8 @@ sketchTool.onMouseUp = function() {
                     //split path
                     let splitPaths = result.removeChildren();
                     erasorItem.parent.insertChildren(erasorItem.index, splitPaths);
-                    let newList = [];
 
                     splitPaths.forEach((newPath) => {
-                        newList.push(newPath); // replace
-                        if (!newPath.data.fixed === true) {
-                            newPath.strokeColor.alpha = 1;
-                        }
                         newPath.data.fixed = true;
                     });
 
