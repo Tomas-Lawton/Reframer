@@ -36,11 +36,9 @@ class Sketch:
                 if path.size(0) > 10:
                     partial_points = path[:10,:]
                     path = path[9:,:]
-                    # print(points.size(0))
                 else:
                     partial_points = path[:,:]
                     path = torch.Tensor([])
-                    # print(points.shape)
 
                 num_control_points = torch.zeros(len(partial_points)//3, dtype=torch.int32) +2
                 points = torch.zeros_like(partial_points)
