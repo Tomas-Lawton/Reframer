@@ -26,8 +26,6 @@ class Sketch:
             self.drawing_area = {'x0': 0.0, 'x1': 1.0, 'y0': 0.0, 'y1': 1.0}
 
     def add_paths(self, path_list):
-        shapes = []
-        shape_groups = []
         for dpath in path_list:
             path = dpath.path.detach().clone()
             width = dpath.width.detach().clone()
@@ -59,15 +57,11 @@ class Sketch:
                     stroke_width=stroke_width,
                     is_closed=False,
                 )
-                shapes.append(shape)
-
                 shape_group = pydiffvg.ShapeGroup(
-                    shape_ids=torch.tensor([len(shapes) - 1]),
+                    shape_ids=torch.tensor([len(self.traces)]),
                     fill_color=None,
                     stroke_color=color,
                 )
-                shape_groups.append(shape_group)
-
                 self.traces.append(Trace(shape, shape_group, is_fixed))
                 self.fixed_list.append(is_fixed.item())
 
