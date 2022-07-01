@@ -33,32 +33,43 @@ class Sketch:
             width = dpath.width.detach().clone()
             color = dpath.color.detach().clone()
             is_fixed = dpath.is_fixed.detach().clone()
-            num_control_points = torch.zeros(dpath.num_segments, dtype=torch.int32) + 2
-            points = torch.zeros_like(path)
-            stroke_width = width * 100
-            points[:, 0] = self.canvas_width * path[:, 0]
-            points[:, 1] = self.canvas_height * path[:, 1]
-
-            # SPLIT INTO SUB PATHS
-            # Push a fixed_list boolean for every split
             
-            shape = pydiffvg.Path(
-                num_control_points=num_control_points,
-                points=points,
-                stroke_width=stroke_width,
-                is_closed=False,
-            )
-            shapes.append(shape)
+            while path.size(0)>0:
+                if path.size(0) > 10:
+                    partial_points = path[:10,:]
+                    path = path[9:,:]
+                    # print(points.size(0))
+                else:
+                    partial_points = path[:,:]
+                    path = torch.Tensor([])
+                    # print(points.shape)
 
-            shape_group = pydiffvg.ShapeGroup(
-                shape_ids=torch.tensor([len(shapes) - 1]),
-                fill_color=None,
-                stroke_color=color,
-            )
-            shape_groups.append(shape_group)
+                num_control_points = torch.zeros(len(partial_points)//3, dtype=torch.int32) +2
+                points = torch.zeros_like(partial_points)
+                stroke_width = width * 100
+                points[:, 0] = self.canvas_width * partial_points[:, 0]
+                points[:, 1] = self.canvas_height * partial_points[:, 1]
 
-            self.traces.append(Trace(shape, shape_group, is_fixed))
-            self.fixed_list.append(is_fixed.item())
+                # SPLIT INTO SUB PATHS
+                # Push a fixed_list boolean for every split
+                
+                shape = pydiffvg.Path(
+                    num_control_points=num_control_points,
+                    points=points,
+                    stroke_width=stroke_width,
+                    is_closed=False,
+                )
+                shapes.append(shape)
+
+                shape_group = pydiffvg.ShapeGroup(
+                    shape_ids=torch.tensor([len(shapes) - 1]),
+                    fill_color=None,
+                    stroke_color=color,
+                )
+                shape_groups.append(shape_group)
+
+                self.traces.append(Trace(shape, shape_group, is_fixed))
+                self.fixed_list.append(is_fixed.item())
 
         if not path_list:
             self.img = torch.ones(
