@@ -72,8 +72,6 @@ class Sketch:
             self.render_img()
 
     def add_random_shapes(self, num_rnd_traces):
-        # print('\n\n',self.drawing_area)
-        # asdasd
         shapes, shape_groups = treebranch_initialization(
             self,
             num_rnd_traces,
