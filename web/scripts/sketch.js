@@ -536,7 +536,7 @@ class Sketch {
                 color: path.strokeColor.components.length === 4 ?
                     [...path.strokeColor.components] :
                     [...path.strokeColor.components, 1],
-                stroke_width: path.strokeWidth,
+                stroke_width: parseFloat(path.strokeWidth),
                 path_data: path.pathData,
                 fixed_path: path.data.fixed,
             })
