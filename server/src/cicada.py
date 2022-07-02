@@ -85,9 +85,9 @@ class CICADA:
             print("no me gusta")
         else:
             self.drawing.add_paths(paths)
+            self.drawing.update_region(self.region, self.normaliseScaleFactor)
             if add_curves:
                 self.drawing.add_random_shapes(self.num_paths)
-            self.drawing.update_region(self.region)
             self.initialize_variables()
             self.initialize_optimizer()            
 
