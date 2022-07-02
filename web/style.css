@@ -95,6 +95,7 @@ body {
 
 #canvas {
     background-color: white;
+    cursor: url("public/pen.svg") -1 20, move;
     /* border-radius: 2em; */
 }
 
@@ -1761,13 +1762,13 @@ input[type="range"]::-webkit-slider-runnable-track {
 input[type="range"]::-webkit-slider-thumb {
     box-shadow: 2px 2px 1px #d1d1d1;
     border: 4px solid #ffffff;
-    height: 38px;
-    width: 38px;
-    border-radius: 46px;
+    height: 28px;
+    width: 28px;
+    border-radius: 41px;
+    margin-top: -8px;
     background: #7b66ff;
     cursor: pointer;
     -webkit-appearance: none;
-    margin-top: -8px;
 }
 
 input[type="range"]:focus::-webkit-slider-runnable-track {
@@ -1788,9 +1789,10 @@ input[type="range"]::-moz-range-track {
 input[type="range"]::-moz-range-thumb {
     box-shadow: 2px 2px 1px #d1d1d1;
     border: 4px solid #ffffff;
-    height: 38px;
-    width: 38px;
-    border-radius: 46px;
+    height: 28px;
+    width: 28px;
+    border-radius: 41px;
+    margin-top: -8px;
     background: #7b66ff;
     cursor: pointer;
 }
@@ -1919,13 +1921,13 @@ input[type="range"]::-webkit-slider-runnable-track {
 input[type="range"]::-webkit-slider-thumb {
     box-shadow: 2px 2px 1px #d1d1d1;
     border: 2px solid #ffffff;
-    height: 19px;
-    width: 19px;
-    border-radius: 23px;
+    height: 28px;
+    width: 28px;
+    border-radius: 41px;
+    margin-top: -8px;
     background: #7b66ff;
     cursor: pointer;
     -webkit-appearance: none;
-    margin-top: -4px;
 }
 
 .hide-swatch {
@@ -2077,10 +2079,10 @@ input[type="range"]::-webkit-slider-thumb {
     input[type="range"]::-webkit-slider-thumb {
         box-shadow: 2px 2px 1px #d1d1d1;
         border: 3px solid #ffffff;
-        height: 19px;
-        width: 19px;
-        border-radius: 23px;
-        margin-top: -4px;
+        height: 28px;
+        width: 28px;
+        border-radius: 41px;
+        margin-top: -8px;
     }
 }
 

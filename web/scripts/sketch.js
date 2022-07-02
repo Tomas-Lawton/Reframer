@@ -6,11 +6,12 @@ class SketchHistory {
         this.sketch = s;
     }
     pushUndo() {
+        ungroup();
+
         this.undoStack.push({
             svg: this.sketch.sketchLayer.project.exportSVG({
                 asString: true,
             }),
-            num: 0, // FIXED PATH LIST
         });
 
         this.undoStack.length > 0 ?
@@ -18,11 +19,12 @@ class SketchHistory {
             (document.getElementById("undo").style.color = "#757575");
     }
     pushRedo() {
+        ungroup();
+
         this.redoStack.push({
             svg: this.sketch.sketchLayer.project.exportSVG({
                 asString: true,
             }),
-            num: 0, // FIXED PATH LIST
         });
 
         this.redoStack.length > 0 ?
@@ -31,6 +33,8 @@ class SketchHistory {
     }
     undo() {
         if (this.undoStack.length > 0) {
+            ungroup();
+
             let last = this.undoStack.pop();
             this.pushRedo();
             this.sketch.sketchLayer.clear();
@@ -43,6 +47,8 @@ class SketchHistory {
     }
     redo() {
         if (this.redoStack.length > 0) {
+            ungroup();
+
             let last = this.redoStack.pop();
             this.pushUndo();
             this.sketch.sketchLayer.clear();

@@ -1,15 +1,17 @@
 const killExploratorySketches = () => {
-    explorer.childNodes.forEach((child, i) => {
-        let stopButton = child.querySelector(".fa-stop");
-        let loader = child.querySelector(".card-loading");
-        loader.classList.remove("button-animation");
-        loader.classList.remove("fa-spinner");
-        loader.classList.add("fa-check");
-        stopButton.style.background = "#f5f5f5";
-        stopButton.style.background = "#d2d2d2";
-        controller.stopSingle(controller.inspireScopes[i]);
-    });
-    controller.inspireScopes = [];
+    if (explorer.length > 0) {
+        explorer.childNodes.forEach((child, i) => {
+            let stopButton = child.querySelector(".fa-stop");
+            let loader = child.querySelector(".card-loading");
+            loader.classList.remove("button-animation");
+            loader.classList.remove("fa-spinner");
+            loader.classList.add("fa-check");
+            stopButton.style.background = "#f5f5f5";
+            stopButton.style.background = "#d2d2d2";
+            controller.stopSingle(controller.inspireScopes[i]);
+        });
+        controller.inspireScopes = [];
+    }
 };
 
 const redStop = () => {
@@ -194,17 +196,6 @@ const updateSelectUI = () => {
         transformControl.style.display = "flex";
         updateFixedUI();
         updateSelectPosition();
-    }
-};
-
-const pauseActiveDrawer = () => {
-    if (controller.activeStates.includes(controller.drawState)) {
-        // TO DO: check if can just check if clip is drawing.. should work?
-        controller.liveCollab = true;
-        controller.pause(); //continue on pen up
-        aiMessage.classList.remove("typed-out");
-        aiMessage.innerHTML = `I'mma let you finish...`;
-        aiMessage.classList.add("typed-out");
     }
 };
 

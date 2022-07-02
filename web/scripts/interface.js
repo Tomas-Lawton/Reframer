@@ -206,6 +206,7 @@ document.getElementById("empty").addEventListener("click", (e) => {
     setActionUI("stopSingle");
     killExploratorySketches();
     controller.clipDrawing = false;
+    // refactor into function
     for (let i = 0; i < 4; i++) {
         explorer.removeChild(explorer.firstChild);
         let sketch = new Sketch(null, defaults, sketchSize);
@@ -523,7 +524,7 @@ autoButton.addEventListener("click", () => {
         autoButton.innerHTML = "Solo draw";
     } else {
         autoButton.innerHTML = "Collab draw!";
-        controller.doneSketching = 500;
+        controller.doneSketching = 4000;
     }
     autoButton.classList.toggle("inactive-pill");
 });
@@ -574,6 +575,27 @@ respectSlider.onmouseup = () => {
         controller.liveCollab = false;
     }
 };
+
+// Shortcuts
+window.addEventListener("keydown", function(event) {
+    if (event.metaKey && event.shiftKey) {
+        if (event.code === "KeyP") {
+            setPenMode("pen", pen);
+        }
+        if (event.code === "KeyS") {
+            setPenMode("select", penDrop);
+        }
+        if (event.code === "KeyE") {
+            setPenMode("erase", document.getElementById("erase"));
+        }
+        if (event.code === "KeyU") {
+            sketchHistory.undo();
+        }
+        if (event.code === "KeyR") {
+            sketchHistory.redo();
+        }
+    }
+});
 
 // document.getElementById("set-background").onclick = function() {
 //     canvas.style.backgroundColor = controller.strokeColor;

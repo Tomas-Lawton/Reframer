@@ -14,12 +14,7 @@ sketchTool.onMouseDown = function(event) {
 
     clearTimeout(sketchTimer);
 
-    let hitResult = mainSketch.sketchLayer.hitTest(event.point, {
-        segments: true,
-        stroke: true,
-        fill: true,
-        tolerance: 4,
-    });
+    let hitResult = mainSketch.sketchLayer.hitTest(event.point);
 
     switch (controller.penMode) {
         case "select":
@@ -49,6 +44,8 @@ sketchTool.onMouseDown = function(event) {
             }
 
             if (hitResult) {
+                sketchHistory.pushUndo();
+
                 pauseActiveDrawer();
                 ungroup();
 
@@ -113,11 +110,8 @@ sketchTool.onMouseDown = function(event) {
             controller.alpha = controller.strokeColor.alpha || 1;
             setThisColor(controller.strokeColor);
             picker.setColor(controller.strokeColor, true);
-            console.log(controller.strokeColor);
-
-            alphaSlider.value = Math.floor(
-                parseFloat(controller.strokeColor.split(",")[3]) * 100
-            );
+            alphaSlider.value =
+                parseFloat(controller.strokeColor.split(",")[3]) * 100 || 1;
     }
 };
 
@@ -138,9 +132,9 @@ sketchTool.onMouseDrag = function(event) {
                     controller.boundingBox.position.x += event.delta.x;
                     controller.boundingBox.position.y += event.delta.y;
 
-                    controller.transformGroup.children.forEach((path) => {
-                        path.data.fixed = true;
-                    });
+                    // controller.transformGroup.children.forEach((path) => {
+                    //     path.data.fixed = true;
+                    // });
                     updateSelectUI();
                 }
             } else if (controller.selectBox !== undefined) {
@@ -216,22 +210,24 @@ sketchTool.onMouseUp = function() {
                 asString: true,
             });
             setLineLabels(userLayer);
-            if (controller.liveCollab) {
-                controller.continueSketch();
-                controller.liveCollab = false;
-            } else if (!noPrompt() && controller.doneSketching !== null && socket) {
-                //stopped with collab draw
-                {
-                    clearTimeout(sketchTimer);
-                    sketchTimer = setTimeout(() => {
-                        controller.draw();
-                        let time = (Math.floor(Math.random() * 5) + 5) * 1000;
-                        setTimeout(() => {
-                            console.log("drawing for: ", time);
-                            controller.stop();
-                            controller.clipDrawing = false;
-                        }, time);
-                    }, controller.doneSketching);
+            if (socket) {
+                if (controller.liveCollab) {
+                    controller.continueSketch();
+                    controller.liveCollab = false;
+                } else if (!noPrompt() && controller.doneSketching !== null) {
+                    //stopped with collab draw
+                    {
+                        clearTimeout(sketchTimer);
+                        sketchTimer = setTimeout(() => {
+                            controller.draw();
+                            let time = (Math.floor(Math.random() * 5) + 5) * 1000;
+                            setTimeout(() => {
+                                console.log("drawing for: ", time);
+                                controller.stop();
+                                controller.clipDrawing = false;
+                            }, time);
+                        }, controller.doneSketching);
+                    }
                 }
             }
 
@@ -375,12 +371,16 @@ const setPenMode = (mode, accentTarget) => {
 
             break;
         case "erase":
+            canvas.style.cursor = "url('public/erase.svg') 8 11, move";
+
             if (useAI) {
                 dropdown.style.display = "none";
             }
             controller.penMode = mode;
             break;
         case "pen":
+            canvas.style.cursor = "url('public/pen.svg') -1 20, move";
+
             let swatches = document.getElementById("swatches");
 
             if (window.innerWidth < 700) {
@@ -400,6 +400,8 @@ const setPenMode = (mode, accentTarget) => {
             "pen";
             break;
         case "select":
+            canvas.style.cursor = "url('public/select.svg') 3 2, move";
+
             penDrop.classList.add("selected-mode");
             penDrop.classList.remove("fa-eraser");
             penDrop.classList.remove("fa-object-group");
@@ -408,6 +410,8 @@ const setPenMode = (mode, accentTarget) => {
             controller.penDropMode = mode;
             break;
         case "lasso":
+            canvas.style.cursor = "crosshair";
+
             if (noPrompt()) {
                 controller.penMode = lastPenMode;
                 openModal({
@@ -425,6 +429,8 @@ const setPenMode = (mode, accentTarget) => {
             }
             break;
         case "dropper":
+            canvas.style.cursor = "url('public/dropper.svg') -1 20, move";
+
             controller.penMode = mode;
             document.getElementById("dropper").style.color = "#ffffff";
     }
