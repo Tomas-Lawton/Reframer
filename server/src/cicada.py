@@ -69,9 +69,10 @@ class CICADA:
             x0 = [start_x, start_y]
             points = [x0] + points_array
 
+            colors = [float(val) for val in path["color"]]
             if len(points) > 0:
-                path_list.append(data_to_tensor(path["color"], float(path["stroke_width"] * self.normaliseScaleFactor), 
-                    points, num_segments, path["fixed_path"]))
+                path_list.append(data_to_tensor(colors, float(path["stroke_width"] * self.normaliseScaleFactor), 
+                    points, float(num_segments), path["fixed_path"]))
         return path_list
 
     def activate(self, add_curves):
@@ -79,15 +80,15 @@ class CICADA:
         self.drawing = Sketch(canvas_w, canvas_h)
 
         self.is_active = True
+        self.drawing.update_region(self.region, self.normaliseScaleFactor)
         paths = self.extract_points(self.sketch_data)
-        if len(paths) == 0:
-            # BREAK OUT NO POINTS
-            print("no me gusta")
-        else:
+        print(paths)
+        if len(paths) > 0:
             self.drawing.add_paths(paths)
-            self.drawing.update_region(self.region, self.normaliseScaleFactor)
-            if add_curves:
-                self.drawing.add_random_shapes(self.num_paths)
+        if add_curves:
+            self.drawing.add_random_shapes(self.num_paths)
+
+        if len(self.drawing.traces) > 0 and self.drawing.img is not None:
             self.initialize_variables()
             self.initialize_optimizer()            
 
@@ -331,7 +332,7 @@ class CICADA:
             data["data"]["fixation"])
         self.text_features = self.encode_text_classes([data["data"]["prompt"]])
         # self.negative_text_features = self.clip_interface.encode_text_classes(["Written words.", "Text."])
-        self.negative_text_features = self.encode_text_classes(["text and written words."])
+        self.negative_text_features = self.encode_text_classes(["letters in the alphabet"])
 
         self.user_canvas_w = self.frame_size
         self.user_canvas_h = self.frame_size
@@ -356,16 +357,19 @@ class CICADA:
             try:
                 self.run_epoch(self.iteration)
                 self.iteration += 1
-                # if self.device == "cpu":
-                await self.render_client(self.iteration, self.losses['global'])
-                # else: 
-                #     if self.iteration % refresh_rate == 0:
-                #         await self.render_client(self.iteration, self.losses['global'])
+                if self.device == "cpu":
+                    await self.render_client(self.iteration, self.losses['global'])
+                else: 
+                    if self.iteration % refresh_rate == 0:
+                        await self.render_client(self.iteration, self.losses['global'])
             except Exception as e:
                 logging.info("Iteration failed on: ", self.index)
                 await self.stop()
 
     def run_async(self):
-        self.is_running = True  # for loop to continue
-        loop = asyncio.get_running_loop()
-        loop.run_in_executor(None, lambda: asyncio.run(self.loop()))
+        if len(self.drawing.traces) > 0 and self.drawing.img is not None:
+            self.is_running = True  # for loop to continue
+            loop = asyncio.get_running_loop()
+            loop.run_in_executor(None, lambda: asyncio.run(self.loop()))
+        else:
+            self.is_running = False

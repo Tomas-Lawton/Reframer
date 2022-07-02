@@ -80,6 +80,13 @@ document.getElementById("delete").addEventListener("click", () =>
             });
             logger.event("clear-sketch");
 
+            if (controller.clipDrawing) {
+                killExploratorySketches()
+                controller.stop();
+                controler.resetMetaControls();
+                controller.clipDrawing = false;
+            }
+
             controller.lastPrompt = null;
             userLayer.clear();
             modal.style.display = "none";
@@ -198,23 +205,11 @@ document
 
 document.getElementById("close-explorer").addEventListener("click", (e) => {
     showHide(document.getElementById("explore-margin"));
+    emptyExplorer();
 });
 
 document.getElementById("empty").addEventListener("click", (e) => {
-    aiMessage.innerHTML = "All done! What should we draw next?";
-    aiMessage.classList.add("typed-out");
-    setActionUI("stopSingle");
-    killExploratorySketches();
-    controller.clipDrawing = false;
-    // refactor into function
-    for (let i = 0; i < 4; i++) {
-        explorer.removeChild(explorer.firstChild);
-        let sketch = new Sketch(null, defaults, sketchSize);
-        let newElem = sketch.renderMini();
-        controller.inspireScopes.push(controller.sketchScopeIndex);
-        explorer.appendChild(newElem);
-        newElem.classList.add("inactive-sketch");
-    }
+    emptyExplorer();
 });
 
 // document.getElementById("settings").addEventListener("click", () => {
@@ -309,6 +304,7 @@ document.getElementById("inspire").addEventListener("click", () => {
 });
 
 stopButton.addEventListener("click", () => {
+    console.log(controller.drawState)
     if (socket) {
         if (
             controller.drawState === "drawing" ||
@@ -327,8 +323,8 @@ stopButton.addEventListener("click", () => {
         ) {
             aiMessage.innerHTML = "All done! What should we draw next?";
             aiMessage.classList.add("typed-out");
-            setActionUI("stopSingle");
             killExploratorySketches();
+            setActionUI("stopSingle");
             controller.clipDrawing = false;
         }
     }
@@ -669,7 +665,7 @@ for (let i = 0; i < 4; i++) {
 
 // sketchBook.style.left =
 //     window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";
-sketchBook.style.display = "none";
+// sketchBook.style.display = "none";
 
 if (window.innerWidth <= 700 || window.innerWidth >= 1000) {
     document

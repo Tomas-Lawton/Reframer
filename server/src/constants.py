@@ -9,4 +9,4 @@ w_geo = 10
 
 prune_places = [round(num_iter * (k + 1) * 0.8 / 1) for k in range(1)]
 p0 = 0.4
-refresh_rate = 10
+refresh_rate = 15

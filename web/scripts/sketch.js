@@ -93,6 +93,7 @@ class Controller {
             "explore",
             "redrawing",
             "continuing",
+            "pause"
         ];
         this.lastHistoryIndex = 0;
         this.penDropMode = "select";
@@ -178,6 +179,8 @@ class Controller {
             this.targetDrawing = false;
             // setPenMode("select", penDrop);
             this.prepare();
+            this.resetMetaControls();
+
             this.updateDrawer({
                 status: "draw",
                 // svg: svg || mainSketch.svg,
@@ -204,6 +207,8 @@ class Controller {
             this.targetDrawing = true;
 
             this.prepare();
+            this.resetMetaControls();
+
             this.updateDrawer({
                 status: "add_new_sketch",
                 sketch: mainSketch.sketch,
@@ -295,6 +300,7 @@ class Controller {
 
         setLineLabels(mainSketch.sketchLayer);
         document.getElementById("calc-lines").innerHTML = `Add : 0`;
+
     }
     resetMetaControls() {
         document.getElementById("prune").classList.add("inactive-action");
@@ -463,8 +469,11 @@ class Sketch {
                 title: "Overwriting Canvas",
                 message: "This will stop AI drawing. Are you sure?",
                 confirmAction: () => {
-                    controller.stop();
-                    controller.clipDrawing = false;
+                    if (controller.drawState === "drawing" || controller.drawState === "continuing") {
+                        controller.stop(); 
+                        controller.clipDrawing = false;
+                    }
+
                     // pauseActiveDrawer();
                     ungroup();
                     this.saveStatic(overwriting.extractScaledSVG(1 / scaleRatio));

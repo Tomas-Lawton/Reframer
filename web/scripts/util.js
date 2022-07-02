@@ -42,9 +42,12 @@ const setPointSize = (s) => {
     controller.strokeWidth = s;
     point.style.width = controller.strokeWidth + "px";
     point.style.height = controller.strokeWidth + "px";
-    getSelectedPaths().forEach(
-        (item) => (item.strokeWidth = controller.strokeWidth)
-    );
+    
+    if (controller.transformGroup) {
+        controller.transformGroup.getItems(
+            (item) => (item.strokeWidth = controller.strokeWidth)
+        );
+    }
 };
 
 const ungroup = () => {

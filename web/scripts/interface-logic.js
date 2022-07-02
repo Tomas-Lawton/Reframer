@@ -1,5 +1,5 @@
 const killExploratorySketches = () => {
-    if (explorer.length > 0) {
+    if (explorer.childNodes.length > 0) {
         explorer.childNodes.forEach((child, i) => {
             let stopButton = child.querySelector(".fa-stop");
             let loader = child.querySelector(".card-loading");
@@ -13,6 +13,23 @@ const killExploratorySketches = () => {
         controller.inspireScopes = [];
     }
 };
+
+const emptyExplorer = () => {
+    aiMessage.innerHTML = "All done! What should we draw next?";
+    aiMessage.classList.add("typed-out");
+    setActionUI("stopSingle");
+    killExploratorySketches();
+    controller.clipDrawing = false;
+    // refactor into function
+    for (let i = 0; i < 4; i++) {
+        explorer.removeChild(explorer.firstChild);
+        let sketch = new Sketch(null, defaults, sketchSize);
+        let newElem = sketch.renderMini();
+        controller.inspireScopes.push(controller.sketchScopeIndex);
+        explorer.appendChild(newElem);
+        newElem.classList.add("inactive-sketch");
+    }
+}
 
 const redStop = () => {
     stopButton.classList.remove("inactive-action");
@@ -118,7 +135,7 @@ const setActionUI = (state) => {
         aiMessage.innerHTML = `Stopped a single sketch!`;
         aiMessage.classList.add("typed-out");
         drawingFinished();
-        controller.resetMetaControls();
+        // controller.resetMetaControls();
     }
     controller.drawState = state;
     console.log("Set: ", state);

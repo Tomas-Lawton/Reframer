@@ -295,8 +295,10 @@ sketchTool.onMouseUp = function() {
                     result.remove(); //remove the compound paths
                 } else {
                     // don't split
-                    if (result.length === 0) {
+                    if (!result.segments.length) {
+                        console.log("Removed")
                         erasorItem.remove();
+                        result.remove();
                     } else {
                         erasorItem.replaceWith(result); //replace
                         result.data.fixed = true;
@@ -304,18 +306,8 @@ sketchTool.onMouseUp = function() {
                 }
             });
 
-            let added = userLayer.addChildren(tmpGroup.removeChildren());
+            userLayer.addChildren(tmpGroup.removeChildren());
             mask.remove();
-
-            if (added.length) {
-                added.forEach((item) => {
-                    if (item instanceof Group) {
-                        if (!item.segments.length) {
-                            item.remove();
-                        }
-                    }
-                });
-            }
 
             // Update
             mainSketch.svg = paper.project.exportSVG({
