@@ -134,10 +134,10 @@ else:
                     main_sketch.draw()
 
                 if data["status"] == "prune":
-                    main_sketch.use_latest_sketch(data)
+                    main_sketch.use_sketch(data)
                     main_sketch.activate(False)
                     main_sketch.prune()
-                    await main_sketch.render_client(main_sketch.iteration, main_sketch.losses["global"], True)
+                    await main_sketch.render_client(main_sketch.iteration, None, True)
 
                 if data["status"] == "stop_single_sketch":
                     for drawer in sketches:

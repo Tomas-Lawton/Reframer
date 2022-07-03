@@ -183,10 +183,7 @@ class Controller {
 
             this.updateDrawer({
                 status: "draw",
-                // svg: svg || mainSketch.svg,
-                // svg: mainSketch.sketchLayer.project.exportJSON(), //test
                 sketch: mainSketch.sketch,
-                // sketchScopeIndex: "None",
                 hasRegion: withRegion,
                 frameSize: mainSketch.frameSize,
                 prompt: this.prompt,
@@ -270,6 +267,10 @@ class Controller {
             this.updateDrawer({
                 status: "prune",
                 sketch: mainSketch.sketch,
+                hasRegion: false,
+                frameSize: mainSketch.frameSize,
+                prompt: this.prompt,
+                lines: this.initRandomCurves ? this.addLines : 0, //adding
                 fixation: this.useFixation,
             });
             setActionUI("pruning");
@@ -334,11 +335,13 @@ class Sketch {
             if (svg === "" || svg === undefined) return;
             this.sketchLayer.clear();
             let importGroup = this.sketchLayer.importSVG(svg);
+            console.log(this.sketchLayer.exportSVG())
+
             let g = importGroup.children[0];
             // if (!(g instanceof Group)) {
             //     g = g.children[0];
             // }
-            let scaledGroup = scaleGroup(g, s);
+            let scaledGroup = scaleGroup(g, s)
             // if (o) {
             //     scaledGroup.position.x += offX;
             //     scaledGroup.position.y += offY;
@@ -349,7 +352,7 @@ class Sketch {
             );
             scaledGroup.remove();
             importGroup.remove(); // not g
-            console.log(finalInserted);
+            // console.log(finalInserted);
             if (fixed !== null) {
                 for (let i = 0; i < fixed.length; i++) {
                     finalInserted[i].data.fixed = fixed[i];

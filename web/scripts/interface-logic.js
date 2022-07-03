@@ -1,4 +1,5 @@
 const killExploratorySketches = () => {
+    console.log(controller.exploreScopes)
     if (controller.exploreScopes.length > 0) {
         explorer.childNodes.forEach((child, i) => {
             let stopButton = child.querySelector(".fa-stop");
@@ -25,7 +26,6 @@ const emptyExplorer = () => {
         explorer.removeChild(explorer.firstChild);
         let sketch = new Sketch(null, defaults, sketchSize);
         let newElem = sketch.renderMini();
-        controller.exploreScopes.push(controller.sketchScopeIndex);
         explorer.appendChild(newElem);
         newElem.classList.add("inactive-sketch");
     }
@@ -173,8 +173,14 @@ const updateRectBounds = (from, to) => {
 
 const updateSelectPosition = () => {
     let center = deleteHandler.getBoundingClientRect().height / 2 + 5;
+
+    if (controller.boundingBox.bounds.width > 50) {
     deleteHandler.style.left = controller.boundingBox.bounds.topRight.x + "px";
     deleteHandler.style.top = controller.boundingBox.bounds.top - center + "px";
+    } else {
+        deleteHandler.style.left = controller.boundingBox.bounds.center.x + "px";
+        deleteHandler.style.top = controller.boundingBox.bounds.bottom + center + "px";
+    }
 
     copyHandler.style.top = controller.boundingBox.bounds.top - center + "px";
     copyHandler.style.left = controller.boundingBox.bounds.topLeft.x + "px";
@@ -205,12 +211,17 @@ const updateFixedUI = () => {
 const updateSelectUI = () => {
     if (controller.boundingBox && getSelectedPaths().length) {
         // Add parent container
-        deleteHandler.style.display = "block";
-        sendToBack.style.display = "block";
-        moveUp.style.display = "block";
-        copyHandler.style.display = "block";
-        fixedHandler.style.display = "block";
-        transformControl.style.display = "flex";
+        if (controller.boundingBox.bounds.width > 50) {
+            deleteHandler.style.display = "block";
+            sendToBack.style.display = "block";
+            moveUp.style.display = "block";
+            copyHandler.style.display = "block";
+            fixedHandler.style.display = "block";
+        } else {
+            fixedHandler.style.display = "block";
+            deleteHandler.style.display = "block";
+        }
+        transformControl.style.display = "flex";   
         updateFixedUI();
         updateSelectPosition();
     }

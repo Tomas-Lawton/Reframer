@@ -41,9 +41,8 @@ function dropSketch(e) {
     sketchGrid.classList.remove("drop-ready");
     const sketchCountIndex = e.dataTransfer.getData("text/plain");
     if (document.querySelector(`#AI-sketch-item-${sketchCountIndex}`)) {
-        // COME BACK HERE
         let importing = controller.sketches[sketchCountIndex];
-        importing.saveStatic(importing.extractJSON());
+        importing.saveStatic(importing.extractSVG());
     }
 }
 
@@ -74,18 +73,22 @@ document.getElementById("delete").addEventListener("click", () =>
         title: "Clearing Canvas",
         message: "Are you sure you want to delete your drawing?",
         confirmAction: () => {
+            ungroup();
             // Save before clearing
             mainSketch.svg = paper.project.exportSVG({
                 asString: true,
             });
             logger.event("clear-sketch");
-
-            if (controller.clipDrawing) {
+            if (controller.clipDrawing || controller.drawState === "pause") {
                 killExploratorySketches();
                 controller.stop();
-                controler.resetMetaControls();
+                controller.resetMetaControls();
                 controller.clipDrawing = false;
             }
+
+            emptyExplorer();
+            document.getElementById("explore-margin").display = "none"
+            document.getElementById("add-refine").style.display = "none";
 
             controller.lastPrompt = null;
             userLayer.clear();
@@ -204,8 +207,8 @@ document
     });
 
 document.getElementById("close-explorer").addEventListener("click", (e) => {
-    showHide(document.getElementById("explore-margin"));
     emptyExplorer();
+    showHide(document.getElementById("explore-margin"));
 });
 
 document.getElementById("empty").addEventListener("click", (e) => {
@@ -289,7 +292,6 @@ document.getElementById("explore").addEventListener("click", () => {
                     sketchSize,
                     "AI"
                 );
-                console.log("here");
                 let newElem = sketch.renderMini();
                 controller.exploreScopes.push(controller.sketchScopeIndex);
                 explorer.appendChild(newElem);
@@ -343,10 +345,12 @@ moveUp.addEventListener("click", () => {
 });
 
 document.getElementById("prune").addEventListener("click", () => {
+    console.log(controller.drawState)
     if (socket) {
         if (
             controller.drawState === "stop" ||
-            controller.drawState === "stop-prune"
+            controller.drawState === "stop-prune" || 
+            controller.drawState === "stopSingle"
         ) {
             // after  draw
             controller.prune();
@@ -355,7 +359,7 @@ document.getElementById("prune").addEventListener("click", () => {
 });
 
 document.getElementById("go-back").addEventListener("click", () => {
-    if (controller.drawState === "stop") {
+    if (controller.drawState === "stop" || controller.drawState === "stop-prune") {
         // mainSketch.arrange();
         // LOAD FIXED PATH LIST ?
         incrementHistory();

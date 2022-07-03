@@ -1578,9 +1578,9 @@ input[type="number"] {
     display: none;
 }
 
-.panel-section {
+/* .panel-section {
     margin: 1.6em 0 0.5em 0;
-}
+} */
 
 .fa-spinner {
     color: #00e900;

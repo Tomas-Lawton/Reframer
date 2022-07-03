@@ -88,7 +88,7 @@ class CICADA:
         if add_curves:
             self.drawing.add_random_shapes(self.num_paths)
 
-        if self.drawing.img is not None:
+        if len(self.drawing.traces) > 0 and self.drawing.img is not None:
             self.initialize_variables()
             self.initialize_optimizer()            
 
@@ -305,11 +305,16 @@ class CICADA:
         with open(f"results/output-{str(self.index)}.svg", "r") as f:
             svg = f.read()
 
+        result_loss = ""
+        if loss is not None:
+            result_loss = str(loss.item())
+
+        print(svg)
         result = {
             "status": status,
             "svg": svg,
             "iterations": t,
-            "loss": str(loss.item()),
+            "loss": result_loss,
             "fixed": self.drawing.fixed_list
         }
         try:
