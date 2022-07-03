@@ -309,7 +309,7 @@ class CICADA:
         if loss is not None:
             result_loss = str(loss.item())
 
-        print(svg)
+        # print(svg)
         result = {
             "status": status,
             "svg": svg,

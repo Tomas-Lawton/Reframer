@@ -71,8 +71,8 @@ sketchTool.onMouseDown = function(event) {
             firstPoint = penPath.add(event.point);
             penPath.add({
                 ...event.point,
-                x: event.point.x + 0.001,
-            }); //make a segment on touch down (one point)
+                x: event.point.x + 0.05, //any smaller will break because BE changes to v0
+            });
             break;
         case "lasso":
             controller.drawRegion = new Rectangle(event.point);
@@ -92,8 +92,8 @@ sketchTool.onMouseDown = function(event) {
             firstErasePoint = erasorPath.add(event.point);
             erasorPath.add({
                 ...event.point,
-                x: event.point.x + 0.001,
-            }); //make a segment on touch down (one point)
+                x: event.point.x + 0.05, //any smaller will break because BE changes to v0
+            });
             tmpGroup = new Group({
                 children: userLayer.removeChildren(),
                 blendMode: "source-out",
@@ -203,6 +203,7 @@ sketchTool.onMouseUp = function() {
                 firstPoint.remove();
             }
             penPath.simplify();
+            console.log(penPath);
 
             penPath.data.fixed = true;
             // Update
