@@ -1,5 +1,5 @@
 const killExploratorySketches = () => {
-    console.log(controller.exploreScopes)
+    console.log(controller.exploreScopes);
     if (controller.exploreScopes.length > 0) {
         explorer.childNodes.forEach((child, i) => {
             let stopButton = child.querySelector(".fa-stop");
@@ -174,12 +174,13 @@ const updateRectBounds = (from, to) => {
 const updateSelectPosition = () => {
     let center = deleteHandler.getBoundingClientRect().height / 2 + 5;
 
-    if (controller.boundingBox.bounds.width > 50) {
-    deleteHandler.style.left = controller.boundingBox.bounds.topRight.x + "px";
-    deleteHandler.style.top = controller.boundingBox.bounds.top - center + "px";
+    if (controller.boundingBox.bounds.width > minSelectionWidth) {
+        deleteHandler.style.left = controller.boundingBox.bounds.topRight.x + "px";
+        deleteHandler.style.top = controller.boundingBox.bounds.top - center + "px";
     } else {
         deleteHandler.style.left = controller.boundingBox.bounds.center.x + "px";
-        deleteHandler.style.top = controller.boundingBox.bounds.bottom + center + "px";
+        deleteHandler.style.top =
+            controller.boundingBox.bounds.bottom + center + "px";
     }
 
     copyHandler.style.top = controller.boundingBox.bounds.top - center + "px";
@@ -191,37 +192,38 @@ const updateSelectPosition = () => {
     sendToBack.style.top = controller.boundingBox.bounds.bottom + center + "px";
     sendToBack.style.left = controller.boundingBox.bounds.topRight.x + "px";
 
-    fixedHandler.style.top = controller.boundingBox.bounds.top - center + "px";
+    fixedHandler.style.top =
+        controller.boundingBox.bounds.top - center - 5 + "px";
     fixedHandler.style.left = controller.boundingBox.bounds.center.x + "px";
 };
 
 const updateFixedUI = () => {
     let i = fixedHandler.querySelector("i");
     if (isFixedGroup()) {
-        console.log("fixed");
         i.classList.add("fa-lock");
         i.classList.remove("fa-unlock");
+        i.classList.add("green");
+        i.classList.remove("orange");
     } else {
-        console.log("unfixed");
         i.classList.remove("fa-lock");
         i.classList.add("fa-unlock");
+        i.classList.add("orange");
+        i.classList.remove("green");
     }
 };
 
 const updateSelectUI = () => {
     if (controller.boundingBox && getSelectedPaths().length) {
-        // Add parent container
-        if (controller.boundingBox.bounds.width > 50) {
-            deleteHandler.style.display = "block";
+        if (controller.boundingBox.bounds.width > minSelectionWidth) {
             sendToBack.style.display = "block";
             moveUp.style.display = "block";
             copyHandler.style.display = "block";
-            fixedHandler.style.display = "block";
-        } else {
-            fixedHandler.style.display = "block";
-            deleteHandler.style.display = "block";
         }
-        transformControl.style.display = "flex";   
+        if (useAI) {
+            fixedHandler.style.display = "block";
+        }
+        deleteHandler.style.display = "block";
+        transformControl.style.display = "flex";
         updateFixedUI();
         updateSelectPosition();
     }

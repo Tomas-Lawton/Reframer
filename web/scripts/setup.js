@@ -134,3 +134,5 @@ const rectangleOptions = {
     strokeWidth: 2,
     selected: true,
 };
+
+const minSelectionWidth = 65;

@@ -19,6 +19,7 @@ const createGroup = (items) => {
         strokeScaling: false,
         transformContent: false,
     });
+    return controller.transformGroup;
 };
 
 const transformGroup = (g, t, a) => {
@@ -42,7 +43,7 @@ const setPointSize = (s) => {
     controller.strokeWidth = s;
     point.style.width = controller.strokeWidth + "px";
     point.style.height = controller.strokeWidth + "px";
-    
+
     if (controller.transformGroup) {
         controller.transformGroup.getItems(
             (item) => (item.strokeWidth = controller.strokeWidth)
@@ -77,9 +78,8 @@ const fitToSelection = (items, state) => {
     let bbox = items.reduce((bbox, item) => {
         return !bbox ? item.bounds : bbox.unite(item.bounds);
     }, null);
-    // Also shouldn't set the boundingBox, should set boundingBox.bounds ???
     controller.boundingBox = new Path.Rectangle(bbox);
-    controller.boundingBox.set(rectangleOptions);
+    controller.boundingBox.set(rectangleOptions); //outline
     controller.boundingBox.sendToBack();
     controller.boundingBox.data.state = state;
     return controller.boundingBox;

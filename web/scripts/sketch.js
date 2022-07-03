@@ -78,7 +78,7 @@ class Controller {
 
         // Defaults
         this.strokeColor = "rgb(24,24,24)";
-        this.strokeWidth = 8;
+        this.strokeWidth = 30;
         this.alpha = 1;
         this.penMode = "pen";
         this.clipDrawing = false;
@@ -335,13 +335,13 @@ class Sketch {
             if (svg === "" || svg === undefined) return;
             this.sketchLayer.clear();
             let importGroup = this.sketchLayer.importSVG(svg);
-            console.log(this.sketchLayer.exportSVG())
+            console.log(this.sketchLayer.exportSVG());
 
             let g = importGroup.children[0];
             // if (!(g instanceof Group)) {
             //     g = g.children[0];
             // }
-            let scaledGroup = scaleGroup(g, s)
+            let scaledGroup = scaleGroup(g, s);
             // if (o) {
             //     scaledGroup.position.x += offX;
             //     scaledGroup.position.y += offY;
@@ -460,11 +460,13 @@ class Sketch {
     add(overwriting, fromLayer, s) {
         if (!fromLayer) return;
         fromLayer = scaleGroup(fromLayer, s);
-        overwriting.sketchLayer.insertChildren(
+        let added = overwriting.sketchLayer.insertChildren(
             fromLayer.index,
             fromLayer.removeChildren()
         );
         fromLayer.remove();
+
+        // Select the added paths
     }
     importTo(overwriting) {
         let i = this.i;

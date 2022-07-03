@@ -87,7 +87,7 @@ document.getElementById("delete").addEventListener("click", () =>
             }
 
             emptyExplorer();
-            document.getElementById("explore-margin").display = "none"
+            document.getElementById("explore-margin").display = "none";
             document.getElementById("add-refine").style.display = "none";
 
             controller.lastPrompt = null;
@@ -136,10 +136,11 @@ copyHandler.addEventListener("click", (e) => {
 });
 
 fixedHandler.addEventListener("click", (e) => {
-    let i = fixedHandler.querySelector("i");
-    i.classList.toggle("fa-lock");
-    i.classList.toggle("fa-unlock");
+    // let i = fixedHandler.querySelector("i");
+    // i.classList.toggle("fa-lock");
+    // i.classList.toggle("fa-unlock");
     isFixedGroup() ? fixGroup(false) : fixGroup(true);
+    updateFixedUI();
 });
 
 document.getElementById("begin").addEventListener("click", () => {
@@ -185,6 +186,7 @@ alphaSlider.oninput = function() {
     setThisColor(rgba);
 };
 
+// tidy
 document
     .getElementById("circle-small")
     .parentElement.addEventListener("click", (e) => {
@@ -345,11 +347,11 @@ moveUp.addEventListener("click", () => {
 });
 
 document.getElementById("prune").addEventListener("click", () => {
-    console.log(controller.drawState)
+    console.log(controller.drawState);
     if (socket) {
         if (
             controller.drawState === "stop" ||
-            controller.drawState === "stop-prune" || 
+            controller.drawState === "stop-prune" ||
             controller.drawState === "stopSingle"
         ) {
             // after  draw
@@ -359,7 +361,10 @@ document.getElementById("prune").addEventListener("click", () => {
 });
 
 document.getElementById("go-back").addEventListener("click", () => {
-    if (controller.drawState === "stop" || controller.drawState === "stop-prune") {
+    if (
+        controller.drawState === "stop" ||
+        controller.drawState === "stop-prune"
+    ) {
         // mainSketch.arrange();
         // LOAD FIXED PATH LIST ?
         incrementHistory();
@@ -654,8 +659,8 @@ picker.onChange = (color) => {
 };
 
 setLineLabels(userLayer);
-
 setActionUI("inactive");
+setPointSize(controller.strokeWidth);
 
 const defaults = new PaperScope();
 defaults.activate();

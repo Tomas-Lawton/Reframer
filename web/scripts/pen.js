@@ -112,6 +112,7 @@ sketchTool.onMouseDown = function(event) {
             picker.setColor(controller.strokeColor, true);
             alphaSlider.value =
                 parseFloat(controller.strokeColor.split(",")[3]) * 100 || 1;
+            hitResult && setPointSize(hitResult.item.strokeWidth);
     }
 };
 
@@ -187,6 +188,7 @@ sketchTool.onMouseUp = function() {
                     path.remove();
                 }
                 createGroup(items); //transformGroup
+                // fit to selction?
                 updateSelectUI();
             }
             if (controller.boundingBox) {
