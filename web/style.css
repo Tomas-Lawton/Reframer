@@ -1092,10 +1092,11 @@ input[type="number"] {
     color: #a091ff;
 }
 
-.select-ui div {
+
+/* .select-ui div {
     border-radius: 50%;
     background-color: #ffffff;
-}
+} */
 
 .select-ui i {
     border-radius: 50%;
@@ -1118,6 +1119,7 @@ input[type="number"] {
 
 .default {
     background: white;
+    border-radius: 50%;
 }
 
 .green {
