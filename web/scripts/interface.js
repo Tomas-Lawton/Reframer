@@ -81,7 +81,7 @@ document.getElementById("delete").addEventListener("click", () =>
             logger.event("clear-sketch");
 
             if (controller.clipDrawing) {
-                killExploratorySketches()
+                killExploratorySketches();
                 controller.stop();
                 controler.resetMetaControls();
                 controller.clipDrawing = false;
@@ -258,7 +258,7 @@ document.getElementById("draw").addEventListener("click", () => {
     }
 });
 
-document.getElementById("inspire").addEventListener("click", () => {
+document.getElementById("explore").addEventListener("click", () => {
     if (socket) {
         if (noPrompt()) {
             openModal({
@@ -268,7 +268,7 @@ document.getElementById("inspire").addEventListener("click", () => {
             });
             return;
         } else {
-            // TO DO: Clean up old scopes (now unused) // controller.inspireScopes
+            // TO DO: Clean up old scopes (now unused) // controller.exploreScopes
             // const total = controller.sketchScopeIndex + Math.floor(Math.random() * 5);
             total = 4;
             for (let i = 0; i < 4; i++) {
@@ -279,7 +279,7 @@ document.getElementById("inspire").addEventListener("click", () => {
                 // if (controller.sketchScopeIndex > total) {
                 //     let sketch = new Sketch(null, defaults, sketchSize, "default");
                 //     let newElem = sketch.renderMini();
-                //     controller.inspireScopes.push(controller.sketchScopeIndex);
+                //     controller.exploreScopes.push(controller.sketchScopeIndex);
                 //     explorer.appendChild(newElem);
                 //     newElem.classList.add("inactive-sketch");
                 // } else {
@@ -291,7 +291,7 @@ document.getElementById("inspire").addEventListener("click", () => {
                 );
                 console.log("here");
                 let newElem = sketch.renderMini();
-                controller.inspireScopes.push(controller.sketchScopeIndex);
+                controller.exploreScopes.push(controller.sketchScopeIndex);
                 explorer.appendChild(newElem);
                 controller.newExploreSketch(controller.sketchScopeIndex);
                 controller.sketchScopeIndex += 1;
@@ -304,7 +304,7 @@ document.getElementById("inspire").addEventListener("click", () => {
 });
 
 stopButton.addEventListener("click", () => {
-    console.log(controller.drawState)
+    console.log(controller.drawState);
     if (socket) {
         if (
             controller.drawState === "drawing" ||

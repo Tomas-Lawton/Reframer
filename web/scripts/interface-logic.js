@@ -1,5 +1,5 @@
 const killExploratorySketches = () => {
-    if (explorer.childNodes.length > 0) {
+    if (controller.exploreScopes.length > 0) {
         explorer.childNodes.forEach((child, i) => {
             let stopButton = child.querySelector(".fa-stop");
             let loader = child.querySelector(".card-loading");
@@ -8,9 +8,9 @@ const killExploratorySketches = () => {
             loader.classList.add("fa-check");
             stopButton.style.background = "#f5f5f5";
             stopButton.style.background = "#d2d2d2";
-            controller.stopSingle(controller.inspireScopes[i]);
+            controller.stopSingle(controller.exploreScopes[i]);
         });
-        controller.inspireScopes = [];
+        controller.exploreScopes = [];
     }
 };
 
@@ -25,11 +25,11 @@ const emptyExplorer = () => {
         explorer.removeChild(explorer.firstChild);
         let sketch = new Sketch(null, defaults, sketchSize);
         let newElem = sketch.renderMini();
-        controller.inspireScopes.push(controller.sketchScopeIndex);
+        controller.exploreScopes.push(controller.sketchScopeIndex);
         explorer.appendChild(newElem);
         newElem.classList.add("inactive-sketch");
     }
-}
+};
 
 const redStop = () => {
     stopButton.classList.remove("inactive-action");
@@ -115,7 +115,7 @@ const setActionUI = (state) => {
             // canvas.classList.add("loading-canvas");
             document.getElementById("history-block").style.display = "none";
             document.getElementById("explore-margin").style.display = "flex";
-            // document.getElementById("inspire").classList.add("active");
+            // document.getElementById("explore").classList.add("active");
         } else if (state == "continuing" || state == "continue-explore") {
             aiMessage.innerHTML = `I'll make that it into ${controller.prompt}.`;
         }

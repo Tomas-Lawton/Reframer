@@ -70,7 +70,7 @@ async def getInformation(info: Request):
 async def home():
     return {"hello", "world"}
 
-
+# Refactor as dictionary
 def kill(d, a):
     a.is_running = False
     for drawer in d:
@@ -114,26 +114,28 @@ else:
                         del drawer
 
                 if data["status"] == "draw":
-                    main_sketch.draw(data)
+                    main_sketch.use_sketch(data)
                     main_sketch.activate(True)
-                    main_sketch.run_async()
+                    main_sketch.draw()
 
                 if data["status"] == "add_new_sketch":
-                    new_exemplar = CICADA(
+                    new_sketch = CICADA(
                          websocket, device, model, data["data"]["sketch_index"]
                     )
-                    sketches.append(new_exemplar)
+                    sketches.append(new_sketch)
 
-                    new_exemplar.draw(data)
-                    new_exemplar.activate(True)
-                    new_exemplar.run_async()
+                    new_sketch.use_sketch(data)
+                    new_sketch.activate(True)
+                    new_sketch.draw()
 
                 if data["status"] == "continue_sketch":
-                    main_sketch.continue_update_sketch(data)
+                    main_sketch.use_latest_sketch(data)
                     main_sketch.activate(False)
-                    main_sketch.run_async()
+                    main_sketch.draw()
 
                 if data["status"] == "prune":
+                    main_sketch.use_latest_sketch(data)
+                    main_sketch.activate(False)
                     main_sketch.prune()
                     await main_sketch.render_client(main_sketch.iteration, main_sketch.losses["global"], True)
 

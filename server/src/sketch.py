@@ -45,9 +45,6 @@ class Sketch:
                 stroke_width = width * 100
                 points[:, 0] = self.canvas_width * partial_points[:, 0]
                 points[:, 1] = self.canvas_height * partial_points[:, 1]
-
-                # SPLIT INTO SUB PATHS
-                # Push a fixed_list boolean for every split
                 
                 shape = pydiffvg.Path(
                     num_control_points=num_control_points,

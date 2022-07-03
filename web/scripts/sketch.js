@@ -73,7 +73,7 @@ class Controller {
         this.drawState;
         // Sketching Data
         this.prompt = null;
-        this.inspireScopes = [];
+        this.exploreScopes = [];
         this.sketches = {};
 
         // Defaults
@@ -93,7 +93,7 @@ class Controller {
             "explore",
             "redrawing",
             "continuing",
-            "pause"
+            "pause",
         ];
         this.lastHistoryIndex = 0;
         this.penDropMode = "select";
@@ -237,7 +237,7 @@ class Controller {
                 //                 svg: mainSketch.svg,
                 //                 frameSize: mainSketch.frameSize, //can remove?
                 //                 fixation: this.useFixation,
-                //                 sketchScopeIndex: controller.inspireScopes[i],
+                //                 sketchScopeIndex: controller.exploreScopes[i],
                 //             });
                 //             setActionUI("continue-explore");
                 //         } catch (e) {
@@ -269,6 +269,8 @@ class Controller {
 
             this.updateDrawer({
                 status: "prune",
+                sketch: mainSketch.sketch,
+                fixation: this.useFixation,
             });
             setActionUI("pruning");
         }
@@ -300,7 +302,6 @@ class Controller {
 
         setLineLabels(mainSketch.sketchLayer);
         document.getElementById("calc-lines").innerHTML = `Add : 0`;
-
     }
     resetMetaControls() {
         document.getElementById("prune").classList.add("inactive-action");
@@ -469,8 +470,11 @@ class Sketch {
                 title: "Overwriting Canvas",
                 message: "This will stop AI drawing. Are you sure?",
                 confirmAction: () => {
-                    if (controller.drawState === "drawing" || controller.drawState === "continuing") {
-                        controller.stop(); 
+                    if (
+                        controller.drawState === "drawing" ||
+                        controller.drawState === "continuing"
+                    ) {
+                        controller.stop();
                         controller.clipDrawing = false;
                     }
 

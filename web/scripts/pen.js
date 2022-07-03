@@ -287,21 +287,21 @@ sketchTool.onMouseUp = function() {
                     let splitPaths = result.removeChildren();
                     erasorItem.parent.insertChildren(erasorItem.index, splitPaths);
 
-                    splitPaths.forEach((newPath) => {
-                        newPath.data.fixed = true;
-                    });
+                    // splitPaths.forEach((newPath) => {
+                    //     newPath.data.fixed = true;
+                    // });
 
                     erasorItem.remove();
                     result.remove(); //remove the compound paths
                 } else {
                     // don't split
                     if (!result.segments.length) {
-                        console.log("Removed")
+                        console.log("Removed");
                         erasorItem.remove();
                         result.remove();
                     } else {
                         erasorItem.replaceWith(result); //replace
-                        result.data.fixed = true;
+                        // result.data.fixed = true;
                     }
                 }
             });

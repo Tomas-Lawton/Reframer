@@ -82,13 +82,13 @@ class CICADA:
         self.is_active = True
         self.drawing.update_region(self.region, self.normaliseScaleFactor)
         paths = self.extract_points(self.sketch_data)
-        print(paths)
+
         if len(paths) > 0:
             self.drawing.add_paths(paths)
         if add_curves:
             self.drawing.add_random_shapes(self.num_paths)
 
-        if len(self.drawing.traces) > 0 and self.drawing.img is not None:
+        if self.drawing.img is not None:
             self.initialize_variables()
             self.initialize_optimizer()            
 
@@ -321,7 +321,7 @@ class CICADA:
             # logging.info(result)
             pass
 
-    def draw(self, data):
+    def use_sketch(self, data):
         logging.info("Updating...")
         self.iteration = 0
         self.frame_size = data["data"]["frame_size"]
@@ -340,7 +340,7 @@ class CICADA:
         self.resizeScaleFactor = 224 / self.frame_size
 
 
-    def continue_update_sketch(self, data):
+    def use_latest_sketch(self, data):
         logging.info("Adding changes...")
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
             data["data"]["fixation"])
@@ -366,7 +366,7 @@ class CICADA:
                 logging.info("Iteration failed on: ", self.index)
                 await self.stop()
 
-    def run_async(self):
+    def draw(self):
         if len(self.drawing.traces) > 0 and self.drawing.img is not None:
             self.is_running = True  # for loop to continue
             loop = asyncio.get_running_loop()
