@@ -124,7 +124,7 @@ copyHandler.addEventListener("click", (e) => {
     controller.transformGroup.selected = false; //deselect og
 
     ungroup();
-    inserted.forEach((pathCopy) => (pathCopy.data.fixed = true)); //save to user paths
+    // inserted.forEach((pathCopy) => (pathCopy.data.fixed = true)); //save to user paths
     createGroup(inserted);
     fitToSelection(getSelectedPaths(), "moving");
     updateSelectUI();
