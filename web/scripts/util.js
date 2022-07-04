@@ -137,7 +137,7 @@ const deleteItems = () => {
         controller.continueSketch();
         controller.liveCollab = false;
     }
-    logger.event("deleted-path");
+    // logger.event("deleted-path");
 };
 
 const getHistoryBatch = (maxSize, startIdx) => {
@@ -247,7 +247,8 @@ const download = () => {
     logger.event("save-sketch");
 
     if (!useAI) {
-        location.reload();
+        userLayer.clear();
+        loadPartial();
     }
 };
 
@@ -280,6 +281,9 @@ const loadResponse = (result) => {
 
 const updateMain = (result) => {
     incrementHistory();
+    // set i?
+    controller.lastIteration = result.iterations;
+
     // if (controller.numTraces > 1) {
     //     showTraceHistoryFrom(sketchHistory.historyHolder.length - 1);
     // } else {
@@ -292,4 +296,27 @@ const updateMain = (result) => {
     );
     // }
     // calcRollingLoss();
+};
+
+const loadPartial = () => {
+    const scaleTo = userLayer.view.viewSize.width;
+    const idx = Math.floor(Math.random() * partialSketches.length);
+    const partial = partialSketches[idx][0];
+    const drawPrompt = partialSketches[idx][1];
+    document.getElementById("partial-message").innerHTML = drawPrompt;
+    let loadedPartial = userLayer.importSVG(partial);
+
+    loadedPartial.getItems().forEach((item) => {
+        if (item instanceof Path) {
+            let newElem = userLayer.addChild(item.clone());
+            newElem.data.fixed = true;
+            newElem.strokeCap = "round";
+            newElem.strokeJoin = "round";
+        }
+    });
+    loadedPartial.remove();
+    scaleGroup(userLayer, scaleTo);
+    mainSketch.svg = paper.project.exportSVG({
+        asString: true,
+    });
 };

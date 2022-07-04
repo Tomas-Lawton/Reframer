@@ -39,7 +39,7 @@ class SketchHistory {
             this.pushRedo();
             this.sketch.sketchLayer.clear();
             this.sketch.load(1, last.svg); //change to fixed list
-            logger.event("undo");
+            // logger.event("undo");
 
             this.undoStack.length === 0 &&
                 (document.getElementById("undo").style.color = "#757575");
@@ -53,7 +53,7 @@ class SketchHistory {
             this.pushUndo();
             this.sketch.sketchLayer.clear();
             this.sketch.load(1, last.svg); //change to fixed list
-            logger.event("redo");
+            // logger.event("redo");
 
             this.redoStack.length === 0 &&
                 (document.getElementById("redo").style.color = "#757575");
@@ -96,7 +96,7 @@ class Controller {
             "pause",
         ];
         this.lastHistoryIndex = 0;
-        this.penDropMode = "select";
+        // this.penDropMode = "select";
         this.sketchScopeIndex = 0;
         // TODO Refactor
         this.buttonControlLeft = true;

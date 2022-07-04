@@ -152,17 +152,20 @@ body {
 
 #sliding-overlay {
     position: absolute;
-    z-index: 11;
+    z-index: 100;
     left: 0;
     right: 0;
-    background-color: #59cdff;
+    /* background-color: #59cdff; */
+    background-color: #ffffff;
+    /* background: #f5f5f5; */
     width: 100%;
     transition: 0.5s ease;
     display: flex;
     justify-content: center;
     align-items: center;
-    bottom: 100%;
-    display: none;
+    height: 100%;
+    /* bottom: 100%; */
+    /* display: none; */
 }
 
 #hero-content {
@@ -170,14 +173,23 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #ffffff;
+    /* background-color: #ffffff; */
     padding: 60px;
     border-radius: 1em;
-    box-shadow: 0 5px 10px rgba(67, 67, 67, 0.19), 0 3px 3px rgba(101, 101, 101, 0.23);
+    /* box-shadow: 0 5px 10px rgba(67, 67, 67, 0.19), 0 3px 3px rgba(101, 101, 101, 0.23); */
+}
+
+#hero-content div {
+    width: 100%;
 }
 
 #hero-content button {
     width: 70px;
+    margin-left: 5px;
+}
+
+#user-name {
+    width: 100%;
 }
 
 
@@ -406,7 +418,10 @@ hr {
     padding: 0.6em 0;
     border-radius: 0 0 0.5em 0.5em;
     box-shadow: 3px 3px 8px rgb(48 48 48 / 18%);
-    top: 0;
+    /* top: 0; */
+    /* bottom: 0; */
+    top: 100vh;
+    transform: translateY(-100%);
     width: 100%;
     align-items: center;
     flex-flow: wrap;
@@ -486,7 +501,7 @@ hr {
 
 .flex {
     display: flex;
-    align-items: center;
+    /* align-items: center; */
     justify-content: space-between;
 }
 
@@ -694,7 +709,7 @@ hr {
     width: 100%;
 }
 
-#prompt-input {
+.prompt-input {
     border-radius: 3.5em;
     display: flex;
     /* padding: 0.6em; */
@@ -725,14 +740,14 @@ input:focus {
     color: #7b66ff;
 } */
 
-#prompt-input i {
+.prompt-input i {
     margin-right: 0.8em;
     font-size: 0.8em;
     color: #7b66ff;
     cursor: pointer;
 }
 
-#prompt-input input {
+.prompt-input input {
     margin: 0.1em;
     padding: -0.1em;
     font-size: 0.8em;
@@ -999,6 +1014,7 @@ input:focus {
 
 .simple-hover:hover {
     background-color: rgb(69, 69, 69);
+    transition: 0.3s;
 }
 
 .selected-mode {
@@ -1222,7 +1238,7 @@ input[type="number"] {
 }
 
 #explore-margin {
-    z-index: 10;
+    z-index: 50;
     /* background: #e7e7e7; */
     background: #f8f7f7;
     border-radius: 1em;
@@ -1245,7 +1261,7 @@ input[type="number"] {
     /* height: 100%; */
     /* width: 20vw; */
     /* width: 19vw; */
-    max-width: 300px;
+    /* max-width: 300px; */
 }
 
 #static-sketches {
@@ -1798,7 +1814,8 @@ input[type="range"]::-webkit-slider-thumb {
     height: 28px;
     width: 28px;
     border-radius: 41px;
-    margin-top: -8px;
+    /* margin-top: -8px; */
+    margin-top: -2px;
     background: #7b66ff;
     cursor: pointer;
     -webkit-appearance: none;
@@ -1869,12 +1886,14 @@ input[type="range"]::-moz-range-thumb {
 
 #pen-controls {
     border-radius: 0 0 1.5em 0;
-    padding: 0 1em;
 }
 
 #top-action-right {
     border-radius: 0 0 0 1.5em;
-    padding: 0 1em;
+}
+
+#top-action-right p {
+    margin-left: 1em;
 }
 
 #undo {
@@ -1908,16 +1927,25 @@ input[type="range"]::-moz-range-thumb {
         background: limegreen;
         width: 100%;
     }
+    .top-center {
+        transform: initial;
+    }
 }
 
 @media screen and (min-width: 700px) {
     #top-action-right {
         display: initial;
         right: 0;
+        padding: 0.2em 0.5em;
+    }
+    #pen-controls {
+        padding: 0.2em 0.5em;
     }
     #static-margin {
         /* width: 16vw; */
         width: 25vw;
+        /* max-width: initial; */
+        max-width: 300px;
     }
     #content {
         flex-direction: initial;
@@ -1934,7 +1962,8 @@ input[type="range"]::-moz-range-thumb {
     .top-center {
         width: auto;
         left: 50%;
-        transform: translateX(-50%);
+        /* transform: translateX(-50%); */
+        transform: translate(-50%, -100%);
         display: flex;
     }
     #rolling-loss {
@@ -1968,6 +1997,7 @@ input[type="range"]::-moz-range-thumb {
         top: 20%;
         /* display: flex; */
         width: 30%;
+        min-width: 320px;
     }
     #sketchbook-panel {
         /* width: 26em; */
@@ -1982,7 +2012,7 @@ input[type="range"]::-moz-range-thumb {
         /* margin: 0.5em 0; */
         margin: 1em 0;
     }
-    .swatches {
+    /* .swatches {
         display: flex;
         width: 100%;
         background: #f5f5f5;
@@ -1994,7 +2024,7 @@ input[type="range"]::-moz-range-thumb {
         width: 0.6em;
         height: 0.6em;
         border-radius: 0.4em;
-    }
+    } */
     .picker_sl {
         box-shadow: none !important;
     }

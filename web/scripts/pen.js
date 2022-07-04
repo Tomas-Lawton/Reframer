@@ -237,6 +237,10 @@ sketchTool.onMouseUp = function() {
             break;
         case "lasso":
             if (socket) {
+                mainSketch.svg = paper.project.exportSVG({
+                    asString: true,
+                });
+                logger.event("start-draw-region");
                 regionPath.remove();
                 controller.resetMetaControls(); //reset since not continuing
                 controller.draw(true);
@@ -329,7 +333,7 @@ sketchTool.onMouseUp = function() {
         asString: true,
     });
     setLineLabels(userLayer);
-    logger.event(controller.penMode + "-up");
+    // logger.event(controller.penMode + "-up");
 
     console.log(userLayer);
 };
@@ -341,39 +345,42 @@ const setPenMode = (mode, accentTarget) => {
         mode.classList.add("simple-hover");
     });
 
-    if (accentTarget) {
-        accentTarget.classList.add("selected-mode");
-        accentTarget.classList.remove("simple-hover");
-    }
     switch (mode) {
-        case "pen-drop":
-            if (useAI) {
-                if (dropdown.style.display !== "flex") {
-                    dropdown.style.display = "flex";
-                    dropdown.style.top =
-                        buttonPanel.getBoundingClientRect().bottom + "px";
-                    dropdown.style.left =
-                        penDrop.getBoundingClientRect().left +
-                        penDrop.getBoundingClientRect().width / 2 +
-                        "px";
-                    setPenMode(controller.penDropMode, penDrop);
-                } else {
-                    dropdown.style.display = "none";
-                }
-            } else {
-                setPenMode("select", penDrop);
-            }
+        // case "pen-drop":
+        //     if (useAI) {
+        //         if (dropdown.style.display !== "flex") {
+        //             dropdown.style.display = "flex";
+        //             dropdown.style.top =
+        //                 buttonPanel.getBoundingClientRect().bottom + "px";
+        //             dropdown.style.left =
+        //                 penDrop.getBoundingClientRect().left +
+        //                 penDrop.getBoundingClientRect().width / 2 +
+        //                 "px";
+        //             setPenMode(controller.penDropMode, penDrop);
+        //         } else {
+        //             dropdown.style.display = "none";
+        //         }
+        //     } else {
+        //         setPenMode("select", penDrop);
+        //     }
 
-            break;
+        //     break;
         case "erase":
-            canvas.style.cursor = "url('public/erase.svg') 8 11, move";
-
-            if (useAI) {
-                dropdown.style.display = "none";
+            if (accentTarget) {
+                accentTarget.classList.add("selected-mode");
+                accentTarget.classList.remove("simple-hover");
             }
+            canvas.style.cursor = "url('public/erase.svg') 8 11, move";
+            // if (useAI) {
+            //     dropdown.style.display = "none";
+            // }
             controller.penMode = mode;
             break;
         case "pen":
+            if (accentTarget) {
+                accentTarget.classList.add("selected-mode");
+                accentTarget.classList.remove("simple-hover");
+            }
             canvas.style.cursor = "url('public/pen.svg') -1 20, move";
 
             let swatches = document.getElementById("swatches");
@@ -390,23 +397,24 @@ const setPenMode = (mode, accentTarget) => {
                     swatches.style.display = "none";
                 }
             }
-            dropdown.style.display = "none";
+            // dropdown.style.display = "none";
             controller.penMode = mode;
             "pen";
             break;
         case "select":
+            if (accentTarget) {
+                accentTarget.classList.add("selected-mode");
+                accentTarget.classList.remove("simple-hover");
+            }
             canvas.style.cursor = "url('public/select.svg') 3 2, move";
-
-            penDrop.classList.add("selected-mode");
-            penDrop.classList.remove("fa-eraser");
-            penDrop.classList.remove("fa-object-group");
-            penDrop.classList.add("fa-arrow-pointer");
+            // penDrop.classList.add("selected-mode");
+            // penDrop.classList.remove("fa-eraser");
+            // penDrop.classList.remove("fa-object-group");
+            // penDrop.classList.add("fa-arrow-pointer");
             controller.penMode = mode;
-            controller.penDropMode = mode;
+            // controller.penDropMode = mode;
             break;
         case "lasso":
-            canvas.style.cursor = "crosshair";
-
             if (noPrompt()) {
                 controller.penMode = lastPenMode;
                 openModal({
@@ -415,15 +423,26 @@ const setPenMode = (mode, accentTarget) => {
                     confirmAction: () => (controlPanel.style.display = "flex"),
                 });
             } else {
-                penDrop.classList.add("selected-mode");
-                penDrop.classList.remove("fa-eraser");
-                penDrop.classList.remove("fa-arrow-pointer");
-                penDrop.classList.add("fa-object-group");
-                controller.penMode = mode;
-                controller.penDropMode = mode;
+                if (socket) {
+                    if (accentTarget) {
+                        accentTarget.classList.add("selected-mode");
+                        accentTarget.classList.remove("simple-hover");
+                    }
+                    // penDrop.classList.add("selected-mode");
+                    // penDrop.classList.remove("fa-eraser");
+                    // penDrop.classList.remove("fa-arrow-pointer");
+                    // penDrop.classList.add("fa-object-group");
+                    canvas.style.cursor = "crosshair";
+                    controller.penMode = mode;
+                    // controller.penDropMode = mode;
+                }
             }
             break;
         case "dropper":
+            if (accentTarget) {
+                accentTarget.classList.add("selected-mode");
+                accentTarget.classList.remove("simple-hover");
+            }
             canvas.style.cursor = "url('public/dropper.svg') -1 20, move";
 
             controller.penMode = mode;
@@ -439,7 +458,11 @@ const setPenMode = (mode, accentTarget) => {
     if (controller.penMode !== "lasso" && controller.penMode !== "select") {
         controller.drawRegion = undefined;
         if (regionPath) regionPath.remove();
-        penDrop.classList.remove("selected-mode");
+        // penDrop.classList.remove("selected-mode");
+    }
+
+    if (controller.penMode !== "dropper") {
+        document.getElementById("dropper").style.color = "#363636";
     }
     // if (controller.penMode !== "dropper") {
     // document.getElementById("dropper").style.color = "#363636";

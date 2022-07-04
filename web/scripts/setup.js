@@ -29,13 +29,17 @@ if (useAI) {
     document.getElementById("partial-message").style.display = "block";
     document.getElementById("ai-content").style.display = "none";
     document.getElementById("tabs").remove();
+
+    document
+        .querySelectorAll(".ai-ui")
+        .forEach((aiItem) => (aiItem.display = "none"));
 }
 
 // Sketching UI
 const canvas = document.getElementById("canvas");
 // General UI
 const prompt = document.getElementById("messageText");
-const promptInput = document.getElementById("prompt-input");
+// const promptInput = document.getElementById("prompt-input");
 const modal = document.getElementById("modal");
 const controlPanel = document.getElementById("control-panel");
 const sketchBook = document.getElementById("sketchbook-panel");
@@ -49,8 +53,8 @@ const selectDot = document.getElementById("contain-pen-dot");
 const alphaSlider = document.getElementById("alpha-slider");
 const stopButton = document.getElementById("stop");
 const buttonPanel = document.querySelector(".top-action");
-const dropdown = document.getElementById("pen-dropdown");
-const penDrop = document.getElementById("pen-drop");
+// const dropdown = document.getElementById("pen-dropdown");
+// const penDrop = document.getElementById("pen-drop");
 const aiMessage = document.getElementById("message");
 const sketchContainer = document.getElementById("canvas-drop");
 const staticSketches = document.getElementById("static-sketches");

@@ -56,7 +56,7 @@ const drawingFinished = () => {
     document.getElementById("spinner").style.display = "none";
     document.getElementById("control-lines").style.display = "block";
 
-    promptInput.style.display = "flex";
+    prompt.parentElement.style.display = "flex";
     // document.getElementById("add-refine").style.display = "none";
     document.getElementById("lasso").classList.remove("inactive-top-action");
     document.getElementById("undo").classList.remove("inactive-top-action");
@@ -99,7 +99,7 @@ const setActionUI = (state) => {
         document.getElementById("undo").classList.add("inactive-top-action");
         document.getElementById("redo").classList.add("inactive-top-action");
 
-        promptInput.style.display = "none";
+        prompt.parentElement.style.display = "none";
         document.getElementById("spinner").style.display = "flex";
 
         // document.getElementById("add-refine").style.display = "block";
