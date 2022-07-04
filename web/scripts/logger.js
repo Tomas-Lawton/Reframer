@@ -15,8 +15,8 @@ class UserData {
             logEventAPI({
                 log_time: new Date().toISOString(),
                 user_id: self.uuid,
-                user_name: self.userName,
                 recorded_data: {
+                    user_name: self.userName,
                     event_type: eventType,
                     event_count: self.events,
                     data: {
