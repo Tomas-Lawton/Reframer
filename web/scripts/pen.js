@@ -108,10 +108,13 @@ sketchTool.onMouseDown = function(event) {
             let col = hitResult ? hitResult.item.strokeColor._canvasStyle : "#ffffff";
             controller.strokeColor = col;
             controller.alpha = controller.strokeColor.alpha || 1;
+            console.log(controller.alpha);
             setThisColor(controller.strokeColor);
             picker.setColor(controller.strokeColor, true);
+            console.log(controller.strokeColor);
+
             alphaSlider.value =
-                parseFloat(controller.strokeColor.split(",")[3]) * 100 || 1;
+                parseFloat(controller.strokeColor.split(",")[3] || 1) * 100;
             hitResult && setPointSize(hitResult.item.strokeWidth);
     }
 };
