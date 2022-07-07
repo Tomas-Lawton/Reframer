@@ -4,8 +4,8 @@
 
 // local
 const http = "http://";
-const base = "localhost:8000";
-
+// const base = "localhost:8000";
+const base = "0.0.0.0:8000"
 const useAI = true;
 let socket = false;
 

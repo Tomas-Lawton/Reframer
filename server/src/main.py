@@ -26,6 +26,7 @@ origins = [
     "https://tomas-lawton.github.io/drawing-client",
     "https://tomas-lawton.github.io",
     "http://localhost:5500",
+    "http://127.0.0.1:5500"
 ]
 
 app.add_middleware(

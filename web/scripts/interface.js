@@ -150,6 +150,7 @@ fixedHandler.addEventListener("click", (e) => {
 document.getElementById("begin").addEventListener("click", () => {
     if (logger.userName !== "" && logger.userName !== undefined) {
         document.getElementById("sliding-overlay").style.bottom = "100%";
+        logger.event("begin-piliot")
     }
 });
 
@@ -703,11 +704,6 @@ for (let i = 0; i < 4; i++) {
 // sketchBook.style.left =
 //     window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";
 
-// if (window.innerWidth <= 700 || window.innerWidth >= 1000) {
-//     document
-//         .querySelectorAll(".hide-swatch")
-//         .forEach((elem) => elem.classList.remove("hide-swatch"));
-// }
 
 if (window.innerWidth <= 700) {
     penControls.appendChild(document.getElementById("scrapbook"));

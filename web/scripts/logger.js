@@ -13,7 +13,7 @@ class UserData {
         ) {
             console.log("Logging: ", eventType, "\n at ", new Date().toISOString());
             logEventAPI({
-                log_time: new Date().toISOString(),
+                log_time: new Date(),
                 user_id: self.uuid,
                 recorded_data: {
                     user_name: self.userName,
