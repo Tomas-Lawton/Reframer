@@ -150,7 +150,7 @@ fixedHandler.addEventListener("click", (e) => {
 document.getElementById("begin").addEventListener("click", () => {
     if (logger.userName !== "" && logger.userName !== undefined) {
         document.getElementById("sliding-overlay").style.bottom = "100%";
-        logger.event("begin-piliot")
+        logger.event("begin-pilot");
     }
 });
 
@@ -704,14 +704,13 @@ for (let i = 0; i < 4; i++) {
 // sketchBook.style.left =
 //     window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";
 
-
 if (window.innerWidth <= 700) {
     penControls.appendChild(document.getElementById("scrapbook"));
     penControls.appendChild(document.getElementById("delete"));
     sketchBook.style.display = "none";
-    palette.classList.toggle("panel-open");
+    document.getElementById("scrapbook").classList.toggle("panel-open");
+    document.getElementById("palette").classList.toggle("panel-open");
     controlPanel.style.display = "none";
-    controlPanel.classList.toggle("panel-open");
 
     let saveText = document.createElement("p");
     saveText.innerHTML = "Next";

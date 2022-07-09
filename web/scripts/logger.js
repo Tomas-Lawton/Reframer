@@ -1,24 +1,25 @@
 class UserData {
     constructor() {
-        self.uuid = "id" + Math.random().toString(16).slice(2);
-        self.events = 0;
-        self.eventLog = [];
-        self.userName = "";
+        this.uuid = "id" + Math.random().toString(16).slice(2);
+        this.events = 0;
+        this.eventLog = [];
+        this.userName = "";
     }
     event(eventType) {
         if (
             useAI ||
             (!useAI && eventType === "save-sketch") ||
-            eventType === "clear-sketch"
+            eventType === "clear-sketch" ||
+            eventType === "begin-pilot"
         ) {
             console.log("Logging: ", eventType, "\n at ", new Date().toISOString());
             logEventAPI({
                 log_time: new Date(),
-                user_id: self.uuid,
+                user_id: this.uuid,
                 recorded_data: {
-                    user_name: self.userName,
+                    user_name: this.userName,
                     event_type: eventType,
-                    event_count: self.events,
+                    event_count: this.events,
                     data: {
                         prompt: controller.prompt,
                         svg: mainSketch.svg,
@@ -30,7 +31,7 @@ class UserData {
                     },
                 },
             });
-            self.events += 1;
+            this.events += 1;
         }
     }
 }

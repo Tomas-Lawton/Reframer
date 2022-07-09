@@ -224,6 +224,11 @@ const download = () => {
     userLayer.getItems().forEach((path) => {
         path.selected = false;
     });
+    mainSketch.svg = paper.project.exportSVG({
+        asString: true,
+    });
+
+    logger.event("save-sketch");
 
     canvas.toBlob((blob) => {
         let url = window.URL || window.webkitURL;
@@ -238,18 +243,23 @@ const download = () => {
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+
+            let b = document.createElement("a");
+            let text = mainSketch.svg;
+            b.setAttribute(
+                "href",
+                "data:text/plain;charset=utf-8," + encodeURIComponent(text)
+            );
+            b.setAttribute("download", "sketch.txt");
+            document.body.appendChild(b);
+            b.click();
+            document.body.removeChild(b);
+        }
+        if (!useAI) {
+            userLayer.clear();
+            loadPartial();
         }
     });
-
-    mainSketch.svg = paper.project.exportSVG({
-        asString: true,
-    });
-    logger.event("save-sketch");
-
-    if (!useAI) {
-        userLayer.clear();
-        loadPartial();
-    }
 };
 
 const loadResponse = (result) => {
