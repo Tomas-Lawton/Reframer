@@ -284,41 +284,43 @@ sketchTool.onMouseUp = function() {
                 let frameUI = lastFrameParent;
                 let input = frameUI.querySelector("input");
                 let closeFrame = frameUI.querySelector("i");
+                let dragCorner = frameUI.querySelector("div");
 
                 let tag = document.createElement("li");
                 let localPrompt = document.createElement("p");
                 let circle = document.createElement("div");
                 circle.style.background =
-                    lastFrameParent.querySelector("input").style.background;
+                    frameUI.querySelector("input").style.background;
                 tag.appendChild(circle);
                 tag.appendChild(localPrompt);
                 localPrompts.querySelector("ul").appendChild(tag);
 
                 let i = mainSketch.localFrames.length;
 
-                lastFrameParent.addEventListener("input", (e) => {
+                frameUI.addEventListener("input", (e) => {
                     localPrompt.innerHTML = e.target.value;
                     mainSketch.localFrames[i].data.prompt = e.target.value;
                 });
 
                 tag.addEventListener("click", (e) => {
                     input.focus();
-                    localPrompts
-                        .querySelector("ul")
-                        .querySelectorAll("li")
-                        .forEach((localTag) => (localTag.style.background = "transparent"));
+                    mainSketch.localFrames.forEach((elem) => {
+                        elem.tag.style.background = "transparent";
+                        elem.frame.style.opacity = 1;
+                    });
+
+                    frameUI.style.opacity = 0.7;
                     tag.style.background = "#413d60";
                 });
 
                 closeFrame.addEventListener("click", (e) => {
-                    //    delete
                     mainSketch.localFrames.splice(i, 1);
                     tag.remove();
                     frameUI.remove();
                     newFrame.remove();
                 });
 
-                frameUI.onmousedown = (e) => {
+                input.onmousedown = (e) => {
                     if (window.innerWidth > 700) {
                         e = e || window.event;
                         pos3 = e.clientX;
@@ -326,14 +328,45 @@ sketchTool.onMouseUp = function() {
                         document.onmouseup = closeDragElement;
                         document.onmousemove = (e) => {
                             elementDrag(e, frameUI);
-                            // also update the rect position
-                            console.log(e);
                             newFrame.position.x += e.movementX;
                             newFrame.position.y += e.movementY;
-                            // newFrame.
-                            // update the frame data
+
+                            mainSketch.localFrames[i].data.points = {
+                                x1: topLeft.x,
+                                y1: topLeft.y,
+                                x2: bottomRight.x,
+                                y2: bottomRight.y,
+                            };
                         };
-                        console.log("dragging");
+                    }
+                };
+
+                dragCorner.onmousedown = (e) => {
+                    if (window.innerWidth > 700) {
+                        e = e || window.event;
+                        pos3 = e.clientX;
+                        pos4 = e.clientY;
+                        document.onmouseup = closeDragElement;
+                        document.onmousemove = (e) => {
+                            // update other rects to do this instead
+                            newFrame.bounds.width += e.movementX;
+                            newFrame.bounds.height += e.movementY;
+                            frameUI.style.width = newFrame.bounds.width + "px";
+                            dragCorner.style.top =
+                                newFrame.bounds.height + frameUI.clientHeight + "px";
+                            dragCorner.style.left = newFrame.bounds.width + "px";
+
+                            let topLeft = newFrame.bounds.topLeft;
+                            let bottomRight = newFrame.bounds.bottomRight;
+
+                            mainSketch.localFrames[i].data.points = {
+                                x1: topLeft.x,
+                                y1: topLeft.y,
+                                x2: bottomRight.x,
+                                y2: bottomRight.y,
+                            };
+                            frameUI.querySelector("input").focus();
+                        };
                     }
                 };
 
@@ -342,7 +375,7 @@ sketchTool.onMouseUp = function() {
 
                 mainSketch.localFrames.push({
                     tag: tag,
-                    frame: lastFrameParent,
+                    frame: frameUI,
                     paperFrame: newFrame,
                     data: {
                         prompt: "default",
@@ -355,7 +388,7 @@ sketchTool.onMouseUp = function() {
                     },
                 });
 
-                lastFrameParent.querySelector("input").focus();
+                frameUI.querySelector("input").focus();
             }
             break;
         case "erase":

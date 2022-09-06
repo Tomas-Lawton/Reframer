@@ -555,9 +555,10 @@ mainSketch = new Sketch("main-sketch", scope, frame, "main");
 mainSketch.svg = paper.project.exportSVG({
     asString: true,
 }); //for svg parsing
-mainSketch.frameLayer = new Layer();
-mainSketch.sketchLayer = new Layer();
 
+mainSketch.sketchLayer = new Layer();
+mainSketch.frameLayer = new Layer();
+mainSketch.frameLayer.activate();
 // console.log(mainSketch.sketchLayer);
 
 sketchHistory = new SketchHistory(mainSketch);

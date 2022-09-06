@@ -1893,7 +1893,6 @@ input[type="range"]::-moz-range-thumb {
     display: flex;
     justify-content: space-between;
     color: white;
-    /* margin-left: -1px; */
 }
 
 .frame-parent input {
@@ -1902,9 +1901,11 @@ input[type="range"]::-moz-range-thumb {
     padding: 0.3em 0.2em 0 0.5em;
     color: white;
     border: none;
-    width: calc(100% - 50px);
+    width: calc(100% - 49px);
     font-weight: lighter;
     font-size: 0.6em;
+    margin: -1px 0 0 -0.5px;
+    z-index: 5;
 }
 
 .frame-parent input:focus {
@@ -1926,6 +1927,7 @@ input[type="range"]::-moz-range-thumb {
     height: 10px;
     cursor: se-resize;
     margin: -11.5px 0 0 -11.5px;
+    z-index: 1;
 }
 
 #local-prompts {
