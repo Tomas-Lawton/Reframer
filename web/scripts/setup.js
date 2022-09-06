@@ -138,9 +138,13 @@ const rectangleOptions = {
     selected: true,
 };
 
+const frameOptions = {
+    fillColor: "rgba(217, 217, 217, 0.24)",
+    strokeColor: "#7000FF",
+    selected: false,
+};
+
 const minSelectionWidth = 65;
-const frames = [];
-let lastFrameParent;
 
 const frameColors = [
     "#EF3054",

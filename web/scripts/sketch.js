@@ -128,44 +128,31 @@ class Controller {
     updateDrawer({
         status,
         sketch,
-        hasRegion,
         frameSize,
         prompt,
         lines,
         sketchScopeIndex,
         fixation,
+        frames,
     }) {
         this.isFirstIteration = true; //reset canvas
         this.lastPrompt = prompt;
-        const canvasBounds = canvas.getBoundingClientRect(); //avoid canvas width glitches
         const res = {
             status: status,
             data: {
                 prompt: prompt,
-                // svg: svg,
                 sketch,
                 random_curves: lines,
                 frame_size: frameSize,
                 fixation: fixation,
-                region: {
-                    activate: hasRegion,
-                    x1: this.drawRegion ? this.drawRegion.x : 0,
-                    y1: this.drawRegion ? canvasBounds.height - this.drawRegion.y : 0,
-                    x2: this.drawRegion ?
-                        this.drawRegion.x + this.drawRegion.width :
-                        canvasBounds.width,
-                    y2: this.drawRegion ?
-                        canvasBounds.height - this.drawRegion.y - this.drawRegion.height // use non-web y coords
-                        :
-                        canvasBounds.height, // same as width
-                },
+                frames: frames,
                 sketch_index: sketchScopeIndex,
             },
         };
         console.log(res);
         ws.send(JSON.stringify(res));
     }
-    draw(withRegion = false, svg = null) {
+    draw(svg = null) {
         if (noPrompt()) {
             openModal({
                 title: "Type a prompt first!",
@@ -180,15 +167,14 @@ class Controller {
             // setPenMode("select", penDrop);
             this.prepare();
             this.resetMetaControls();
-
             this.updateDrawer({
                 status: "draw",
                 sketch: mainSketch.sketch,
-                hasRegion: withRegion,
                 frameSize: mainSketch.frameSize,
                 prompt: this.prompt,
                 lines: this.initRandomCurves ? this.addLines : 0, //adding
                 fixation: this.useFixation,
+                frames: mainSketch.localFrames.data,
             });
             this.step = 0;
             setActionUI("drawing");
@@ -202,19 +188,17 @@ class Controller {
                 console.error("sketch size not found");
             }
             this.targetDrawing = true;
-
             this.prepare();
             this.resetMetaControls();
-
             this.updateDrawer({
                 status: "add_new_sketch",
                 sketch: mainSketch.sketch,
-                hasRegion: false,
                 frameSize: mainSketch.frameSize,
                 prompt: this.prompt,
                 lines: this.addLines,
                 sketchScopeIndex: sketchCountIndex,
                 fixation: this.useFixation,
+                frames: mainSketch.localFrames.data,
             });
         }
     }
@@ -267,7 +251,6 @@ class Controller {
             this.updateDrawer({
                 status: "prune",
                 sketch: mainSketch.sketch,
-                hasRegion: false,
                 frameSize: mainSketch.frameSize,
                 prompt: this.prompt,
                 lines: this.initRandomCurves ? this.addLines : 0, //adding
@@ -293,14 +276,11 @@ class Controller {
     }
     prepare() {
         sketchHistory.clear();
-        // make sure correct
         ungroup();
         mainSketch.sketchLayer.getItems().forEach((path) => {
             path.selected = false;
         });
-
         mainSketch.buildSketch();
-
         setLineLabels(mainSketch.sketchLayer);
         document.getElementById("calc-lines").innerHTML = `Add : 0`;
     }
@@ -325,6 +305,7 @@ class Sketch {
         this.elem; //DOM elem
         this.sketchLayer;
         this.frameSize = size;
+        this.localFrames = [];
         // Fixed path list???
 
         controller.sketches[this.i] = this;

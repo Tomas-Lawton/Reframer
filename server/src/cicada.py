@@ -80,7 +80,6 @@ class CICADA:
         self.drawing = Sketch(canvas_w, canvas_h)
 
         self.is_active = True
-        self.drawing.update_region(self.region, self.normaliseScaleFactor)
         paths = self.extract_points(self.sketch_data)
 
         if len(paths) > 0:
@@ -332,7 +331,6 @@ class CICADA:
         self.frame_size = data["data"]["frame_size"]
         self.num_paths = data["data"]["random_curves"]
         self.sketch_data = data["data"]["sketch"]
-        self.region = data["data"]["region"]
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
             data["data"]["fixation"])
         self.text_features = self.encode_text_classes([data["data"]["prompt"]])

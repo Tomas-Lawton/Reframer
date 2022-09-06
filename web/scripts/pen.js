@@ -7,7 +7,8 @@ let sketchTimer,
     mask,
     selectBox,
     firstPoint,
-    firstErasePoint;
+    firstErasePoint,
+    lastFrameParent;
 
 sketchTool.onMouseDown = function(event) {
     console.log(mainSketch.sketchLayer.children);
@@ -84,17 +85,24 @@ sketchTool.onMouseDown = function(event) {
             lastFrameParent.classList.add("frame-parent");
             let frameInput = document.createElement("input");
             let frameCross = document.createElement("i");
+            let dragIcon = document.createElement("div");
+
             frameCross.classList.add("fa-solid", "fa-xmark");
             frameInput.style.background = frameCol;
             frameCross.style.background = frameCol;
             lastFrameParent.appendChild(frameInput);
             lastFrameParent.appendChild(frameCross);
+            lastFrameParent.appendChild(dragIcon);
             sketchContainer.appendChild(lastFrameParent);
 
             lastFrameParent.style.top =
                 controller.drawRegion.top - lastFrameParent.clientHeight + "px";
             lastFrameParent.style.left = controller.drawRegion.left + "px";
             lastFrameParent.width = controller.drawRegion.width + "px";
+
+            dragIcon.style.top =
+                controller.drawRegion.height + lastFrameParent.clientHeight + "px";
+            dragIcon.style.left = controller.drawRegion.width + "px";
             break;
         case "erase":
             sketchHistory.pushUndo();
@@ -177,12 +185,14 @@ sketchTool.onMouseDrag = function(event) {
             controller.drawRegion.height += event.delta.y;
             if (regionPath !== undefined) regionPath.remove(); //remove old one. maybe could update the old one instead?
             regionPath = new Path.Rectangle(controller.drawRegion);
-            regionPath.set(rectangleOptions);
+            regionPath.set(frameOptions);
 
-            lastFrameParent.style.top =
-                controller.drawRegion.top - lastFrameParent.clientHeight + "px";
-            lastFrameParent.style.left = controller.drawRegion.left + "px";
             lastFrameParent.style.width = controller.drawRegion.width + "px";
+
+            let dragIcon = lastFrameParent.querySelector("div");
+            dragIcon.style.top =
+                controller.drawRegion.height + lastFrameParent.clientHeight + "px";
+            dragIcon.style.left = controller.drawRegion.width + "px";
             break;
     }
 };
@@ -269,7 +279,7 @@ sketchTool.onMouseUp = function() {
                 regionPath.remove();
 
                 let newFrame = new Path.Rectangle(controller.drawRegion);
-                newFrame.set(rectangleOptions); //completed
+                newFrame.set(frameOptions); //completed
 
                 let frameUI = lastFrameParent;
                 let input = frameUI.querySelector("input");
@@ -284,8 +294,11 @@ sketchTool.onMouseUp = function() {
                 tag.appendChild(localPrompt);
                 localPrompts.querySelector("ul").appendChild(tag);
 
+                let i = mainSketch.localFrames.length;
+
                 lastFrameParent.addEventListener("input", (e) => {
                     localPrompt.innerHTML = e.target.value;
+                    mainSketch.localFrames[i].data.prompt = e.target.value;
                 });
 
                 tag.addEventListener("click", (e) => {
@@ -297,26 +310,52 @@ sketchTool.onMouseUp = function() {
                     tag.style.background = "#413d60";
                 });
 
-                let i = frames.length;
                 closeFrame.addEventListener("click", (e) => {
                     //    delete
-                    frames.splice(i, 1);
+                    mainSketch.localFrames.splice(i, 1);
                     tag.remove();
                     frameUI.remove();
                     newFrame.remove();
                 });
 
-                frames.push({ tag: tag, frame: lastFrameParent, paperFrame: newFrame });
+                frameUI.onmousedown = (e) => {
+                    if (window.innerWidth > 700) {
+                        e = e || window.event;
+                        pos3 = e.clientX;
+                        pos4 = e.clientY;
+                        document.onmouseup = closeDragElement;
+                        document.onmousemove = (e) => {
+                            elementDrag(e, frameUI);
+                            // also update the rect position
+                            console.log(e);
+                            newFrame.position.x += e.movementX;
+                            newFrame.position.y += e.movementY;
+                            // newFrame.
+                            // update the frame data
+                        };
+                        console.log("dragging");
+                    }
+                };
+
+                let topLeft = newFrame.bounds.topLeft;
+                let bottomRight = newFrame.bounds.bottomRight;
+
+                mainSketch.localFrames.push({
+                    tag: tag,
+                    frame: lastFrameParent,
+                    paperFrame: newFrame,
+                    data: {
+                        prompt: "default",
+                        points: {
+                            x1: topLeft.x,
+                            y1: topLeft.y,
+                            x2: bottomRight.x,
+                            y2: bottomRight.y,
+                        },
+                    },
+                });
+
                 lastFrameParent.querySelector("input").focus();
-
-                // frameParent.width = newFrame
-
-                // frames.push()
-                // create the list item.
-
-                // controller.resetMetaControls(); //reset since not continuing
-                // controller.draw(true);
-                // console.log(mainSketch.sketchLayer);
             }
             break;
         case "erase":

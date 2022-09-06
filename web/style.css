@@ -1893,7 +1893,7 @@ input[type="range"]::-moz-range-thumb {
     display: flex;
     justify-content: space-between;
     color: white;
-    /* margin-top: 1px; */
+    /* margin-left: -1px; */
 }
 
 .frame-parent input {
@@ -1916,6 +1916,16 @@ input[type="range"]::-moz-range-thumb {
     border-radius: 5px 5px 0 0;
     padding: 0.3em 0.5em 0 0.5em;
     font-size: 0.6em;
+}
+
+.frame-parent div {
+    background: white;
+    border: 1px solid #7000ff;
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    cursor: se-resize;
+    margin: -11.5px 0 0 -11.5px;
 }
 
 #local-prompts {
