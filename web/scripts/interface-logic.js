@@ -23,11 +23,13 @@ const emptyExplorer = () => {
     controller.clipDrawing = false;
     // refactor into function
     for (let i = 0; i < 4; i++) {
-        explorer.removeChild(explorer.firstChild);
-        let sketch = new Sketch(null, defaults, sketchSize);
-        let newElem = sketch.renderMini();
-        explorer.appendChild(newElem);
-        newElem.classList.add("inactive-sketch");
+        if (explorer.firstChild) {
+            explorer.removeChild(explorer.firstChild);
+            let sketch = new Sketch(null, defaults, sketchSize);
+            let newElem = sketch.renderMini();
+            explorer.appendChild(newElem);
+            newElem.classList.add("inactive-sketch");
+        }
     }
 };
 
@@ -56,9 +58,8 @@ const drawingFinished = () => {
     document.getElementById("spinner").style.display = "none";
     document.getElementById("control-lines").style.display = "block";
 
-    prompt.parentElement.style.display = "flex";
     // document.getElementById("add-refine").style.display = "none";
-    document.getElementById("lasso").classList.remove("inactive-top-action");
+    // document.getElementById("lasso").classList.remove("inactive-top-action");
     document.getElementById("undo").classList.remove("inactive-top-action");
     document.getElementById("redo").classList.remove("inactive-top-action");
     inactiveStop();
@@ -95,18 +96,19 @@ const setActionUI = (state) => {
             // elem.classList.remove("active");
         });
         redStop();
-        document.getElementById("lasso").classList.add("inactive-top-action");
+        // document.getElementById("lasso").classList.add("inactive-top-action");
         document.getElementById("undo").classList.add("inactive-top-action");
         document.getElementById("redo").classList.add("inactive-top-action");
 
-        prompt.parentElement.style.display = "none";
         document.getElementById("spinner").style.display = "flex";
 
         // document.getElementById("add-refine").style.display = "block";
         // document.getElementById("respect-block").classList.add("inactive-section");
 
         if (state == "drawing") {
-            aiMessage.innerHTML = `Got it! Drawing ${controller.prompt}!`;
+            // aiMessage.innerHTML = `Got it! Drawing ${controller.prompt}!`;
+            aiMessage.innerHTML = `Don't wait. Draw with me!`;
+
             // sketchBook.style.display = "flex";
             // document.getElementById("scrapbook").classList.add("panel-open");
             // document.getElementById("draw").classList.add("active");
@@ -139,6 +141,38 @@ const setActionUI = (state) => {
     }
     controller.drawState = state;
     console.log("Set: ", state);
+};
+
+const stopDrawer = () => {
+    if (socket) {
+        if (
+            controller.drawState === "drawing" ||
+            controller.drawState === "continuing" ||
+            controller.drawState === "pause"
+        ) {
+            if (controller.drawState === "pause") {
+                controller.liveCollab = false;
+            }
+
+            controller.stop(); //flag
+            controller.clipDrawing = false;
+            mainSketch.svg = paper.project.exportSVG({
+                asString: true,
+            });
+            logger.event("stop-drawing");
+        } else if (
+            controller.drawState === "explore" ||
+            controller.drawState === "continue-explore"
+        ) {
+            aiMessage.innerHTML = "All done! What should we draw next?";
+            aiMessage.classList.add("typed-out");
+            killExploratorySketches();
+            setActionUI("stopSingle");
+            controller.clipDrawing = false;
+            // doesn't show explore data
+            logger.event("stop-exploring");
+        }
+    }
 };
 
 // dragging moves select elements + ui
@@ -254,7 +288,6 @@ const openModal = (data) => {
 
     document.getElementById("modal-title").innerHTML = data.title;
     document.getElementById("modal-message").innerHTML = data.message;
-
     document.getElementById("cancel-modal").onclick = () => cancel();
     document.getElementById("modal-cross").onclick = () => close();
     document.getElementById("confirm-modal").onclick = () => {

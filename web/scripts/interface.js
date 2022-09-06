@@ -46,10 +46,9 @@ function dropSketch(e) {
     }
 }
 
-sketchGrid.addEventListener("dragover", dragoverhover);
-// sketchGrid.addEventListener("dragenter", dragentersketches);
-sketchGrid.addEventListener("dragleave", dragleavesketch);
-sketchGrid.addEventListener("drop", dropSketch);
+// sketchGrid.addEventListener("dragover", dragoverhover);
+// sketchGrid.addEventListener("dragleave", dragleavesketch);
+// sketchGrid.addEventListener("drop", dropSketch);
 
 // Drawing Controls
 document.querySelectorAll(".pen-mode").forEach((elem) => {
@@ -79,7 +78,7 @@ document.getElementById("delete").addEventListener("click", () =>
                 asString: true,
             });
             logger.event("clear-sketch");
-            userLayer.clear();
+            mainSketch.sketchLayer.clear();
             modal.style.display = "none";
 
             if (useAI) {
@@ -102,14 +101,6 @@ document.getElementById("delete").addEventListener("click", () =>
         },
     })
 );
-
-document.body.addEventListener("keydown", function(event) {
-    if (document.activeElement !== prompt) {
-        if (event.key == "Delete" || event.key == "Backspace") {
-            deleteItems();
-        }
-    }
-});
 
 deleteHandler.addEventListener("click", (e) => {
     deleteItems();
@@ -147,12 +138,12 @@ fixedHandler.addEventListener("click", (e) => {
     updateFixedUI();
 });
 
-document.getElementById("begin").addEventListener("click", () => {
-    if (logger.userName !== "" && logger.userName !== undefined) {
-        document.getElementById("sliding-overlay").style.bottom = "100%";
-        logger.event("begin-pilot");
-    }
-});
+// document.getElementById("begin").addEventListener("click", () => {
+//     if (logger.userName !== "" && logger.userName !== undefined) {
+//         document.getElementById("sliding-overlay").style.bottom = "100%";
+//         logger.event("begin-pilot");
+//     }
+// });
 
 document.getElementById("undo").addEventListener("click", () => {
     sketchHistory.undo();
@@ -235,7 +226,7 @@ document.getElementById("empty").addEventListener("click", (e) => {
 timeKeeper.oninput = function() {
     if (this.value === 0) return; // 0 is pre-generation state
     historyIndex = this.value;
-    userLayer.clear();
+    mainSketch.sketchLayer.clear();
     if (controller.numTraces > 1) {
         showTraceHistoryFrom(historyIndex);
     } else {
@@ -254,7 +245,9 @@ palette.addEventListener("click", () => {
 });
 
 prompt.addEventListener("input", (e) => {
-    controller.prompt = e.target.value.toLowerCase();
+    // controller.prompt = e.target.value.toLowerCase();
+    controller.prompt = e.target.value;
+
     if (controller.prompt === "") {
         aiMessage.innerHTML = ` What are we drawing?`;
         controllerUI.forEach((elem) => elem.classList.add("inactive-section"));
@@ -262,6 +255,8 @@ prompt.addEventListener("input", (e) => {
         aiMessage.innerHTML = `Ok, ${controller.prompt}.`;
         controllerUI.forEach((elem) => elem.classList.remove("inactive-section"));
     }
+
+    console.log(controller.prompt);
 });
 
 prompt.addEventListener("blur", () => {
@@ -271,9 +266,9 @@ prompt.addEventListener("blur", () => {
     logger.event("set-prompt");
 });
 
-document.getElementById("user-name").addEventListener("input", (e) => {
-    logger.userName = e.target.value;
-});
+// document.getElementById("user-name").addEventListener("input", (e) => {
+//     logger.userName = e.target.value;
+// });
 
 document.getElementById("draw").addEventListener("click", () => {
     if (socket) {
@@ -328,35 +323,7 @@ document.getElementById("explore").addEventListener("click", () => {
 
 stopButton.addEventListener("click", () => {
     console.log(controller.drawState);
-    if (socket) {
-        if (
-            controller.drawState === "drawing" ||
-            controller.drawState === "continuing" ||
-            controller.drawState === "pause"
-        ) {
-            if (controller.drawState === "pause") {
-                controller.liveCollab = false;
-            }
-
-            controller.stop(); //flag
-            controller.clipDrawing = false;
-            mainSketch.svg = paper.project.exportSVG({
-                asString: true,
-            });
-            logger.event("stop-drawing");
-        } else if (
-            controller.drawState === "explore" ||
-            controller.drawState === "continue-explore"
-        ) {
-            aiMessage.innerHTML = "All done! What should we draw next?";
-            aiMessage.classList.add("typed-out");
-            killExploratorySketches();
-            setActionUI("stopSingle");
-            controller.clipDrawing = false;
-            // doesn't show explore data
-            logger.event("stop-exploring");
-        }
-    }
+    stopDrawer();
 });
 
 sendToBack.addEventListener("click", () => {
@@ -371,22 +338,37 @@ moveUp.addEventListener("click", () => {
     controller.boundingBox.insertBelow(thisItem);
 });
 
-document.getElementById("prune").addEventListener("click", () => {
+// document.getElementById("prune").addEventListener("click", () => {
+//     console.log(controller.drawState);
+//     if (socket) {
+//         if (
+//             controller.drawState === "stop" ||
+//             controller.drawState === "stop-prune" ||
+//             controller.drawState === "stopSingle"
+//         ) {
+//             // after  draw
+//             controller.prune();
+//         }
+//         mainSketch.svg = paper.project.exportSVG({
+//             asString: true,
+//         });
+//         logger.event("prune-sketch");
+//     }
+// });
+
+document.getElementById("focus").addEventListener("click", () => {
     console.log(controller.drawState);
-    if (socket) {
-        if (
-            controller.drawState === "stop" ||
-            controller.drawState === "stop-prune" ||
-            controller.drawState === "stopSingle"
-        ) {
-            // after  draw
-            controller.prune();
-        }
-        mainSketch.svg = paper.project.exportSVG({
-            asString: true,
-        });
-        logger.event("prune-sketch");
-    }
+    mainSketch.frameLayer.activate();
+    setPenMode("local", null);
+    // activate focus
+    // open focus panel
+    // allow drawing rectangles on new layer
+    // on mouse up, position UI above active frame
+    // write in local prompt ontop of frame
+    // add to the focus panel
+    //
+
+    // showHide(localPrompts);
 });
 
 document.getElementById("go-back").addEventListener("click", () => {
@@ -403,37 +385,22 @@ document.getElementById("go-back").addEventListener("click", () => {
     }
 });
 
-document.getElementById("random-prompt").addEventListener("click", () => {
-    let randomPrompt =
-        promptList[Math.floor(Math.random() * promptList.length)].toLowerCase();
-    prompt.value = randomPrompt;
-    controller.prompt = randomPrompt;
-    aiMessage.innerHTML = `Ok, ${randomPrompt}.`;
-    document
-        .querySelectorAll(".inactive-section")
-        .forEach((elem) => elem.classList.remove("inactive-section"));
-});
+// document.getElementById("random-prompt").addEventListener("click", () => {
+//     let randomPrompt =
+//         promptList[Math.floor(Math.random() * promptList.length)].toLowerCase();
+//     prompt.value = randomPrompt;
+//     controller.prompt = randomPrompt;
+//     aiMessage.innerHTML = `Ok, ${randomPrompt}.`;
+//     document
+//         .querySelectorAll(".inactive-section")
+//         .forEach((elem) => elem.classList.remove("inactive-section"));
+// });
 
 // Control panel
 
 controlPanel.onmousedown = (e) => {
     if (window.innerWidth > 700) {
-        let content;
-        if (!useAI) {
-            content = document.getElementById("style-content");
-        } else {
-            document.querySelectorAll(".tab-item").forEach((tab) => {
-                if (tab.classList.contains("active-tab")) {
-                    if (tab.id === "collab-tab") {
-                        content = document.getElementById("ai-content");
-                    } else {
-                        content = document.getElementById("style-content");
-                    }
-                }
-            });
-        }
-
-        let bounds = content.getBoundingClientRect();
+        let bounds = document.getElementById("ai-content").getBoundingClientRect();
         e = e || window.event;
         pos3 = e.clientX;
         pos4 = e.clientY;
@@ -449,23 +416,34 @@ controlPanel.onmousedown = (e) => {
     }
 };
 
-sketchBook.onmousedown = (e) => {
+// sketchBook.onmousedown = (e) => {
+//     if (window.innerWidth > 700) {
+//         let content = document.getElementById("static-sketches");
+//         let bounds = content.getBoundingClientRect();
+//         e = e || window.event;
+//         pos3 = e.clientX;
+//         pos4 = e.clientY;
+//         if (
+//             pos3 < bounds.left ||
+//             pos3 > bounds.right ||
+//             pos4 < bounds.top ||
+//             pos4 > bounds.bottom
+//         ) {
+//             document.onmouseup = closeDragElement;
+//             document.onmousemove = (e) => elementDrag(e, sketchBook);
+//             console.log("dragging");
+//         }
+//     }
+// };
+
+localPrompts.onmousedown = (e) => {
     if (window.innerWidth > 700) {
-        let content = document.getElementById("static-sketches");
-        let bounds = content.getBoundingClientRect();
         e = e || window.event;
         pos3 = e.clientX;
         pos4 = e.clientY;
-        if (
-            pos3 < bounds.left ||
-            pos3 > bounds.right ||
-            pos4 < bounds.top ||
-            pos4 > bounds.bottom
-        ) {
-            document.onmouseup = closeDragElement;
-            document.onmousemove = (e) => elementDrag(e, sketchBook);
-            console.log("dragging");
-        }
+        document.onmouseup = closeDragElement;
+        document.onmousemove = (e) => elementDrag(e, localPrompts);
+        console.log("dragging");
     }
 };
 
@@ -540,10 +518,10 @@ document.querySelectorAll(".tab-item").forEach((tab) => {
     });
 });
 
-document.getElementById("scrapbook").addEventListener("click", () => {
-    showHide(sketchBook);
-    document.getElementById("scrapbook").classList.toggle("panel-open");
-});
+// document.getElementById("scrapbook").addEventListener("click", () => {
+//     showHide(sketchBook);
+//     document.getElementById("scrapbook").classList.toggle("panel-open");
+// });
 
 // document.querySelectorAll(".card-icon-background").forEach((elem) => {
 //     elem.addEventListener("click", () => {
@@ -551,34 +529,34 @@ document.getElementById("scrapbook").addEventListener("click", () => {
 //     });
 // });
 
-document.getElementById("save-sketch").addEventListener("click", () => {
-    ungroup();
-    mainSketch.sketchLayer.getItems().forEach((path) => {
-        path.selected = false;
-    });
+// document.getElementById("save-sketch").addEventListener("click", () => {
+//     ungroup();
+//     mainSketch.sketchLayer.getItems().forEach((path) => {
+//         path.selected = false;
+//     });
 
-    mainSketch.saveStatic(
-        mainSketch.extractScaledSVG(1 / scaleRatio) //adds as backup
-    );
-    mainSketch.svg = paper.project.exportSVG({
-        asString: true,
-    });
-    logger.event("saved-in-sketchbook");
-});
+//     mainSketch.saveStatic(
+//         mainSketch.extractScaledSVG(1 / scaleRatio) //adds as backup
+//     );
+//     mainSketch.svg = paper.project.exportSVG({
+//         asString: true,
+//     });
+//     logger.event("saved-in-sketchbook");
+// });
 
-const autoButton = document.getElementById("autodraw-button");
-autoButton.addEventListener("click", () => {
-    if (controller.doneSketching !== null) {
-        controller.doneSketching = null; // never add
-        autoButton.innerHTML = "Solo draw";
-        logger.event("solo-drawing");
-    } else {
-        autoButton.innerHTML = "Collab draw!";
-        controller.doneSketching = 4000;
-        logger.event("collab-drawing");
-    }
-    autoButton.classList.toggle("inactive-pill");
-});
+// const autoButton = document.getElementById("autodraw-button");
+// autoButton.addEventListener("click", () => {
+//     if (controller.doneSketching !== null) {
+//         controller.doneSketching = null; // never add
+//         autoButton.innerHTML = "Solo draw";
+//         logger.event("solo-drawing");
+//     } else {
+//         autoButton.innerHTML = "Collab draw!";
+//         controller.doneSketching = 4000;
+//         logger.event("collab-drawing");
+//     }
+//     autoButton.classList.toggle("inactive-pill");
+// });
 
 // document.getElementById("show-all-paths").addEventListener("click", () => {
 //     controller.showAllLines = !controller.showAllLines;
@@ -587,22 +565,22 @@ autoButton.addEventListener("click", () => {
 
 document.getElementById("num-squiggles").oninput = function() {
     controller.maxCurves = parseInt(this.value);
-    setLineLabels(userLayer);
+    setLineLabels(mainSketch.sketchLayer);
 };
 
 document.getElementById("num-traces").oninput = function() {
     controller.numTraces = parseInt(this.value);
 };
 
-document.getElementById("overwrite").addEventListener("click", () => {
-    if (controller.allowOverwrite) {
-        document.getElementById("overwrite").innerHTML = "Copy";
-    } else {
-        document.getElementById("overwrite").innerHTML = "Overwrite";
-    }
-    document.getElementById("overwrite").classList.toggle("inactive-pill");
-    controller.allowOverwrite = !controller.allowOverwrite;
-});
+// document.getElementById("overwrite").addEventListener("click", () => {
+//     if (controller.allowOverwrite) {
+//         document.getElementById("overwrite").innerHTML = "Copy";
+//     } else {
+//         document.getElementById("overwrite").innerHTML = "Overwrite";
+//     }
+//     document.getElementById("overwrite").classList.toggle("inactive-pill");
+//     controller.allowOverwrite = !controller.allowOverwrite;
+// });
 
 const respectSlider = document.getElementById("respect-slider");
 let lastFixation = controller.useFixation;
@@ -646,6 +624,27 @@ window.addEventListener("keydown", function(event) {
             sketchHistory.redo();
         }
     }
+
+    if (event.key == "Escape") {
+        // close the frame mode
+        stopDrawer();
+    }
+
+    if (document.activeElement !== prompt) {
+        if (event.key == "Delete" || event.key == "Backspace") {
+            deleteItems();
+        }
+    } else {
+        if (event.key == "Enter") {
+            if (socket) {
+                controller.draw();
+                mainSketch.svg = paper.project.exportSVG({
+                    asString: true,
+                });
+                logger.event("start-drawing");
+            }
+        }
+    }
 });
 
 // document.getElementById("set-background").onclick = function() {
@@ -687,19 +686,19 @@ picker.onChange = (color) => {
     setThisColor(controller.strokeColor);
 };
 
-setLineLabels(userLayer);
+setLineLabels(mainSketch.sketchLayer);
 setActionUI("inactive");
 setPointSize(controller.strokeWidth);
 
-const defaults = new PaperScope();
-defaults.activate();
-for (let i = 0; i < 4; i++) {
-    let sketch = new Sketch(null, defaults, sketchSize);
-    let newElem = sketch.renderMini();
-    // controller.sketchScopeIndex += 1; //remove later
-    newElem.classList.add("inactive-sketch");
-    document.getElementById("explore-sketches").appendChild(newElem);
-}
+// const defaults = new PaperScope();
+// defaults.activate();
+// for (let i = 0; i < 4; i++) {
+//     let sketch = new Sketch(null, defaults, sketchSize);
+//     let newElem = sketch.renderMini();
+//     // controller.sketchScopeIndex += 1; //remove later
+//     newElem.classList.add("inactive-sketch");
+//     document.getElementById("explore-sketches").appendChild(newElem);
+// }
 
 // sketchBook.style.left =
 //     window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";

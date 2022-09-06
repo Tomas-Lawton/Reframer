@@ -227,7 +227,7 @@ class Controller {
                 //         try {
                 //             mainSketch.arrange();
                 //             // TO DO CHANGE
-                //             setLineLabels(userLayer);
+                //             setLineLabels(mainSketch.sketchLayer);
                 //             document.getElementById("calc-lines").innerHTML = `Add : 0`;
                 //             this.updateDrawer({
                 //                 status: "continue_single_sketch",
@@ -305,7 +305,7 @@ class Controller {
         document.getElementById("calc-lines").innerHTML = `Add : 0`;
     }
     resetMetaControls() {
-        document.getElementById("prune").classList.add("inactive-action");
+        // document.getElementById("prune").classList.add("inactive-action");
         document.getElementById("history-block").style.display = "none";
         this.step = 0;
         timeKeeper.setAttribute("max", "0");
@@ -574,7 +574,9 @@ mainSketch = new Sketch("main-sketch", scope, frame, "main");
 mainSketch.svg = paper.project.exportSVG({
     asString: true,
 }); //for svg parsing
-mainSketch.sketchLayer = userLayer;
-// console.log(userLayer);
+mainSketch.frameLayer = new Layer();
+mainSketch.sketchLayer = new Layer();
+
+// console.log(mainSketch.sketchLayer);
 
 sketchHistory = new SketchHistory(mainSketch);

@@ -10,7 +10,7 @@ let sketchTimer,
     firstErasePoint;
 
 sketchTool.onMouseDown = function(event) {
-    console.log(userLayer.children);
+    console.log(mainSketch.sketchLayer.children);
 
     clearTimeout(sketchTimer);
 
@@ -74,8 +74,27 @@ sketchTool.onMouseDown = function(event) {
                 x: event.point.x + 0.05, //any smaller will break because BE changes to v0
             });
             break;
-        case "lasso":
+        case "local":
+            // if you pen down on a segment, then you can resize the box
             controller.drawRegion = new Rectangle(event.point);
+
+            let frameCol =
+                frameColors[Math.floor(Math.random() * frameColors.length)];
+            lastFrameParent = document.createElement("div");
+            lastFrameParent.classList.add("frame-parent");
+            let frameInput = document.createElement("input");
+            let frameCross = document.createElement("i");
+            frameCross.classList.add("fa-solid", "fa-xmark");
+            frameInput.style.background = frameCol;
+            frameCross.style.background = frameCol;
+            lastFrameParent.appendChild(frameInput);
+            lastFrameParent.appendChild(frameCross);
+            sketchContainer.appendChild(lastFrameParent);
+
+            lastFrameParent.style.top =
+                controller.drawRegion.top - lastFrameParent.clientHeight + "px";
+            lastFrameParent.style.left = controller.drawRegion.left + "px";
+            lastFrameParent.width = controller.drawRegion.width + "px";
             break;
         case "erase":
             sketchHistory.pushUndo();
@@ -95,7 +114,7 @@ sketchTool.onMouseDown = function(event) {
                 x: event.point.x + 0.05, //any smaller will break because BE changes to v0
             });
             tmpGroup = new Group({
-                children: userLayer.removeChildren(),
+                children: mainSketch.sketchLayer.removeChildren(),
                 blendMode: "source-out",
                 insert: false,
             });
@@ -153,12 +172,17 @@ sketchTool.onMouseDrag = function(event) {
                 selectBox.set(rectangleOptions);
             }
             break;
-        case "lasso":
+        case "local":
             controller.drawRegion.width += event.delta.x;
             controller.drawRegion.height += event.delta.y;
             if (regionPath !== undefined) regionPath.remove(); //remove old one. maybe could update the old one instead?
             regionPath = new Path.Rectangle(controller.drawRegion);
             regionPath.set(rectangleOptions);
+
+            lastFrameParent.style.top =
+                controller.drawRegion.top - lastFrameParent.clientHeight + "px";
+            lastFrameParent.style.left = controller.drawRegion.left + "px";
+            lastFrameParent.style.width = controller.drawRegion.width + "px";
             break;
     }
 };
@@ -174,7 +198,9 @@ sketchTool.onMouseUp = function() {
             if (selectBox) {
                 //after moving
                 //moving selection
-                let items = userLayer.getItems({ inside: selectBox.bounds });
+                let items = mainSketch.sketchLayer.getItems({
+                    inside: selectBox.bounds,
+                });
                 let rect = items.pop();
                 if (rect) {
                     rect.remove(); // can be undefined if flat box
@@ -215,7 +241,7 @@ sketchTool.onMouseUp = function() {
             mainSketch.svg = paper.project.exportSVG({
                 asString: true,
             });
-            setLineLabels(userLayer);
+            setLineLabels(mainSketch.sketchLayer);
             if (socket) {
                 if (controller.liveCollab) {
                     controller.continueSketch();
@@ -238,16 +264,59 @@ sketchTool.onMouseUp = function() {
             }
 
             break;
-        case "lasso":
+        case "local":
             if (socket) {
-                mainSketch.svg = paper.project.exportSVG({
-                    asString: true,
-                });
-                logger.event("start-draw-region");
                 regionPath.remove();
-                controller.resetMetaControls(); //reset since not continuing
-                controller.draw(true);
-                console.log(userLayer);
+
+                let newFrame = new Path.Rectangle(controller.drawRegion);
+                newFrame.set(rectangleOptions); //completed
+
+                let frameUI = lastFrameParent;
+                let input = frameUI.querySelector("input");
+                let closeFrame = frameUI.querySelector("i");
+
+                let tag = document.createElement("li");
+                let localPrompt = document.createElement("p");
+                let circle = document.createElement("div");
+                circle.style.background =
+                    lastFrameParent.querySelector("input").style.background;
+                tag.appendChild(circle);
+                tag.appendChild(localPrompt);
+                localPrompts.querySelector("ul").appendChild(tag);
+
+                lastFrameParent.addEventListener("input", (e) => {
+                    localPrompt.innerHTML = e.target.value;
+                });
+
+                tag.addEventListener("click", (e) => {
+                    input.focus();
+                    localPrompts
+                        .querySelector("ul")
+                        .querySelectorAll("li")
+                        .forEach((localTag) => (localTag.style.background = "transparent"));
+                    tag.style.background = "#413d60";
+                });
+
+                let i = frames.length;
+                closeFrame.addEventListener("click", (e) => {
+                    //    delete
+                    frames.splice(i, 1);
+                    tag.remove();
+                    frameUI.remove();
+                    newFrame.remove();
+                });
+
+                frames.push({ tag: tag, frame: lastFrameParent, paperFrame: newFrame });
+                lastFrameParent.querySelector("input").focus();
+
+                // frameParent.width = newFrame
+
+                // frames.push()
+                // create the list item.
+
+                // controller.resetMetaControls(); //reset since not continuing
+                // controller.draw(true);
+                // console.log(mainSketch.sketchLayer);
             }
             break;
         case "erase":
@@ -316,14 +385,14 @@ sketchTool.onMouseUp = function() {
                 }
             });
 
-            userLayer.addChildren(tmpGroup.removeChildren());
+            mainSketch.sketchLayer.addChildren(tmpGroup.removeChildren());
             mask.remove();
 
             // Update
             mainSketch.svg = paper.project.exportSVG({
                 asString: true,
             });
-            setLineLabels(userLayer);
+            setLineLabels(mainSketch.sketchLayer);
             if (controller.liveCollab) {
                 controller.continueSketch();
                 controller.liveCollab = false;
@@ -335,14 +404,13 @@ sketchTool.onMouseUp = function() {
     mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
-    setLineLabels(userLayer);
+    setLineLabels(mainSketch.sketchLayer);
     // logger.event(controller.penMode + "-up");
 
-    console.log(userLayer);
+    console.log(mainSketch.sketchLayer);
 };
 
 const setPenMode = (mode, accentTarget) => {
-    let lastPenMode = controller.penMode;
     document.querySelectorAll(".pen-mode").forEach((mode) => {
         mode.classList.remove("selected-mode");
         mode.classList.add("simple-hover");
@@ -417,28 +485,10 @@ const setPenMode = (mode, accentTarget) => {
             controller.penMode = mode;
             // controller.penDropMode = mode;
             break;
-        case "lasso":
-            if (noPrompt()) {
-                controller.penMode = lastPenMode;
-                openModal({
-                    title: "Add a prompt first!",
-                    message: "You need a prompt to generate sketches with the region tool.",
-                    confirmAction: () => (controlPanel.style.display = "flex"),
-                });
-            } else {
-                if (socket) {
-                    if (accentTarget) {
-                        accentTarget.classList.add("selected-mode");
-                        accentTarget.classList.remove("simple-hover");
-                    }
-                    // penDrop.classList.add("selected-mode");
-                    // penDrop.classList.remove("fa-eraser");
-                    // penDrop.classList.remove("fa-arrow-pointer");
-                    // penDrop.classList.add("fa-object-group");
-                    canvas.style.cursor = "crosshair";
-                    controller.penMode = mode;
-                    // controller.penDropMode = mode;
-                }
+        case "local":
+            if (socket) {
+                canvas.style.cursor = "crosshair";
+                controller.penMode = mode;
             }
             break;
         case "dropper":
@@ -454,14 +504,18 @@ const setPenMode = (mode, accentTarget) => {
 
     if (controller.penMode !== "select") {
         ungroup();
-        userLayer.getItems().forEach((path) => {
+        mainSketch.sketchLayer.getItems().forEach((path) => {
             path.selected = false;
         });
     }
-    if (controller.penMode !== "lasso" && controller.penMode !== "select") {
+    if (controller.penMode !== "local" && controller.penMode !== "select") {
         controller.drawRegion = undefined;
         if (regionPath) regionPath.remove();
         // penDrop.classList.remove("selected-mode");
+    }
+
+    if (controller.penMode !== "local") {
+        mainSketch.sketchLayer.activate();
     }
 
     if (controller.penMode !== "dropper") {

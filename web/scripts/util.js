@@ -56,7 +56,10 @@ const ungroup = () => {
     if (controller.transformGroup !== null) {
         controller.transformGroup.applyMatrix = true;
         selected = controller.transformGroup.removeChildren();
-        userLayer.insertChildren(controller.transformGroup.index, selected);
+        mainSketch.sketchLayer.insertChildren(
+            controller.transformGroup.index,
+            selected
+        );
         controller.transformGroup.remove();
         controller.transformGroup = null;
     }
@@ -86,7 +89,7 @@ const fitToSelection = (items, state) => {
 };
 
 const getSelectedPaths = () =>
-    userLayer.getItems().filter((path) => path.selected);
+    mainSketch.sketchLayer.getItems().filter((path) => path.selected);
 
 const noPrompt = () =>
     controller.prompt === "" ||
@@ -176,7 +179,7 @@ const showTraceHistoryFrom = (fromIndex) => {
         let refList = [];
         for (let stored of items) {
             // TO DO CHANGE??? so fixed paths
-            userLayer.importSVG(stored.svg); //overlay
+            mainSketch.sketchLayer.importSVG(stored.svg); //overlay
             // refList.push(mainSketch.load(1, stored.svg, stored.num));
         }
         controller.traces = refList;
@@ -221,7 +224,7 @@ const rgbToHex = (r, g, b) => {
 const download = () => {
     // REMOVE REFs to select box
     // to do: refactor these.
-    userLayer.getItems().forEach((path) => {
+    mainSketch.sketchLayer.getItems().forEach((path) => {
         path.selected = false;
     });
     mainSketch.svg = paper.project.exportSVG({
@@ -256,7 +259,7 @@ const download = () => {
             document.body.removeChild(b);
         }
         if (!useAI) {
-            userLayer.clear();
+            mainSketch.sketchLayer.clear();
             loadPartial();
         }
     });
@@ -276,7 +279,12 @@ const loadResponse = (result) => {
         if (matches != null) {
             if (result.svg === "") return null;
             let sketch = controller.sketches[parseInt(result.status)];
-            sketch.load(sketchSize / 224, result.svg, result.fixed, sketch.userLayer);
+            sketch.load(
+                sketchSize / 224,
+                result.svg,
+                result.fixed,
+                sketch.mainSketch.sketchLayer
+            );
         }
 
         // Prune Main
@@ -309,23 +317,23 @@ const updateMain = (result) => {
 };
 
 const loadPartial = () => {
-    const scaleTo = userLayer.view.viewSize.width;
+    const scaleTo = mainSketch.sketchLayer.view.viewSize.width;
     const idx = Math.floor(Math.random() * partialSketches.length);
     const partial = partialSketches[idx][0];
     const drawPrompt = partialSketches[idx][1];
     document.getElementById("partial-message").innerHTML = drawPrompt;
-    let loadedPartial = userLayer.importSVG(partial);
+    let loadedPartial = mainSketch.sketchLayer.importSVG(partial);
 
     loadedPartial.getItems().forEach((item) => {
         if (item instanceof Path) {
-            let newElem = userLayer.addChild(item.clone());
+            let newElem = mainSketch.sketchLayer.addChild(item.clone());
             newElem.data.fixed = true;
             newElem.strokeCap = "round";
             newElem.strokeJoin = "round";
         }
     });
     loadedPartial.remove();
-    scaleGroup(userLayer, scaleTo);
+    scaleGroup(mainSketch.sketchLayer, scaleTo);
     mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });

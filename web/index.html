@@ -22,7 +22,6 @@
     <script type="text/javascript" src="scripts/pen.js" defer></script>
     <script type="text/javascript" src="scripts/logger.js" defer></script>
     <script type="text/javascript" src="scripts/interface.js" defer></script>
-
 </head>
 
 <body>
@@ -41,14 +40,14 @@
         </div>
     </div>
 
-    <div id="sliding-overlay">
+    <!-- <div id="sliding-overlay">
         <div id="hero-content">
             <div class="flex prompt-input">
                 <input type="text" id="user-name" placeholder="Enter a name..." />
             </div>
             <button id="begin">BEGIN</button>
         </div>
-    </div>
+    </div> -->
 
     <div id="settings-ui">
         <hr />
@@ -78,63 +77,42 @@
         <i class="fa-solid fa-arrow-pointer fa-fw pen-mode" id="select"></i>
         <i class="fa-solid fa-pen fa-fw pen-mode selected-mode" id="pen"></i>
         <i class="fa-solid fa-eraser fa-fw pen-mode simple-hover" id="erase"></i>
-        <i class="region fa-solid fa-object-group fa-fw pen-mode ai-ui" id="lasso"></i>
+        <!-- <i class="region fa-solid fa-object-group fa-fw pen-mode ai-ui" id="lasso"></i> -->
         <i class="fa-solid fa-sliders fa-fw panel-open" id="palette"></i>
         <i class="fa-solid fa-rotate-left fa-fw simple-hover" id="undo"></i>
         <i class="fa-solid fa-rotate-right fa-fw simple-hover" id="redo"></i>
     </div>
 
     <div class="top-action" id="top-action-right">
-        <i class="fa-solid fa-book fa-fw panel-open" id="scrapbook"></i>
+        <!-- <i class="fa-solid fa-book fa-fw panel-open" id="scrapbook"></i> -->
         <i class="fa-solid fa-save fa-fw" id="save"></i>
         <i class="fa-solid fa-trash fa-fw" id="delete"></i>
         <!-- <i class="fa-solid fa-cog fa-fw" id="settings"></i> -->
     </div>
     <!-- <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i> -->
 
-    <div id="control-panel">
-        <div id="tabs">
-            <div class="tab-item active-tab ai-ui" id="collab-tab">
-                <i class="fa-solid fa-sliders fa-fw"></i>
-            </div>
-            <div class="tab-item" id="style-tab">
-                <i class="fa-solid fa-brush fa-fw"></i>
-            </div>
-        </div>
+    <div id="local-prompts">
+        <h3>Focus Frames</h3>
+        <ul></ul>
+    </div>
 
+    <div id="control-panel">
         <div class="ai-ui content-margin">
             <div id="ai-content">
-                <div class="tab-info">
-                    <div>
-                        <h1 class="panel-title">AI Panel</h1>
-                        <!-- <h2 class="panel-subtitle">Start with a prompt</h2> -->
-                    </div>
-                </div>
-
-
                 <div class="panel-section">
-                    <div class="flex">
+                    <div class="flex" style="display: none">
                         <h1 class="panel-title" id="message">
                             What are we drawing?
                         </h1>
                     </div>
-                    <div class="prompt-input">
-                        <input type="text" id="messageText" placeholder="A majestic rainbow unicorn..." />
-                        <i class="fas fa-lightbulb" id="random-prompt"></i>
-                    </div>
+                    <!-- <h2 class="panel-title">Prompt</h2> -->
                     <div id="spinner">
                         <i class="fa-solid fa-spinner button-animation " id="loading"></i>
                     </div>
+                    <input type="text" tabIndex="0" class="prompt-input" id="messageText" placeholder="A majestic rainbow unicorn..." />
                 </div>
 
                 <div class="panel-section">
-                    <div class="flex">
-                        <h1 class="panel-title">
-                            Action
-                        </h1>
-                        <!-- Change text to Draw some -->
-                        <!-- <p class="pill" id="show-all-paths">Draw all</p> -->
-                    </div>
                     <div class="inactive-section" id="set-modes">
                         <div class="ai-action" id="draw">
                             <i class="fa-solid fa-robot fa-fw"></i>
@@ -144,9 +122,9 @@
                             <i class="fa-solid fa-lightbulb fa-fw"></i>
                             <p>Explore</p>
                         </div>
-                        <div class="ai-action inactive-action" id="prune">
-                            <i class="fa-solid fa-broom fa-fw" id="clean-icon"></i>
-                            <p>Clean up</p>
+                        <div class="ai-action" id="focus">
+                            <i class="fa-solid fa-magnifying-glass fa-fw" id="focus-icon"></i>
+                            <p>Focus</p>
                         </div>
                         <div class="ai-action inactive-action" id="stop">
                             <i class="fa-solid fa-stop fa-fw" id="stop-icon"></i>
@@ -159,12 +137,6 @@
                     </div>
                 </div>
                 <div class="panel-section">
-                    <div class="flex">
-                        <h1 class="panel-title">
-                            Behaviour
-                        </h1>
-                        <p class="pill inactive-pill" id="autodraw-button">Solo draw</p>
-                    </div>
                     <div class="inactive-section slider-block" id="respect-block">
                         <div id="control-lines">
                             <div class="flex">
@@ -183,53 +155,16 @@
             </div>
         </div>
 
-
-        <div class="content-margin" id="style-view">
-            <div id="style-content">
-                <div class="tab-info">
-                    <div>
-                        <h1 class="panel-title">Styles</h1>
-                        <h2 class="panel-subtitle">Colors and Transforms</h2>
-                    </div>
-                </div>
-
-                <div id="picker-ui">
-                    <div id="color-picker"></div>
-                </div>
-
-                <div class="slider-block">
-                    <div class="flex">
-                        <p class="slider-label">Alpha</p>
-                    </div>
-                    <input type="range" id="alpha-slider" value="75" min="0" max="100">
-
-                    <div class="flex">
-                        <p class="slider-label">Stroke</p>
-                    </div>
-                    <input type="range" id="width-slider" value="12" min="1" max="48">
-                </div>
-
-                <div id="art-control-final">
-                    <div id="stroke-dot">
-                        <div id="point-size"></div>
-                    </div>
-                    <div id="pen-color" class="off-black"></div>
-                </div>
-                <!-- <p id="set-background">Set background</p> -->
+        <div class="ai-ui" id="explore-margin">
+            <div id="explore-sketches"></div>
+            <div id="explorer-buttons">
+                <p class="pill" id="empty">Empty</p>
+                <p class="pill" id="close-explorer">Close <i class="fa-solid fa-xmark"></i></p>
             </div>
         </div>
+
     </div>
-
-
-    <div class="ai-ui" id="explore-margin">
-        <div id="explore-sketches"></div>
-        <div id="explorer-buttons">
-            <p class="pill" id="empty">Empty</p>
-            <p class="pill" id="close-explorer">Close <i class="fa-solid fa-xmark"></i></p>
-        </div>
-    </div>
-
-    <div id="sketchbook-panel">
+    <!-- <div id="sketchbook-panel">
         <div id="sketchbook-content">
             <div id="static-margin">
                 <div id="static-sketches">
@@ -269,7 +204,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- <p id="rolling-loss">Step: 0 Loss: 0</p> -->
     <div class="top-center" id="swatches">
@@ -293,7 +228,32 @@
             <div class="center">
                 <div class="circle" id="circle-large"></div>
             </div>
+            <div class="center">
+                <i class="fa-solid fa-expand"></i>
+            </div>
         </div>
+
+        <div id="expanded-styles">
+            <div class="slider-block">
+                <div class="flex">
+                    <p class="slider-label">Alpha</p>
+                </div>
+                <input type="number" id="alpha-slider" value="75" min="0" max="100">
+
+                <div class="flex">
+                    <p class="slider-label">Stroke</p>
+                </div>
+                <input type="number" id="width-slider" value="12" min="1" max="48">
+            </div>
+
+            <div id="art-control-final">
+                <div id="stroke-dot">
+                    <div id="point-size"></div>
+                </div>
+                <div id="pen-color" class="off-black"></div>
+            </div>
+        </div>
+
     </div>
 
     <div id="content">

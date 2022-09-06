@@ -6,14 +6,13 @@
 const http = "http://";
 // const base = "localhost:8000";
 const base = "0.0.0.0:8000";
-const useAI = false;
+const useAI = true;
 let socket = false;
 
 if (useAI) {
     document
         .querySelectorAll(".ai-ui")
         .forEach((aiItem) => aiItem.classList.remove("ai-ui"));
-    document.getElementById("style-view").style.display = "none";
 
     var ws = new WebSocket("ws://" + base + "/ws");
     ws.onclose = (event) => {
@@ -47,6 +46,7 @@ const penControls = document.getElementById("pen-controls");
 const message = document.getElementById("message");
 const palette = document.getElementById("palette");
 const timeKeeper = document.getElementById("time-slider");
+const localPrompts = document.getElementById("local-prompts");
 // const lossText = document.getElementById("rolling-loss");
 const setTraces = document.getElementById("num-traces");
 const selectDot = document.getElementById("contain-pen-dot");
@@ -89,10 +89,10 @@ const containerRect = document
     .getElementById("contain-canvas")
     .getBoundingClientRect();
 
-const sketchSize =
-    document.querySelectorAll("div#sketch-grid")[0].offsetWidth / 2 - 5;
-const reusableExemplar = sketchTemplate.cloneNode(true); //clone to use
-sketchTemplate.remove();
+// const sketchSize =
+//     document.querySelectorAll("div#sketch-grid")[0].offsetWidth / 2 - 5;
+// const reusableExemplar = sketchTemplate.cloneNode(true); //clone to use
+// sketchTemplate.remove();
 // console.log(sketchSize);
 
 if (containerRect.width > window.innerHeight) {
@@ -112,7 +112,7 @@ const offset = frame / 2;
 // const offY = Math.max(0, canvas.height - canvas.width) / 2;
 // const offY = 0;
 // const offX = (canvas.width - canvas.height) / 2;
-const scaleRatio = frame / sketchSize;
+// const scaleRatio = frame / sketchSize;
 
 // Paper Setup
 paper.install(window);
@@ -122,7 +122,6 @@ sketchScope.activate();
 scope.setup(canvas);
 scope.activate();
 
-const userLayer = new Layer();
 const sketchTool = new Tool();
 sketchTool.minDistance = 5;
 
@@ -140,3 +139,22 @@ const rectangleOptions = {
 };
 
 const minSelectionWidth = 65;
+const frames = [];
+let lastFrameParent;
+
+const frameColors = [
+    "#EF3054",
+    "#43AA8B",
+    "#254441",
+    "#FF6F59",
+    "#33032F",
+    "#531253",
+    "#BC6C25",
+    "#89A7A7",
+    "#253237",
+    "#E34A6F",
+    "#60A561",
+    "#444140",
+    "#00A5CF",
+    "#25A18E",
+];
