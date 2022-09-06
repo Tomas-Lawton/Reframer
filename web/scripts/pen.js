@@ -110,7 +110,7 @@ sketchTool.onMouseDown = function(event) {
             pauseActiveDrawer();
 
             erasorPath = new Path({
-                strokeWidth: controller.strokeWidth * 5,
+                strokeWidth: controller.strokeWidth,
                 strokeCap: "round",
                 strokeJoin: "round",
                 opacity: 0.85,
@@ -396,7 +396,7 @@ sketchTool.onMouseUp = function() {
                 firstErasePoint.remove();
             }
             erasorPath.simplify();
-            const eraseRadius = (controller.strokeWidth * 5) / 2;
+            const eraseRadius = controller.strokeWidth;
             const outerPath = OffsetUtils.offsetPath(erasorPath, eraseRadius);
             const innerPath = OffsetUtils.offsetPath(erasorPath, -eraseRadius);
             erasorPath.remove();

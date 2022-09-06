@@ -124,7 +124,6 @@ else:
                          websocket, device, model, data["data"]["sketch_index"]
                     )
                     sketches.append(new_sketch)
-
                     new_sketch.use_sketch(data)
                     new_sketch.activate(True)
                     new_sketch.draw()

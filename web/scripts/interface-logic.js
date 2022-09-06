@@ -310,10 +310,10 @@ const setLineLabels = (layer) => {
     controller.addLines = res > 0 ? res : 0;
     document.getElementById(
         "max-lines"
-    ).innerHTML = `Lines : ${controller.maxCurves}`;
+    ).innerHTML = `Total Lines: ${controller.maxCurves}`;
     document.getElementById(
         "calc-lines"
-    ).innerHTML = `Add : ${controller.addLines}`;
+    ).innerHTML = `Adding: ${controller.addLines}`;
 };
 
 const setDefaultTransform = () => {

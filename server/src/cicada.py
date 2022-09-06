@@ -76,14 +76,13 @@ class CICADA:
         return path_list
 
     def activate(self, add_curves):
-        # Move this ?
         self.drawing = Sketch(canvas_w, canvas_h)
-
         self.is_active = True
         paths = self.extract_points(self.sketch_data)
 
         if len(paths) > 0:
             self.drawing.add_paths(paths)
+
         if add_curves:
             self.drawing.add_random_shapes(self.num_paths)
 
@@ -337,6 +336,11 @@ class CICADA:
         # self.negative_text_features = self.clip_interface.encode_text_classes(["Written words.", "Text."])
         self.negative_text_features = self.encode_text_classes(["letters in the alphabet"])
 
+        self.local_frames = data["data"]["frames"]
+        logging.info("\n \nHEREEEEEEE")
+        logging.info(self.local_frames)
+        #Encode self.local_frames!
+
         self.user_canvas_w = self.frame_size
         self.user_canvas_h = self.frame_size
         self.normaliseScaleFactor = 1 / self.frame_size
@@ -344,6 +348,7 @@ class CICADA:
 
 
     def use_latest_sketch(self, data):
+        """Only for things that can be changed on the fly"""
         logging.info("Adding changes...")
         self.w_points, self.w_colors, self.w_widths = use_penalisation(
             data["data"]["fixation"])

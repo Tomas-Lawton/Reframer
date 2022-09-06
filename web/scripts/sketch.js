@@ -174,7 +174,7 @@ class Controller {
                 prompt: this.prompt,
                 lines: this.initRandomCurves ? this.addLines : 0, //adding
                 fixation: this.useFixation,
-                frames: mainSketch.localFrames.data,
+                frames: mainSketch.localFrames.map((elem) => elem.data),
             });
             this.step = 0;
             setActionUI("drawing");
@@ -198,7 +198,7 @@ class Controller {
                 lines: this.addLines,
                 sketchScopeIndex: sketchCountIndex,
                 fixation: this.useFixation,
-                frames: mainSketch.localFrames.data,
+                frames: mainSketch.localFrames.map((elem) => elem.data),
             });
         }
     }
@@ -558,7 +558,7 @@ mainSketch.svg = paper.project.exportSVG({
 
 mainSketch.sketchLayer = new Layer();
 mainSketch.frameLayer = new Layer();
-mainSketch.frameLayer.activate();
+mainSketch.sketchLayer.activate();
 // console.log(mainSketch.sketchLayer);
 
 sketchHistory = new SketchHistory(mainSketch);

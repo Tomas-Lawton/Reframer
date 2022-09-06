@@ -67,6 +67,10 @@ document.querySelectorAll(".swatch").forEach((elem) => {
     });
 });
 
+document.getElementById("pen-color").addEventListener("click", () => {
+    showHide(document.getElementById("picker-ui"));
+});
+
 document.getElementById("delete").addEventListener("click", () =>
     openModal({
         title: "Clearing Canvas",
@@ -157,10 +161,6 @@ document.getElementById("save").addEventListener("click", () => {
     download();
 });
 
-document.getElementById("width-slider").oninput = function() {
-    setPointSize(this.value);
-};
-
 rotateSlider.oninput = function() {
     transformGroup(controller.transformGroup, "rotation", this.value);
 };
@@ -182,6 +182,12 @@ alphaSlider.oninput = function() {
     controller.alpha = this.value / 100;
     controller.strokeColor = rgba;
     setThisColor(rgba);
+    setPenMode("pen", pen);
+};
+
+document.getElementById("width-slider").oninput = function() {
+    setPointSize(this.value);
+    setPenMode("pen", pen);
 };
 
 // tidy
@@ -360,15 +366,7 @@ document.getElementById("focus").addEventListener("click", () => {
     console.log(controller.drawState);
     mainSketch.frameLayer.activate();
     setPenMode("local", null);
-    // activate focus
-    // open focus panel
-    // allow drawing rectangles on new layer
-    // on mouse up, position UI above active frame
-    // write in local prompt ontop of frame
-    // add to the focus panel
-    //
-
-    // showHide(localPrompts);
+    showHide(localPrompts);
 });
 
 document.getElementById("go-back").addEventListener("click", () => {
@@ -452,6 +450,8 @@ document.getElementById("swatches").onmousedown = (e) => {
         e = e || window.event;
         pos3 = e.clientX;
         pos4 = e.clientY;
+
+        // check the bounds so don't include picker
         document.onmouseup = closeDragElement;
         document.onmousemove = (e) =>
             elementDrag(e, document.getElementById("swatches"));

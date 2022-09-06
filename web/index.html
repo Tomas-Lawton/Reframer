@@ -105,24 +105,27 @@
                             What are we drawing?
                         </h1>
                     </div>
-                    <!-- <h2 class="panel-title">Prompt</h2> -->
+                    <!-- <h2 class="panel-title">AI Actions</h2> -->
                     <div id="spinner">
                         <i class="fa-solid fa-spinner button-animation " id="loading"></i>
                     </div>
-                    <input type="text" tabIndex="0" class="prompt-input" id="messageText" placeholder="A majestic rainbow unicorn..." />
+                    <input type="text" tabIndex="0" class="prompt-input" id="messageText" placeholder="Start by describing your sketch..." autocomplete="off" />
                 </div>
 
                 <div class="panel-section">
                     <div class="inactive-section" id="set-modes">
-                        <div class="ai-action" id="draw">
+                        <div class="ai-action tooltip" id="draw">
+                            <span class="tooltiptext">Change the sketch using AI</span>
                             <i class="fa-solid fa-robot fa-fw"></i>
                             <p>Draw</p>
                         </div>
-                        <div class="ai-action" id="explore">
+                        <div class="ai-action tooltip" id="explore">
+                            <span class="tooltiptext">Get options for developing the sketch</span>
                             <i class="fa-solid fa-lightbulb fa-fw"></i>
                             <p>Explore</p>
                         </div>
-                        <div class="ai-action" id="focus">
+                        <div class="ai-action tooltip" id="focus">
+                            <span class="tooltiptext">Labeling parts the image helps AI focus</span>
                             <i class="fa-solid fa-magnifying-glass fa-fw" id="focus-icon"></i>
                             <p>Focus</p>
                         </div>
@@ -130,23 +133,23 @@
                             <i class="fa-solid fa-stop fa-fw" id="stop-icon"></i>
                             <p id="stop-text">Stop</p>
                         </div>
-                        <div class="ai-action inactive-action" id="redraw">
+                        <!-- <div class="ai-action inactive-action" id="redraw">
                             <i class="fa-solid fa-repeat fa-fw"></i>
                             <p>Try again</p>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <div class="panel-section">
                     <div class="inactive-section slider-block" id="respect-block">
                         <div id="control-lines">
                             <div class="flex">
-                                <p class="slider-label" id="max-lines">Lines: </p>
-                                <p class="slider-label" id="calc-lines">Add: </p>
+                                <p class="slider-label" id="max-lines">Total Lines: </p>
+                                <p class="slider-label" id="calc-lines">Adding: </p>
                             </div>
                             <input id="num-squiggles" type="range" min="0" value="48" max="150">
                         </div>
                         <div class="flex">
-                            <p class="slider-label">Fixed Amount</p>
+                            <p class="slider-label">Line Freedom</p>
                             <p class="slider-label" id="fix-label">More</p>
                         </div>
                         <input type="range" id="respect-slider" value="3" min="0" max="4">
@@ -207,50 +210,55 @@
     </div> -->
 
     <!-- <p id="rolling-loss">Step: 0 Loss: 0</p> -->
+
     <div class="top-center" id="swatches">
-        <div class="red swatch"></div>
-        <div class="yellow swatch "></div>
-        <div class="green swatch"></div>
-        <div class="blue swatch"></div>
-        <div class="pink swatch "></div>
-        <div class="purple swatch"></div>
-        <div class="off-black swatch"></div>
-        <div class="white swatch"></div>
-        <i class="fas fa-fw fa-eye-dropper pen-mode" id="dropper"></i>
-
-        <div id="points">
-            <div class="center">
-                <div class="circle" id="circle-small"></div>
+        <div id="basic-styles">
+            <div id="picker-ui">
+                <div id="color-picker"></div>
             </div>
             <div class="center">
-                <div class="circle" id="circle-med"></div>
+                <div id="pen-color" class="off-black"></div>
             </div>
-            <div class="center">
-                <div class="circle" id="circle-large"></div>
-            </div>
-            <div class="center">
-                <i class="fa-solid fa-expand"></i>
-            </div>
+            <div class="red swatch"></div>
+            <div class="yellow swatch "></div>
+            <div class="green swatch"></div>
+            <div class="blue swatch"></div>
+            <div class="pink swatch "></div>
+            <div class="purple swatch"></div>
+            <div class="off-black swatch"></div>
+            <div class="white swatch"></div>
+            <i class="fas fa-fw fa-eye-dropper pen-mode" id="dropper"></i>
         </div>
-
         <div id="expanded-styles">
-            <div class="slider-block">
-                <div class="flex">
-                    <p class="slider-label">Alpha</p>
+            <div id="points">
+                <div class="center">
+                    <div class="circle" id="circle-small"></div>
                 </div>
-                <input type="number" id="alpha-slider" value="75" min="0" max="100">
+                <div class="center">
+                    <div class="circle" id="circle-med"></div>
+                </div>
+                <div class="center">
+                    <div class="circle" id="circle-large"></div>
+                </div>
+            </div>
 
+            <div class="stroke-control">
                 <div class="flex">
                     <p class="slider-label">Stroke</p>
                 </div>
                 <input type="number" id="width-slider" value="12" min="1" max="48">
             </div>
 
+            <div class="stroke-control">
+                <div class="flex">
+                    <p class="slider-label">Opacity</p>
+                </div>
+                <input type="number" id="alpha-slider" value="75" min="0" max="100">
+            </div>
             <div id="art-control-final">
                 <div id="stroke-dot">
                     <div id="point-size"></div>
                 </div>
-                <div id="pen-color" class="off-black"></div>
             </div>
         </div>
 

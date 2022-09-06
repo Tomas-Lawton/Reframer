@@ -38,7 +38,6 @@ if (useAI) {
 const canvas = document.getElementById("canvas");
 // General UI
 const prompt = document.getElementById("messageText");
-// const promptInput = document.getElementById("prompt-input");
 const modal = document.getElementById("modal");
 const controlPanel = document.getElementById("control-panel");
 const sketchBook = document.getElementById("sketchbook-panel");
@@ -139,7 +138,7 @@ const rectangleOptions = {
 };
 
 const frameOptions = {
-    fillColor: "rgba(217, 217, 217, 0.24)",
+    fillColor: "rgba(226,226,226,0.44)",
     strokeColor: "#7000FF",
     selected: false,
 };
@@ -151,14 +150,12 @@ const frameColors = [
     "#43AA8B",
     "#254441",
     "#FF6F59",
-    "#33032F",
-    "#531253",
     "#BC6C25",
     "#89A7A7",
-    "#253237",
     "#E34A6F",
     "#60A561",
-    "#444140",
     "#00A5CF",
     "#25A18E",
 ];
+
+prompt.focus();
