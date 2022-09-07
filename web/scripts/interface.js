@@ -367,6 +367,15 @@ document.getElementById("focus").addEventListener("click", () => {
     mainSketch.frameLayer.activate();
     setPenMode("local", null);
     showHide(localPrompts);
+
+    // if set
+    mainSketch.localFrames.forEach((frame) => {
+        showHide(frame.frame);
+        frame.paperFrame.set({
+            fillColor: "rgba(226,226,226,0)",
+            strokeColor: "rgba(217, 217, 217, 0.3)",
+        });
+    });
 });
 
 document.getElementById("go-back").addEventListener("click", () => {
