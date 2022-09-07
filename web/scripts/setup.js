@@ -51,6 +51,7 @@ const setTraces = document.getElementById("num-traces");
 const selectDot = document.getElementById("contain-pen-dot");
 const alphaSlider = document.getElementById("alpha-slider");
 const stopButton = document.getElementById("stop");
+const focusButton = document.getElementById("focus");
 const buttonPanel = document.querySelector(".top-action");
 // const dropdown = document.getElementById("pen-dropdown");
 // const penDrop = document.getElementById("pen-drop");
@@ -61,7 +62,7 @@ const explorer = document.getElementById("explore-sketches");
 const sketchGrid = document.getElementById("grid-container");
 const pen = document.getElementById("pen");
 // Actions
-const actionControls = document.querySelectorAll(".ai-action");
+const actionControls = document.querySelectorAll(".action-button");
 const aiCard = document.getElementById("describe-card");
 // Selected UI
 const deleteHandler = document.getElementById("delete-handler");

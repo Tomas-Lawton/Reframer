@@ -33,36 +33,75 @@ const emptyExplorer = () => {
     }
 };
 
-const redStop = () => {
+const activateUI = () => {
+    actionControls.forEach((elem) => {
+        elem.classList.add("inactive-action");
+    });
     stopButton.classList.remove("inactive-action");
     stopButton.style.background = "#ff6060";
     stopButton.style.color = "#ffffff";
     stopButton.querySelector("i").style.color = "#ffffff";
     stopButton.style.cursor = "pointer";
+
+    document.getElementById("undo").classList.add("inactive-top-action");
+    document.getElementById("redo").classList.add("inactive-top-action");
+    document.getElementById("spinner").style.display = "flex";
+    document.getElementById("control-lines").style.display = "none";
+
+    aiMessage.classList.add("typed-out");
 };
 
-const inactiveStop = () => {
+const inactiveStopUI = () => {
     stopButton.classList.add("inactive-action");
     stopButton.style.background = "#f5f5f5";
     stopButton.style.color = "#d2d2d2";
     stopButton.querySelector("i").style.color = "#d2d2d2";
     stopButton.style.cursor = "default";
+    aiMessage.classList.add("typed-out");
 };
 
-const drawingFinished = () => {
+const inactiveFocusUI = () => {
+    focusButton.style.background = "#f3f1ff";
+    focusButton.style.color = "#7b66ff";
+    focusButton.querySelector("i").style.color = "#7b66ff";
+    focusButton.style.cursor = "default";
+};
+
+const stopDrawingUI = () => {
     canvas.classList.remove("loading-canvas");
     actionControls.forEach((elem) => {
         elem.classList.remove("inactive-action");
-        // elem.classList.remove("active");
     });
     document.getElementById("spinner").style.display = "none";
     document.getElementById("control-lines").style.display = "block";
-
-    // document.getElementById("add-refine").style.display = "none";
-    // document.getElementById("lasso").classList.remove("inactive-top-action");
     document.getElementById("undo").classList.remove("inactive-top-action");
     document.getElementById("redo").classList.remove("inactive-top-action");
-    inactiveStop();
+    document.getElementById("select").classList.remove("inactive-top-action");
+    document.getElementById("pen").classList.remove("inactive-top-action");
+    document.getElementById("erase").classList.remove("inactive-top-action");
+    inactiveFocusUI();
+    inactiveStopUI();
+};
+
+const focusUI = () => {
+    actionControls.forEach((elem) => {
+        elem.classList.add("inactive-action");
+    });
+    focusButton.classList.remove("inactive-action");
+
+    // add pen and erase
+    document.getElementById("undo").classList.add("inactive-top-action");
+    document.getElementById("redo").classList.add("inactive-top-action");
+    document.getElementById("select").classList.add("inactive-top-action");
+    document.getElementById("pen").classList.add("inactive-top-action");
+    document.getElementById("erase").classList.add("inactive-top-action");
+
+    focusButton.style.background = "#15d335";
+    focusButton.style.color = "#ffffff";
+    focusButton.querySelector("i").style.color = "#ffffff";
+    focusButton.style.cursor = "pointer";
+
+    aiMessage.classList.add("typed-out");
 };
 
 const setThisColor = (rgba) => {
@@ -77,73 +116,52 @@ const setThisColor = (rgba) => {
 
 const setActionUI = (state) => {
     aiMessage.classList.remove("typed-out");
-
-    if (state == "pruning") {
-        aiMessage.classList.remove("typed-out");
-        aiMessage.innerHTML = "Just a moment while I tidy up!";
-        aiMessage.classList.add("typed-out");
-        canvas.classList.add("loading-canvas");
-        actionControls.forEach((elem) => {
-            elem.classList.add("inactive-action");
-            // elem.classList.remove("active");
-        });
-        inactiveStop();
-    } else if (state == "stop-prune") {
-        drawingFinished();
-    } else if (controller.activeStates.includes(state)) {
-        actionControls.forEach((elem) => {
-            elem.classList.add("inactive-action");
-            // elem.classList.remove("active");
-        });
-        redStop();
-        // document.getElementById("lasso").classList.add("inactive-top-action");
-        document.getElementById("undo").classList.add("inactive-top-action");
-        document.getElementById("redo").classList.add("inactive-top-action");
-
-        document.getElementById("spinner").style.display = "flex";
-
-        // document.getElementById("add-refine").style.display = "block";
-        // document.getElementById("respect-block").classList.add("inactive-section");
-
-        if (state == "drawing") {
-            // aiMessage.innerHTML = `Got it! Drawing ${controller.prompt}!`;
+    switch (state) {
+        case "drawing":
+            activateUI();
             aiMessage.innerHTML = `Don't wait. Draw with me!`;
-
-            // sketchBook.style.display = "flex";
-            // document.getElementById("scrapbook").classList.add("panel-open");
-            // document.getElementById("draw").classList.add("active");
-        } else if (state == "explore") {
+            break;
+        case "explore":
+            activateUI();
             aiMessage.innerHTML = `I've got some ideas for ${controller.prompt}!`;
-            // canvas.classList.add("loading-canvas");
             document.getElementById("history-block").style.display = "none";
             document.getElementById("explore-margin").style.display = "flex";
-            // document.getElementById("explore").classList.add("active");
-        } else if (state == "continuing" || state == "continue-explore") {
+            break;
+        case "continuing" || "continue-explore":
+            activateUI();
             aiMessage.innerHTML = `I'll make that it into ${controller.prompt}.`;
-        }
-        aiMessage.classList.add("typed-out");
-
-        document.getElementById("control-lines").style.display = "none";
-    } else if (state === "stop") {
-        aiMessage.innerHTML = "All done! What should we draw next?";
-        aiMessage.classList.add("typed-out");
-        drawingFinished();
-        if (
-            sketchHistory.historyHolder.length > 1 //first elem empty
-        ) {
-            document.getElementById("history-block").style.display = "flex";
-        }
-    } else if (state === "stopSingle") {
-        aiMessage.innerHTML = `Stopped a single sketch!`;
-        aiMessage.classList.add("typed-out");
-        drawingFinished();
-        // controller.resetMetaControls();
+            break;
+        case "pruning":
+            inactiveStopUI();
+            aiMessage.innerHTML = "Just a moment while I tidy up!";
+            canvas.classList.add("loading-canvas");
+            actionControls.forEach((elem) => elem.classList.add("inactive-action"));
+            break;
+        case "focus":
+            focusUI();
+            aiMessage.innerHTML = "Specify local areas of the image!";
+            // canvas.classList.add("loading-canvas");
+            break;
+        case "stop-prune":
+            stopDrawingUI();
+            break;
+        case "stop":
+            stopDrawingUI();
+            aiMessage.innerHTML = "All done! What should we draw next?";
+            sketchHistory.historyHolder.length > 1 &&
+                (document.getElementById("history-block").style.display = "flex");
+            break;
+        case "stopSingle":
+            stopDrawingUI();
+            aiMessage.innerHTML = `Stopped a single sketch!`;
+            break;
     }
     controller.drawState = state;
     console.log("Set: ", state);
 };
 
 const stopDrawer = () => {
+    // to do: flatten this function
     if (socket) {
         if (
             controller.drawState === "drawing" ||
@@ -169,7 +187,6 @@ const stopDrawer = () => {
             killExploratorySketches();
             setActionUI("stopSingle");
             controller.clipDrawing = false;
-            // doesn't show explore data
             logger.event("stop-exploring");
         }
     }

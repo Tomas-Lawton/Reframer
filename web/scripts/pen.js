@@ -275,121 +275,117 @@ sketchTool.onMouseUp = function() {
 
             break;
         case "local":
-            if (socket) {
-                regionPath.remove();
+            regionPath.remove();
 
-                let newFrame = new Path.Rectangle(controller.drawRegion);
-                newFrame.set(frameOptions); //completed
+            let newFrame = new Path.Rectangle(controller.drawRegion);
+            newFrame.set(frameOptions); //completed
 
-                let frameUI = lastFrameParent;
-                let input = frameUI.querySelector("input");
-                let closeFrame = frameUI.querySelector("i");
-                let dragCorner = frameUI.querySelector("div");
+            let frameUI = lastFrameParent;
+            let input = frameUI.querySelector("input");
+            let closeFrame = frameUI.querySelector("i");
+            let dragCorner = frameUI.querySelector("div");
 
-                let tag = document.createElement("li");
-                let localPrompt = document.createElement("p");
-                let circle = document.createElement("div");
-                circle.style.background =
-                    frameUI.querySelector("input").style.background;
-                tag.appendChild(circle);
-                tag.appendChild(localPrompt);
-                localPrompts.querySelector("ul").appendChild(tag);
+            let tag = document.createElement("li");
+            let localPrompt = document.createElement("p");
+            let circle = document.createElement("div");
+            circle.style.background = frameUI.querySelector("input").style.background;
+            tag.appendChild(circle);
+            tag.appendChild(localPrompt);
+            localPrompts.querySelector("ul").appendChild(tag);
 
-                let i = mainSketch.localFrames.length;
+            let i = mainSketch.localFrames.length;
 
-                frameUI.addEventListener("input", (e) => {
-                    localPrompt.innerHTML = e.target.value;
-                    mainSketch.localFrames[i].data.prompt = e.target.value;
+            frameUI.addEventListener("input", (e) => {
+                localPrompt.innerHTML = e.target.value;
+                mainSketch.localFrames[i].data.prompt = e.target.value;
+            });
+
+            tag.addEventListener("click", (e) => {
+                input.focus();
+                mainSketch.localFrames.forEach((elem) => {
+                    elem.tag.style.background = "transparent";
+                    elem.frame.style.opacity = 1;
                 });
 
-                tag.addEventListener("click", (e) => {
-                    input.focus();
-                    mainSketch.localFrames.forEach((elem) => {
-                        elem.tag.style.background = "transparent";
-                        elem.frame.style.opacity = 1;
-                    });
+                frameUI.style.opacity = 0.7;
+                tag.style.background = "#413d60";
+            });
 
-                    frameUI.style.opacity = 0.7;
-                    tag.style.background = "#413d60";
-                });
+            closeFrame.addEventListener("click", (e) => {
+                mainSketch.localFrames.splice(i, 1);
+                tag.remove();
+                frameUI.remove();
+                newFrame.remove();
+            });
 
-                closeFrame.addEventListener("click", (e) => {
-                    mainSketch.localFrames.splice(i, 1);
-                    tag.remove();
-                    frameUI.remove();
-                    newFrame.remove();
-                });
+            input.onmousedown = (e) => {
+                if (window.innerWidth > 700) {
+                    e = e || window.event;
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                    document.onmouseup = closeDragElement;
+                    document.onmousemove = (e) => {
+                        elementDrag(e, frameUI);
+                        newFrame.position.x += e.movementX;
+                        newFrame.position.y += e.movementY;
 
-                input.onmousedown = (e) => {
-                    if (window.innerWidth > 700) {
-                        e = e || window.event;
-                        pos3 = e.clientX;
-                        pos4 = e.clientY;
-                        document.onmouseup = closeDragElement;
-                        document.onmousemove = (e) => {
-                            elementDrag(e, frameUI);
-                            newFrame.position.x += e.movementX;
-                            newFrame.position.y += e.movementY;
-
-                            mainSketch.localFrames[i].data.points = {
-                                x1: topLeft.x,
-                                y1: topLeft.y,
-                                x2: bottomRight.x,
-                                y2: bottomRight.y,
-                            };
-                        };
-                    }
-                };
-
-                dragCorner.onmousedown = (e) => {
-                    if (window.innerWidth > 700) {
-                        e = e || window.event;
-                        pos3 = e.clientX;
-                        pos4 = e.clientY;
-                        document.onmouseup = closeDragElement;
-                        document.onmousemove = (e) => {
-                            // update other rects to do this instead
-                            newFrame.bounds.width += e.movementX;
-                            newFrame.bounds.height += e.movementY;
-                            frameUI.style.width = newFrame.bounds.width + "px";
-                            dragCorner.style.top =
-                                newFrame.bounds.height + frameUI.clientHeight + "px";
-                            dragCorner.style.left = newFrame.bounds.width + "px";
-
-                            let topLeft = newFrame.bounds.topLeft;
-                            let bottomRight = newFrame.bounds.bottomRight;
-
-                            mainSketch.localFrames[i].data.points = {
-                                x1: topLeft.x,
-                                y1: topLeft.y,
-                                x2: bottomRight.x,
-                                y2: bottomRight.y,
-                            };
-                            frameUI.querySelector("input").focus();
-                        };
-                    }
-                };
-
-                let topLeft = newFrame.bounds.topLeft;
-                let bottomRight = newFrame.bounds.bottomRight;
-
-                mainSketch.localFrames.push({
-                    tag: tag,
-                    frame: frameUI,
-                    paperFrame: newFrame,
-                    data: {
-                        prompt: "default",
-                        points: {
+                        mainSketch.localFrames[i].data.points = {
                             x1: topLeft.x,
                             y1: topLeft.y,
                             x2: bottomRight.x,
                             y2: bottomRight.y,
-                        },
-                    },
-                });
+                        };
+                    };
+                }
+            };
 
-                frameUI.querySelector("input").focus();
-            }
+            dragCorner.onmousedown = (e) => {
+                if (window.innerWidth > 700) {
+                    e = e || window.event;
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                    document.onmouseup = closeDragElement;
+                    document.onmousemove = (e) => {
+                        // update other rects to do this instead
+                        newFrame.bounds.width += e.movementX;
+                        newFrame.bounds.height += e.movementY;
+                        frameUI.style.width = newFrame.bounds.width + "px";
+                        dragCorner.style.top =
+                            newFrame.bounds.height + frameUI.clientHeight + "px";
+                        dragCorner.style.left = newFrame.bounds.width + "px";
+
+                        let topLeft = newFrame.bounds.topLeft;
+                        let bottomRight = newFrame.bounds.bottomRight;
+
+                        mainSketch.localFrames[i].data.points = {
+                            x1: topLeft.x,
+                            y1: topLeft.y,
+                            x2: bottomRight.x,
+                            y2: bottomRight.y,
+                        };
+                        frameUI.querySelector("input").focus();
+                    };
+                }
+            };
+
+            let topLeft = newFrame.bounds.topLeft;
+            let bottomRight = newFrame.bounds.bottomRight;
+
+            mainSketch.localFrames.push({
+                tag: tag,
+                frame: frameUI,
+                paperFrame: newFrame,
+                data: {
+                    prompt: "default",
+                    points: {
+                        x1: topLeft.x,
+                        y1: topLeft.y,
+                        x2: bottomRight.x,
+                        y2: bottomRight.y,
+                    },
+                },
+            });
+            frameUI.querySelector("input").focus();
             break;
         case "erase":
             if (firstErasePoint && erasorPath.segments.length > 2) {
@@ -558,10 +554,8 @@ const setPenMode = (mode, accentTarget) => {
             // controller.penDropMode = mode;
             break;
         case "local":
-            if (socket) {
-                canvas.style.cursor = "crosshair";
-                controller.penMode = mode;
-            }
+            canvas.style.cursor = "crosshair";
+            controller.penMode = mode;
             break;
         case "dropper":
             if (accentTarget) {

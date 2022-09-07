@@ -606,7 +606,7 @@ hr {
     color: #7b66ff !important;
 }
 
-.ai-action {
+.action-button {
     box-shadow: 3px 6px 9px rgb(48 48 48 / 19%);
     display: flex;
     flex-flow: column;
@@ -624,18 +624,18 @@ hr {
     color: #7b66ff;
 }
 
-.ai-action i {
+.action-button i {
     margin-bottom: 0.3em;
     font-size: 1.4em;
 }
 
-.ai-action:hover {
+.action-button:hover {
     transition: 0.3s;
     background-color: #7b66ff;
     color: white;
 }
 
-.ai-action:hover>i {
+.action-button:hover>i {
     transition: 0.3s;
     /* font-size: 2em; */
     color: white;
@@ -1937,7 +1937,6 @@ input[type="range"]::-moz-range-thumb {
 }
 
 #local-prompts {
-    display: none;
     flex-direction: column;
     position: absolute;
     min-width: 200px;

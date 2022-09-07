@@ -253,7 +253,6 @@ palette.addEventListener("click", () => {
 prompt.addEventListener("input", (e) => {
     // controller.prompt = e.target.value.toLowerCase();
     controller.prompt = e.target.value;
-
     if (controller.prompt === "") {
         aiMessage.innerHTML = ` What are we drawing?`;
         controllerUI.forEach((elem) => elem.classList.add("inactive-section"));
@@ -261,8 +260,6 @@ prompt.addEventListener("input", (e) => {
         aiMessage.innerHTML = `Ok, ${controller.prompt}.`;
         controllerUI.forEach((elem) => elem.classList.remove("inactive-section"));
     }
-
-    console.log(controller.prompt);
 });
 
 prompt.addEventListener("blur", () => {
@@ -362,13 +359,18 @@ moveUp.addEventListener("click", () => {
 //     }
 // });
 
-document.getElementById("focus").addEventListener("click", () => {
-    console.log(controller.drawState);
+focusButton.addEventListener("click", () => {
     mainSketch.frameLayer.activate();
     setPenMode("local", null);
     showHide(localPrompts);
+    showHide(document.getElementById("swatches"));
 
-    // if set
+    if (localPrompts.style.display === "flex") {
+        setActionUI("focus");
+    } else {
+        setActionUI("stop");
+    }
+
     mainSketch.localFrames.forEach((frame) => {
         showHide(frame.frame);
         frame.paperFrame.set({
@@ -376,6 +378,11 @@ document.getElementById("focus").addEventListener("click", () => {
             strokeColor: "rgba(217, 217, 217, 0.3)",
         });
     });
+
+    // function to select specific prompt i in list
+    // FOCUS the list item also
+    if (mainSketch.localFrames[0])
+        mainSketch.localFrames[0].frame.querySelector("input").focus();
 });
 
 document.getElementById("go-back").addEventListener("click", () => {
@@ -712,6 +719,7 @@ setPointSize(controller.strokeWidth);
 // sketchBook.style.left =
 //     window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";
 
+localPrompts.style.display = "none";
 if (window.innerWidth <= 700) {
     penControls.appendChild(document.getElementById("scrapbook"));
     penControls.appendChild(document.getElementById("delete"));
