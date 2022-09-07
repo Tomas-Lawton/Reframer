@@ -79,6 +79,8 @@ const transformControl = document.getElementById("transform-ui");
 const controllerUI = document.querySelectorAll(".inactive-section");
 const sketchTemplate = document.getElementById("sketch-template");
 
+const eyeDropper = document.getElementById("dropper");
+
 const padding = parseInt(
     window
     .getComputedStyle(document.getElementById("contain-canvas"), null)

@@ -59,7 +59,7 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
 document.querySelectorAll(".swatch").forEach((elem) => {
     elem.addEventListener("click", () => {
         let col = window.getComputedStyle(elem).backgroundColor;
-        alphaSlider.value = 100;
+        alphaSlider.value = 1;
         controller.strokeColor = col;
         getSelectedPaths().forEach((path) => (path.strokeColor = col));
         picker.setColor(col);
@@ -136,8 +136,8 @@ copyHandler.addEventListener("click", (e) => {
 
 fixedHandler.addEventListener("click", (e) => {
     // let i = fixedHandler.querySelector("i");
+    // i.classList.toggle("fa-hand");
     // i.classList.toggle("fa-lock");
-    // i.classList.toggle("fa-unlock");
     isFixedGroup() ? fixGroup(false) : fixGroup(true);
     updateFixedUI();
 });
@@ -178,8 +178,8 @@ scaleNumber.oninput = function() {
 };
 
 alphaSlider.oninput = function() {
-    let rgba = getRGBA(this.value / 100);
-    controller.alpha = this.value / 100;
+    let rgba = getRGBA(this.value);
+    controller.alpha = this.value;
     controller.strokeColor = rgba;
     setThisColor(rgba);
     setPenMode("pen", pen);
@@ -219,6 +219,20 @@ document.getElementById("close-explorer").addEventListener("click", (e) => {
 
 document.getElementById("empty").addEventListener("click", (e) => {
     emptyExplorer();
+});
+
+eyeDropper.addEventListener("click", (e) => {
+    if (controller.penMode !== "dropper") {
+        setPenMode("dropper", eyeDropper);
+        eyeDropper.classList.add("selected-mode");
+        eyeDropper.classList.remove("simple-hover");
+        eyeDropper.style.color = "#ffffff";
+    } else {
+        setPenMode("pen", pen);
+        eyeDropper.classList.remove("selected-mode");
+        eyeDropper.classList.add("simple-hover");
+        eyeDropper.style.color = "#363636;";
+    }
 });
 
 // document.getElementById("settings").addEventListener("click", () => {
@@ -365,24 +379,31 @@ focusButton.addEventListener("click", () => {
     showHide(localPrompts);
     showHide(document.getElementById("swatches"));
 
-    if (localPrompts.style.display === "flex") {
+    let isFrameMode = localPrompts.style.display === "flex";
+
+    if (isFrameMode) {
         setActionUI("focus");
+        // function to select specific prompt i in list
+        // FOCUS the list item also
+        if (mainSketch.localFrames[0]) {
+            mainSketch.localFrames[0].frame.querySelector("input").focus();
+        }
     } else {
         setActionUI("stop");
+        setPenMode("pen", pen);
     }
 
     mainSketch.localFrames.forEach((frame) => {
         showHide(frame.frame);
-        frame.paperFrame.set({
-            fillColor: "rgba(226,226,226,0)",
-            strokeColor: "rgba(217, 217, 217, 0.3)",
-        });
+        if (isFrameMode) {
+            frame.paperFrame.set(frameOptions);
+        } else {
+            frame.paperFrame.set({
+                fillColor: "rgba(226,226,226,0)",
+                strokeColor: "rgba(217, 217, 217, 0.3)",
+            });
+        }
     });
-
-    // function to select specific prompt i in list
-    // FOCUS the list item also
-    if (mainSketch.localFrames[0])
-        mainSketch.localFrames[0].frame.querySelector("input").focus();
 });
 
 document.getElementById("go-back").addEventListener("click", () => {
@@ -461,7 +482,7 @@ localPrompts.onmousedown = (e) => {
     }
 };
 
-document.getElementById("swatches").onmousedown = (e) => {
+document.getElementById("style-handle").onmousedown = (e) => {
     if (window.innerWidth > 700) {
         e = e || window.event;
         pos3 = e.clientX;

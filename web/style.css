@@ -411,17 +411,16 @@ hr {
     position: absolute;
     z-index: 10;
     display: none;
-    background: #f5f5f5;
-    /* padding: 0.6em 0; */
-    border-radius: 0 0 0.5em 0.5em;
     box-shadow: 3px 3px 8px rgb(48 48 48 / 18%);
-    /* top: 0; */
-    /* bottom: 0; */
     top: 100vh;
     transform: translateY(-100%);
     width: 100%;
-    align-items: center;
-    flex-flow: wrap;
+}
+
+#style-content {
+    background: #f5f5f5;
+    border-radius: 0 0.3em 0.3em 0;
+    padding: 1em 1em 1em 0;
 }
 
 #dropper {
@@ -944,7 +943,7 @@ input:focus {
     font-size: 1em;
 }
 
-.card-info .fa-stop {
+.card-info .fa-hand {
     background: rgb(255, 96, 96);
 }
 
@@ -1148,6 +1147,46 @@ input[type="number"] {
     max-width: 350px;
     width: 100%;
     display: flex;
+}
+
+
+/* Accordion */
+
+.accordion {
+    background: white;
+}
+
+.accordion-header {
+    padding: 1em;
+}
+
+.accordion-item-question {
+    font-size: 1.2em;
+    font-weight: 400;
+}
+
+.accordion-title {
+    margin-bottom: 1em;
+}
+
+.accordion-item {
+    padding: 0.5em;
+}
+
+.accordion-item-header {
+    display: flex;
+    align-items: center;
+    column-gap: 0.5em;
+}
+
+.accordion-item-button {
+    width: 3em;
+    height: 3em;
+    border-radius: 50%;
+}
+
+#subtract-icon {
+    display: none;
 }
 
 #sketchbook-panel {
@@ -1498,6 +1537,21 @@ input[type="number"] {
     align-items: center;
 }
 
+#style-handle {
+    width: 12px;
+    background: #14112afa;
+    border-radius: 0.3em 0 0 0.3em;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#style-handle i {
+    color: white;
+    padding: 0 0.2em;
+}
+
 .swatches {
     display: flex;
     width: 100%;
@@ -1507,19 +1561,24 @@ input[type="number"] {
     border-radius: 0.5em 0.5em 0 0;
 }
 
+.swatches:first-child {
+    width: 1em;
+    background: #14112afa;
+}
+
 .swatch {
     width: 1.4em;
     height: 1.4em;
     border-radius: 0.4em;
     border: 3px dashed black;
-    margin: 0.25em;
+    /* margin: 0.25em; */
 }
 
 .stroke-control {
     background: #f5f5f5;
     color: #7b66ff;
     border-radius: 1em;
-    margin-bottom: 0.8em;
+    /* margin-bottom: 0.8em; */
 }
 
 .stroke-control input {
@@ -1605,12 +1664,11 @@ input[type="number"] {
 }
 
 .slider-block {
-    background: #f5f5f5;
+    /* background: #f5f5f5; */
     color: #7b66ff;
-    padding: 1.4em 1.8em;
     border-radius: 1em;
-    /* margin-bottom: 0.5em; */
-    margin-bottom: 0.8em;
+    padding: 0.5em 0 1.4em 0;
+    padding: 0.5em 0;
 }
 
 #add-refine {
@@ -1631,7 +1689,6 @@ input[type="number"] {
 }
 
 #art-control-final {
-    width: 100%;
     display: flex;
 }
 
@@ -1686,14 +1743,9 @@ input[type="number"] {
 }
 
 #pen-color {
-    /* border-radius: 0.5em; */
-    /* width: 60%; */
-    /* background-color: #12b700; */
-    box-shadow: inset 2px 4px 10px rgba(0, 0, 0, 0.15);
+    box-shadow: inset 2px 4px 10px rgb(0 0 0 / 20%);
     display: flex;
-    /* flex: 1; */
     margin-left: 0.5em;
-    /* border: none; */
     width: 25px;
     height: 25px;
 }
@@ -1707,10 +1759,10 @@ input[type="number"] {
 
 #picker-ui {
     display: none;
-    margin-bottom: 0.8em;
     position: absolute;
     z-index: 5;
-    bottom: 35px;
+    bottom: 40px;
+    margin-left: 0.5em;
 }
 
 .picker_hue {
@@ -1730,12 +1782,11 @@ input[type="number"] {
     border-radius: 2em;
 }
 
+
+/* Remove default ui */
+
 .picker_wrapper {
     box-shadow: none;
-}
-
-.picker_slider .picker_selector {
-    border-radius: 50px;
 }
 
 .picker_done button {
@@ -1746,29 +1797,40 @@ input[type="number"] {
     display: none;
 }
 
-.picker_sl {
-    box-shadow: none !important;
-    margin-top: 1em;
-    border-radius: 1em 1em;
-}
+
+/* Remove margin */
 
 .layout_default.picker_wrapper>* {
-    margin: 0.01em !important;
+    margin: 0;
+}
+
+
+/* Slider thumb */
+
+.picker_slider .picker_selector {
+    border-radius: 1em;
+}
+
+.layout_default .picker_slider,
+.layout_default .picker_selector {
+    padding: 0.5em;
 }
 
 .layout_default.picker_wrapper {
-    background: white !important;
+    background: transparent !important;
     width: 100%;
 }
 
+
+/* Picker */
+
 .layout_default .picker_sl {
-    /* width: 100% !important; */
     min-width: 100px;
-    margin-top: 0.5em !important;
+    margin-top: 0.2em !important;
 }
 
-.layout_default .picker_sl::before {
-    margin-bottom: -5px !important;
+.picker_sl {
+    border-radius: 0.5em;
 }
 
 
@@ -1939,7 +2001,7 @@ input[type="range"]::-moz-range-thumb {
 #local-prompts {
     flex-direction: column;
     position: absolute;
-    min-width: 200px;
+    width: 150px;
     left: 50%;
     top: 50%;
     z-index: 12;
@@ -1953,12 +2015,41 @@ input[type="range"]::-moz-range-thumb {
 }
 
 #local-prompts h3 {
-    margin: 1em;
+    /* margin: 1em 1em 1em 0; */
+    margin-bottom: 1em;
     font-weight: 400;
-    font-size: 0.8em;
+    font-size: 0.6em;
 }
 
-#local-prompts>div {
+#prompt-info {
+    background: #413d60;
+    padding: 0.4em;
+    font-size: 0.9em;
+    border-radius: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+
+/* can reuse this one??? */
+
+#prompt-info .list-circle {
+    border-radius: 50%;
+    background: #fecb16;
+    width: 25px;
+    height: 25px;
+    margin-right: 0.4em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#prompt-info p {
+    font-size: 0.6em;
+    font-weight: 300;
+    margin-top: 0.5em;
+}
+
+#local-prompts ul>div {
     background: rgba(64, 61, 86, 0.47);
     border-radius: 10px 10px 0px 0px;
     padding: 1em;
@@ -1979,8 +2070,8 @@ input[type="range"]::-moz-range-thumb {
     width: 100%;
     align-items: center;
     padding: 0.4em;
-    font-weight: 400;
-    font-size: 0.8em;
+    font-size: 0.6em;
+    font-weight: 300;
 }
 
 #local-prompts li:last-child {

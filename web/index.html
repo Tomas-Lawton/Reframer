@@ -93,6 +93,12 @@
 
     <div id="local-prompts">
         <h3>Focus Frames</h3>
+        <div id="prompt-info">
+            <div class="list-circle"><i class="fa-solid fa-info"></i></div>
+            <div>
+                <p>Drag to a frame and type to add a local prompt</p>
+            </div>
+        </div>
         <ul></ul>
     </div>
 
@@ -126,36 +132,46 @@
                         </div>
                         <div class="action-button tooltip" id="focus">
                             <span class="tooltiptext">Labeling parts the image helps AI focus</span>
-                            <i class="fa-solid fa-magnifying-glass fa-fw" id="focus-icon"></i>
-                            <p>Focus</p>
+                            <i class="fa-solid fa-note-sticky fa-fw" id="focus-icon"></i>
+                            <p>Frame</p>
                         </div>
                         <div class="action-button inactive-action" id="stop">
-                            <i class="fa-solid fa-stop fa-fw" id="stop-icon"></i>
+                            <i class="fa-solid fa-hand fa-fw" id="stop-icon"></i>
                             <p id="stop-text">Stop</p>
                         </div>
-                        <!-- <div class="action-button inactive-action" id="redraw">
-                            <i class="fa-solid fa-repeat fa-fw"></i>
-                            <p>Try again</p>
-                        </div> -->
                     </div>
                 </div>
-                <div class="panel-section">
-                    <div class="inactive-section slider-block" id="respect-block">
-                        <div id="control-lines">
-                            <div class="flex">
-                                <p class="slider-label" id="max-lines">Total Lines: </p>
-                                <p class="slider-label" id="calc-lines">Adding: </p>
+
+                <div class="panel-section accordion-item">
+                    <header class="accordion-item-header">
+                        <button class="accordion-item-button">
+                            <i id="add-icon" class=" fa-solid fa-plus"></i>
+                            <i id="subtract-icon" class="fa-solid fa-minus"></i>
+                        </button>
+                        <h3 class="accordion-item-question">Draw controls</h3>
+                    </header>
+
+                    <div class="accordion-item-body">
+                        <div class="inactive-section slider-block" id="respect-block">
+                            <div id="control-lines">
+                                <div class="flex">
+                                    <p class="slider-label" id="max-lines">Total Lines: </p>
+                                    <p class="slider-label" id="calc-lines">Adding: </p>
+                                </div>
+                                <input id="num-squiggles" type="range" min="0" value="48" max="150">
                             </div>
-                            <input id="num-squiggles" type="range" min="0" value="48" max="150">
+                            <div class="flex">
+                                <p class="slider-label">Line Freedom</p>
+                                <p class="slider-label" id="fix-label">More</p>
+                            </div>
+                            <input type="range" id="respect-slider" value="3" min="0" max="4">
                         </div>
-                        <div class="flex">
-                            <p class="slider-label">Line Freedom</p>
-                            <p class="slider-label" id="fix-label">More</p>
-                        </div>
-                        <input type="range" id="respect-slider" value="3" min="0" max="4">
                     </div>
                 </div>
+
             </div>
+
+
         </div>
 
         <div class="ai-ui" id="explore-margin">
@@ -193,7 +209,7 @@
                                         <h3></h3>
                                     </div>
                                     <div class="card-icon-background">
-                                        <i class="fa-solid fa-stop fa-fw"></i>
+                                        <i class="fa-solid fa-hand fa-fw"></i>
                                         <i class="fa-solid fa-minus fa-fw"></i>
                                     </div>
                                 </div>
@@ -212,56 +228,58 @@
     <!-- <p id="rolling-loss">Step: 0 Loss: 0</p> -->
 
     <div class="top-center" id="swatches">
-        <div id="basic-styles">
-            <div id="picker-ui">
-                <div id="color-picker"></div>
+        <div id="style-handle"><i class="fa-solid fa-grip-lines-vertical"></i></div>
+        <div id="style-content">
+            <div id="basic-styles">
+                <div id="picker-ui">
+                    <div id="color-picker"></div>
+                </div>
+                <div class="center">
+                    <div id="pen-color" class="off-black"></div>
+                </div>
+                <div class="red swatch"></div>
+                <div class="yellow swatch "></div>
+                <div class="green swatch"></div>
+                <div class="blue swatch"></div>
+                <div class="pink swatch "></div>
+                <div class="purple swatch"></div>
+                <div class="off-black swatch"></div>
+                <div class="white swatch"></div>
             </div>
-            <div class="center">
-                <div id="pen-color" class="off-black"></div>
+            <div id="expanded-styles">
+                <div id="points">
+                    <i class="fas fa-fw fa-eye-dropper" id="dropper"></i>
+                    <div class="center">
+                        <div class="circle" id="circle-small"></div>
+                    </div>
+                    <div class="center">
+                        <div class="circle" id="circle-med"></div>
+                    </div>
+                    <div class="center">
+                        <div class="circle" id="circle-large"></div>
+                    </div>
+                </div>
+
+                <div class="stroke-control">
+                    <div class="flex">
+                        <p class="slider-label">Stroke</p>
+                    </div>
+                    <input type="number" id="width-slider" value="12" min="1" max="48">
+                </div>
+
+                <div class="stroke-control">
+                    <div class="flex">
+                        <p class="slider-label">Opacity</p>
+                    </div>
+                    <input type="number" id="alpha-slider" step="0.01" value=".75" min="0" max="1">
+                </div>
+                <div id="art-control-final">
+                    <div id="stroke-dot">
+                        <div id="point-size"></div>
+                    </div>
+                </div>
             </div>
-            <div class="red swatch"></div>
-            <div class="yellow swatch "></div>
-            <div class="green swatch"></div>
-            <div class="blue swatch"></div>
-            <div class="pink swatch "></div>
-            <div class="purple swatch"></div>
-            <div class="off-black swatch"></div>
-            <div class="white swatch"></div>
-            <i class="fas fa-fw fa-eye-dropper pen-mode" id="dropper"></i>
         </div>
-        <div id="expanded-styles">
-            <div id="points">
-                <div class="center">
-                    <div class="circle" id="circle-small"></div>
-                </div>
-                <div class="center">
-                    <div class="circle" id="circle-med"></div>
-                </div>
-                <div class="center">
-                    <div class="circle" id="circle-large"></div>
-                </div>
-            </div>
-
-            <div class="stroke-control">
-                <div class="flex">
-                    <p class="slider-label">Stroke</p>
-                </div>
-                <input type="number" id="width-slider" value="12" min="1" max="48">
-            </div>
-
-            <div class="stroke-control">
-                <div class="flex">
-                    <p class="slider-label">Opacity</p>
-                </div>
-                <input type="number" id="alpha-slider" value="75" min="0" max="100">
-            </div>
-            <div id="art-control-final">
-                <div id="stroke-dot">
-                    <div id="point-size"></div>
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <div id="content">
@@ -271,7 +289,7 @@
                     <h2 id="partial-message">Draw a drawing of a oubwego</h2>
                     <div id="fixed-handler" class="select-ui">
                         <div>
-                            <i class="fa-solid fa-lock fa-fw"></i>
+                            <i class="fa-solid fa-hand fa-fw"></i>
                         </div>
                     </div>
                     <div id="delete-handler" class="select-ui default">

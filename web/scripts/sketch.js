@@ -379,7 +379,7 @@ class Sketch {
             }
 
             let removeButton = newElem.querySelector(".fa-minus");
-            let stopButton = newElem.querySelector(".fa-stop");
+            let stopButton = newElem.querySelector(".fa-hand");
             let loader = newElem.querySelector(".card-loading");
 
             newElem.id = `${this.type}-sketch-item-${domIdx}`;

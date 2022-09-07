@@ -2,7 +2,7 @@ const killExploratorySketches = () => {
     console.log(controller.exploreScopes);
     if (controller.exploreScopes.length > 0) {
         explorer.childNodes.forEach((child, i) => {
-            let stopButton = child.querySelector(".fa-stop");
+            let stopButton = child.querySelector(".fa-hand");
             let loader = child.querySelector(".card-loading");
             loader.classList.remove("button-animation");
             loader.classList.remove("fa-spinner");
@@ -100,7 +100,6 @@ const focusUI = () => {
     focusButton.style.color = "#ffffff";
     focusButton.querySelector("i").style.color = "#ffffff";
     focusButton.style.cursor = "pointer";
-
     aiMessage.classList.add("typed-out");
 };
 
@@ -251,13 +250,13 @@ const updateSelectPosition = () => {
 const updateFixedUI = () => {
     let i = fixedHandler.querySelector("i");
     if (isFixedGroup()) {
-        i.classList.add("fa-lock");
-        i.classList.remove("fa-unlock");
+        i.classList.add("fa-hand");
+        i.classList.remove("fa-lock");
         i.classList.add("green");
         i.classList.remove("orange");
     } else {
-        i.classList.remove("fa-lock");
-        i.classList.add("fa-unlock");
+        i.classList.remove("fa-hand");
+        i.classList.add("fa-lock");
         i.classList.add("orange");
         i.classList.remove("green");
     }

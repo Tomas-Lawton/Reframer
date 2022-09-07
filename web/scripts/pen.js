@@ -11,10 +11,7 @@ let sketchTimer,
     lastFrameParent;
 
 sketchTool.onMouseDown = function(event) {
-    console.log(mainSketch.sketchLayer.children);
-
     clearTimeout(sketchTimer);
-
     let hitResult = mainSketch.sketchLayer.hitTest(event.point);
 
     switch (controller.penMode) {
@@ -140,8 +137,7 @@ sketchTool.onMouseDown = function(event) {
             picker.setColor(controller.strokeColor, true);
             console.log(controller.strokeColor);
 
-            alphaSlider.value =
-                parseFloat(controller.strokeColor.split(",")[3] || 1) * 100;
+            alphaSlider.value = parseFloat(controller.strokeColor.split(",")[3] || 1);
             hitResult && setPointSize(hitResult.item.strokeWidth);
     }
 };
@@ -298,6 +294,7 @@ sketchTool.onMouseUp = function() {
             frameUI.addEventListener("input", (e) => {
                 localPrompt.innerHTML = e.target.value;
                 mainSketch.localFrames[i].data.prompt = e.target.value;
+                document.getElementById("prompt-info").style.display = "none";
             });
 
             tag.addEventListener("click", (e) => {
@@ -307,7 +304,7 @@ sketchTool.onMouseUp = function() {
                     elem.frame.style.opacity = 1;
                 });
 
-                frameUI.style.opacity = 0.7;
+                frameUI.style.opacity = 0.85;
                 tag.style.background = "#413d60";
             });
 
@@ -316,6 +313,10 @@ sketchTool.onMouseUp = function() {
                 tag.remove();
                 frameUI.remove();
                 newFrame.remove();
+
+                if (mainSketch.localFrames.length === 0) {
+                    document.getElementById("prompt-info").style.display = "initial";
+                }
             });
 
             input.onmousedown = (e) => {
@@ -558,14 +559,8 @@ const setPenMode = (mode, accentTarget) => {
             controller.penMode = mode;
             break;
         case "dropper":
-            if (accentTarget) {
-                accentTarget.classList.add("selected-mode");
-                accentTarget.classList.remove("simple-hover");
-            }
             canvas.style.cursor = "url('public/dropper.svg') -1 20, move";
-
             controller.penMode = mode;
-            document.getElementById("dropper").style.color = "#ffffff";
     }
 
     if (controller.penMode !== "select") {
@@ -585,10 +580,6 @@ const setPenMode = (mode, accentTarget) => {
     }
 
     if (controller.penMode !== "dropper") {
-        document.getElementById("dropper").style.color = "#363636";
+        eyeDropper.style.color = "#363636";
     }
-    // if (controller.penMode !== "dropper") {
-    // document.getElementById("dropper").style.color = "#363636";
-    // REMOVE LISTENR
-    // }
 };
