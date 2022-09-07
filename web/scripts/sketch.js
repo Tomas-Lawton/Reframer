@@ -531,7 +531,7 @@ class Sketch {
         // change to load??
         toCanvas.activeLayer.importSVG(sJSON);
         newElem.classList.add("bounce");
-        document.getElementById("sketch-grid").prepend(newElem);
+        // document.getElementById("sketch-grid").prepend(newElem);
         controller.sketchScopeIndex += 1;
     }
     buildSketch() {

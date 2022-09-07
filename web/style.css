@@ -95,6 +95,10 @@ body {
     padding-left: 0;
 }
 
+.greeeeeen {
+    background-color: rgb(22 211 139);
+}
+
 #canvas {
     background-color: white;
     cursor: url("public/pen.svg") -1 20, move;
@@ -695,7 +699,7 @@ hr {
 
 #message {
     color: #7b66ff;
-    text-align: center;
+    /* text-align: center; */
     margin: 1em 0;
     display: flex;
     overflow: hidden;
@@ -1170,7 +1174,8 @@ input[type="number"] {
 }
 
 .accordion-item {
-    padding: 0.5em;
+    padding: 1.5em;
+    border-radius: 1em;
 }
 
 .accordion-item-header {
@@ -1185,8 +1190,47 @@ input[type="number"] {
     border-radius: 50%;
 }
 
+.accordion-item-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: 0.25s;
+}
+
+.open {
+    border: 2px solid #7b66ff;
+}
+
+.open .accordion-item-body {
+    max-height: 22em;
+}
+
+.open .accordion-item-button {
+    background: #f3f1ff;
+}
+
+.open #subtract-icon {
+    display: block;
+}
+
+.open #add-icon {
+    display: none;
+}
+
 #subtract-icon {
     display: none;
+}
+
+.closed {
+    border: 2px solid #f5f5f5;
+}
+
+.closed:hover {
+    background: #f5f5f5;
+    transition: 0.25s;
+}
+
+.closed:hover .accordion-item-button {
+    background: white;
 }
 
 #sketchbook-panel {
@@ -1374,6 +1418,7 @@ input[type="number"] {
     color: #1b1b1b;
     /* color: white; */
     font-size: 2rem;
+    padding: 0.5em 0;
 }
 
 
@@ -1667,8 +1712,7 @@ input[type="number"] {
     /* background: #f5f5f5; */
     color: #7b66ff;
     border-radius: 1em;
-    padding: 0.5em 0 1.4em 0;
-    padding: 0.5em 0;
+    padding: 1em 0 0 0;
 }
 
 #add-refine {
@@ -1933,7 +1977,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 #control-lines {
-    margin-bottom: 0.5em;
+    margin-top: 0.5em;
 }
 
 #pen-controls {
@@ -2001,7 +2045,7 @@ input[type="range"]::-moz-range-thumb {
 #local-prompts {
     flex-direction: column;
     position: absolute;
-    width: 150px;
+    width: 185px;
     left: 50%;
     top: 50%;
     z-index: 12;
@@ -2009,16 +2053,14 @@ input[type="range"]::-moz-range-thumb {
     box-shadow: 10px 5px 15px rgb(28 28 28 / 20%);
     overflow: hidden;
     border-radius: 0.6em;
-    padding: 0.5em;
+    padding: 1em 0.6em 0.6em 0.6em;
     color: white;
-    /* margin: 5em; */
 }
 
 #local-prompts h3 {
-    /* margin: 1em 1em 1em 0; */
     margin-bottom: 1em;
     font-weight: 400;
-    font-size: 0.6em;
+    font-size: 0.8em;
 }
 
 #prompt-info {
@@ -2033,14 +2075,17 @@ input[type="range"]::-moz-range-thumb {
 /* can reuse this one??? */
 
 #prompt-info .list-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.list-circle {
     border-radius: 50%;
     background: #fecb16;
     width: 25px;
     height: 25px;
     margin-right: 0.4em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 #prompt-info p {
@@ -2067,24 +2112,38 @@ input[type="range"]::-moz-range-thumb {
 #local-prompts li {
     border-bottom: 2px solid #4a3f62;
     display: flex;
-    width: 100%;
     align-items: center;
     padding: 0.4em;
     font-size: 0.6em;
     font-weight: 300;
+    justify-content: space-between;
+}
+
+#local-prompts li div:first-child {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+#local-prompts li i {
+    padding: 0.2em 0.8em;
+    border-radius: 0.2em;
+    font-size: 1.2em;
 }
 
 #local-prompts li:last-child {
     border-bottom: none;
 }
 
-#local-prompts li div {
+
+/* #local-prompts li div {
     border-radius: 50%;
     background: #8c5de4;
     width: 25px;
     height: 25px;
     margin-right: 0.4em;
 }
+ */
 
 
 /* Action Tooltip */
@@ -2174,7 +2233,7 @@ input[type="range"]::-moz-range-thumb {
         font-size: 1.8rem;
     }
     #contain-canvas {
-        padding: 3em;
+        padding: 1em;
     }
     /* #top-action-right {
         display: initial;

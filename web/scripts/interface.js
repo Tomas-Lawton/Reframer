@@ -378,6 +378,8 @@ focusButton.addEventListener("click", () => {
     setPenMode("local", null);
     showHide(localPrompts);
     showHide(document.getElementById("swatches"));
+    backDrop.classList.toggle("greeeeeen");
+    accordionItem.classList.toggle("inactive-section");
 
     let isFrameMode = localPrompts.style.display === "flex";
 
@@ -400,7 +402,7 @@ focusButton.addEventListener("click", () => {
         } else {
             frame.paperFrame.set({
                 fillColor: "rgba(226,226,226,0)",
-                strokeColor: "rgba(217, 217, 217, 0.3)",
+                strokeColor: "rgba(217, 217, 217, 0.8)",
             });
         }
     });
@@ -642,6 +644,14 @@ respectSlider.onmouseup = () => {
     }
 };
 
+const accordionItem = document.querySelector(".accordion-item");
+document
+    .querySelector(".accordion-item-header")
+    .addEventListener("click", () => {
+        accordionItem.classList.toggle("open");
+        accordionItem.classList.toggle("closed");
+    });
+
 // Shortcuts
 window.addEventListener("keydown", function(event) {
     if (event.metaKey && event.shiftKey) {
@@ -727,15 +737,15 @@ setLineLabels(mainSketch.sketchLayer);
 setActionUI("inactive");
 setPointSize(controller.strokeWidth);
 
-// const defaults = new PaperScope();
-// defaults.activate();
-// for (let i = 0; i < 4; i++) {
-//     let sketch = new Sketch(null, defaults, sketchSize);
-//     let newElem = sketch.renderMini();
-//     // controller.sketchScopeIndex += 1; //remove later
-//     newElem.classList.add("inactive-sketch");
-//     document.getElementById("explore-sketches").appendChild(newElem);
-// }
+const defaults = new PaperScope();
+defaults.activate();
+for (let i = 0; i < 4; i++) {
+    let sketch = new Sketch(null, defaults, sketchSize);
+    let newElem = sketch.renderMini();
+    // controller.sketchScopeIndex += 1; //remove later
+    newElem.classList.add("inactive-sketch");
+    document.getElementById("explore-sketches").appendChild(newElem);
+}
 
 // sketchBook.style.left =
 //     window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";

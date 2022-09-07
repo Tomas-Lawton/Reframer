@@ -79,6 +79,12 @@
         <i class="fa-solid fa-eraser fa-fw pen-mode simple-hover" id="erase"></i>
         <!-- <i class="region fa-solid fa-object-group fa-fw pen-mode ai-ui" id="lasso"></i> -->
         <i class="fa-solid fa-sliders fa-fw panel-open" id="palette"></i>
+
+
+
+
+
+        <!-- REMOVE -->
         <i class="fa-solid fa-rotate-left fa-fw simple-hover" id="undo"></i>
         <i class="fa-solid fa-rotate-right fa-fw simple-hover" id="redo"></i>
     </div>
@@ -106,15 +112,7 @@
         <div class="ai-ui content-margin">
             <div id="ai-content">
                 <div class="panel-section">
-                    <div class="flex" style="display: none">
-                        <h1 class="panel-title" id="message">
-                            What are we drawing?
-                        </h1>
-                    </div>
-                    <!-- <h2 class="panel-title">AI Actions</h2> -->
-                    <div id="spinner">
-                        <i class="fa-solid fa-spinner button-animation " id="loading"></i>
-                    </div>
+                    <h2 class="panel-title">Action</h2>
                     <input type="text" tabIndex="0" class="prompt-input" id="messageText" placeholder="Start by describing your sketch..." autocomplete="off" />
                 </div>
 
@@ -142,17 +140,22 @@
                     </div>
                 </div>
 
-                <div class="panel-section accordion-item">
+                <div class="inactive-section closed panel-section accordion-item">
                     <header class="accordion-item-header">
                         <button class="accordion-item-button">
                             <i id="add-icon" class=" fa-solid fa-plus"></i>
                             <i id="subtract-icon" class="fa-solid fa-minus"></i>
                         </button>
-                        <h3 class="accordion-item-question">Draw controls</h3>
+                        <h3 class="accordion-item-question">Control AI</h3>
                     </header>
 
                     <div class="accordion-item-body">
                         <div class="inactive-section slider-block" id="respect-block">
+                            <div class="flex">
+                                <p class="slider-label">Line Freedom</p>
+                                <p class="slider-label" id="fix-label">More</p>
+                            </div>
+                            <input type="range" id="respect-slider" value="3" min="0" max="4">
                             <div id="control-lines">
                                 <div class="flex">
                                     <p class="slider-label" id="max-lines">Total Lines: </p>
@@ -160,11 +163,6 @@
                                 </div>
                                 <input id="num-squiggles" type="range" min="0" value="48" max="150">
                             </div>
-                            <div class="flex">
-                                <p class="slider-label">Line Freedom</p>
-                                <p class="slider-label" id="fix-label">More</p>
-                            </div>
-                            <input type="range" id="respect-slider" value="3" min="0" max="4">
                         </div>
                     </div>
                 </div>
@@ -183,6 +181,23 @@
         </div>
 
     </div>
+
+    <div class="sketch-card" id="sketch-template" draggable="true">
+        <div class="card-info">
+            <div>
+                <i class="fa-solid fa-spinner button-animation card-loading"></i>
+                <h3></h3>
+            </div>
+            <div class="card-icon-background">
+                <i class="fa-solid fa-hand fa-fw"></i>
+                <i class="fa-solid fa-minus fa-fw"></i>
+            </div>
+        </div>
+        <div class="sketch">
+            <canvas id="template-sketch" class="sketch-canvas"></canvas>
+        </div>
+    </div>
+
     <!-- <div id="sketchbook-panel">
         <div id="sketchbook-content">
             <div id="static-margin">
@@ -286,6 +301,14 @@
         <div id="sketch-view">
             <div id="contain-canvas">
                 <div class="canvas-standard-drop" id="canvas-drop">
+                    <div class="flex" style="position:absolute; right:0;">
+                        <h1 class="panel-title" id="message">
+                            What are we drawing?
+                        </h1>
+                        <div id="spinner">
+                            <i class="fa-solid fa-spinner button-animation " id="loading"></i>
+                        </div>
+                    </div>
                     <h2 id="partial-message">Draw a drawing of a oubwego</h2>
                     <div id="fixed-handler" class="select-ui">
                         <div>

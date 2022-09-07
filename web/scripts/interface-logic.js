@@ -34,6 +34,9 @@ const emptyExplorer = () => {
 };
 
 const activateUI = () => {
+    accordionItem.classList.add("open");
+    accordionItem.classList.remove("closed");
+
     actionControls.forEach((elem) => {
         elem.classList.add("inactive-action");
     });
@@ -96,7 +99,7 @@ const focusUI = () => {
     document.getElementById("pen").classList.add("inactive-top-action");
     document.getElementById("erase").classList.add("inactive-top-action");
 
-    focusButton.style.background = "#15d335";
+    focusButton.style.background = "rgb(21 211 139";
     focusButton.style.color = "#ffffff";
     focusButton.querySelector("i").style.color = "#ffffff";
     focusButton.style.cursor = "pointer";

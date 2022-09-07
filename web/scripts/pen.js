@@ -282,13 +282,24 @@ sketchTool.onMouseUp = function() {
             let dragCorner = frameUI.querySelector("div");
 
             let tag = document.createElement("li");
+            let c1 = document.createElement("div");
+            let c2 = document.createElement("div");
             let localPrompt = document.createElement("p");
             let circle = document.createElement("div");
+            let closeButton = document.createElement("i");
+
+            circle.classList.add("list-circle");
             circle.style.background = frameUI.querySelector("input").style.background;
-            tag.appendChild(circle);
-            tag.appendChild(localPrompt);
+            closeButton.classList.add("fa-solid", "fa-xmark");
+
+            c1.appendChild(circle);
+            c1.appendChild(localPrompt);
+            c2.appendChild(closeButton);
+            tag.appendChild(c1);
+            tag.appendChild(c2);
             localPrompts.querySelector("ul").appendChild(tag);
 
+            // TODO CHANGE BROKEN
             let i = mainSketch.localFrames.length;
 
             frameUI.addEventListener("input", (e) => {
@@ -308,8 +319,15 @@ sketchTool.onMouseUp = function() {
                 tag.style.background = "#413d60";
             });
 
+            // w!!!!!!!!hen you move a previous item, the index here is no longer correct
+            // it just messes up the arr even tho the other parts are removed!!!!!!
             closeFrame.addEventListener("click", (e) => {
+                // create function for delete logic
+                console.log(mainSketch.localFrames.length);
+                console.log("index", i);
                 mainSketch.localFrames.splice(i, 1);
+                console.log(mainSketch.localFrames.length);
+
                 tag.remove();
                 frameUI.remove();
                 newFrame.remove();
@@ -320,6 +338,7 @@ sketchTool.onMouseUp = function() {
             });
 
             input.onmousedown = (e) => {
+                // this will also get messed up now
                 if (window.innerWidth > 700) {
                     e = e || window.event;
                     pos3 = e.clientX;

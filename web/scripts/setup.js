@@ -78,23 +78,20 @@ const transformControl = document.getElementById("transform-ui");
 
 const controllerUI = document.querySelectorAll(".inactive-section");
 const sketchTemplate = document.getElementById("sketch-template");
-
+const backDrop = document.getElementById("contain-canvas");
 const eyeDropper = document.getElementById("dropper");
 
 const padding = parseInt(
-    window
-    .getComputedStyle(document.getElementById("contain-canvas"), null)
-    .getPropertyValue("padding")
+    window.getComputedStyle(backDrop, null).getPropertyValue("padding")
 );
 
-const containerRect = document
-    .getElementById("contain-canvas")
-    .getBoundingClientRect();
+const containerRect = backDrop.getBoundingClientRect();
 
+const sketchSize = 100;
 // const sketchSize =
 //     document.querySelectorAll("div#sketch-grid")[0].offsetWidth / 2 - 5;
-// const reusableExemplar = sketchTemplate.cloneNode(true); //clone to use
-// sketchTemplate.remove();
+const reusableExemplar = sketchTemplate.cloneNode(true); //clone to use
+sketchTemplate.remove();
 // console.log(sketchSize);
 
 if (containerRect.width > window.innerHeight) {
@@ -114,7 +111,7 @@ const offset = frame / 2;
 // const offY = Math.max(0, canvas.height - canvas.width) / 2;
 // const offY = 0;
 // const offX = (canvas.width - canvas.height) / 2;
-// const scaleRatio = frame / sketchSize;
+const scaleRatio = frame / sketchSize;
 
 // Paper Setup
 paper.install(window);
