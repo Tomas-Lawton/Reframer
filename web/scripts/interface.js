@@ -395,7 +395,8 @@ focusButton.addEventListener("click", () => {
         setPenMode("pen", pen);
     }
 
-    mainSketch.localFrames.forEach((frame) => {
+    for (const item in mainSketch.localFrames) {
+        let frame = mainSketch.localFrames[item];
         showHide(frame.frame);
         if (isFrameMode) {
             frame.paperFrame.set(frameOptions);
@@ -405,7 +406,7 @@ focusButton.addEventListener("click", () => {
                 strokeColor: "rgba(217, 217, 217, 0.8)",
             });
         }
-    });
+    }
 });
 
 document.getElementById("go-back").addEventListener("click", () => {
@@ -650,6 +651,13 @@ document
     .addEventListener("click", () => {
         accordionItem.classList.toggle("open");
         accordionItem.classList.toggle("closed");
+
+        if (accordionItem.classList.contains("open")) {
+            accordionItem.lastChild.style.maxHeight =
+                accordionItem.lastElementChild.scrollHeight + "px";
+        } else {
+            accordionItem.lastChild.style.maxHeight = "0px";
+        }
     });
 
 // Shortcuts

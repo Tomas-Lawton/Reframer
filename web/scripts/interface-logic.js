@@ -54,6 +54,17 @@ const activateUI = () => {
     aiMessage.classList.add("typed-out");
 };
 
+const deleteFrame = (i) => {
+    let item = mainSketch.localFrames[i];
+    item.tag.remove();
+    item.frame.remove();
+    item.paperFrame.remove();
+    delete mainSketch.localFrames[i];
+    if (Object.keys(mainSketch.localFrames).length === 0) {
+        document.getElementById("prompt-info").style.display = "initial";
+    }
+};
+
 const inactiveStopUI = () => {
     stopButton.classList.add("inactive-action");
     stopButton.style.background = "#f5f5f5";

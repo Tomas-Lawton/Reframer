@@ -299,8 +299,7 @@ sketchTool.onMouseUp = function() {
             tag.appendChild(c2);
             localPrompts.querySelector("ul").appendChild(tag);
 
-            // TODO CHANGE BROKEN
-            let i = mainSketch.localFrames.length;
+            let i = createUUID();
 
             frameUI.addEventListener("input", (e) => {
                 localPrompt.innerHTML = e.target.value;
@@ -310,35 +309,23 @@ sketchTool.onMouseUp = function() {
 
             tag.addEventListener("click", (e) => {
                 input.focus();
-                mainSketch.localFrames.forEach((elem) => {
+                for (const elem in mainSketch.localFrames.values) {
                     elem.tag.style.background = "transparent";
                     elem.frame.style.opacity = 1;
-                });
-
+                }
                 frameUI.style.opacity = 0.85;
                 tag.style.background = "#413d60";
             });
 
-            // w!!!!!!!!hen you move a previous item, the index here is no longer correct
-            // it just messes up the arr even tho the other parts are removed!!!!!!
             closeFrame.addEventListener("click", (e) => {
-                // create function for delete logic
-                console.log(mainSketch.localFrames.length);
-                console.log("index", i);
-                mainSketch.localFrames.splice(i, 1);
-                console.log(mainSketch.localFrames.length);
+                deleteFrame(i);
+            });
 
-                tag.remove();
-                frameUI.remove();
-                newFrame.remove();
-
-                if (mainSketch.localFrames.length === 0) {
-                    document.getElementById("prompt-info").style.display = "initial";
-                }
+            closeButton.addEventListener("click", (e) => {
+                deleteFrame(i);
             });
 
             input.onmousedown = (e) => {
-                // this will also get messed up now
                 if (window.innerWidth > 700) {
                     e = e || window.event;
                     pos3 = e.clientX;
@@ -391,7 +378,7 @@ sketchTool.onMouseUp = function() {
             let topLeft = newFrame.bounds.topLeft;
             let bottomRight = newFrame.bounds.bottomRight;
 
-            mainSketch.localFrames.push({
+            mainSketch.localFrames[i] = {
                 tag: tag,
                 frame: frameUI,
                 paperFrame: newFrame,
@@ -404,7 +391,7 @@ sketchTool.onMouseUp = function() {
                         y2: bottomRight.y,
                     },
                 },
-            });
+            };
             frameUI.querySelector("input").focus();
             break;
         case "erase":
@@ -582,7 +569,7 @@ const setPenMode = (mode, accentTarget) => {
             controller.penMode = mode;
     }
 
-    if (controller.penMode !== "select") {
+    if (controller.penMode !== "select" && controller.penMode !== "dropper") {
         ungroup();
         mainSketch.sketchLayer.getItems().forEach((path) => {
             path.selected = false;

@@ -174,7 +174,7 @@ class Controller {
                 prompt: this.prompt,
                 lines: this.initRandomCurves ? this.addLines : 0, //adding
                 fixation: this.useFixation,
-                frames: mainSketch.localFrames.map((elem) => elem.data),
+                frames: Object.values(mainSketch.localFrames).map((elem) => elem.data),
             });
             this.step = 0;
             setActionUI("drawing");
@@ -198,7 +198,7 @@ class Controller {
                 lines: this.addLines,
                 sketchScopeIndex: sketchCountIndex,
                 fixation: this.useFixation,
-                frames: mainSketch.localFrames.map((elem) => elem.data),
+                frames: Object.values(mainSketch.localFrames).map((elem) => elem.data),
             });
         }
     }
