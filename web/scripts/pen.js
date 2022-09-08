@@ -337,10 +337,10 @@ sketchTool.onMouseUp = function() {
                         newFrame.position.y += e.movementY;
 
                         mainSketch.localFrames[i].data.points = {
-                            x1: topLeft.x,
-                            y1: topLeft.y,
-                            x2: bottomRight.x,
-                            y2: bottomRight.y,
+                            x0: topLeft.x,
+                            y0: topLeft.y,
+                            x1: bottomRight.x,
+                            y1: bottomRight.y,
                         };
                     };
                 }
@@ -365,10 +365,10 @@ sketchTool.onMouseUp = function() {
                         let bottomRight = newFrame.bounds.bottomRight;
 
                         mainSketch.localFrames[i].data.points = {
-                            x1: topLeft.x,
-                            y1: topLeft.y,
-                            x2: bottomRight.x,
-                            y2: bottomRight.y,
+                            x0: topLeft.x,
+                            y0: topLeft.y,
+                            x1: bottomRight.x,
+                            y1: bottomRight.y,
                         };
                         frameUI.querySelector("input").focus();
                     };
@@ -385,10 +385,10 @@ sketchTool.onMouseUp = function() {
                 data: {
                     prompt: "default",
                     points: {
-                        x1: topLeft.x,
-                        y1: topLeft.y,
-                        x2: bottomRight.x,
-                        y2: bottomRight.y,
+                        x0: topLeft.x,
+                        y0: topLeft.y,
+                        x1: bottomRight.x,
+                        y1: bottomRight.y,
                     },
                 },
             };

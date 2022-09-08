@@ -1792,6 +1792,7 @@ input[type="number"] {
     margin-left: 0.5em;
     width: 25px;
     height: 25px;
+    border-radius: 50%;
 }
 
 #art-sliders {

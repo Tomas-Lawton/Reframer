@@ -77,6 +77,19 @@ class CICADA:
 
     def activate(self, add_curves):
         self.drawing = Sketch(canvas_w, canvas_h)
+        
+        # calc points
+        for local_item in self.local_frames:
+            self.add_attention_region(
+                local_item.prompt,
+        {'x0': local_item.points.x0, 'x1': local_item.points.x1, 'y0': local_item.points.y0, 'y1': local_item.points.y1}
+        )
+
+        # self.add_attention_region(
+        # 'A strawberry ice-cream cone.',
+        # {'x0': 0.125, 'x1': 0.375, 'y0': 0.25, 'y1': 0.5},
+        # )
+
         self.is_active = True
         paths = self.extract_points(self.sketch_data)
 
