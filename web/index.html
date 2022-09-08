@@ -49,14 +49,6 @@
         </div>
     </div> -->
 
-    <div id="settings-ui">
-        <hr />
-        <!-- <label>Use advanced prompts</label>
-        <input id="advanced-prompts" type="checkbox"> -->
-        <label>Trace History (default: 1)</label>
-        <input id="num-traces" type="number" min="1" value="1" max="5">
-    </div>
-
     <!-- <div class="ai-ui" id="pen-dropdown">
         <div class="simple-drop pen-mode" id="select">
             <div>
@@ -73,16 +65,7 @@
     </div> -->
 
     <div class="top-action" id="pen-controls">
-        <!-- <i class="fa-solid fa-arrow-pointer fa-fw simple-hover pen-mode" id="pen-drop"></i> -->
-        <i class="fa-solid fa-arrow-pointer fa-fw pen-mode" id="select"></i>
-        <i class="fa-solid fa-pen fa-fw pen-mode selected-mode" id="pen"></i>
-        <i class="fa-solid fa-eraser fa-fw pen-mode simple-hover" id="erase"></i>
-        <!-- <i class="region fa-solid fa-object-group fa-fw pen-mode ai-ui" id="lasso"></i> -->
         <i class="fa-solid fa-sliders fa-fw panel-open" id="palette"></i>
-
-
-
-
 
         <!-- REMOVE -->
         <i class="fa-solid fa-rotate-left fa-fw simple-hover" id="undo"></i>
@@ -93,7 +76,7 @@
         <!-- <i class="fa-solid fa-book fa-fw panel-open" id="scrapbook"></i> -->
         <i class="fa-solid fa-save fa-fw" id="save"></i>
         <i class="fa-solid fa-trash fa-fw" id="delete"></i>
-        <!-- <i class="fa-solid fa-cog fa-fw" id="settings"></i> -->
+        <i class="fa-solid fa-cog fa-fw" id="settings"></i>
     </div>
     <!-- <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i> -->
 
@@ -263,6 +246,7 @@
             </div>
             <div id="expanded-styles">
                 <div id="points">
+                    <i class="fa-solid fa-arrow-pointer fa-fw pen-mode" id="select"></i>
                     <i class="fas fa-fw fa-eye-dropper" id="dropper"></i>
                     <div class="center">
                         <div class="circle" id="circle-small"></div>
@@ -295,6 +279,11 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="draw-tools">
+        <img class="erase-tool" src="public/erase-pencil.svg" alt="erasor"></img>
+        <img class="pen-tool selected" src="public/tip-pencil.svg" alt="erasor"></img>
     </div>
 
     <div id="content">
@@ -369,8 +358,14 @@
                 </div>
             </div>
         </div>
+
+        <!-- Future -->
+        <!-- <div id="settings-ui">
+            <hr />
+            <label>Trace History (default: 1)</label>
+            <input id="num-traces" type="number" min="1" value="1" max="5">
+        </div> -->
     </div>
-    <!-- <i class="fa-solid fa-download" id="upload"></i> -->
 </body>
 
 </html>

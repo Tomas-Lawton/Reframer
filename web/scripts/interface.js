@@ -235,13 +235,28 @@ eyeDropper.addEventListener("click", (e) => {
     }
 });
 
-// document.getElementById("settings").addEventListener("click", () => {
-//     openModal({
-//         title: "Advanced",
-//         message: "Change the drawing behaviour and UI.",
-//         ui: document.getElementById("settings-ui"),
-//     });
-// });
+const penTool = document.querySelector(".pen-tool");
+const eraseTool = document.querySelector(".erase-tool");
+
+penTool.addEventListener("click", (e) => {
+    eraseTool.classList.toggle("selected");
+    penTool.classList.toggle("selected");
+    setPenMode("pen");
+});
+
+eraseTool.addEventListener("click", (e) => {
+    eraseTool.classList.toggle("selected");
+    penTool.classList.toggle("selected");
+    setPenMode("erase");
+});
+
+document.getElementById("settings").addEventListener("click", () => {
+    // openModal({
+    //     title: "Advanced",
+    //     message: "Change the drawing behaviour and UI.",
+    //     ui: document.getElementById("settings-ui"),
+    // });
+});
 
 timeKeeper.oninput = function() {
     if (this.value === 0) return; // 0 is pre-generation state

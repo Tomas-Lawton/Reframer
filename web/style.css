@@ -399,16 +399,12 @@ hr {
 .top-action {
     display: flex;
     align-items: center;
-    /* background-color: #000000d6; */
-    background-color: #000000c2;
     color: white;
     position: absolute;
     z-index: 10;
     border-radius: 3em;
-    /* margin: 0.2em; */
-    /* box-shadow: 10px 9px 27px rgb(48 48 48 / 18%); */
-    box-shadow: 3px 3px 8px rgb(48 48 48 / 18%);
-    /* overflow: hidden; */
+    background: #14112afa;
+    box-shadow: 10px 5px 15px rgb(28 28 28 / 20%);
 }
 
 .top-center {
@@ -973,11 +969,8 @@ input:focus {
 .simple-drop {
     display: flex;
     cursor: pointer;
-    /* margin: 1em 0.5em; */
     color: white;
     font-weight: 500;
-    /* padding: 1.8em 1.8em 1.8em 1.3em; */
-    /* padding: 1.8em; */
     padding: 0.8em;
     font-size: 0.7em;
 }
@@ -1498,6 +1491,32 @@ input[type="number"] {
     to {
         transform: rotate(360deg);
     }
+}
+
+.draw-tools {
+    background: linear-gradient(173.58deg, #eeeeee 4.75%, #ffffff 88.29%);
+    box-shadow: 10px 11px 37px rgba(48, 48, 48, 0.29);
+    width: 154px;
+    border-radius: 2em 0 0 2em;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    z-index: 5;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3em 0;
+}
+
+.draw-tools img {
+    margin: 0.5em;
+}
+
+.selected {
+    padding-right: 100px;
+    filter: drop-shadow(5px 4px 4px rgba(48, 48, 48, 0.22));
+    transition: 0.25s;
 }
 
 #loading {
