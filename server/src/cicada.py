@@ -2,8 +2,7 @@ import copy
 import torch
 import pydiffvg
 from util.processing import get_augment_trans
-from util.loss import CLIPConvLoss2
-from util.utils import area_mask, use_penalisation, k_min_elements
+from util.utils import area_mask, use_penalisation, k_min_elements, scale_points
 from util.clip_utility import  data_to_tensor
 
 import clip
@@ -21,7 +20,8 @@ class CICADA:
         self.model = model
         # self.clipConvLoss = CLIPConvLoss2(self.device)
         self.augment_trans = get_augment_trans(canvas_w, normalize_clip)
-        
+        self.attention_regions = []
+
         # Variables
         self.iteration = 0
         self.w_points = 0.01
@@ -39,6 +39,17 @@ class CICADA:
         with torch.no_grad():
             features = self.model.encode_text(tokens)  # normalise
             return features / features.norm(dim=-1, keepdim=True)
+
+    def add_attention_region(self, prompt, drawing_area):
+        text_input = clip.tokenize(prompt).to(self.device)
+        with torch.no_grad():
+            text_features = self.model.encode_text(text_input)
+            mask = area_mask(canvas_w, canvas_h, drawing_area).to(
+                self.device
+            )
+            self.attention_regions.append(
+                {'text_features': text_features, 'mask': 1 - mask}
+            )
 
     def extract_points(self, data):
         path_list = []
@@ -77,18 +88,11 @@ class CICADA:
 
     def activate(self, add_curves):
         self.drawing = Sketch(canvas_w, canvas_h)
-        
-        # calc points
-        for local_item in self.local_frames:
-            self.add_attention_region(
-                local_item.prompt,
-        {'x0': local_item.points.x0, 'x1': local_item.points.x1, 'y0': local_item.points.y0, 'y1': local_item.points.y1}
-        )
-
-        # self.add_attention_region(
-        # 'A strawberry ice-cream cone.',
-        # {'x0': 0.125, 'x1': 0.375, 'y0': 0.25, 'y1': 0.5},
-        # )
+    
+        for l in self.local_frames:
+            attention_area = scale_points(l['points'], self.normaliseScaleFactor)
+            print("AREA:", attention_area)
+            self.add_attention_region(l['prompt'], attention_area)
 
         self.is_active = True
         paths = self.extract_points(self.sketch_data)
@@ -183,6 +187,19 @@ class CICADA:
                     )
                     * 0.3
                 )
+
+        for att_region in self.attention_regions:
+            cropped_batch = []
+            cropped_img = img * att_region['mask'] + 1 - att_region['mask']
+            for n in range(num_augs):
+                cropped_batch.append(self.augment_trans(cropped_img))
+            cropped_batch = torch.cat(cropped_batch)
+            cropped_features = self.model.encode_image(cropped_batch)
+            for n in range(num_augs):
+                loss -= torch.cosine_similarity(
+                    att_region['text_features'], cropped_features[n : n + 1], dim=1
+                )
+
         self.img_features = img_features
 
         points_loss = 0
@@ -352,8 +369,6 @@ class CICADA:
         self.local_frames = data["data"]["frames"]
         logging.info("\n \nHEREEEEEEE")
         logging.info(self.local_frames)
-        #Encode self.local_frames!
-
         self.user_canvas_w = self.frame_size
         self.user_canvas_h = self.frame_size
         self.normaliseScaleFactor = 1 / self.frame_size

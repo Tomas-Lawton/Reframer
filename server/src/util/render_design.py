@@ -6,31 +6,6 @@ import copy
 import logging
 import numpy as np
 
-def calculate_draw_region(region, normaliseScaleFactor):
-    logging.info("Using region")
-    leftX = min(
-        float(region['x1']) * normaliseScaleFactor,
-        float(region['x2']) * normaliseScaleFactor,
-    )
-    rightX = max(
-        float(region['x1']) * normaliseScaleFactor,
-        float(region['x2']) * normaliseScaleFactor,
-    )
-    bottomY = min(
-        float(region['y1']) * normaliseScaleFactor,
-        float(region['y2']) * normaliseScaleFactor,
-    )
-    topY = max(
-        float(region['y1']) * normaliseScaleFactor,
-        float(region['y2']) * normaliseScaleFactor,
-    )
-    return {
-        'x0': leftX,
-        'x1': rightX,
-        'y0': bottomY,
-        'y1': topY,
-    }
-
 class UserSketch:
     def __init__(self, path_list, canvas_height, canvas_width):
 

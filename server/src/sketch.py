@@ -1,6 +1,6 @@
 import torch
 import pydiffvg
-from util.render_design import treebranch_initialization, calculate_draw_region
+from util.render_design import treebranch_initialization
 
 class Trace:
     def __init__(self, shape, shape_group, is_fixed):
@@ -133,5 +133,3 @@ class Sketch:
         img = img[:, :, :3].unsqueeze(0).permute(0, 3, 1, 2)
         self.img = img
         return img
-
-

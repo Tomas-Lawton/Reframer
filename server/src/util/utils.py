@@ -2,6 +2,14 @@ import torch
 import numpy as np
 import imageio
 
+def scale_points(points, normaliseScaleFactor):
+    return {
+        'x0': float(points['x0']) * normaliseScaleFactor,
+        'x1': float(points['x1']) * normaliseScaleFactor,
+        'y0': float(points['y0']) * normaliseScaleFactor,
+        'y1': float(points['y1']) * normaliseScaleFactor,
+    }
+
 def save_data(save_path, name, params):
     with open(save_path + name + '.txt', 'w') as f:
         f.write('I0: ' + params.svg_path + '\n')
