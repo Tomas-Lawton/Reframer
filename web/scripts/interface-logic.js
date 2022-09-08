@@ -48,7 +48,7 @@ const activateUI = () => {
 
     document.getElementById("undo").classList.add("inactive-top-action");
     document.getElementById("redo").classList.add("inactive-top-action");
-    document.getElementById("spinner").style.display = "flex";
+    document.getElementById("loading").style.display = "flex";
     document.getElementById("control-lines").style.display = "none";
 
     aiMessage.classList.add("typed-out");
@@ -86,7 +86,7 @@ const stopDrawingUI = () => {
     actionControls.forEach((elem) => {
         elem.classList.remove("inactive-action");
     });
-    document.getElementById("spinner").style.display = "none";
+    document.getElementById("loading").style.display = "none";
     document.getElementById("control-lines").style.display = "block";
     document.getElementById("undo").classList.remove("inactive-top-action");
     document.getElementById("redo").classList.remove("inactive-top-action");

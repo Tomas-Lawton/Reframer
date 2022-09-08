@@ -1502,18 +1502,14 @@ input[type="number"] {
 
 #loading {
     font-size: 3em;
-    /* color: white; */
-    /* color: #7b66ff; */
-    /* color: #00e900; */
     color: #cccccc;
-}
-
-#spinner {
-    width: 100%;
+    position: absolute;
+    right: 0;
+    bottom: 0;
     display: none;
-    /* margin: inherit; */
-    /* justify-content: flex-end; */
     justify-content: center;
+    padding: 0.2em;
+    pointer-events: none;
 }
 
 .tab-item {
