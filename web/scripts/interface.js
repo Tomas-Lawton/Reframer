@@ -1,55 +1,3 @@
-function dragover(e) {
-    e.preventDefault();
-}
-
-function dragentercanvas(e) {
-    e.preventDefault();
-    canvas.classList.add("drop-ready");
-}
-
-function dropCanvas(e) {
-    canvas.classList.remove("drop-ready");
-    let i = e.dataTransfer.getData("text/plain");
-    // to do switch around mainsketch imports?
-    controller.sketches[i].importTo(mainSketch);
-}
-
-function dragleavecanvas(e) {
-    e.preventDefault();
-    canvas.classList.remove("drop-ready");
-}
-
-sketchContainer.addEventListener("dragover", dragover);
-sketchContainer.addEventListener("dragenter", dragentercanvas);
-sketchContainer.addEventListener("dragleave", dragleavecanvas);
-sketchContainer.addEventListener("drop", dropCanvas);
-
-function dragoverhover(e) {
-    e.preventDefault();
-    sketchGrid.classList.add("drop-ready");
-    sketchGrid.classList.remove("basic-background");
-}
-
-function dragleavesketch(e) {
-    e.preventDefault();
-    sketchGrid.classList.remove("drop-ready");
-    sketchGrid.classList.add("basic-background");
-}
-
-function dropSketch(e) {
-    // AI to Static
-    sketchGrid.classList.remove("drop-ready");
-    const sketchCountIndex = e.dataTransfer.getData("text/plain");
-    if (document.querySelector(`#AI-sketch-item-${sketchCountIndex}`)) {
-        let importing = controller.sketches[sketchCountIndex];
-        importing.saveStatic(importing.extractSVG());
-    }
-}
-
-// sketchGrid.addEventListener("dragover", dragoverhover);
-// sketchGrid.addEventListener("dragleave", dragleavesketch);
-// sketchGrid.addEventListener("drop", dropSketch);
-
 // Drawing Controls
 document.querySelectorAll(".pen-mode").forEach((elem) => {
     elem.addEventListener("click", () => {
@@ -67,7 +15,7 @@ document.querySelectorAll(".swatch").forEach((elem) => {
     });
 });
 
-document.getElementById("pen-color").addEventListener("click", () => {
+document.getElementById("stroke-dot").addEventListener("click", () => {
     showHide(document.getElementById("picker-ui"));
 });
 
@@ -235,22 +183,12 @@ eyeDropper.addEventListener("click", (e) => {
     }
 });
 
-const penTool = document.querySelector(".pen-tool");
-const eraseTool = document.querySelector(".erase-tool");
-
-penTool.addEventListener("click", (e) => {
-    eraseTool.classList.toggle("selected");
-    penTool.classList.toggle("selected");
-    setPenMode("pen");
-});
-
-eraseTool.addEventListener("click", (e) => {
-    eraseTool.classList.toggle("selected");
-    penTool.classList.toggle("selected");
-    setPenMode("erase");
-});
+penTool.addEventListener("click", (e) => setPenMode("pen"));
+eraseTool.addEventListener("click", (e) => setPenMode("erase"));
+selectTool.addEventListener("click", (e) => setPenMode("select"));
 
 document.getElementById("settings").addEventListener("click", () => {
+    showHide(dropdown);
     // openModal({
     //     title: "Advanced",
     //     message: "Change the drawing behaviour and UI.",
@@ -392,7 +330,7 @@ focusButton.addEventListener("click", () => {
     mainSketch.frameLayer.activate();
     setPenMode("local", null);
     showHide(localPrompts);
-    showHide(document.getElementById("swatches"));
+    showHide(document.querySelector(".draw-tools"));
     backDrop.classList.toggle("greeeeeen");
     accordionItem.classList.toggle("inactive-section");
 
@@ -573,69 +511,10 @@ document.querySelectorAll(".tab-item").forEach((tab) => {
     });
 });
 
-// document.getElementById("scrapbook").addEventListener("click", () => {
-//     showHide(sketchBook);
-//     document.getElementById("scrapbook").classList.toggle("panel-open");
-// });
-
-// document.querySelectorAll(".card-icon-background").forEach((elem) => {
-//     elem.addEventListener("click", () => {
-//         elem.parentElement.parentElement.remove();
-//     });
-// });
-
-// document.getElementById("save-sketch").addEventListener("click", () => {
-//     ungroup();
-//     mainSketch.sketchLayer.getItems().forEach((path) => {
-//         path.selected = false;
-//     });
-
-//     mainSketch.saveStatic(
-//         mainSketch.extractScaledSVG(1 / scaleRatio) //adds as backup
-//     );
-//     mainSketch.svg = paper.project.exportSVG({
-//         asString: true,
-//     });
-//     logger.event("saved-in-sketchbook");
-// });
-
-// const autoButton = document.getElementById("autodraw-button");
-// autoButton.addEventListener("click", () => {
-//     if (controller.doneSketching !== null) {
-//         controller.doneSketching = null; // never add
-//         autoButton.innerHTML = "Solo draw";
-//         logger.event("solo-drawing");
-//     } else {
-//         autoButton.innerHTML = "Collab draw!";
-//         controller.doneSketching = 4000;
-//         logger.event("collab-drawing");
-//     }
-//     autoButton.classList.toggle("inactive-pill");
-// });
-
-// document.getElementById("show-all-paths").addEventListener("click", () => {
-//     controller.showAllLines = !controller.showAllLines;
-//     document.getElementById("show-all-paths").classList.toggle("inactive-pill");
-// });
-
 document.getElementById("num-squiggles").oninput = function() {
     controller.maxCurves = parseInt(this.value);
     setLineLabels(mainSketch.sketchLayer);
 };
-
-document.getElementById("num-traces").oninput = function() {
-    controller.numTraces = parseInt(this.value);
-};
-
-// document.getElementById("overwrite").addEventListener("click", () => {
-//     if (controller.allowOverwrite) {
-//         document.getElementById("overwrite").innerHTML = "Copy";
-//     } else {
-//         document.getElementById("overwrite").innerHTML = "Overwrite";
-//     }
-//     document.getElementById("overwrite").classList.toggle("inactive-pill");
-//     controller.allowOverwrite = !controller.allowOverwrite;
-// });
 
 const respectSlider = document.getElementById("respect-slider");
 let lastFixation = controller.useFixation;
@@ -661,19 +540,17 @@ respectSlider.onmouseup = () => {
 };
 
 const accordionItem = document.querySelector(".accordion-item");
-document
-    .querySelector(".accordion-item-header")
-    .addEventListener("click", () => {
-        accordionItem.classList.toggle("open");
-        accordionItem.classList.toggle("closed");
-
-        if (accordionItem.classList.contains("open")) {
-            accordionItem.lastChild.style.maxHeight =
-                accordionItem.lastElementChild.scrollHeight + "px";
-        } else {
-            accordionItem.lastChild.style.maxHeight = "0px";
-        }
-    });
+const header = document.querySelector(".accordion-item-header");
+const body = document.querySelector(".accordion-item-body");
+header.addEventListener("click", () => {
+    accordionItem.classList.toggle("open");
+    accordionItem.classList.toggle("closed");
+    if (accordionItem.classList.contains("open")) {
+        body.style.maxHeight = body.scrollHeight + "px";
+    } else {
+        body.style.maxHeight = "0px";
+    }
+});
 
 // Shortcuts
 window.addEventListener("keydown", function(event) {
@@ -716,18 +593,6 @@ window.addEventListener("keydown", function(event) {
         }
     }
 });
-
-// document.getElementById("set-background").onclick = function() {
-//     canvas.style.backgroundColor = controller.strokeColor;
-// };
-
-// document.getElementById("moodboard-cross").addEventListener("click", () => {
-//     if (!moodboard.style.display || moodboard.style.display === "none") {
-//         moodboard.style.display = "block";
-//     } else {
-//         moodboard.style.display = "none";
-//     }
-// });
 
 // LOAD UI
 
@@ -773,6 +638,9 @@ for (let i = 0; i < 4; i++) {
 // sketchBook.style.left =
 //     window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";
 
+// remove
+// controlPanel.style.display = "none";
+
 localPrompts.style.display = "none";
 if (window.innerWidth <= 700) {
     penControls.appendChild(document.getElementById("scrapbook"));
@@ -795,3 +663,102 @@ if (window.innerWidth <= 700) {
             download();
         });
 }
+
+// document.getElementById("scrapbook").addEventListener("click", () => {
+//     showHide(sketchBook);
+//     document.getElementById("scrapbook").classList.toggle("panel-open");
+// });
+
+// document.querySelectorAll(".card-icon-background").forEach((elem) => {
+//     elem.addEventListener("click", () => {
+//         elem.parentElement.parentElement.remove();
+//     });
+// });
+
+// document.getElementById("save-sketch").addEventListener("click", () => {
+//     ungroup();
+//     mainSketch.sketchLayer.getItems().forEach((path) => {
+//         path.selected = false;
+//     });
+
+//     mainSketch.saveStatic(
+//         mainSketch.extractScaledSVG(1 / scaleRatio) //adds as backup
+//     );
+//     mainSketch.svg = paper.project.exportSVG({
+//         asString: true,
+//     });
+//     logger.event("saved-in-sketchbook");
+// });
+
+// document.getElementById("show-all-paths").addEventListener("click", () => {
+//     controller.showAllLines = !controller.showAllLines;
+//     document.getElementById("show-all-paths").classList.toggle("inactive-pill");
+// });
+
+// document.getElementById("num-traces").oninput = function() {
+//     controller.numTraces = parseInt(this.value);
+// };
+
+// document.getElementById("overwrite").addEventListener("click", () => {
+//     if (controller.allowOverwrite) {
+//         document.getElementById("overwrite").innerHTML = "Copy";
+//     } else {
+//         document.getElementById("overwrite").innerHTML = "Overwrite";
+//     }
+//     document.getElementById("overwrite").classList.toggle("inactive-pill");
+//     controller.allowOverwrite = !controller.allowOverwrite;
+// });
+
+// function dragover(e) {
+//     e.preventDefault();
+// }
+
+// function dragentercanvas(e) {
+//     e.preventDefault();
+//     canvas.classList.add("drop-ready");
+// }
+
+// function dropCanvas(e) {
+//     canvas.classList.remove("drop-ready");
+//     let i = e.dataTransfer.getData("text/plain");
+//     // to do switch around mainsketch imports?
+//     controller.sketches[i].importTo(mainSketch);
+// }
+
+// function dragleavecanvas(e) {
+//     e.preventDefault();
+//     canvas.classList.remove("drop-ready");
+// }
+
+// sketchContainer.addEventListener("dragover", dragover);
+// sketchContainer.addEventListener("dragenter", dragentercanvas);
+// sketchContainer.addEventListener("dragleave", dragleavecanvas);
+// sketchContainer.addEventListener("drop", dropCanvas);
+
+// function dragoverhover(e) {
+//     e.preventDefault();
+//     sketchGrid.classList.add("drop-ready");
+//     sketchGrid.classList.remove("basic-background");
+// }
+
+// function dragleavesketch(e) {
+//     e.preventDefault();
+//     sketchGrid.classList.remove("drop-ready");
+//     sketchGrid.classList.add("basic-background");
+// }
+
+// function dropSketch(e) {
+//     // AI to Static
+//     sketchGrid.classList.remove("drop-ready");
+//     const sketchCountIndex = e.dataTransfer.getData("text/plain");
+//     if (document.querySelector(`#AI-sketch-item-${sketchCountIndex}`)) {
+//         let importing = controller.sketches[sketchCountIndex];
+//         importing.saveStatic(importing.extractSVG());
+//     }
+// }
+
+// sketchGrid.addEventListener("dragover", dragoverhover);
+// sketchGrid.addEventListener("dragleave", dragleavesketch);
+// sketchGrid.addEventListener("drop", dropSketch);
+
+console.info("Page loaded");

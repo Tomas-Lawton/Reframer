@@ -486,47 +486,20 @@ sketchTool.onMouseUp = function() {
 };
 
 const setPenMode = (mode, accentTarget) => {
-    document.querySelectorAll(".pen-mode").forEach((mode) => {
-        mode.classList.remove("selected-mode");
-        mode.classList.add("simple-hover");
-    });
-
     switch (mode) {
-        // case "pen-drop":
-        //     if (useAI) {
-        //         if (dropdown.style.display !== "flex") {
-        //             dropdown.style.display = "flex";
-        //             dropdown.style.top =
-        //                 buttonPanel.getBoundingClientRect().bottom + "px";
-        //             dropdown.style.left =
-        //                 penDrop.getBoundingClientRect().left +
-        //                 penDrop.getBoundingClientRect().width / 2 +
-        //                 "px";
-        //             setPenMode(controller.penDropMode, penDrop);
-        //         } else {
-        //             dropdown.style.display = "none";
-        //         }
-        //     } else {
-        //         setPenMode("select", penDrop);
-        //     }
-
-        //     break;
         case "erase":
-            if (accentTarget) {
-                accentTarget.classList.add("selected-mode");
-                accentTarget.classList.remove("simple-hover");
-            }
+            selectTool.classList.remove("selected");
+            eraseTool.classList.add("selected");
+            penTool.classList.remove("selected");
+
             canvas.style.cursor = "url('public/erase.svg') 8 11, move";
-            // if (useAI) {
-            //     dropdown.style.display = "none";
-            // }
             controller.penMode = mode;
             break;
         case "pen":
-            if (accentTarget) {
-                accentTarget.classList.add("selected-mode");
-                accentTarget.classList.remove("simple-hover");
-            }
+            selectTool.classList.remove("selected");
+            eraseTool.classList.remove("selected");
+            penTool.classList.add("selected");
+
             canvas.style.cursor = "url('public/pen.svg') -1 20, move";
 
             let swatches = document.getElementById("swatches");
@@ -543,22 +516,16 @@ const setPenMode = (mode, accentTarget) => {
                     swatches.style.display = "none";
                 }
             }
-            // dropdown.style.display = "none";
             controller.penMode = mode;
             "pen";
             break;
         case "select":
-            if (accentTarget) {
-                accentTarget.classList.add("selected-mode");
-                accentTarget.classList.remove("simple-hover");
-            }
+            selectTool.classList.add("selected");
+            eraseTool.classList.remove("selected");
+            penTool.classList.remove("selected");
+
             canvas.style.cursor = "url('public/select.svg') 3 2, move";
-            // penDrop.classList.add("selected-mode");
-            // penDrop.classList.remove("fa-eraser");
-            // penDrop.classList.remove("fa-object-group");
-            // penDrop.classList.add("fa-arrow-pointer");
             controller.penMode = mode;
-            // controller.penDropMode = mode;
             break;
         case "local":
             canvas.style.cursor = "crosshair";

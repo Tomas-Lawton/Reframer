@@ -53,8 +53,7 @@ const alphaSlider = document.getElementById("alpha-slider");
 const stopButton = document.getElementById("stop");
 const focusButton = document.getElementById("focus");
 const buttonPanel = document.querySelector(".top-action");
-// const dropdown = document.getElementById("pen-dropdown");
-// const penDrop = document.getElementById("pen-drop");
+const dropdown = document.getElementById("pen-dropdown");
 const aiMessage = document.getElementById("message");
 const sketchContainer = document.getElementById("canvas-drop");
 const staticSketches = document.getElementById("static-sketches");
@@ -80,6 +79,10 @@ const controllerUI = document.querySelectorAll(".inactive-section");
 const sketchTemplate = document.getElementById("sketch-template");
 const backDrop = document.getElementById("contain-canvas");
 const eyeDropper = document.getElementById("dropper");
+
+const penTool = document.querySelector(".pen-tool");
+const eraseTool = document.querySelector(".erase-tool");
+const selectTool = document.querySelector(".pointer-tool");
 
 const padding = parseInt(
     window.getComputedStyle(backDrop, null).getPropertyValue("padding")
@@ -124,7 +127,7 @@ scope.activate();
 const sketchTool = new Tool();
 sketchTool.minDistance = 5;
 
-const maxPointSize = 47.99;
+const maxPointSize = 130.99;
 document.getElementById("width-slider").setAttribute("max", maxPointSize);
 
 const promptList = partialSketches.map((elem) => elem[1]);

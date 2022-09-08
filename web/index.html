@@ -49,36 +49,31 @@
         </div>
     </div> -->
 
-    <!-- <div class="ai-ui" id="pen-dropdown">
-        <div class="simple-drop pen-mode" id="select">
-            <div>
-                <i class="select fa-solid fa-arrow-pointer fa-fw"></i>
-            </div>
-            <p>Select</p>
-        </div>
-        <div class="simple-drop pen-mode ai-ui" id="lasso">
-            <div>
-                <i class="region fa-solid fa-object-group fa-fw"></i>
-            </div>
-            <p>AI Zone</p>
-        </div>
-    </div> -->
-
     <div class="top-action" id="pen-controls">
+        <!-- <i class="fa-solid fa-book fa-fw panel-open" id="scrapbook"></i> -->
         <i class="fa-solid fa-sliders fa-fw panel-open" id="palette"></i>
-
-        <!-- REMOVE -->
         <i class="fa-solid fa-rotate-left fa-fw simple-hover" id="undo"></i>
         <i class="fa-solid fa-rotate-right fa-fw simple-hover" id="redo"></i>
     </div>
 
     <div class="top-action" id="top-action-right">
-        <!-- <i class="fa-solid fa-book fa-fw panel-open" id="scrapbook"></i> -->
-        <i class="fa-solid fa-save fa-fw" id="save"></i>
-        <i class="fa-solid fa-trash fa-fw" id="delete"></i>
         <i class="fa-solid fa-cog fa-fw" id="settings"></i>
     </div>
-    <!-- <i class="fa-solid fa-left-right fa-fw" id="switch-side"></i> -->
+
+    <div class="ai-ui" id="pen-dropdown">
+        <div class="simple-drop pen-mode" id="save">
+            <div>
+                <i class="fa-solid fa-save fa-fw"></i>
+            </div>
+            <p>Save</p>
+        </div>
+        <div class="simple-drop pen-mode ai-ui" id="delete">
+            <div>
+                <i class="fa-solid fa-trash fa-fw"></i>
+            </div>
+            <p>Clear</p>
+        </div>
+    </div>
 
     <div id="local-prompts">
         <h3>Focus Frames</h3>
@@ -95,7 +90,7 @@
         <div class="ai-ui content-margin">
             <div id="ai-content">
                 <div class="panel-section">
-                    <h2 class="panel-title">Action</h2>
+                    <!-- <h2 class="panel-title">Action</h2> -->
                     <input type="text" tabIndex="0" class="prompt-input" id="messageText" placeholder="Start by describing your sketch..." autocomplete="off" />
                 </div>
 
@@ -131,7 +126,6 @@
                         </button>
                         <h3 class="accordion-item-question">Control AI</h3>
                     </header>
-
                     <div class="accordion-item-body">
                         <div class="inactive-section slider-block" id="respect-block">
                             <div class="flex">
@@ -151,18 +145,15 @@
                 </div>
 
             </div>
-
-
         </div>
+    </div>
 
-        <div class="ai-ui" id="explore-margin">
-            <div id="explore-sketches"></div>
-            <div id="explorer-buttons">
-                <p class="pill" id="empty">Empty</p>
-                <p class="pill" id="close-explorer">Close <i class="fa-solid fa-xmark"></i></p>
-            </div>
+    <div class="ai-ui" id="explore-margin">
+        <div id="explore-sketches"></div>
+        <div id="explorer-buttons">
+            <p class="pill" id="empty">Empty</p>
+            <p class="pill" id="close-explorer">Close <i class="fa-solid fa-xmark"></i></p>
         </div>
-
     </div>
 
     <div class="sketch-card" id="sketch-template" draggable="true">
@@ -225,16 +216,16 @@
 
     <!-- <p id="rolling-loss">Step: 0 Loss: 0</p> -->
 
-    <div class="top-center" id="swatches">
-        <div id="style-handle"><i class="fa-solid fa-grip-lines-vertical"></i></div>
+    <div class="draw-tools">
+        <img class="pointer-tool" src="public/tool-pointer.svg" alt="pointer"></img>
+        <img class="erase-tool" src="public/erase-pencil.svg" alt="erasor"></img>
+        <img class="pen-tool selected" src="public/tip-pencil.svg" alt="erasor"></img>
         <div id="style-content">
             <div id="basic-styles">
-                <div id="picker-ui">
-                    <div id="color-picker"></div>
-                </div>
-                <div class="center">
-                    <div id="pen-color" class="off-black"></div>
-                </div>
+                <i class="fas fa-fw fa-eye-dropper" id="dropper"></i>
+                <div class="circle" id="circle-small"></div>
+                <div class="circle" id="circle-med"></div>
+                <div class="circle" id="circle-large"></div>
                 <div class="red swatch"></div>
                 <div class="yellow swatch "></div>
                 <div class="green swatch"></div>
@@ -244,33 +235,23 @@
                 <div class="off-black swatch"></div>
                 <div class="white swatch"></div>
             </div>
-            <div id="expanded-styles">
-                <div id="points">
-                    <i class="fa-solid fa-arrow-pointer fa-fw pen-mode" id="select"></i>
-                    <i class="fas fa-fw fa-eye-dropper" id="dropper"></i>
-                    <div class="center">
-                        <div class="circle" id="circle-small"></div>
-                    </div>
-                    <div class="center">
-                        <div class="circle" id="circle-med"></div>
-                    </div>
-                    <div class="center">
-                        <div class="circle" id="circle-large"></div>
-                    </div>
-                </div>
-
+            <div id="stroke-style">
                 <div class="stroke-control">
                     <div class="flex">
                         <p class="slider-label">Stroke</p>
                     </div>
-                    <input type="number" id="width-slider" value="12" min="1" max="48">
+                    <input type="number" id="width-slider" value="12" min="1" max="131">
                 </div>
-
                 <div class="stroke-control">
                     <div class="flex">
                         <p class="slider-label">Opacity</p>
                     </div>
                     <input type="number" id="alpha-slider" step="0.01" value=".75" min="0" max="1">
+                </div>
+            </div>
+            <div id="expanded-styles">
+                <div id="picker-ui">
+                    <div id="color-picker"></div>
                 </div>
                 <div id="art-control-final">
                     <div id="stroke-dot">
@@ -279,11 +260,7 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="draw-tools">
-        <img class="erase-tool" src="public/erase-pencil.svg" alt="erasor"></img>
-        <img class="pen-tool selected" src="public/tip-pencil.svg" alt="erasor"></img>
+        <div id="style-handle"><i class="fa-solid fa-grip-lines"></i></div>
     </div>
 
     <div id="content">
@@ -358,14 +335,17 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Future -->
-        <!-- <div id="settings-ui">
+
+
+    <!-- Future -->
+    <!-- <div id="settings-ui">
             <hr />
             <label>Trace History (default: 1)</label>
             <input id="num-traces" type="number" min="1" value="1" max="5">
         </div> -->
-    </div>
+
 </body>
 
 </html>

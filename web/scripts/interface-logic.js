@@ -90,9 +90,7 @@ const stopDrawingUI = () => {
     document.getElementById("control-lines").style.display = "block";
     document.getElementById("undo").classList.remove("inactive-top-action");
     document.getElementById("redo").classList.remove("inactive-top-action");
-    document.getElementById("select").classList.remove("inactive-top-action");
-    document.getElementById("pen").classList.remove("inactive-top-action");
-    document.getElementById("erase").classList.remove("inactive-top-action");
+
     inactiveFocusUI();
     inactiveStopUI();
 };
@@ -106,9 +104,6 @@ const focusUI = () => {
     // add pen and erase
     document.getElementById("undo").classList.add("inactive-top-action");
     document.getElementById("redo").classList.add("inactive-top-action");
-    document.getElementById("select").classList.add("inactive-top-action");
-    document.getElementById("pen").classList.add("inactive-top-action");
-    document.getElementById("erase").classList.add("inactive-top-action");
 
     focusButton.style.background = "rgb(21 211 139";
     focusButton.style.color = "#ffffff";
@@ -118,7 +113,6 @@ const focusUI = () => {
 };
 
 const setThisColor = (rgba) => {
-    document.getElementById("pen-color").style.background = rgba;
     document.getElementById("point-size").style.background = rgba;
     if (controller.transformGroup) {
         controller.transformGroup.children.forEach(
