@@ -224,16 +224,24 @@ class CICADA:
 # fixed: 1 x points loss. doesn't work because this amount is variable.
 
         for k in range(len(self.points_vars)):
-            if not self.drawing.traces[k].is_fixed:
+            if  self.drawing.traces[k].is_fixed:
                 points_loss += torch.norm(self.points_vars[k] - self.points_vars0[k])
                 colors_loss += torch.norm(self.color_vars[k] - self.color_vars0[k])
                 widths_loss += torch.norm(
                     self.stroke_width_vars[k] - self.stroke_width_vars0[k]
                 )
-            else:
-                points_loss += torch.norm(10)
-                colors_loss += torch.norm(10)
-                widths_loss += torch.norm(10)
+
+        # for k in range(len(self.points_vars)):
+        #     if not self.drawing.traces[k].is_fixed:
+        #         points_loss += torch.norm(self.points_vars[k] - self.points_vars0[k])
+        #         colors_loss += torch.norm(self.color_vars[k] - self.color_vars0[k])
+        #         widths_loss += torch.norm(
+        #             self.stroke_width_vars[k] - self.stroke_width_vars0[k]
+        #         )
+        # else:
+        #     points_loss += torch.norm(10)
+        #     colors_loss += torch.norm(10)
+        #     widths_loss += torch.norm(10)
 
         loss += self.w_points * points_loss
         loss += self.w_colors * colors_loss

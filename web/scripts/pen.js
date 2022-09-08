@@ -179,6 +179,7 @@ sketchTool.onMouseDrag = function(event) {
         case "local":
             controller.drawRegion.width += event.delta.x;
             controller.drawRegion.height += event.delta.y;
+
             if (regionPath !== undefined) regionPath.remove(); //remove old one. maybe could update the old one instead?
             regionPath = new Path.Rectangle(controller.drawRegion);
             regionPath.set(frameOptions);

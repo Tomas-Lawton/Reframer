@@ -2,7 +2,7 @@ class SketchHistory {
     constructor(s) {
         this.undoStack = [];
         this.redoStack = [];
-        this.historyHolder = [{ svg: "", num: 0 }];
+        this.historyHolder = [];
         this.sketch = s;
     }
     pushUndo() {
@@ -152,7 +152,7 @@ class Controller {
         console.log(res);
         ws.send(JSON.stringify(res));
     }
-    draw(svg = null) {
+    draw() {
         if (noPrompt()) {
             openModal({
                 title: "Type a prompt first!",
@@ -164,9 +164,13 @@ class Controller {
         if (!this.clipDrawing) {
             this.clipDrawing = true;
             this.targetDrawing = false;
-            // setPenMode("select", penDrop);
+
+            sketchHistory.historyHolder.push({
+                svg: mainSketch.svg,
+            });
+
             this.prepare();
-            this.resetMetaControls();
+            // this.resetMetaControls();
             this.updateDrawer({
                 status: "draw",
                 sketch: mainSketch.sketch,
@@ -189,7 +193,7 @@ class Controller {
             }
             this.targetDrawing = true;
             this.prepare();
-            this.resetMetaControls();
+            // this.resetMetaControls();
             this.updateDrawer({
                 status: "add_new_sketch",
                 sketch: mainSketch.sketch,
@@ -227,6 +231,9 @@ class Controller {
                 //     });
             } else {
                 try {
+                    sketchHistory.historyHolder.push({
+                        svg: mainSketch.svg,
+                    });
                     this.prepare();
                     this.updateDrawer({
                         status: "continue_sketch",
@@ -290,7 +297,8 @@ class Controller {
         this.step = 0;
         timeKeeper.setAttribute("max", "0");
         timeKeeper.value = "0";
-        sketchHistory.historyHolder = [{ svg: "", num: 0 }];
+        // sketchHistory.historyHolder = [{ svg: "", num: 0 }];
+        sketchHistory.historyHolder = [];
     }
 }
 
@@ -319,9 +327,6 @@ class Sketch {
             console.log(this.sketchLayer.exportSVG());
 
             let g = importGroup.children[0];
-            // if (!(g instanceof Group)) {
-            //     g = g.children[0];
-            // }
             let scaledGroup = scaleGroup(g, s);
             // if (o) {
             //     scaledGroup.position.x += offX;
@@ -547,7 +552,6 @@ class Sketch {
             })
         );
         this.sketch = pathList;
-        console.log(pathList);
     }
 }
 

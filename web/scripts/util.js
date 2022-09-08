@@ -1,17 +1,3 @@
-if (useAI) {
-    ws.onmessage = function(event) {
-        try {
-            loadResponse(JSON.parse(event.data));
-        } catch (e) {
-            if ((event.data.match(/{/g) || []).length > 1) {
-                console.log("Parsing Concurrent JSON events");
-            }
-            console.log("Cooked ", e);
-            controller.clipDrawing = false;
-        }
-    };
-}
-
 const createUUID = () => {
     var d = new Date().getTime();
     var d2 =
@@ -171,6 +157,7 @@ const getHistoryBatch = (maxSize, startIdx) => {
 
     for (let i = 0; i < batchSize; i++) {
         // num traces
+        // not sure this is still correct (0 user, then after both)
         traceList.push(sketchHistory.historyHolder[startIdx - i - 1]);
     }
     return traceList;
@@ -207,13 +194,13 @@ const showTraceHistoryFrom = (fromIndex) => {
 };
 
 const incrementHistory = () => {
+    controller.step += 1;
+    timeKeeper.setAttribute("max", String(controller.step));
+    timeKeeper.value = String(controller.step);
+
     sketchHistory.historyHolder.push({
         svg: mainSketch.svg,
     });
-    timeKeeper.setAttribute("max", String(controller.step + 1));
-    timeKeeper.value = String(controller.step + 1);
-    setTraces.setAttribute("max", String(controller.step + 1));
-    controller.step += 1;
 };
 
 const pauseActiveDrawer = () => {
@@ -278,10 +265,6 @@ const download = () => {
             b.click();
             document.body.removeChild(b);
         }
-        if (!useAI) {
-            mainSketch.sketchLayer.clear();
-            loadPartial();
-        }
     });
 };
 
@@ -318,21 +301,9 @@ const loadResponse = (result) => {
 };
 
 const updateMain = (result) => {
-    incrementHistory();
-    // set i?
     controller.lastIteration = result.iterations;
-
-    // if (controller.numTraces > 1) {
-    //     showTraceHistoryFrom(sketchHistory.historyHolder.length - 1);
-    // } else {
-    mainSketch.load(
-        frame / 224,
-        result.svg,
-        result.fixed, // FIXED PATH LIST
-        true,
-        true
-    );
-    // }
+    mainSketch.load(frame / 224, result.svg, result.fixed, true, true);
+    incrementHistory();
     // calcRollingLoss();
 };
 

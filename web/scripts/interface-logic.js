@@ -49,7 +49,7 @@ const activateUI = () => {
     document.getElementById("undo").classList.add("inactive-top-action");
     document.getElementById("redo").classList.add("inactive-top-action");
     document.getElementById("loading").style.display = "flex";
-    document.getElementById("control-lines").style.display = "none";
+    document.querySelector(".control-lines").style.display = "none";
 
     aiMessage.classList.add("typed-out");
 };
@@ -87,10 +87,9 @@ const stopDrawingUI = () => {
         elem.classList.remove("inactive-action");
     });
     document.getElementById("loading").style.display = "none";
-    document.getElementById("control-lines").style.display = "block";
+    document.querySelector(".control-lines").style.display = "block";
     document.getElementById("undo").classList.remove("inactive-top-action");
     document.getElementById("redo").classList.remove("inactive-top-action");
-
     inactiveFocusUI();
     inactiveStopUI();
 };
@@ -156,7 +155,7 @@ const setActionUI = (state) => {
             stopDrawingUI();
             aiMessage.innerHTML = "All done! What should we draw next?";
             sketchHistory.historyHolder.length > 1 &&
-                (document.getElementById("history-block").style.display = "flex");
+                (document.getElementById("history-block").style.display = "block");
             break;
         case "stopSingle":
             stopDrawingUI();
@@ -232,7 +231,7 @@ const updateRectBounds = (from, to) => {
 const updateSelectPosition = () => {
     let center = deleteHandler.getBoundingClientRect().height / 2 + 5;
 
-    if (controller.boundingBox.bounds.width > minSelectionWidth) {
+    if (controller.boundingBox.bounds.width > 65) {
         deleteHandler.style.left = controller.boundingBox.bounds.topRight.x + "px";
         deleteHandler.style.top = controller.boundingBox.bounds.top - center + "px";
     } else {
@@ -272,14 +271,13 @@ const updateFixedUI = () => {
 
 const updateSelectUI = () => {
     if (controller.boundingBox && getSelectedPaths().length) {
-        if (controller.boundingBox.bounds.width > minSelectionWidth) {
+        if (controller.boundingBox.bounds.width > 65) {
             sendToBack.style.display = "block";
             moveUp.style.display = "block";
             copyHandler.style.display = "block";
         }
-        if (useAI) {
-            fixedHandler.style.display = "block";
-        }
+        fixedHandler.style.display = "block";
+
         deleteHandler.style.display = "block";
         transformControl.style.display = "flex";
         updateFixedUI();

@@ -13,15 +13,16 @@
     <script type="text/javascript" src="https://unpkg.com/paper@0.11.5/dist/paper-full.js"></script>
     <script type="text/javascript" src="scripts/offset.js"></script>
 
-    <script type="text/javascript" src="scripts/svg.js" defer></script>
+    <script type="text/javascript" src="scripts/network.js" defer></script>
+    <script type="text/javascript" src="scripts/ui.js" defer></script>
     <script type="text/javascript" src="scripts/setup.js" defer></script>
     <script type="text/javascript" src="scripts/sketch.js" defer></script>
-    <script type="text/javascript" src="scripts/api.js" defer></script>
     <script type="text/javascript" src="scripts/util.js" defer></script>
     <script type="text/javascript" src="scripts/interface-logic.js" defer></script>
     <script type="text/javascript" src="scripts/pen.js" defer></script>
     <script type="text/javascript" src="scripts/logger.js" defer></script>
     <script type="text/javascript" src="scripts/interface.js" defer></script>
+    <script type="text/javascript" src="scripts/hydrate.js" defer></script>
 </head>
 
 <body>
@@ -60,14 +61,14 @@
         <i class="fa-solid fa-cog fa-fw" id="settings"></i>
     </div>
 
-    <div class="ai-ui" id="pen-dropdown">
+    <div id="pen-dropdown">
         <div class="simple-drop pen-mode" id="save">
             <div>
                 <i class="fa-solid fa-save fa-fw"></i>
             </div>
             <p>Save</p>
         </div>
-        <div class="simple-drop pen-mode ai-ui" id="delete">
+        <div class="simple-drop pen-mode" id="delete">
             <div>
                 <i class="fa-solid fa-trash fa-fw"></i>
             </div>
@@ -87,7 +88,7 @@
     </div>
 
     <div id="control-panel">
-        <div class="ai-ui content-margin">
+        <div class="content-margin">
             <div id="ai-content">
                 <div class="panel-section">
                     <!-- <h2 class="panel-title">Action</h2> -->
@@ -127,28 +128,36 @@
                         <h3 class="accordion-item-question">Control AI</h3>
                     </header>
                     <div class="accordion-item-body">
-                        <div class="inactive-section slider-block" id="respect-block">
+                        <div>
                             <div class="flex">
                                 <p class="slider-label">Line Freedom</p>
                                 <p class="slider-label" id="fix-label">More</p>
                             </div>
-                            <input type="range" id="respect-slider" value="3" min="0" max="4">
-                            <div id="control-lines">
-                                <div class="flex">
-                                    <p class="slider-label" id="max-lines">Total Lines: </p>
-                                    <p class="slider-label" id="calc-lines">Adding: </p>
-                                </div>
-                                <input id="num-squiggles" type="range" min="0" value="48" max="150">
+                            <input type="range" id="respect-slider" value="4" min="0" max="4">
+                        </div>
+                        <div class="control-lines">
+                            <div class="flex">
+                                <p class="slider-label" id="max-lines">Total Lines: </p>
+                                <p class="slider-label" id="calc-lines">Adding: </p>
                             </div>
+                            <input id="num-squiggles" type="range" min="0" value="48" max="150">
+                        </div>
+                        <div id="history-block">
+                            <div class="flex">
+                                <p class="slider-label">History </p>
+                                <p class="slider-label">Latest</p>
+                            </div>
+                            <input type="range" id="time-slider" value="0" min="0" max="0">
                         </div>
                     </div>
-                </div>
 
+                </div>
             </div>
         </div>
     </div>
+    </div>
 
-    <div class="ai-ui" id="explore-margin">
+    <div id="explore-margin">
         <div id="explore-sketches"></div>
         <div id="explorer-buttons">
             <p class="pill" id="empty">Empty</p>
@@ -319,18 +328,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="history-block">
-                        <div id="refine-controls">
-                            <div id="go-back">
-                                <i class="fa-solid fa-arrow-left-long fa-fw"></i>
-                                <p>Back</p>
-                            </div>
-                            <div>
-                                <input type="range" id="time-slider" value="0" min="0" max="0">
-                            </div>
 
-                        </div>
-                    </div>
                     <canvas id="canvas"></canvas>
                 </div>
             </div>

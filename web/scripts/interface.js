@@ -33,23 +33,19 @@ document.getElementById("delete").addEventListener("click", () =>
             mainSketch.sketchLayer.clear();
             modal.style.display = "none";
 
-            if (useAI) {
-                if (controller.clipDrawing || controller.drawState === "pause") {
-                    killExploratorySketches();
-                    controller.stop();
-                    controller.resetMetaControls();
-                    controller.clipDrawing = false;
-                }
-
-                emptyExplorer();
-                document.getElementById("explore-margin").display = "none";
-                // document.getElementById("add-refine").style.display = "none";
-
-                controller.lastPrompt = null;
-                updateSelectUI();
-            } else {
-                loadPartial();
+            if (controller.clipDrawing || controller.drawState === "pause") {
+                killExploratorySketches();
+                controller.stop();
+                controller.resetMetaControls();
+                controller.clipDrawing = false;
             }
+
+            emptyExplorer();
+            document.getElementById("explore-margin").display = "none";
+            // document.getElementById("add-refine").style.display = "none";
+
+            controller.lastPrompt = null;
+            updateSelectUI();
         },
     })
 );
@@ -197,19 +193,13 @@ document.getElementById("settings").addEventListener("click", () => {
 });
 
 timeKeeper.oninput = function() {
-    if (this.value === 0) return; // 0 is pre-generation state
-    historyIndex = this.value;
     mainSketch.sketchLayer.clear();
-    if (controller.numTraces > 1) {
-        showTraceHistoryFrom(historyIndex);
-    } else {
-        let stored = sketchHistory.historyHolder[historyIndex];
-        mainSketch.load(
-            1,
-            stored.svg,
-            false // don't reapply opacity
-        );
-    }
+    let stored = sketchHistory.historyHolder[this.value];
+    mainSketch.load(
+        1,
+        stored.svg,
+        false // don't reapply opacity
+    );
 };
 
 palette.addEventListener("click", () => {
@@ -262,6 +252,10 @@ document.getElementById("explore").addEventListener("click", () => {
         } else {
             // TO DO: Clean up old scopes (now unused) // controller.exploreScopes
             // const total = controller.sketchScopeIndex + Math.floor(Math.random() * 5);
+            sketchHistory.historyHolder.push({
+                svg: mainSketch.svg,
+            });
+
             total = 4;
             for (let i = 0; i < 4; i++) {
                 explorer.removeChild(explorer.firstChild);
@@ -330,7 +324,7 @@ focusButton.addEventListener("click", () => {
     mainSketch.frameLayer.activate();
     setPenMode("local", null);
     showHide(localPrompts);
-    showHide(document.querySelector(".draw-tools"));
+    document.querySelector(".draw-tools").classList.toggle("hidden");
     backDrop.classList.toggle("greeeeeen");
     accordionItem.classList.toggle("inactive-section");
 
@@ -362,20 +356,7 @@ focusButton.addEventListener("click", () => {
     }
 });
 
-document.getElementById("go-back").addEventListener("click", () => {
-    if (
-        controller.drawState === "stop" ||
-        controller.drawState === "stop-prune"
-    ) {
-        // mainSketch.arrange();
-        // LOAD FIXED PATH LIST ?
-        incrementHistory();
-        let stored = sketchHistory.historyHolder[1];
-        timeKeeper.value = 1;
-        mainSketch.load(1, stored.svg);
-    }
-});
-
+// add back after the study.
 // document.getElementById("random-prompt").addEventListener("click", () => {
 //     let randomPrompt =
 //         promptList[Math.floor(Math.random() * promptList.length)].toLowerCase();
@@ -388,7 +369,6 @@ document.getElementById("go-back").addEventListener("click", () => {
 // });
 
 // Control panel
-
 controlPanel.onmousedown = (e) => {
     if (window.innerWidth > 700) {
         let bounds = document.getElementById("ai-content").getBoundingClientRect();
@@ -539,9 +519,6 @@ respectSlider.onmouseup = () => {
     }
 };
 
-const accordionItem = document.querySelector(".accordion-item");
-const header = document.querySelector(".accordion-item-header");
-const body = document.querySelector(".accordion-item-body");
 header.addEventListener("click", () => {
     accordionItem.classList.toggle("open");
     accordionItem.classList.toggle("closed");
@@ -593,76 +570,6 @@ window.addEventListener("keydown", function(event) {
         }
     }
 });
-
-// LOAD UI
-
-// Random partial sketch
-if (!useAI) {
-    loadPartial();
-}
-
-const picker = new Picker({
-    parent: document.getElementById("color-picker"),
-    popup: false,
-    alpha: false,
-    defaultColor: "#0cf",
-    editor: false,
-    editorFormat: "hex", // or 'rgb', 'hsl'
-});
-
-picker.setColor(controller.strokeColor);
-picker.onChange = (color) => {
-    controller.strokeColor = color.rgbaString;
-    controller.strokeColor = getRGBA(controller.alpha);
-
-    getSelectedPaths().forEach(
-        (item) => (item.strokeColor = controller.strokeColor)
-    );
-    setThisColor(controller.strokeColor);
-};
-
-setLineLabels(mainSketch.sketchLayer);
-setActionUI("inactive");
-setPointSize(controller.strokeWidth);
-
-const defaults = new PaperScope();
-defaults.activate();
-for (let i = 0; i < 4; i++) {
-    let sketch = new Sketch(null, defaults, sketchSize);
-    let newElem = sketch.renderMini();
-    // controller.sketchScopeIndex += 1; //remove later
-    newElem.classList.add("inactive-sketch");
-    document.getElementById("explore-sketches").appendChild(newElem);
-}
-
-// sketchBook.style.left =
-//     window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";
-
-// remove
-// controlPanel.style.display = "none";
-
-localPrompts.style.display = "none";
-if (window.innerWidth <= 700) {
-    penControls.appendChild(document.getElementById("scrapbook"));
-    penControls.appendChild(document.getElementById("delete"));
-    sketchBook.style.display = "none";
-    document.getElementById("scrapbook").classList.toggle("panel-open");
-    document.getElementById("palette").classList.toggle("panel-open");
-    controlPanel.style.display = "none";
-
-    let saveText = document.createElement("p");
-    saveText.innerHTML = "Next";
-    document.getElementById("top-action-right").prepend(saveText);
-
-    document.getElementById("save").removeEventListener("click", () => {
-        download();
-    });
-    document
-        .getElementById("save")
-        .parentElement.addEventListener("click", () => {
-            download();
-        });
-}
 
 // document.getElementById("scrapbook").addEventListener("click", () => {
 //     showHide(sketchBook);
@@ -760,5 +667,8 @@ if (window.innerWidth <= 700) {
 // sketchGrid.addEventListener("dragover", dragoverhover);
 // sketchGrid.addEventListener("dragleave", dragleavesketch);
 // sketchGrid.addEventListener("drop", dropSketch);
+
+// sketchBook.style.left =
+//     window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";
 
 console.info("Page loaded");
