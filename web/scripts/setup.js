@@ -20,7 +20,6 @@ const frameOptions = {
     strokeColor: "#7000FF",
     selected: false,
 };
-const minSelectionWidth = 65;
 const frameColors = [
     "#EF3054",
     "#43AA8B",

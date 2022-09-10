@@ -206,47 +206,41 @@ class CICADA:
         widths_loss = 0
         colors_loss = 0
 
-
-# if it's fixed the point, color, and width multiplyer are higher
-# this means that fixed things are more influenced by penalisation values
-# and, non fixed just have the default value
-
-#before fixed items were included here, while unfixed 
-#now, unfixed items will be included with the variable penalisation
-#and, fixed items will have the loss set high so it's penalised
-
 # before
-# non-fixed: loss adds 0 because points loss stays at 0
-# fixed: points loss x variable value (highest is 1)
+# non-fixed: loss += 0 because points_loss stays at 0
+# fixed (variable): points loss += value respect log value times points_loss (highest of 1)
 
 # after 
-# non-fixed: loss adds the amount which then multiplies the variable amoount
-# fixed: 1 x points loss. doesn't work because this amount is variable.
+# non-fixed (variable): points loss += value respect log value times points_loss (highest of 1)
+# fixed: points_loss is now multplied by the hightest value of 1.
+
+        # for k in range(len(self.points_vars)):
+        #     if  self.drawing.traces[k].is_fixed:
+        #         points_loss += torch.norm(self.points_vars[k] - self.points_vars0[k])
+        #         colors_loss += torch.norm(self.color_vars[k] - self.color_vars0[k])
+        #         widths_loss += torch.norm(
+        #             self.stroke_width_vars[k] - self.stroke_width_vars0[k]
+        #         )
+
+        # loss += self.w_points * points_loss
+        # loss += self.w_colors * colors_loss
+        # loss += self.w_widths * widths_loss
+        # loss += self.w_img * img_loss
 
         for k in range(len(self.points_vars)):
-            if  self.drawing.traces[k].is_fixed:
+            if not self.drawing.traces[k].is_fixed:
                 points_loss += torch.norm(self.points_vars[k] - self.points_vars0[k])
                 colors_loss += torch.norm(self.color_vars[k] - self.color_vars0[k])
                 widths_loss += torch.norm(
                     self.stroke_width_vars[k] - self.stroke_width_vars0[k]
                 )
 
-        # for k in range(len(self.points_vars)):
-        #     if not self.drawing.traces[k].is_fixed:
-        #         points_loss += torch.norm(self.points_vars[k] - self.points_vars0[k])
-        #         colors_loss += torch.norm(self.color_vars[k] - self.color_vars0[k])
-        #         widths_loss += torch.norm(
-        #             self.stroke_width_vars[k] - self.stroke_width_vars0[k]
-        #         )
-        # else:
-        #     points_loss += torch.norm(10)
-        #     colors_loss += torch.norm(10)
-        #     widths_loss += torch.norm(10)
-
         loss += self.w_points * points_loss
         loss += self.w_colors * colors_loss
         loss += self.w_widths * widths_loss
         loss += self.w_img * img_loss
+
+
 
         # geo_loss = self.clipConvLoss(img * self.mask + 1 - self.mask, self.img0)
 
