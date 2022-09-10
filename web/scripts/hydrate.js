@@ -33,3 +33,5 @@ for (let i = 0; i < 4; i++) {
 }
 
 localPrompts.style.display = "none";
+
+// drawTools.

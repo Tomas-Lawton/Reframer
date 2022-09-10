@@ -41,6 +41,7 @@ const controllerUI = document.querySelectorAll(".inactive-section");
 const sketchTemplate = document.getElementById("sketch-template");
 const eyeDropper = document.getElementById("dropper");
 
+const styles = document.querySelector(".draw-tools");
 const penTool = document.querySelector(".pen-tool");
 const eraseTool = document.querySelector(".erase-tool");
 const selectTool = document.querySelector(".pointer-tool");

@@ -324,7 +324,7 @@ focusButton.addEventListener("click", () => {
     mainSketch.frameLayer.activate();
     setPenMode("local", null);
     showHide(localPrompts);
-    document.querySelector(".draw-tools").classList.toggle("hidden");
+    styles.classList.toggle("hidden");
     backDrop.classList.toggle("greeeeeen");
     accordionItem.classList.toggle("inactive-section");
 
@@ -385,6 +385,14 @@ controlPanel.onmousedown = (e) => {
             document.onmousemove = (e) => elementDrag(e, controlPanel);
         }
     }
+};
+
+styles.onmousedown = (e) => {
+    e = e || window.event;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    document.onmousemove = (e) => elementDrag(e, styles);
 };
 
 // sketchBook.onmousedown = (e) => {
