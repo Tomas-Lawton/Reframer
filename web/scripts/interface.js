@@ -491,22 +491,22 @@ document.getElementById("num-squiggles").oninput = function() {
 };
 
 const respectSlider = document.getElementById("respect-slider");
-let lastFixation = controller.useFixation;
+let lastLearningRate = controller.learningRate;
 
 respectSlider.oninput = function() {
-    controller.useFixation = parseInt(this.value);
-    let msg = controller.useFixation > 2 ? "More" : "Less";
+    controller.learningRate = parseInt(this.value);
+    let msg = controller.learningRate > 2 ? "More" : "Less";
     document.getElementById("fix-label").innerHTML = msg;
 };
 
 respectSlider.onmousedown = () => {
     pauseActiveDrawer();
-    lastFixation = controller.useFixation;
+    lastLearningRate = controller.learningRate;
 };
 
 respectSlider.onmouseup = () => {
     if (controller.liveCollab) {
-        if (controller.useFixation !== lastFixation) {
+        if (controller.learningRate !== lastLearningRate) {
             controller.continueSketch();
         }
         controller.liveCollab = false;
@@ -523,14 +523,20 @@ header.addEventListener("click", () => {
     }
 });
 
-header.addEventListener("click", () => {
-    accordionItem.classList.toggle("open");
-    accordionItem.classList.toggle("closed");
-    if (accordionItem.classList.contains("open")) {
-        body.style.maxHeight = body.scrollHeight + "px";
-    } else {
-        body.style.maxHeight = "0px";
-    }
+toolWindow.addEventListener("click", () => {
+    document
+        .querySelectorAll(".expanded")
+        .forEach((item) => (item.style.display = "inherit"));
+    toolWindow.style.display = "none";
+    toolToggle.firstChild.classList.add("fa-minus");
+    toolToggle.firstChild.classList.remove("fa-plus");
+    // currentTool.classList.remove("active-tool");
+    styles.style.maxWidth = "300px";
+    toolToggle.style.display = "flex";
+
+    // currentTool.style.top = "100px";
+    styles.style.left = window.innerWidth - 10 - styles.offsetWidth + "px";
+    styles.style.top = window.innerHeight / 2 + "px";
 });
 
 toolToggle.addEventListener("click", () => {
@@ -538,27 +544,16 @@ toolToggle.addEventListener("click", () => {
     // currentTool.style.height = "230px";
     // currentTool.classList.toggle("current-tool");
 
-    if (document.querySelector(".tool-view").style.display === "none") {
-        document
-            .querySelectorAll(".expanded")
-            .forEach((item) => (item.style.display = "none"));
-        document.querySelector(".tool-view").style.display = "flex";
-        toolToggle.firstChild.classList.add("fa-plus");
-        toolToggle.firstChild.classList.remove("fa-minus");
-        // currentTool.classList.add("active-tool");
-        // styles.style.top = window.innerHeight - 10 - styles.offsetHeight / 2 + "px";
-    } else {
-        document
-            .querySelectorAll(".expanded")
-            .forEach((item) => (item.style.display = "inherit"));
-        document.querySelector(".tool-view").style.display = "none";
-        toolToggle.firstChild.classList.add("fa-minus");
-        toolToggle.firstChild.classList.remove("fa-plus");
-        currentTool.classList.remove("active-tool");
-        // currentTool.style.top = "100px";
-        styles.style.left = window.innerWidth - 10 - styles.offsetWidth + "px";
-        styles.style.top = window.innerHeight / 2 + "px";
-    }
+    document
+        .querySelectorAll(".expanded")
+        .forEach((item) => (item.style.display = "none"));
+    toolWindow.style.display = "flex";
+    toolToggle.firstChild.classList.add("fa-plus");
+    toolToggle.firstChild.classList.remove("fa-minus");
+    styles.style.maxWidth = "120px";
+    toolToggle.style.display = "none";
+    // currentTool.classList.add("active-tool");
+    // styles.style.top = window.innerHeight - 10 - styles.offsetHeight / 2 + "px";
 });
 // Shortcuts
 window.addEventListener("keydown", function(event) {

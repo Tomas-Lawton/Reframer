@@ -109,7 +109,7 @@ class Controller {
         this.traces = null;
         this.boundingBox = null;
         this.transformGroup = null;
-        this.useFixation = 3;
+        this.learningRate = 3;
         this.showAllLines = true;
         this.targetDrawing = false;
 
@@ -130,7 +130,7 @@ class Controller {
         prompt,
         lines,
         sketchScopeIndex,
-        fixation,
+        rate,
         frames,
     }) {
         this.isFirstIteration = true; //reset canvas
@@ -142,7 +142,7 @@ class Controller {
                 sketch,
                 random_curves: lines,
                 frame_size: frameSize,
-                fixation: fixation,
+                rate: rate,
                 frames: frames,
                 sketch_index: sketchScopeIndex,
             },
@@ -175,7 +175,7 @@ class Controller {
                 frameSize: mainSketch.frameSize,
                 prompt: this.prompt,
                 lines: this.initRandomCurves ? this.addLines : 0, //adding
-                fixation: this.useFixation,
+                rate: this.learningRate,
                 frames: Object.values(mainSketch.localFrames).map((elem) => elem.data),
             });
             this.step = 0;
@@ -199,7 +199,7 @@ class Controller {
                 prompt: this.prompt,
                 lines: this.addLines,
                 sketchScopeIndex: sketchCountIndex,
-                fixation: this.useFixation,
+                rate: this.learningRate,
                 frames: Object.values(mainSketch.localFrames).map((elem) => elem.data),
             });
         }
@@ -236,7 +236,7 @@ class Controller {
                     this.updateDrawer({
                         status: "continue_sketch",
                         sketch: mainSketch.sketch,
-                        fixation: this.useFixation,
+                        rate: this.learningRate,
                     });
                     setActionUI("continuing");
                 } catch (e) {
@@ -259,7 +259,7 @@ class Controller {
                 frameSize: mainSketch.frameSize,
                 prompt: this.prompt,
                 lines: this.initRandomCurves ? this.addLines : 0, //adding
-                fixation: this.useFixation,
+                rate: this.learningRate,
             });
             setActionUI("pruning");
         }
@@ -553,7 +553,7 @@ class Sketch {
     }
 }
 
-mainSketch = new Sketch("main-sketch", scope, frame, "main");
+mainSketch = new Sketch("main-sketch", scope, canvasFrame, "main");
 mainSketch.svg = paper.project.exportSVG({
     asString: true,
 }); //for svg parsing

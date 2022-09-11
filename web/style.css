@@ -377,7 +377,7 @@ hr {
 #style-content {
     border-radius: 0 0.3em 0.3em 0;
     display: grid;
-    margin-top: 0.5em;
+    /* margin-top: 0.5em; */
     /* padding: 0.5em;
     background: #f5f5f5; */
 }
@@ -1236,7 +1236,6 @@ input[type="number"] {
     /* background: #f5f5f5; */
     background: white;
     overflow: hidden;
-    padding-bottom: 0.5em;
 }
 
 .draw-tools>div:first-child {
@@ -1262,6 +1261,7 @@ input[type="number"] {
 }
 
 .style-window-toggle {
+    cursor: pointer;
     border-radius: 50%;
     background: #dfdfdf;
     color: #5f5f60;
@@ -1539,12 +1539,15 @@ input[type="number"] {
     box-shadow: inset 7px 17px 24px 10px #dadeff;
     overflow: hidden;
     justify-content: center;
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
 }
 
 .tool-view img {
     transform: rotate(90deg);
-    width: 170px;
-    height: 253px;
+    width: 121px;
+    height: 172px;
 }
 
 .animation-window {

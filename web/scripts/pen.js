@@ -241,9 +241,8 @@ sketchTool.onMouseUp = function() {
                 firstPoint.remove();
             }
             penPath.simplify();
-            console.log(penPath);
 
-            penPath.data.fixed = true;
+            penPath.data.fixed = false;
             // Update
             mainSketch.svg = paper.project.exportSVG({
                 asString: true,

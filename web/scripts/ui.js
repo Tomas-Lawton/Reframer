@@ -46,6 +46,7 @@ const penTool = document.querySelector(".pen-tool");
 const eraseTool = document.querySelector(".erase-tool");
 const selectTool = document.querySelector(".pointer-tool");
 const toolToggle = document.querySelector(".style-window-toggle");
+const toolWindow = document.querySelector(".tool-view");
 
 const accordionItem = document.querySelector(".accordion-item");
 const header = document.querySelector(".accordion-item-header");
@@ -58,8 +59,8 @@ const redoButton = document.querySelector(".redo");
 const canvas = document.getElementById("canvas");
 const backDrop = document.getElementById("contain-canvas");
 const sketchSize = 100;
-const frame = Math.min(canvas.width, canvas.height);
-const scaleRatio = frame / sketchSize;
+const canvasFrame = Math.min(canvas.width, canvas.height);
+const scaleRatio = canvasFrame / 224;
 const padding = parseInt(
     window.getComputedStyle(backDrop, null).getPropertyValue("padding")
 );

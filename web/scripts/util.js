@@ -302,7 +302,7 @@ const loadResponse = (result) => {
 
 const updateMain = (result) => {
     controller.lastIteration = result.iterations;
-    mainSketch.load(frame / 224, result.svg, result.fixed, true, true);
+    mainSketch.load(scaleRatio / 1, result.svg, result.fixed, true, true);
     incrementHistory();
     // calcRollingLoss();
 };
