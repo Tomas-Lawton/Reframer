@@ -486,13 +486,17 @@ sketchTool.onMouseUp = function() {
     console.log(mainSketch.sketchLayer);
 };
 
-const setPenMode = (mode, accentTarget) => {
+const setPenMode = (mode) => {
+    let tools = document.querySelectorAll(".window-tool");
+    tools.forEach((tool) => {
+        tool.classList.remove("current-tool");
+    });
     switch (mode) {
         case "erase":
             selectTool.classList.remove("selected");
             eraseTool.classList.add("selected");
             penTool.classList.remove("selected");
-
+            document.querySelector(".erase-preview").classList.add("current-tool");
             canvas.style.cursor = "url('public/erase.svg') 8 11, move";
             controller.penMode = mode;
             break;
@@ -500,6 +504,7 @@ const setPenMode = (mode, accentTarget) => {
             selectTool.classList.remove("selected");
             eraseTool.classList.remove("selected");
             penTool.classList.add("selected");
+            document.querySelector(".pencil-preview").classList.add("current-tool");
 
             canvas.style.cursor = "url('public/pen.svg') -1 20, move";
 
@@ -524,6 +529,7 @@ const setPenMode = (mode, accentTarget) => {
             selectTool.classList.add("selected");
             eraseTool.classList.remove("selected");
             penTool.classList.remove("selected");
+            document.querySelector(".finger-preview").classList.add("current-tool");
 
             canvas.style.cursor = "url('public/select.svg') 3 2, move";
             controller.penMode = mode;

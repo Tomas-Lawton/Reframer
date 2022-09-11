@@ -15,8 +15,8 @@ class SketchHistory {
         });
 
         this.undoStack.length > 0 ?
-            (document.getElementById("undo").style.color = "#ffffff") :
-            (document.getElementById("undo").style.color = "#757575");
+            (undoButton.style.color = "#7b66ff") :
+            (undoButton.style.color = "#757575");
     }
     pushRedo() {
         ungroup();
@@ -28,8 +28,8 @@ class SketchHistory {
         });
 
         this.redoStack.length > 0 ?
-            (document.getElementById("redo").style.color = "#ffffff") :
-            (document.getElementById("redo").style.color = "#757575");
+            (redoButton.style.color = "#7b66ff") :
+            (redoButton.style.color = "#757575");
     }
     undo() {
         if (this.undoStack.length > 0) {
@@ -41,8 +41,7 @@ class SketchHistory {
             this.sketch.load(1, last.svg); //change to fixed list
             // logger.event("undo");
 
-            this.undoStack.length === 0 &&
-                (document.getElementById("undo").style.color = "#757575");
+            this.undoStack.length === 0 && (undoButton.style.color = "#757575");
         }
     }
     redo() {
@@ -55,8 +54,7 @@ class SketchHistory {
             this.sketch.load(1, last.svg); //change to fixed list
             // logger.event("redo");
 
-            this.redoStack.length === 0 &&
-                (document.getElementById("redo").style.color = "#757575");
+            this.redoStack.length === 0 && (redoButton.style.color = "#757575");
         }
     }
     clear() {

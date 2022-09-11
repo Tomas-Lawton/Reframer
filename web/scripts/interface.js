@@ -15,7 +15,7 @@ document.querySelectorAll(".swatch").forEach((elem) => {
     });
 });
 
-document.getElementById("stroke-dot").addEventListener("click", () => {
+document.querySelector(".tool-color").addEventListener("click", () => {
     showHide(document.getElementById("picker-ui"));
 });
 
@@ -93,11 +93,11 @@ fixedHandler.addEventListener("click", (e) => {
 //     }
 // });
 
-document.getElementById("undo").addEventListener("click", () => {
+undoButton.addEventListener("click", () => {
     sketchHistory.undo();
 });
 
-document.getElementById("redo").addEventListener("click", () => {
+redoButton.addEventListener("click", () => {
     sketchHistory.redo();
 });
 
@@ -204,7 +204,7 @@ timeKeeper.oninput = function() {
 
 palette.addEventListener("click", () => {
     showHide(controlPanel);
-    palette.classList.toggle("panel-open");
+    palette.classList.toggle("panel-closed");
 });
 
 prompt.addEventListener("input", (e) => {
@@ -426,20 +426,6 @@ localPrompts.onmousedown = (e) => {
     }
 };
 
-document.getElementById("style-handle").onmousedown = (e) => {
-    if (window.innerWidth > 700) {
-        e = e || window.event;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-
-        // check the bounds so don't include picker
-        document.onmouseup = closeDragElement;
-        document.onmousemove = (e) =>
-            elementDrag(e, document.getElementById("swatches"));
-        console.log("dragging");
-    }
-};
-
 document.getElementById("explore-margin").onmousedown = (e) => {
     if (window.innerWidth > 700) {
         let content = document.getElementById("explore-sketches");
@@ -537,6 +523,43 @@ header.addEventListener("click", () => {
     }
 });
 
+header.addEventListener("click", () => {
+    accordionItem.classList.toggle("open");
+    accordionItem.classList.toggle("closed");
+    if (accordionItem.classList.contains("open")) {
+        body.style.maxHeight = body.scrollHeight + "px";
+    } else {
+        body.style.maxHeight = "0px";
+    }
+});
+
+toolToggle.addEventListener("click", () => {
+    let currentTool = document.querySelector(".animation-window");
+    // currentTool.style.height = "230px";
+    // currentTool.classList.toggle("current-tool");
+
+    if (document.querySelector(".tool-view").style.display === "none") {
+        document
+            .querySelectorAll(".expanded")
+            .forEach((item) => (item.style.display = "none"));
+        document.querySelector(".tool-view").style.display = "flex";
+        toolToggle.firstChild.classList.add("fa-plus");
+        toolToggle.firstChild.classList.remove("fa-minus");
+        // currentTool.classList.add("active-tool");
+        // styles.style.top = window.innerHeight - 10 - styles.offsetHeight / 2 + "px";
+    } else {
+        document
+            .querySelectorAll(".expanded")
+            .forEach((item) => (item.style.display = "inherit"));
+        document.querySelector(".tool-view").style.display = "none";
+        toolToggle.firstChild.classList.add("fa-minus");
+        toolToggle.firstChild.classList.remove("fa-plus");
+        currentTool.classList.remove("active-tool");
+        // currentTool.style.top = "100px";
+        styles.style.left = window.innerWidth - 10 - styles.offsetWidth + "px";
+        styles.style.top = window.innerHeight / 2 + "px";
+    }
+});
 // Shortcuts
 window.addEventListener("keydown", function(event) {
     if (event.metaKey && event.shiftKey) {
@@ -581,7 +604,7 @@ window.addEventListener("keydown", function(event) {
 
 // document.getElementById("scrapbook").addEventListener("click", () => {
 //     showHide(sketchBook);
-//     document.getElementById("scrapbook").classList.toggle("panel-open");
+//     document.getElementById("scrapbook").classList.toggle("panel-closed");
 // });
 
 // document.querySelectorAll(".card-icon-background").forEach((elem) => {

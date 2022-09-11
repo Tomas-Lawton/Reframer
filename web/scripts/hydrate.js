@@ -33,5 +33,4 @@ for (let i = 0; i < 4; i++) {
 }
 
 localPrompts.style.display = "none";
-
-// drawTools.
+document.querySelector(".tool-view").style.display = "none";

@@ -14,7 +14,7 @@ const selectDot = document.getElementById("contain-pen-dot");
 const alphaSlider = document.getElementById("alpha-slider");
 const stopButton = document.getElementById("stop");
 const focusButton = document.getElementById("focus");
-const buttonPanel = document.querySelector(".top-action");
+const buttonPanel = document.querySelector(".action");
 const dropdown = document.getElementById("pen-dropdown");
 const aiMessage = document.getElementById("message");
 const sketchContainer = document.getElementById("canvas-drop");
@@ -45,10 +45,14 @@ const styles = document.querySelector(".draw-tools");
 const penTool = document.querySelector(".pen-tool");
 const eraseTool = document.querySelector(".erase-tool");
 const selectTool = document.querySelector(".pointer-tool");
+const toolToggle = document.querySelector(".style-window-toggle");
 
 const accordionItem = document.querySelector(".accordion-item");
 const header = document.querySelector(".accordion-item-header");
 const body = document.querySelector(".accordion-item-body");
+
+const undoButton = document.querySelector(".undo");
+const redoButton = document.querySelector(".redo");
 
 // Sketching UI
 const canvas = document.getElementById("canvas");

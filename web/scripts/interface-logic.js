@@ -46,8 +46,8 @@ const activateUI = () => {
     stopButton.querySelector("i").style.color = "#ffffff";
     stopButton.style.cursor = "pointer";
 
-    document.getElementById("undo").classList.add("inactive-top-action");
-    document.getElementById("redo").classList.add("inactive-top-action");
+    undoButton.classList.add("inactive-action");
+    redoButton.classList.add("inactive-action");
     document.getElementById("loading").style.display = "flex";
     document.querySelector(".control-lines").style.display = "none";
 
@@ -88,8 +88,8 @@ const stopDrawingUI = () => {
     });
     document.getElementById("loading").style.display = "none";
     document.querySelector(".control-lines").style.display = "block";
-    document.getElementById("undo").classList.remove("inactive-top-action");
-    document.getElementById("redo").classList.remove("inactive-top-action");
+    undoButton.classList.remove("inactive-action");
+    redoButton.classList.remove("inactive-action");
     inactiveFocusUI();
     inactiveStopUI();
 };
@@ -100,9 +100,8 @@ const focusUI = () => {
     });
     focusButton.classList.remove("inactive-action");
 
-    // add pen and erase
-    document.getElementById("undo").classList.add("inactive-top-action");
-    document.getElementById("redo").classList.add("inactive-top-action");
+    undoButton.classList.add("inactive-action");
+    redoButton.classList.add("inactive-action");
 
     focusButton.style.background = "rgb(21 211 139";
     focusButton.style.color = "#ffffff";
@@ -113,6 +112,8 @@ const focusUI = () => {
 
 const setThisColor = (rgba) => {
     document.getElementById("point-size").style.background = rgba;
+    document.querySelector(".tool-color").style.background = rgba;
+
     if (controller.transformGroup) {
         controller.transformGroup.children.forEach(
             (child) => (child.strokeColor = rgba)
