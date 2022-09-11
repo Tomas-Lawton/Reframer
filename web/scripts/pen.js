@@ -43,6 +43,7 @@ sketchTool.onMouseDown = function(event) {
 
             if (hitResult) {
                 sketchHistory.pushUndo();
+                // should it also add to timeSlider here? No. probs when the pen goes up. Since it's a snapshot not a recovery.
 
                 pauseActiveDrawer();
                 ungroup();
@@ -180,6 +181,13 @@ sketchTool.onMouseDrag = function(event) {
             controller.drawRegion.width += event.delta.x;
             controller.drawRegion.height += event.delta.y;
 
+            if (controller.drawRegion.width < 0) {
+                controller.drawRegion.width = 0;
+            }
+            if (controller.drawRegion.height < 0) {
+                controller.drawRegion.height = 0;
+            }
+
             if (regionPath !== undefined) regionPath.remove(); //remove old one. maybe could update the old one instead?
             regionPath = new Path.Rectangle(controller.drawRegion);
             regionPath.set(frameOptions);
@@ -247,6 +255,8 @@ sketchTool.onMouseUp = function() {
             mainSketch.svg = paper.project.exportSVG({
                 asString: true,
             });
+            incrementHistory();
+
             setLineLabels(mainSketch.sketchLayer);
             if (socket) {
                 if (controller.liveCollab) {
@@ -353,9 +363,21 @@ sketchTool.onMouseUp = function() {
                     pos4 = e.clientY;
                     document.onmouseup = closeDragElement;
                     document.onmousemove = (e) => {
-                        // update other rects to do this instead
-                        newFrame.bounds.width += e.movementX;
-                        newFrame.bounds.height += e.movementY;
+                        // TODO update other rects to do this instead . didn't work?
+                        let x = newFrame.bounds.width;
+                        let y = newFrame.bounds.height;
+                        if (x + e.movementX > 1) {
+                            newFrame.bounds.width += e.movementY;
+                        } else {
+                            newFrame.bounds.width = 1;
+                        }
+
+                        if (y + e.movementY > 1) {
+                            newFrame.bounds.height += e.movementY;
+                        } else {
+                            newFrame.bounds.height = 1;
+                        }
+
                         frameUI.style.width = newFrame.bounds.width + "px";
                         dragCorner.style.top =
                             newFrame.bounds.height + frameUI.clientHeight + "px";

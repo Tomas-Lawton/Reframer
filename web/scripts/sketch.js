@@ -166,7 +166,7 @@ class Controller {
             sketchHistory.historyHolder.push({
                 svg: mainSketch.svg,
             });
-
+            sketchHistory.pushUndo();
             this.prepare();
             // this.resetMetaControls();
             this.updateDrawer({
@@ -207,44 +207,21 @@ class Controller {
     continueSketch() {
         if (!this.clipDrawing) {
             this.clipDrawing = true;
-
-            if (this.targetDrawing) {
-                //     explorer.childNodes.forEach((child, i) => {
-                //         try {
-                //             mainSketch.arrange();
-                //             // TO DO CHANGE
-                //             setLineLabels(mainSketch.sketchLayer);
-                //             document.getElementById("calc-lines").innerHTML = `Add : 0`;
-                //             this.updateDrawer({
-                //                 status: "continue_single_sketch",
-                //                 svg: mainSketch.svg,
-                //                 frameSize: mainSketch.frameSize, //can remove?
-                //                 fixation: this.useFixation,
-                //                 sketchScopeIndex: controller.exploreScopes[i],
-                //             });
-                //             setActionUI("continue-explore");
-                //         } catch (e) {
-                //             console.log("Problem with update");
-                //         }
-                //     });
-            } else {
-                try {
-                    sketchHistory.historyHolder.push({
-                        svg: mainSketch.svg,
-                    });
-                    this.prepare();
-                    this.updateDrawer({
-                        status: "continue_sketch",
-                        sketch: mainSketch.sketch,
-                        rate: this.learningRate,
-                    });
-                    setActionUI("continuing");
-                } catch (e) {
-                    console.log("Problem with update");
-                }
+            try {
+                sketchHistory.historyHolder.push({
+                    svg: mainSketch.svg,
+                });
+                sketchHistory.pushUndo();
+                this.prepare();
+                this.updateDrawer({
+                    status: "continue_sketch",
+                    sketch: mainSketch.sketch,
+                    rate: this.learningRate,
+                });
+                setActionUI("continuing");
+            } catch (e) {
+                console.log("Problem with update");
             }
-        } else {
-            throw new Error("Can't continue if already running");
         }
     }
     prune() {
@@ -265,6 +242,9 @@ class Controller {
         }
     }
     stop() {
+        sketchHistory.historyHolder.push({
+            svg: mainSketch.svg,
+        });
         this.updateDrawer({ status: "stop" });
         setActionUI("stop");
     }
@@ -280,7 +260,7 @@ class Controller {
         });
     }
     prepare() {
-        sketchHistory.clear();
+        // sketchHistory.clear();
         ungroup();
         mainSketch.sketchLayer.getItems().forEach((path) => {
             path.selected = false;

@@ -197,7 +197,6 @@ const incrementHistory = () => {
     controller.step += 1;
     timeKeeper.setAttribute("max", String(controller.step));
     timeKeeper.value = String(controller.step);
-
     sketchHistory.historyHolder.push({
         svg: mainSketch.svg,
     });

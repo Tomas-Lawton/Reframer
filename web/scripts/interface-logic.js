@@ -95,6 +95,9 @@ const stopDrawingUI = () => {
 };
 
 const focusUI = () => {
+    accordionItem.classList.remove("open");
+    accordionItem.classList.add("closed");
+
     actionControls.forEach((elem) => {
         elem.classList.add("inactive-action");
     });

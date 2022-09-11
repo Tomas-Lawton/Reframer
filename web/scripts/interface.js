@@ -32,6 +32,7 @@ document.getElementById("delete").addEventListener("click", () =>
             logger.event("clear-sketch");
             mainSketch.sketchLayer.clear();
             modal.style.display = "none";
+            sketchHistory.clear();
 
             if (controller.clipDrawing || controller.drawState === "pause") {
                 killExploratorySketches();
@@ -255,7 +256,8 @@ document.getElementById("explore").addEventListener("click", () => {
             sketchHistory.historyHolder.push({
                 svg: mainSketch.svg,
             });
-
+            sketchHistory.pushUndo();
+            //
             total = 4;
             for (let i = 0; i < 4; i++) {
                 explorer.removeChild(explorer.firstChild);
