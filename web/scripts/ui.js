@@ -17,7 +17,6 @@ const focusButton = document.getElementById("focus");
 const buttonPanel = document.querySelector(".action");
 const dropdown = document.getElementById("pen-dropdown");
 const aiMessage = document.getElementById("message");
-const sketchContainer = document.getElementById("canvas-drop");
 const staticSketches = document.getElementById("static-sketches");
 const explorer = document.getElementById("explore-sketches");
 const sketchGrid = document.getElementById("grid-container");
@@ -56,16 +55,13 @@ const undoButton = document.querySelector(".undo");
 const redoButton = document.querySelector(".redo");
 
 // Sketching UI
-const canvas = document.getElementById("canvas");
 const backDrop = document.getElementById("contain-canvas");
-const sketchSize = 100;
-const canvasFrame = Math.min(canvas.width, canvas.height);
-const scaleRatio = canvasFrame / 224;
+const containerRect = backDrop.getBoundingClientRect();
 const padding = parseInt(
     window.getComputedStyle(backDrop, null).getPropertyValue("padding")
 );
-const containerRect = backDrop.getBoundingClientRect();
 
+const canvas = document.getElementById("canvas");
 if (containerRect.width > window.innerHeight) {
     canvas.width = window.innerHeight - padding * 2;
     canvas.height = window.innerHeight - padding * 2;
@@ -73,6 +69,13 @@ if (containerRect.width > window.innerHeight) {
     canvas.height = containerRect.width - padding * 2;
     canvas.width = containerRect.width - padding * 2;
 }
+const canvasFrame = Math.min(canvas.width, canvas.height);
+
+const sketchContainer = document.getElementById("canvas-drop");
+
+const sketchSize = 100;
+console.log(canvasFrame);
+const scaleRatio = 224 / canvasFrame;
 
 const reusableExemplar = sketchTemplate.cloneNode(true); //clone to use
 sketchTemplate.remove();
