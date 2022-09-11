@@ -222,9 +222,73 @@ const getRGBA = (a) => {
     return `rgba(${rgba.join()})`;
 };
 
+const lighten = (col, amt) => {
+    col = parseInt(col, 16);
+    return (
+        ((col & 0x0000ff) + amt) |
+        ((((col >> 8) & 0x00ff) + amt) << 8) |
+        (((col >> 16) + amt) << 16)
+    ).toString(16);
+};
+
+const RGB_Linear_Blend = (p, c0, c1) => {
+    var i = parseInt,
+        r = Math.round,
+        P = 1 - p,
+        [a, b, c, d] = c0.split(","),
+        [e, f, g, h] = c1.split(","),
+        x = d || h,
+        j = x ?
+        "," +
+        (!d ?
+            h :
+            !h ?
+            d :
+            r((parseFloat(d) * P + parseFloat(h) * p) * 1000) / 1000 + ")") :
+        ")";
+    return (
+        "rgb" +
+        (x ? "a(" : "(") +
+        r(
+            i(a[3] == "a" ? a.slice(5) : a.slice(4)) * P +
+            i(e[3] == "a" ? e.slice(5) : e.slice(4)) * p
+        ) +
+        "," +
+        r(i(b) * P + i(f) * p) +
+        "," +
+        r(i(c) * P + i(g) * p) +
+        j
+    );
+};
+
 const rgbToHex = (r, g, b) => {
     if (r > 255 || g > 255 || b > 255) throw "Invalid color component";
     return ((r << 16) | (g << 8) | b).toString(16);
+};
+
+const rgbaToHexStr = (orig) => {
+    var a,
+        isPercent,
+        rgb = orig
+        .replace(/\s/g, "")
+        .match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i),
+        alpha = ((rgb && rgb[4]) || "").trim(),
+        hex = rgb ?
+        (rgb[1] | (1 << 8)).toString(16).slice(1) +
+        (rgb[2] | (1 << 8)).toString(16).slice(1) +
+        (rgb[3] | (1 << 8)).toString(16).slice(1) :
+        orig;
+
+    if (alpha !== "") {
+        a = alpha;
+    } else {
+        a = 01;
+    }
+    // multiply before convert to HEX
+    a = ((a * 255) | (1 << 8)).toString(16).slice(1);
+    hex = hex + a;
+
+    return hex;
 };
 
 const download = () => {
@@ -327,4 +391,8 @@ const loadPartial = () => {
     mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
+};
+
+const scaleRange = (number, inMin, inMax, outMin, outMax) => {
+    return ((number - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
 };

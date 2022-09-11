@@ -63,6 +63,18 @@ body {
     flex-direction: column;
 }
 
+.socket-connect {
+    border-radius: 50%;
+    position: absolute;
+    left: 1em;
+    bottom: 1em;
+    z-index: 5;
+    width: 12px;
+    height: 12px;
+    background: #f6ab2a;
+    box-shadow: inset 1px 2px 4px rgb(0 0 0 / 15%);
+}
+
 #penmode-inner-circle {
     width: 0.6em;
     height: 0.6em;
@@ -1531,7 +1543,7 @@ input[type="number"] {
     width: 130px;
     height: 130px;
     position: relative;
-    /* change */
+    cursor: crosshair;
     box-shadow: inset 7px 10px 12px 7px rgb(0 0 0 / 10%);
 }
 
@@ -1542,9 +1554,11 @@ input[type="number"] {
     width: 80px;
     height: 80px;
     cursor: pointer;
+    display: flex;
+    margin: 1em;
 }
 
-.tool-view img {
+.tool-view svg {
     transform: rotate(90deg);
     width: 121px;
     height: 172px;
@@ -1570,10 +1584,6 @@ input[type="number"] {
     transition: ease 0.5s;
 } */
 
-#stroke-dot {
-    border: 2px solid #7b66ff;
-}
-
 #stroke-dot div {
     position: absolute;
     border-radius: 50%;
@@ -1592,10 +1602,7 @@ input[type="number"] {
 
 #picker-ui {
     position: absolute;
-    z-index: 5;
-    padding: 0.6em;
-    border-radius: 0.5em;
-    background: #14112afa;
+    z-index: 12;
     display: none;
 }
 

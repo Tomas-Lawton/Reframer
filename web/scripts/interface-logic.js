@@ -115,13 +115,56 @@ const focusUI = () => {
 
 const setThisColor = (rgba) => {
     document.getElementById("point-size").style.background = rgba;
-    document.querySelector(".tool-color").style.background = rgba;
+    // document.querySelector(".tool-color").style.background = rgba;
+    document.getElementById(
+        "stroke-dot"
+    ).style.boxShadow = `inset 7px 10px 12px 7px ${getRGBA(0.2)}`;
+    document.querySelector(
+        ".tool-view"
+    ).style.boxShadow = `inset 7px 10px 12px 7px ${getRGBA(0.2)}`;
+
+    document
+        .querySelectorAll(".tool-view .main-color")
+        .forEach((elem) => (elem.style.fill = rgba));
+    console.log(controller.strokeColor);
+    document
+        .querySelectorAll(".tool-view .second-color")
+        .forEach(
+            (elem) =>
+            (elem.style.fill = RGB_Linear_Blend(
+                0.3,
+                controller.strokeColor,
+                "rgba(255, 255, 255, 1)"
+            ))
+        );
+
+    // set active tool colors
+    // set the background
 
     if (controller.transformGroup) {
         controller.transformGroup.children.forEach(
             (child) => (child.strokeColor = rgba)
         );
     }
+};
+
+const setAlpha = (a) => {
+    let rgba = getRGBA(a);
+    controller.alpha = a;
+    controller.strokeColor = rgba;
+    setThisColor(rgba);
+    setPenMode("pen", pen);
+};
+
+const setMouseOver = () => {
+    var div = document.getElementById("stroke-dot");
+    div.mouseIsOver = false;
+    div.onmouseover = function() {
+        this.mouseIsOver = true;
+    };
+    div.onmouseout = function() {
+        this.mouseIsOver = false;
+    };
 };
 
 const setActionUI = (state) => {

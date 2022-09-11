@@ -10,11 +10,13 @@ let socket = false;
 const ws = new WebSocket("ws://" + base + "/ws");
 ws.onclose = (event) => {
     console.log("Closed socket... Running without AI\n" + event);
-    alert("Restart server... ded");
+    // alert("Restart server... ded");
+    socketLight.style.background = "#f6ab2a";
 };
 ws.onopen = (event) => {
     console.log("Connected AI Socket\n" + event);
     socket = true;
+    socketLight.style.background = "#00d457";
 };
 ws.onmessage = function(event) {
     try {

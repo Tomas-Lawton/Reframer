@@ -1,9 +1,10 @@
+const socketLight = document.querySelector(".socket-connect");
+
 // General UI
 const prompt = document.getElementById("messageText");
 const modal = document.getElementById("modal");
 const controlPanel = document.getElementById("control-panel");
 const sketchBook = document.getElementById("sketchbook-panel");
-const penControls = document.getElementById("pen-controls");
 const message = document.getElementById("message");
 const palette = document.getElementById("palette");
 const timeKeeper = document.getElementById("time-slider");
@@ -53,6 +54,8 @@ const body = document.querySelector(".accordion-item-body");
 
 const undoButton = document.querySelector(".undo");
 const redoButton = document.querySelector(".redo");
+
+const pickerSelect = document.getElementById("picker-ui");
 
 // Sketching UI
 const backDrop = document.getElementById("contain-canvas");

@@ -4,6 +4,7 @@ document.querySelectorAll(".pen-mode").forEach((elem) => {
         setPenMode(elem.id, elem);
     });
 });
+
 document.querySelectorAll(".swatch").forEach((elem) => {
     elem.addEventListener("click", () => {
         let col = window.getComputedStyle(elem).backgroundColor;
@@ -15,8 +16,11 @@ document.querySelectorAll(".swatch").forEach((elem) => {
     });
 });
 
-document.querySelector(".tool-color").addEventListener("click", () => {
-    showHide(document.getElementById("picker-ui"));
+toolWindow.addEventListener("click", () => {
+    showHide(pickerSelect);
+    pickerSelect.style.left =
+        styles.getBoundingClientRect().left - pickerSelect.offsetWidth + "px";
+    pickerSelect.style.top = styles.getBoundingClientRect().top + "px";
 });
 
 document.getElementById("delete").addEventListener("click", () =>
@@ -123,11 +127,7 @@ scaleNumber.oninput = function() {
 };
 
 alphaSlider.oninput = function() {
-    let rgba = getRGBA(this.value);
-    controller.alpha = this.value;
-    controller.strokeColor = rgba;
-    setThisColor(rgba);
-    setPenMode("pen", pen);
+    setAlpha(this.value);
 };
 
 document.getElementById("width-slider").oninput = function() {
@@ -393,8 +393,14 @@ styles.onmousedown = (e) => {
     e = e || window.event;
     pos3 = e.clientX;
     pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    document.onmousemove = (e) => elementDrag(e, styles);
+    if (!document.getElementById("stroke-dot").mouseIsOver) {
+        document.onmouseup = closeDragElement;
+        document.onmousemove = (e) => elementDrag(e, [pickerSelect, styles]);
+    } else {
+        console.log("moving hairs");
+        document.onmouseup = closeDragElement;
+        document.onmousemove = (e) => shiftPen(e);
+    }
 };
 
 // sketchBook.onmousedown = (e) => {
@@ -449,21 +455,46 @@ document.getElementById("explore-margin").onmousedown = (e) => {
     }
 };
 
-function elementDrag(e, item) {
+function elementDrag(e, arr) {
     e = e || window.event;
     // e.preventDefault();
     pos1 = pos3 - e.clientX;
     pos2 = pos4 - e.clientY;
     pos3 = e.clientX;
     pos4 = e.clientY;
-    item.style.top = item.offsetTop - pos2 + "px";
-    item.style.left = item.offsetLeft - pos1 + "px";
+
+    if (Array.isArray(arr)) {
+        arr.forEach((item) => {
+            item.style.top = item.offsetTop - pos2 + "px";
+            item.style.left = item.offsetLeft - pos1 + "px";
+        });
+    } else {
+        let item = arr;
+        item.style.top = item.offsetTop - pos2 + "px";
+        item.style.left = item.offsetLeft - pos1 + "px";
+    }
 }
 
 function closeDragElement() {
     document.onmouseup = null;
     document.onmousemove = null;
 }
+
+const shiftPen = (e) => {
+    e = e || window.event;
+    // calulate the absolute x and y dist from the center
+    let item = document.getElementById("stroke-dot");
+    let bounds = item.getBoundingClientRect();
+    var centerX = bounds.left + item.offsetWidth / 2;
+    var centerY = bounds.top + item.offsetHeight / 2;
+
+    let distX = Math.min(Math.abs(centerX - e.clientX) * 2, 131);
+    let distY = Math.min(Math.abs(centerY - e.clientY) * 2, 131);
+
+    let newAlpha = scaleRange(distX, 0, 131, 1, 0);
+    setPointSize(distY);
+    setAlpha(newAlpha);
+};
 
 document.querySelectorAll(".tab-item").forEach((tab) => {
     tab.addEventListener("click", () => {
@@ -525,37 +556,37 @@ header.addEventListener("click", () => {
     }
 });
 
-toolWindow.addEventListener("click", () => {
-    document
-        .querySelectorAll(".expanded")
-        .forEach((item) => (item.style.display = "inherit"));
-    toolWindow.style.display = "none";
-    toolToggle.firstChild.classList.add("fa-minus");
-    toolToggle.firstChild.classList.remove("fa-plus");
-    // currentTool.classList.remove("active-tool");
-    styles.style.maxWidth = "300px";
-    toolToggle.style.display = "flex";
-
-    // currentTool.style.top = "100px";
-    styles.style.left = window.innerWidth - 10 - styles.offsetWidth + "px";
-    styles.style.top = window.innerHeight / 2 + "px";
-});
-
 toolToggle.addEventListener("click", () => {
-    let currentTool = document.querySelector(".animation-window");
+    // let currentTool = document.querySelector(".animation-window");
     // currentTool.style.height = "230px";
     // currentTool.classList.toggle("current-tool");
+    if (toolToggle.firstChild.classList.contains("fa-minus")) {
+        document
+            .querySelectorAll(".expanded")
+            .forEach((item) => (item.style.display = "none"));
+        toolWindow.style.display = "flex";
+        toolToggle.firstChild.classList.add("fa-plus");
+        toolToggle.firstChild.classList.remove("fa-minus");
+        styles.style.maxWidth = "120px";
 
-    document
-        .querySelectorAll(".expanded")
-        .forEach((item) => (item.style.display = "none"));
-    toolWindow.style.display = "flex";
-    toolToggle.firstChild.classList.add("fa-plus");
-    toolToggle.firstChild.classList.remove("fa-minus");
-    styles.style.maxWidth = "120px";
-    toolToggle.style.display = "none";
-    // currentTool.classList.add("active-tool");
-    // styles.style.top = window.innerHeight - 10 - styles.offsetHeight / 2 + "px";
+        pickerSelect.style.left =
+            styles.getBoundingClientRect().left - pickerSelect.offsetWidth + "px";
+        pickerSelect.style.top = styles.getBoundingClientRect().top + "px";
+        // currentTool.classList.add("active-tool");
+        // styles.style.top = window.innerHeight - 10 - styles.offsetHeight / 2 + "px";
+    } else {
+        document
+            .querySelectorAll(".expanded")
+            .forEach((item) => (item.style.display = "inherit"));
+        toolToggle.firstChild.classList.add("fa-minus");
+        toolToggle.firstChild.classList.remove("fa-plus");
+        // currentTool.classList.remove("active-tool");
+        styles.style.maxWidth = "300px";
+
+        // currentTool.style.top = "100px";
+        styles.style.left = window.innerWidth - 10 - styles.offsetWidth + "px";
+        styles.style.top = window.innerHeight / 2 + "px";
+    }
 });
 // Shortcuts
 window.addEventListener("keydown", function(event) {
