@@ -91,7 +91,6 @@ class CICADA:
     
         for l in self.local_frames:
             attention_area = scale_points(l['points'], self.normaliseScaleFactor)
-            print("AREA:", attention_area)
             self.add_attention_region(l['prompt'], attention_area)
 
         self.is_active = True
@@ -206,29 +205,8 @@ class CICADA:
         widths_loss = 0
         colors_loss = 0
 
-# before
-# non-fixed: loss += 0 because points_loss stays at 0
-# fixed (variable): points loss += value respect log value times points_loss (highest of 1)
-
-# after 
-# non-fixed (variable): points loss += value respect log value times points_loss (highest of 1)
-# fixed: points_loss is now multplied by the hightest value of 1.
-
-        # for k in range(len(self.points_vars)):
-        #     if  self.drawing.traces[k].is_fixed:
-        #         points_loss += torch.norm(self.points_vars[k] - self.points_vars0[k])
-        #         colors_loss += torch.norm(self.color_vars[k] - self.color_vars0[k])
-        #         widths_loss += torch.norm(
-        #             self.stroke_width_vars[k] - self.stroke_width_vars0[k]
-        #         )
-
-        # loss += self.w_points * points_loss
-        # loss += self.w_colors * colors_loss
-        # loss += self.w_widths * widths_loss
-        # loss += self.w_img * img_loss
-
         for k in range(len(self.points_vars)):
-            if not self.drawing.traces[k].is_fixed:
+            if self.drawing.traces[k].is_fixed:
                 points_loss += torch.norm(self.points_vars[k] - self.points_vars0[k])
                 colors_loss += torch.norm(self.color_vars[k] - self.color_vars0[k])
                 widths_loss += torch.norm(
@@ -240,15 +218,13 @@ class CICADA:
         loss += self.w_widths * widths_loss
         loss += self.w_img * img_loss
 
-
-
         # geo_loss = self.clipConvLoss(img * self.mask + 1 - self.mask, self.img0)
 
         # for l_name in geo_loss:
-        #     loss += w_geo * geo_loss[l_name]
-        # loss += args.w_geo * geo_loss['clip_conv_loss_layer3']
+        #     loss += args.w_geo * geo_loss[l_name]
 
         # Backpropagate the gradients.
+        loss *= self.lr_control
         loss.backward()
 
         # Take a gradient descent step.
@@ -383,8 +359,7 @@ class CICADA:
         self.frame_size = data["data"]["frame_size"]
         self.num_paths = data["data"]["random_curves"]
         self.sketch_data = data["data"]["sketch"]
-        self.w_points, self.w_colors, self.w_widths = use_penalisation(
-            data["data"]["fixation"])
+        self.lr_control = data["data"]["rate"]
         self.text_features = self.encode_text_classes([data["data"]["prompt"]])
         # self.negative_text_features = self.clip_interface.encode_text_classes(["Written words.", "Text."])
         self.negative_text_features = self.encode_text_classes(["letters in the alphabet"])
@@ -401,8 +376,7 @@ class CICADA:
     def use_latest_sketch(self, data):
         """Only for things that can be changed on the fly"""
         logging.info("Adding changes...")
-        self.w_points, self.w_colors, self.w_widths = use_penalisation(
-            data["data"]["fixation"])
+        self.lr_control = data["data"]["rate"]
         self.sketch_data = data["data"]["sketch"]
 
 
