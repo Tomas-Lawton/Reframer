@@ -82,7 +82,6 @@ class Controller {
         this.clipDrawing = false;
         this.maximumTraces = 1; // todo change
         this.step = 0;
-        this.lastRollingLoss = 0;
         this.linesDisabled = false;
         this.activeStates = [
             "drawing",
@@ -105,11 +104,10 @@ class Controller {
         this.selectionBox = null;
         this.lastPrompt = null;
         this.isFirstIteration = null;
-        this.lastRollingLoss = null;
         this.traces = null;
         this.boundingBox = null;
         this.transformGroup = null;
-        this.learningRate = 3;
+        this.learningRate = 0.5;
         this.showAllLines = true;
         this.targetDrawing = false;
 
@@ -121,15 +119,14 @@ class Controller {
         this.numTraces = 1;
 
         this.liveCollab = false;
-        this.allowOverwrite = true;
     }
     updateDrawer({
         status,
         sketch,
-        frameSize,
+        frame_size,
         prompt,
-        lines,
-        sketchScopeIndex,
+        random_curves,
+        sketch_index,
         rate,
         frames,
     }) {
@@ -138,13 +135,13 @@ class Controller {
         const res = {
             status: status,
             data: {
-                prompt: prompt,
+                prompt,
                 sketch,
-                random_curves: lines,
-                frame_size: frameSize,
-                rate: rate,
-                frames: frames,
-                sketch_index: sketchScopeIndex,
+                random_curves,
+                frame_size,
+                rate,
+                frames,
+                sketch_index,
             },
         };
         console.log(res);
@@ -172,9 +169,9 @@ class Controller {
             this.updateDrawer({
                 status: "draw",
                 sketch: mainSketch.sketch,
-                frameSize: mainSketch.frameSize,
+                frame_size: mainSketch.frameSize,
                 prompt: this.prompt,
-                lines: this.initRandomCurves ? this.addLines : 0, //adding
+                random_curves: this.initRandomCurves ? this.addLines : 0, //adding
                 rate: this.learningRate,
                 frames: Object.values(mainSketch.localFrames).map((elem) => elem.data),
             });
@@ -195,10 +192,10 @@ class Controller {
             this.updateDrawer({
                 status: "add_new_sketch",
                 sketch: mainSketch.sketch,
-                frameSize: mainSketch.frameSize,
+                frame_size: mainSketch.frameSize,
                 prompt: this.prompt,
-                lines: this.addLines,
-                sketchScopeIndex: sketchCountIndex,
+                random_curves: this.addLines,
+                sketch_index: sketchCountIndex,
                 rate: this.learningRate,
                 frames: Object.values(mainSketch.localFrames).map((elem) => elem.data),
             });
@@ -227,15 +224,13 @@ class Controller {
     prune() {
         if (!this.clipDrawing) {
             this.clipDrawing = true;
-
             this.prepare();
-
             this.updateDrawer({
                 status: "prune",
                 sketch: mainSketch.sketch,
-                frameSize: mainSketch.frameSize,
+                frame_size: mainSketch.frameSize,
                 prompt: this.prompt,
-                lines: this.initRandomCurves ? this.addLines : 0, //adding
+                random_curves: this.initRandomCurves ? this.addLines : 0, //adding
                 rate: this.learningRate,
             });
             setActionUI("pruning");
@@ -256,11 +251,10 @@ class Controller {
     stopSingle(i) {
         this.updateDrawer({
             status: "stop_single_sketch",
-            sketchScopeIndex: i,
+            sketch_index: i,
         });
     }
     prepare() {
-        // sketchHistory.clear();
         ungroup();
         mainSketch.sketchLayer.getItems().forEach((path) => {
             path.selected = false;
@@ -270,12 +264,10 @@ class Controller {
         document.getElementById("calc-lines").innerHTML = `Add : 0`;
     }
     resetMetaControls() {
-        // document.getElementById("prune").classList.add("inactive-action");
         document.getElementById("history-block").style.display = "none";
         this.step = 0;
         timeKeeper.setAttribute("max", "0");
         timeKeeper.value = "0";
-        // sketchHistory.historyHolder = [{ svg: "", num: 0 }];
         sketchHistory.historyHolder = [];
     }
 }
@@ -292,6 +284,7 @@ class Sketch {
         this.sketchLayer;
         this.frameSize = size;
         this.localFrames = [];
+        this.semanticLoss = 1;
         // Fixed path list???
 
         controller.sketches[this.i] = this;
@@ -302,7 +295,7 @@ class Sketch {
             if (svg === "" || svg === undefined) return;
             this.sketchLayer.clear();
             let importGroup = this.sketchLayer.importSVG(svg);
-            console.log(this.sketchLayer.exportSVG());
+            // console.log(this.sketchLayer.exportSVG());
 
             let g = importGroup.children[0];
             let scaledGroup = scaleGroup(g, s);
@@ -329,7 +322,7 @@ class Sketch {
                 asString: true,
             });
 
-            console.log("LOADED: ", this.sketchLayer);
+            // console.log("LOADED: ", this.sketchLayer);
         }
         // arrange() {
         //     let sorted = [...this.userPathList];
@@ -434,58 +427,20 @@ class Sketch {
     }
     importTo(overwriting) {
         let i = this.i;
-        if (controller.clipDrawing) {
-            openModal({
-                title: "Overwriting Canvas",
-                message: "This will stop AI drawing. Are you sure?",
-                confirmAction: () => {
-                    if (
-                        controller.drawState === "drawing" ||
-                        controller.drawState === "continuing"
-                    ) {
-                        controller.stop();
-                        controller.clipDrawing = false;
-                    }
-
-                    // pauseActiveDrawer();
-                    ungroup();
-                    this.saveStatic(overwriting.extractScaledSVG(1 / scaleRatio));
-                    let fromLayer = controller.sketches[i].sketchLayer.clone();
-                    if (fromLayer.firstChild instanceof Group) {
-                        fromLayer = fromLayer.children[0];
-                    }
-                    this.overwrite(overwriting, fromLayer, scaleRatio);
-                },
-            });
-        } else if (controller.allowOverwrite) {
-            openModal({
-                title: "Overwriting Canvas",
-                message: "Import into the main canvas? Sketch will be saved.",
-                confirmAction: () => {
-                    // pauseActiveDrawer();
-                    ungroup(); //remove first even tho deleted
-                    this.saveStatic(overwriting.extractScaledSVG(1 / scaleRatio));
-                    let fromLayer = controller.sketches[i].sketchLayer.clone();
-                    if (fromLayer.firstChild instanceof Group) {
-                        fromLayer = fromLayer.children[0];
-                    }
-                    this.overwrite(overwriting, fromLayer, scaleRatio);
-                },
-            });
-        } else {
-            // pauseActiveDrawer();
-            ungroup(); //could stay selected but something happens to position when dragging
-            mainSketch.sketchLayer.getItems().forEach((path) => {
-                path.selected = false;
-            });
-
-            this.saveStatic(overwriting.extractScaledSVG(1 / scaleRatio));
-            let fromLayer = controller.sketches[i].sketchLayer.clone();
-            if (fromLayer.firstChild instanceof Group) {
-                fromLayer = fromLayer.children[0];
-            }
-            this.add(overwriting, fromLayer, scaleRatio);
-        }
+        openModal({
+            title: "Overwriting Canvas",
+            message: "This will replace the canvas contents. Are you sure?",
+            confirmAction: () => {
+                // pauseActiveDrawer();
+                ungroup(); //remove first even tho deleted
+                this.saveStatic(overwriting.extractScaledSVG(1 / scaleRatio));
+                let fromLayer = controller.sketches[i].sketchLayer.clone();
+                if (fromLayer.firstChild instanceof Group) {
+                    fromLayer = fromLayer.children[0];
+                }
+                this.overwrite(overwriting, fromLayer, fullMiniRatio);
+            },
+        });
     }
     clone() {
         let clone = this.sketchLayer.clone({

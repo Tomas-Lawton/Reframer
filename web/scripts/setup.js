@@ -1,7 +1,10 @@
 paper.install(window);
+const spark = new PaperScope();
 const scope = new PaperScope();
 const sketchScope = new PaperScope();
 sketchScope.activate();
+// spark.setup(sparkCanvas);
+// spark.activate();
 scope.setup(canvas);
 scope.activate();
 const sketchTool = new Tool();

@@ -149,48 +149,11 @@ const deleteItems = () => {
     // logger.event("deleted-path");
 };
 
-const getHistoryBatch = (maxSize, startIdx) => {
-    let len = sketchHistory.historyHolder.length;
-    if (len <= 1) return null;
-    let traceList = [];
-    let batchSize = Math.min(maxSize, startIdx); // not first item
-
-    for (let i = 0; i < batchSize; i++) {
-        // num traces
-        // not sure this is still correct (0 user, then after both)
-        traceList.push(sketchHistory.historyHolder[startIdx - i - 1]);
-    }
-    return traceList;
-};
-
 const calcRollingLoss = () => {
-    const items = getHistoryBatch(
-        setTraces.value,
-        sketchHistory.historyHolder.length - 1
-    );
-    if (items) {
-        const sum = items.reduce(
-            (partialSum, historyItem) => partialSum + historyItem.loss,
-            0
-        );
-        const newRollingLoss = sum / items.length;
-        controller.lastRollingLoss = newRollingLoss;
-    }
-};
-
-// TO DO make worker with new loader
-const showTraceHistoryFrom = (fromIndex) => {
-    const items = getHistoryBatch(controller.numTraces, fromIndex);
-    if (items) {
-        controller.traces = null;
-        let refList = [];
-        for (let stored of items) {
-            // TO DO CHANGE??? so fixed paths
-            mainSketch.sketchLayer.importSVG(stored.svg); //overlay
-            // refList.push(mainSketch.load(1, stored.svg, stored.num));
-        }
-        controller.traces = refList;
-    }
+    if (!(sketchHistory.historyHolder.length > 5 + 1)) return null; //ignore [0]
+    let losses = sketchHistory.historyHolder.slice(-5);
+    console.log(losses.map((e) => e.loss));
+    return losses.reduce((t, v) => t + v.loss, 0) / losses.length;
 };
 
 const incrementHistory = () => {
@@ -199,6 +162,7 @@ const incrementHistory = () => {
     timeKeeper.value = String(controller.step);
     sketchHistory.historyHolder.push({
         svg: mainSketch.svg,
+        loss: mainSketch.semanticLoss,
     });
 };
 
@@ -220,15 +184,6 @@ const getRGBA = (a) => {
     let rgba = controller.strokeColor.replace(/[^\d,]/g, "").split(",");
     rgba[3] = a;
     return `rgba(${rgba.join()})`;
-};
-
-const lighten = (col, amt) => {
-    col = parseInt(col, 16);
-    return (
-        ((col & 0x0000ff) + amt) |
-        ((((col >> 8) & 0x00ff) + amt) << 8) |
-        (((col >> 16) + amt) << 16)
-    ).toString(16);
 };
 
 const RGB_Linear_Blend = (p, c0, c1) => {
@@ -259,36 +214,6 @@ const RGB_Linear_Blend = (p, c0, c1) => {
         r(i(c) * P + i(g) * p) +
         j
     );
-};
-
-const rgbToHex = (r, g, b) => {
-    if (r > 255 || g > 255 || b > 255) throw "Invalid color component";
-    return ((r << 16) | (g << 8) | b).toString(16);
-};
-
-const rgbaToHexStr = (orig) => {
-    var a,
-        isPercent,
-        rgb = orig
-        .replace(/\s/g, "")
-        .match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i),
-        alpha = ((rgb && rgb[4]) || "").trim(),
-        hex = rgb ?
-        (rgb[1] | (1 << 8)).toString(16).slice(1) +
-        (rgb[2] | (1 << 8)).toString(16).slice(1) +
-        (rgb[3] | (1 << 8)).toString(16).slice(1) :
-        orig;
-
-    if (alpha !== "") {
-        a = alpha;
-    } else {
-        a = 01;
-    }
-    // multiply before convert to HEX
-    a = ((a * 255) | (1 << 8)).toString(16).slice(1);
-    hex = hex + a;
-
-    return hex;
 };
 
 const download = () => {
@@ -335,39 +260,36 @@ const loadResponse = (result) => {
     console.log("Result: ", result);
 
     if (controller.clipDrawing) {
-        // Main
         if (result.status === "None") {
-            updateMain(result);
+            loadUpdates(result);
         }
-
-        // Explore
-        var matches = result.status.match(/\d+/g); //if status is a num
-        if (matches != null) {
+        // To Do: Tidy
+        if (result.status.match(/\d+/g) != null) {
             if (result.svg === "") return null;
             let sketch = controller.sketches[parseInt(result.status)];
             sketch.load(
                 sketchSize / 224,
                 result.svg,
                 result.fixed,
-                sketch.mainSketch.sketchLayer
+                sketch.sketchLayer
             );
         }
 
-        // Prune Main
         if (controller.drawState == "pruning") {
-            updateMain(result);
+            loadUpdates(result);
             setActionUI("stop-prune");
             controller.clipDrawing = false; //single update
-            incrementHistory(); //still sorted
+            mainSketch.semanticLoss = parseFloat(result.loss);
+            incrementHistory();
         }
     }
 };
 
-const updateMain = (result) => {
+const loadUpdates = (result) => {
     controller.lastIteration = result.iterations;
-    mainSketch.load(1 / scaleRatio, result.svg, result.fixed, true, true);
+    mainSketch.load(scaleRatio, result.svg, result.fixed, true, true);
+    mainSketch.semanticLoss = parseFloat(result.loss);
     incrementHistory();
-    // calcRollingLoss();
 };
 
 const loadPartial = () => {

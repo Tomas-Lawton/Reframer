@@ -60,6 +60,8 @@ const pickerSelect = document.getElementById("picker-ui");
 
 const respectSlider = document.getElementById("respect-slider");
 
+const sparkCanvas = document.querySelector(".sparkline");
+
 // Sketching UI
 const canvasFrame = document.querySelector(".canvas-frame");
 const containerRect = canvasFrame.getBoundingClientRect();
@@ -72,8 +74,9 @@ const frameOutline = Math.min(canvas.width, canvas.height);
 const sketchContainer = document.getElementById("canvas-drop");
 const canvasBounds = canvas.getBoundingClientRect();
 
-const sketchSize = 100;
-const scaleRatio = 224 / frameOutline;
+const sketchSize = 130;
+const scaleRatio = frameOutline / 224;
+const fullMiniRatio = frameOutline / sketchSize;
 
 const reusableExemplar = sketchTemplate.cloneNode(true); //clone to use
 sketchTemplate.remove();

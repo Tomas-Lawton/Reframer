@@ -846,7 +846,8 @@ input:focus {
 
 .selected-mode {
     background-color: #7b66ff;
-    color: white;
+    padding: 0.2em;
+    border-radius: 4px;
 }
 
 .selected-mode:hover {

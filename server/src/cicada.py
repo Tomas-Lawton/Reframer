@@ -31,6 +31,7 @@ class CICADA:
         self.w_full_img = 0.001
         prune_places = [round(num_iter * (k + 1) * 0.8 / 1) for k in range(1)]
         self.prune_ratio = p0 / len(prune_places)
+        self.rolling_losses = []
 
     def encode_text_classes(self, token_list):
         if token_list == []:
@@ -243,6 +244,8 @@ class CICADA:
             # 'image': img_loss,
             # 'geometric': geo_loss,
         }
+        self.rolling_losses.append(loss.item())
+        logging.info(f"Completed {t}")
 
     
     def prune(self):
@@ -312,15 +315,10 @@ class CICADA:
 
         self.initialize_variables()
 
-    async def render_client(self, t, loss, pruning=False):
-        status = str(self.index)
-        if pruning:
-            status="pruning"
-
+    def get_svg(self):
+        #TO DO Refactor so svg not needed and send points direct
         shapes = [trace.shape for trace in self.drawing.traces]
         shape_groups = [trace.shape_group for trace in self.drawing.traces]
-
-        # Keep for now but remove later
         pydiffvg.save_svg(
             f"results/output-{str(self.index)}.svg",
             self.user_canvas_w,
@@ -328,26 +326,31 @@ class CICADA:
             shapes,
             shape_groups,
         )
-        svg = ""
         with open(f"results/output-{str(self.index)}.svg", "r") as f:
-            svg = f.read()
+            return f.read()
 
-        result_loss = ""
-        if loss is not None:
-            result_loss = str(loss.item())
+
+    async def render_client(self, t, pruning=False):
+        rolling_loss = str(sum(self.rolling_losses) / len(self.rolling_losses))
+        self.rolling_losses = []
+
+        status = str(self.index)
+        if pruning:
+            status="pruning"
+
+        svg = self.get_svg()
 
         # print(svg)
         result = {
             "status": status,
             "svg": svg,
             "iterations": t,
-            "loss": result_loss,
+            "loss": rolling_loss,
             "fixed": self.drawing.fixed_list
         }
         try:
             await self.ws.send_json(result)
-
-            logging.info(f"Finished update for {self.index}")
+            logging.info(f"Update send for {self.index}")
         except Exception as e:
             logging.error("Failed sending WS response")
             # logging.info(result)
@@ -359,11 +362,7 @@ class CICADA:
         self.frame_size = data["data"]["frame_size"]
         self.num_paths = data["data"]["random_curves"]
         self.sketch_data = data["data"]["sketch"]
-        # log scale 0-1 and then multiple by 10.
-
-
         self.lr_control = 10 * (data["data"]["rate"] ** 2.5)
-        print("LEARNING RATE: \n ", self.lr_control)
         self.text_features = self.encode_text_classes([data["data"]["prompt"]])
         # self.negative_text_features = self.clip_interface.encode_text_classes(["Written words.", "Text."])
         self.negative_text_features = self.encode_text_classes(["letters in the alphabet"])
@@ -392,11 +391,11 @@ class CICADA:
             try:
                 self.run_epoch(self.iteration)
                 self.iteration += 1
-                if self.device == "cpu":
-                    await self.render_client(self.iteration, self.losses['global'])
+                if not self.device == "cuda" and self.iteration % 3 == 0:
+                        await self.render_client(self.iteration)
                 else: 
                     if self.iteration % refresh_rate == 0:
-                        await self.render_client(self.iteration, self.losses['global'])
+                        await self.render_client(self.iteration)
             except Exception as e:
                 logging.info("Iteration failed on: ", self.index)
                 await self.stop()

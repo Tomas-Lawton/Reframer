@@ -255,7 +255,7 @@ sketchTool.onMouseUp = function() {
             mainSketch.svg = paper.project.exportSVG({
                 asString: true,
             });
-            incrementHistory();
+            // incrementHistory();
 
             setLineLabels(mainSketch.sketchLayer);
             if (socket) {
@@ -503,15 +503,16 @@ sketchTool.onMouseUp = function() {
     });
     setLineLabels(mainSketch.sketchLayer);
     // logger.event(controller.penMode + "-up");
-
-    console.log(mainSketch.sketchLayer);
 };
 
 const setPenMode = (mode) => {
-    let tools = document.querySelectorAll(".window-tool");
-    tools.forEach((tool) => {
-        tool.classList.remove("current-tool");
-    });
+    if (mode !== "dropper") {
+        let tools = document.querySelectorAll(".window-tool");
+        tools.forEach((tool) => {
+            tool.classList.remove("current-tool");
+        });
+    }
+
     switch (mode) {
         case "erase":
             selectTool.classList.remove("selected");

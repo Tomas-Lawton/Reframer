@@ -211,7 +211,6 @@ const setActionUI = (state) => {
             break;
     }
     controller.drawState = state;
-    console.log("Set: ", state);
 };
 
 const stopDrawer = () => {
