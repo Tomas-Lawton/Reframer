@@ -33,13 +33,16 @@ class CICADA:
         self.prune_ratio = p0 / len(prune_places)
         self.rolling_losses = []
 
-    def encode_text_classes(self, token_list):
-        if token_list == []:
-            return token_list
-        tokens = clip.tokenize(token_list).to(self.device)
+    def encode_text_classes(self, prompt):
+        text_input = clip.tokenize(prompt).to(self.device)
+        n1 = clip.tokenize("A badly drawn sketch.").to(self.device)
+        n2 = clip.tokenize("Many ugly, messy drawings.").to(self.device)
+
         with torch.no_grad():
-            features = self.model.encode_text(tokens)  # normalise
-            return features / features.norm(dim=-1, keepdim=True)
+            self.text_features = self.model.encode_text(text_input)
+            print(self.text_features)
+            self.text_features_neg1 = self.model.encode_text(n1)
+            self.text_features_neg2 = self.model.encode_text(n2)
 
     def add_attention_region(self, prompt, drawing_area):
         text_input = clip.tokenize(prompt).to(self.device)
@@ -177,16 +180,10 @@ class CICADA:
         im_batch = torch.cat(img_augs)
         img_features = self.model.encode_image(im_batch)
         for n in range(num_augs):
-            loss -= torch.cosine_similarity(
-                self.text_features, img_features[n : n + 1], dim=1
-            )
-            if use_neg_prompts:
-                loss += (
-                    -torch.cosine_similarity(
-                        self.negative_text_features, img_features[n : n + 1], dim=1 #allow multiple
-                    )
-                    * 0.3
-                )
+            loss -= torch.cosine_similarity(self.text_features, img_features[n:n+1], dim=1)
+            if use_negative:
+                loss += torch.cosine_similarity(self.text_features_neg1, img_features[n:n+1], dim=1) * 0.3
+                loss += torch.cosine_similarity(self.text_features_neg2, img_features[n:n+1], dim=1) * 0.3
 
         for att_region in self.attention_regions:
             cropped_batch = []
@@ -363,9 +360,7 @@ class CICADA:
         self.num_paths = data["data"]["random_curves"]
         self.sketch_data = data["data"]["sketch"]
         self.lr_control = 10 * (data["data"]["rate"] ** 2.5)
-        self.text_features = self.encode_text_classes([data["data"]["prompt"]])
-        # self.negative_text_features = self.clip_interface.encode_text_classes(["Written words.", "Text."])
-        self.negative_text_features = self.encode_text_classes(["letters in the alphabet"])
+        self.text_features = self.encode_text_classes(data["data"]["prompt"])
         self.local_frames = data["data"]["frames"]
         logging.info(self.local_frames)
         self.user_canvas_w = self.frame_size

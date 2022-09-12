@@ -284,7 +284,7 @@ class Sketch {
         this.sketchLayer;
         this.frameSize = size;
         this.localFrames = [];
-        this.semanticLoss = 1;
+        // this.semanticLoss = 1;
         // Fixed path list???
 
         controller.sketches[this.i] = this;

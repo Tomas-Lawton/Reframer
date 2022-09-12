@@ -531,7 +531,7 @@ document.getElementById("num-squiggles").oninput = function() {
 
 let lastLearningRate = controller.learningRate;
 respectSlider.oninput = function() {
-    controller.learningRate = parseInt(this.value);
+    controller.learningRate = parseFloat(this.value);
     let msg = controller.learningRate > 0.5 ? "More" : "Less";
     document.getElementById("fix-label").innerHTML = msg;
 };

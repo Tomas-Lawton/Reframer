@@ -83,12 +83,17 @@ sketchTool.onMouseDown = function(event) {
             lastFrameParent.classList.add("frame-parent");
             let frameInput = document.createElement("input");
             let frameCross = document.createElement("i");
+            let frameHand = document.createElement("i");
             let dragIcon = document.createElement("div");
 
             frameCross.classList.add("fa-solid", "fa-xmark");
+            frameHand.classList.add("fa-solid", "fa-hand-back-fist");
             frameInput.style.background = frameCol;
             frameCross.style.background = frameCol;
+            frameHand.style.background = frameCol;
+
             lastFrameParent.appendChild(frameInput);
+            lastFrameParent.appendChild(frameHand);
             lastFrameParent.appendChild(frameCross);
             lastFrameParent.appendChild(dragIcon);
             sketchContainer.appendChild(lastFrameParent);
@@ -288,7 +293,8 @@ sketchTool.onMouseUp = function() {
 
             let frameUI = lastFrameParent;
             let input = frameUI.querySelector("input");
-            let closeFrame = frameUI.querySelector("i");
+            let closeFrame = frameUI.querySelectorAll("i")[1];
+            let grabFrame = frameUI.querySelectorAll("i")[0];
             let dragCorner = frameUI.querySelector("div");
 
             let tag = document.createElement("li");
@@ -335,6 +341,33 @@ sketchTool.onMouseUp = function() {
             closeButton.addEventListener("click", (e) => {
                 deleteFrame(i);
             });
+
+            grabFrame.onmousedown = (e) => {
+                // TO DOOOOOO O
+
+                //
+                // ALSO MOVE THE STUFF INTHE LAYER BEHIND INTERSECTING WITH THE COORDS
+                //
+                //
+                if (window.innerWidth > 700) {
+                    e = e || window.event;
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                    document.onmouseup = closeDragElement;
+                    document.onmousemove = (e) => {
+                        elementDrag(e, frameUI);
+                        newFrame.position.x += e.movementX;
+                        newFrame.position.y += e.movementY;
+
+                        mainSketch.localFrames[i].data.points = {
+                            x0: topLeft.x,
+                            y0: topLeft.y,
+                            x1: bottomRight.x,
+                            y1: bottomRight.y,
+                        };
+                    };
+                }
+            };
 
             input.onmousedown = (e) => {
                 if (window.innerWidth > 700) {

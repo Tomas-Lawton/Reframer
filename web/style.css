@@ -867,6 +867,15 @@ input:focus {
     background: #9383ff;
 }
 
+.hint {
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+
 .swatch:after {
     content: "";
     display: block;

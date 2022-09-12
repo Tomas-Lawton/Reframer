@@ -1,4 +1,4 @@
-use_neg_prompts = True
+use_negative = True
 normalize_clip = True
 max_width = 5
 canvas_w = 224
