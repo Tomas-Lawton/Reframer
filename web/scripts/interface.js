@@ -1,11 +1,10 @@
-// Drawing Controls
-document.querySelectorAll(".pen-mode").forEach((elem) => {
+document.querySelectorAll(".pen-mode").forEach((elem) =>
     elem.addEventListener("click", () => {
         setPenMode(elem.id, elem);
-    });
-});
+    })
+);
 
-document.querySelectorAll(".swatch").forEach((elem) => {
+document.querySelectorAll(".swatch").forEach((elem) =>
     elem.addEventListener("click", () => {
         let col = window.getComputedStyle(elem).backgroundColor;
         alphaSlider.value = 1;
@@ -13,8 +12,8 @@ document.querySelectorAll(".swatch").forEach((elem) => {
         getSelectedPaths().forEach((path) => (path.strokeColor = col));
         picker.setColor(col);
         setPenMode("pen", pen);
-    });
-});
+    })
+);
 
 toolWindow.addEventListener("click", () => {
     showHide(pickerSelect);
@@ -135,27 +134,20 @@ document.getElementById("width-slider").oninput = function() {
     setPenMode("pen", pen);
 };
 
-// tidy
-document
-    .getElementById("circle-small")
-    .parentElement.addEventListener("click", (e) => {
-        setPointSize(document.getElementById("circle-small").offsetWidth);
+let dots = document.querySelectorAll(".stroke-circle");
+dots.forEach((elem) =>
+    elem.addEventListener("click", () => {
+        setPointSize(elem.offsetWidth - 4);
         setPenMode("pen", pen);
-    });
-
-document
-    .getElementById("circle-med")
-    .parentElement.addEventListener("click", (e) => {
-        setPointSize(document.getElementById("circle-med").offsetWidth);
-        setPenMode("pen", pen);
-    });
-
-document
-    .getElementById("circle-large")
-    .parentElement.addEventListener("click", (e) => {
-        setPointSize(document.getElementById("circle-large").offsetWidth);
-        setPenMode("pen", pen);
-    });
+        dots.forEach((dot) => {
+            if (dot == elem) {
+                dot.classList.add("current-dot");
+            } else {
+                dot.classList.remove("current-dot");
+            }
+        });
+    })
+);
 
 document.getElementById("close-explorer").addEventListener("click", (e) => {
     emptyExplorer();
@@ -380,6 +372,12 @@ focusButton.addEventListener("click", () => {
 
 // Controlpanel drawer drag
 
+controlDrawer.firstElementChild.onmousedown = (e) => {
+    pos3 = e.clientX;
+    document.onmouseup = closeDragElement;
+    document.onmousemove = (e) => setDrawerSize(e);
+};
+
 styles.onmousedown = (e) => {
     e = e || window.event;
     pos3 = e.clientX;
@@ -454,7 +452,7 @@ document.getElementById("explore-margin").onmousedown = (e) => {
     }
 };
 
-function elementDrag(e, arr) {
+const elementDrag = (e, arr) => {
     e = e || window.event;
     // e.preventDefault();
     pos1 = pos3 - e.clientX;
@@ -472,7 +470,7 @@ function elementDrag(e, arr) {
         item.style.top = item.offsetTop - pos2 + "px";
         item.style.left = item.offsetLeft - pos1 + "px";
     }
-}
+};
 
 function closeDragElement() {
     document.onmouseup = null;
@@ -493,6 +491,15 @@ const shiftPen = (e) => {
     let newAlpha = scaleRange(distX, 0, 131, 1, 0);
     setPointSize(distY);
     setAlpha(newAlpha);
+};
+
+const setDrawerSize = (e) => {
+    let item = document.querySelector(".content-margin");
+    e = e || window.event;
+    let controlPadding = window.getComputedStyle(item).paddingLeft;
+    controlPadding = parseInt(controlPadding);
+    pos3 = e.clientX - controlPadding * 2;
+    item.style.width = pos3 + "px";
 };
 
 document.querySelectorAll(".tab-item").forEach((tab) => {
@@ -522,12 +529,10 @@ document.getElementById("num-squiggles").oninput = function() {
     setLineLabels(mainSketch.sketchLayer);
 };
 
-const respectSlider = document.getElementById("respect-slider");
 let lastLearningRate = controller.learningRate;
-
 respectSlider.oninput = function() {
     controller.learningRate = parseInt(this.value);
-    let msg = controller.learningRate > 2 ? "More" : "Less";
+    let msg = controller.learningRate > 0.5 ? "More" : "Less";
     document.getElementById("fix-label").innerHTML = msg;
 };
 

@@ -4,6 +4,7 @@ const socketLight = document.querySelector(".socket-connect");
 const prompt = document.getElementById("messageText");
 const modal = document.getElementById("modal");
 const controlPanel = document.querySelector(".control-panel");
+const controlDrawer = document.querySelector(".control-drawer");
 const sketchBook = document.getElementById("sketchbook-panel");
 const message = document.getElementById("message");
 const palette = document.getElementById("palette");
@@ -57,12 +58,12 @@ const redoButton = document.querySelector(".redo");
 
 const pickerSelect = document.getElementById("picker-ui");
 
+const respectSlider = document.getElementById("respect-slider");
+
 // Sketching UI
 const canvasFrame = document.querySelector(".canvas-frame");
 const containerRect = canvasFrame.getBoundingClientRect();
-const padding = parseInt(
-    window.getComputedStyle(canvasFrame, null).getPropertyValue("padding")
-);
+const padding = parseInt(window.getComputedStyle(canvasFrame).padding);
 const canvas = document.getElementById("canvas");
 canvas.width = window.innerHeight - padding * 2 - 30;
 canvas.height = window.innerHeight - padding * 2 - 30;

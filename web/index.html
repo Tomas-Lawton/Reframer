@@ -128,7 +128,7 @@
                                 <p class="slider-label">Line Freedom</p>
                                 <p class="slider-label" id="fix-label">More</p>
                             </div>
-                            <input type="range" id="respect-slider" value="4" min="0" max="4">
+                            <input type="range" id="respect-slider" value="0.1" min="0" max="1" step="0.1">
                         </div>
                         <div class="control-lines">
                             <div class="flex">
@@ -165,9 +165,10 @@
                 </div>
                 <i class="fa-solid fa-spinner button-animation " id="loading"></i>
                 <h2 id="partial-message">Draw a drawing of a oubwego</h2>
-                <div id="fixed-handler" class="select-ui">
+                <div id="fixed-handler" class="select-ui tooltip">
+                    <span class="tooltiptext">Unchecked lines will move</span>
                     <div>
-                        <i class="fa-solid fa-hand fa-fw"></i>
+                        <i class="fa-solid fa-minimize fa-fw"></i>
                     </div>
                 </div>
                 <div id="delete-handler" class="select-ui default">
@@ -191,7 +192,7 @@
                     </div>
                 </div>
                 <div id="transform-ui" style="display: none">
-                    <div class="transformer">
+                    <div class="transform-control">
                         <div class="flex">
                             <p>Rotate</p>
                             <input type="number" id="rotate-number" value="0" min="-180" max="180" step="1">
@@ -200,7 +201,7 @@
                             <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
                         </div>
                     </div>
-                    <div class="transformer">
+                    <div class="transform-control">
                         <div class="flex">
                             <p>Scale</p>
                             <input type="number" id="scale-number" value="10" min="1" max="20">
@@ -381,9 +382,9 @@
         <div id="style-content">
             <div class="expanded" id="basic-styles">
                 <i class="fas fa-fw fa-eye-dropper" id="dropper"></i>
-                <div class="circle" id="circle-small"></div>
-                <div class="circle" id="circle-med"></div>
-                <div class="circle" id="circle-large"></div>
+                <div class="stroke-circle"></div>
+                <div class="stroke-circle"></div>
+                <div class="stroke-circle"></div>
                 <div class="red swatch"></div>
                 <div class="yellow swatch "></div>
                 <div class="green swatch"></div>

@@ -305,13 +305,13 @@ const updateSelectPosition = () => {
 const updateFixedUI = () => {
     let i = fixedHandler.querySelector("i");
     if (isFixedGroup()) {
-        i.classList.add("fa-hand");
-        i.classList.remove("fa-lock");
+        i.classList.remove("fa-minimize");
+        i.classList.add("fa-check");
         i.classList.add("green");
         i.classList.remove("orange");
     } else {
-        i.classList.remove("fa-hand");
-        i.classList.add("fa-lock");
+        i.classList.add("fa-minimize");
+        i.classList.remove("fa-check");
         i.classList.add("orange");
         i.classList.remove("green");
     }

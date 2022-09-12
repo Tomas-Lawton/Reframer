@@ -359,13 +359,15 @@ class CICADA:
         self.frame_size = data["data"]["frame_size"]
         self.num_paths = data["data"]["random_curves"]
         self.sketch_data = data["data"]["sketch"]
-        self.lr_control = data["data"]["rate"]
+        # log scale 0-1 and then multiple by 10.
+
+
+        self.lr_control = 10 * (data["data"]["rate"] ** 2.5)
+        print("LEARNING RATE: \n ", self.lr_control)
         self.text_features = self.encode_text_classes([data["data"]["prompt"]])
         # self.negative_text_features = self.clip_interface.encode_text_classes(["Written words.", "Text."])
         self.negative_text_features = self.encode_text_classes(["letters in the alphabet"])
-
         self.local_frames = data["data"]["frames"]
-        logging.info("\n \nHEREEEEEEE")
         logging.info(self.local_frames)
         self.user_canvas_w = self.frame_size
         self.user_canvas_h = self.frame_size

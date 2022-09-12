@@ -159,13 +159,14 @@ body {
     border-radius: 2em; */
 }
 
-.canvas-frame p {
+.canvas-frame>p {
     position: absolute;
     z-index: 5;
     font-weight: 400;
     font-size: 12px;
     line-height: 18px;
     color: #ffffff;
+    margin-left: 2em;
 }
 
 #partial-message {
@@ -427,21 +428,6 @@ hr {
 
 #points>div {
     margin-left: 0.5em;
-}
-
-#circle-small {
-    width: 0.3em;
-    height: 0.3em;
-}
-
-#circle-med {
-    width: 0.9em;
-    height: 0.9em;
-}
-
-#circle-large {
-    width: 1.3em;
-    height: 1.3em;
 }
 
 .pen-mode .fa-check {
@@ -911,8 +897,11 @@ input[type="number"] {
     top: 1em;
 }
 
-.transformer {
+.transform-control {
     width: 46%;
+    color: #7b66ff;
+    font-weight: 400;
+    font-size: 0.8em;
 }
 
 #set-background {
@@ -938,6 +927,11 @@ input[type="number"] {
     color: #7b66ff;
     box-shadow: 0px 5px 10px rgb(28 28 28 / 10%);
     color: #7b66ff;
+}
+
+#fixed-handler {
+    /* override tooltip */
+    position: absolute;
 }
 
 #fixed-handler i {
@@ -990,11 +984,14 @@ input[type="number"] {
     border-radius: 37px;
     z-index: 12;
     transform: translateX(-1px);
+    cursor: col-resize;
 }
 
 .control-panel .content-margin {
-    min-width: 24em;
     padding: 2em 4.5em 0;
+    min-width: 230px;
+    max-width: 424px;
+    width: 297px;
 }
 
 .control-panel>header {
@@ -1070,7 +1067,8 @@ input[type="number"] {
 }
 
 .open .accordion-item-button {
-    background: #f3f1ff;
+    background: #ffeed7;
+    color: #fb7d00;
 }
 
 .open #subtract-icon {
@@ -1095,7 +1093,8 @@ input[type="number"] {
 }
 
 .closed:hover .accordion-item-button {
-    background: white;
+    background: #ffeed7;
+    color: #fb7d00;
 }
 
 .accordion-item-body>div {
@@ -1472,10 +1471,30 @@ input[type="number"] {
     background: #14112afa;
 }
 
-.circle {
+.stroke-circle {
     border-radius: 50%;
     background: #363636;
     margin: auto;
+    border: 2px solid #ffffff;
+}
+
+.current-dot {
+    border: 2px solid #7b66ff !important;
+}
+
+.stroke-circle:nth-child(2) {
+    width: 0.3em;
+    height: 0.3em;
+}
+
+.stroke-circle:nth-child(3) {
+    width: 0.9em;
+    height: 0.9em;
+}
+
+.stroke-circle:nth-child(4) {
+    width: 1.3em;
+    height: 1.3em;
 }
 
 #dropper {
