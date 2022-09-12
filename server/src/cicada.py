@@ -40,7 +40,6 @@ class CICADA:
 
         with torch.no_grad():
             self.text_features = self.model.encode_text(text_input)
-            print(self.text_features)
             self.text_features_neg1 = self.model.encode_text(n1)
             self.text_features_neg2 = self.model.encode_text(n2)
 
@@ -360,9 +359,8 @@ class CICADA:
         self.num_paths = data["data"]["random_curves"]
         self.sketch_data = data["data"]["sketch"]
         self.lr_control = 10 * (data["data"]["rate"] ** 2.5)
-        self.text_features = self.encode_text_classes(data["data"]["prompt"])
+        self.encode_text_classes(data["data"]["prompt"])
         self.local_frames = data["data"]["frames"]
-        logging.info(self.local_frames)
         self.user_canvas_w = self.frame_size
         self.user_canvas_h = self.frame_size
         self.normaliseScaleFactor = 1 / self.frame_size
