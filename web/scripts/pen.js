@@ -319,11 +319,12 @@ sketchTool.onMouseUp = function() {
 
             tag.addEventListener("click", (e) => {
                 input.focus();
-                for (const elem in mainSketch.localFrames.values) {
-                    elem.tag.style.background = "transparent";
-                    elem.frame.style.opacity = 1;
+                for (const key in mainSketch.localFrames) {
+                    let item = mainSketch.localFrames[key];
+                    item.tag.style.background = "";
+                    item.frame.style.opacity = 1;
                 }
-                frameUI.style.opacity = 0.85;
+                frameUI.style.opacity = 0.9;
                 tag.style.background = "#413d60";
             });
 
