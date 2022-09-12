@@ -76,7 +76,7 @@ class Controller {
 
         // Defaults
         this.strokeColor = "rgb(24,24,24)";
-        this.strokeWidth = 30;
+        this.strokeWidth = 7;
         this.alpha = 1;
         this.penMode = "pen";
         this.clipDrawing = false;
@@ -533,7 +533,7 @@ class Sketch {
     }
 }
 
-mainSketch = new Sketch("main-sketch", scope, canvasFrame, "main");
+mainSketch = new Sketch("main-sketch", scope, frameOutline, "main");
 mainSketch.svg = paper.project.exportSVG({
     asString: true,
 }); //for svg parsing

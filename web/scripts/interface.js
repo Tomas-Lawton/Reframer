@@ -209,8 +209,9 @@ palette.addEventListener("click", () => {
 });
 
 prompt.addEventListener("input", (e) => {
-    // controller.prompt = e.target.value.toLowerCase();
-    controller.prompt = e.target.value;
+    controller.prompt = e.target.value.toLowerCase();
+    // controller.prompt = e.target.value;
+    canvasFrame.firstElementChild.innerHTML = `Sketch of ${controller.prompt}`;
     if (controller.prompt === "") {
         aiMessage.innerHTML = ` What are we drawing?`;
         controllerUI.forEach((elem) => elem.classList.add("inactive-section"));
@@ -326,8 +327,12 @@ focusButton.addEventListener("click", () => {
     mainSketch.frameLayer.activate();
     setPenMode("local", null);
     showHide(localPrompts);
+    showHide(styles);
+
     styles.classList.toggle("hidden");
-    backDrop.classList.toggle("greeeeeen");
+    document.querySelector(".project").classList.toggle("greeeeeen");
+    canvasFrame.firstElementChild.classList.toggle("greeeeeen");
+
     accordionItem.classList.toggle("inactive-section");
 
     let isFrameMode = localPrompts.style.display === "flex";
@@ -336,12 +341,15 @@ focusButton.addEventListener("click", () => {
         setActionUI("focus");
         // function to select specific prompt i in list
         // FOCUS the list item also
-        if (mainSketch.localFrames[0]) {
-            mainSketch.localFrames[0].frame.querySelector("input").focus();
-        }
+        // if (mainSketch.localFrames[0]) {
+        //     mainSketch.localFrames[0].frame.querySelector("input").focus();
+        // }
+        canvasFrame.firstElementChild.innerHTML = `Creating focus frames for: ${controller.prompt}`;
+        prompt.focus();
     } else {
         setActionUI("stop");
         setPenMode("pen", pen);
+        canvasFrame.firstElementChild.innerHTML = `Sketch of ${controller.prompt}`;
     }
 
     for (const item in mainSketch.localFrames) {
@@ -370,24 +378,7 @@ focusButton.addEventListener("click", () => {
 //         .forEach((elem) => elem.classList.remove("inactive-section"));
 // });
 
-// Control panel
-controlPanel.onmousedown = (e) => {
-    if (window.innerWidth > 700) {
-        let bounds = document.getElementById("ai-content").getBoundingClientRect();
-        e = e || window.event;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        if (
-            pos3 < bounds.left ||
-            pos3 > bounds.right ||
-            pos4 < bounds.top ||
-            pos4 > bounds.bottom
-        ) {
-            document.onmouseup = closeDragElement;
-            document.onmousemove = (e) => elementDrag(e, controlPanel);
-        }
-    }
-};
+// Controlpanel drawer drag
 
 styles.onmousedown = (e) => {
     e = e || window.event;
@@ -401,6 +392,14 @@ styles.onmousedown = (e) => {
         document.onmouseup = closeDragElement;
         document.onmousemove = (e) => shiftPen(e);
     }
+};
+
+canvasFrame.firstElementChild.onmousedown = (e) => {
+    e = e || window.event;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    document.onmousemove = (e) => elementDrag(e, canvasFrame);
 };
 
 // sketchBook.onmousedown = (e) => {
@@ -560,6 +559,10 @@ toolToggle.addEventListener("click", () => {
     // let currentTool = document.querySelector(".animation-window");
     // currentTool.style.height = "230px";
     // currentTool.classList.toggle("current-tool");
+    pickerSelect.style.left =
+        styles.getBoundingClientRect().left - pickerSelect.offsetWidth + "px";
+    pickerSelect.style.top = styles.getBoundingClientRect().top + "px";
+
     if (toolToggle.firstChild.classList.contains("fa-minus")) {
         document
             .querySelectorAll(".expanded")
@@ -568,10 +571,6 @@ toolToggle.addEventListener("click", () => {
         toolToggle.firstChild.classList.add("fa-plus");
         toolToggle.firstChild.classList.remove("fa-minus");
         styles.style.maxWidth = "120px";
-
-        pickerSelect.style.left =
-            styles.getBoundingClientRect().left - pickerSelect.offsetWidth + "px";
-        pickerSelect.style.top = styles.getBoundingClientRect().top + "px";
         // currentTool.classList.add("active-tool");
         // styles.style.top = window.innerHeight - 10 - styles.offsetHeight / 2 + "px";
     } else {

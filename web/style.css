@@ -2,6 +2,11 @@
 * {
     margin: 0;
     font-family: "Poppins", sans-serif;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: -moz-none;
+    -o-user-select: none;
+    user-select: none;
 }
 
 #upload {
@@ -58,9 +63,11 @@ body {
     height: 100vh;
     display: flex;
     width: 100%;
-    background: #f5f5f5;
-    overflow: auto;
-    flex-direction: column;
+    background: #e5e5e5;
+}
+
+.page {
+    display: flex;
 }
 
 .socket-connect {
@@ -100,17 +107,20 @@ body {
     margin: 0.1em;
 }
 
-#contain-canvas {
+.canvas-frame {
     width: 100%;
     display: flex;
-    align-items: center;
+    /* align-items: center; */
+    align-items: flex-end;
     justify-content: center;
     padding-left: 0;
-    background: white;
+    /* background: white; */
+    /* background: #e5e5e5; */
+    position: absolute;
 }
 
 
-/* #contain-canvas::before {
+/* #canvas-frame::before {
     content: "";
     background-image: url("public/paper.png");
     background-size: cover;
@@ -121,10 +131,6 @@ body {
     left: 0px;
     opacity: 0.5;
 } */
-
-.greeeeeen {
-    background-color: rgb(22 211 139);
-}
 
 #canvas {
     background-color: white;
@@ -141,15 +147,25 @@ body {
 }
 
 .canvas-standard-drop {
+    border-radius: 2em;
     box-shadow: 4px 9px 27px rgb(48 48 48 / 18%);
 }
 
-#canvas-drop {
+.canvas-standard-drop {
     position: relative;
     display: flex;
     overflow: hidden;
     /* border: 2px dashed #a7a7a7;
     border-radius: 2em; */
+}
+
+.canvas-frame p {
+    position: absolute;
+    z-index: 5;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 18px;
+    color: #ffffff;
 }
 
 #partial-message {
@@ -168,12 +184,19 @@ body {
     padding-left: 1vw;
 }
 
-#sketch-view {
+.greeeeeen {
+    transition: 0.5s;
+    background: #292929 !important;
+    color: white !important;
+}
+
+.project {
     display: flex;
     width: 100%;
     height: 100%;
     position: relative;
-    background: #f5f5f5;
+    background: linear-gradient(180deg, #a965ff 0%, #8e67ff 57.81%, #6850ff 100%);
+    overflow: hidden;
 }
 
 #sliding-overlay {
@@ -325,12 +348,13 @@ button[confirm] {
     flex-direction: column;
 }
 
-#content {
+
+/* #content {
     display: flex;
     height: inherit;
     width: 100%;
     flex-direction: column;
-}
+} */
 
 .fa-solid .fas {
     font-size: 1em;
@@ -365,6 +389,8 @@ hr {
 .action i {
     /* border: 2px solid #7b66ff; */
     padding: 0.6em;
+    /* border-radius: 50%; */
+    background: #f5f5f5;
     border-radius: 50%;
 }
 
@@ -523,7 +549,6 @@ hr {
 }
 
 .action-button {
-    box-shadow: 3px 6px 9px rgb(48 48 48 / 19%);
     display: flex;
     flex-flow: column;
     align-items: center;
@@ -533,7 +558,8 @@ hr {
     cursor: pointer;
     border-radius: 1.5em;
     font-size: 0.8em;
-    background: #f3f1ff;
+    font-weight: 500;
+    background: #f7f6ff;
     color: #7b66ff;
 }
 
@@ -940,23 +966,53 @@ input[type="number"] {
     width: 100%;
 }
 
-#control-panel {
-    position: absolute;
-    z-index: 11;
-    flex-direction: column;
+.control-panel {
     box-shadow: 0px 5px 20px rgb(28 28 28 / 15%);
-    border-radius: 2em;
-    top: 5em;
-    left: 2em;
-    max-width: initial;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 3em;
-    border-radius: 2em;
-    overflow: hidden;
-    max-width: 350px;
-    width: 100%;
+    background: #ffffff;
+    position: relative;
+}
+
+.control-drawer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5px;
+    height: 100%;
+    background: rgba(217, 217, 217, 0.58);
+}
+
+.control-drawer>div {
+    position: absolute;
+    width: 7px;
+    height: 42px;
+    top: 50%;
+    background: #ff9f5a;
+    border-radius: 37px;
+    z-index: 12;
+    transform: translateX(-1px);
+}
+
+.control-panel .content-margin {
+    min-width: 24em;
+    padding: 2em 4.5em 0;
+}
+
+.control-panel>header {
+    padding: 1em;
+}
+
+.control-panel header div {
     display: flex;
+    align-items: center;
+}
+
+.control-panel header span {
+    font-weight: 500;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    color: #7b66ff;
+    margin: 0 0.5em;
 }
 
 .accordion {
@@ -991,6 +1047,8 @@ input[type="number"] {
     width: 3em;
     height: 3em;
     border-radius: 50%;
+    background: #ff9f5a;
+    color: white;
 }
 
 .accordion-item-body {
@@ -1069,7 +1127,7 @@ input[type="number"] {
 .content-margin {
     width: auto;
     padding: 0.5em;
-    background: white;
+    /* background: white; */
 }
 
 #sketchbook-content {
@@ -1157,7 +1215,7 @@ input[type="number"] {
     font-weight: 500;
     color: #1b1b1b;
     font-size: 2rem;
-    padding: 0.5em 0;
+    padding: 0.5em 0 0;
 }
 
 .panel-subtitle {
@@ -1166,6 +1224,13 @@ input[type="number"] {
     color: #7b66ff;
     font-weight: 500;
     font-size: 1.2rem;
+}
+
+.control-subtitle {
+    margin-bottom: 1em;
+    font-weight: 500;
+    font-size: 0.8em;
+    color: #717171;
 }
 
 #tabs {
@@ -1765,14 +1830,15 @@ input[type="range"]::-moz-range-thumb {
 .frame-parent input {
     background: #23203a;
     border-radius: 5px 5px 0 0;
-    padding: 0.3em 0.2em 0 0.5em;
+    padding: -3.7em 0.2em 0 0.5em;
     color: white;
     border: none;
-    width: calc(100% - 49px);
-    font-weight: lighter;
-    font-size: 0.6em;
-    margin: -1px 0 0 -0.5px;
+    font-weight: 400;
+    font-size: 0.8em;
+    padding: 0.6em 1em 0.2em 0.8em;
+    margin: -14px 0 0 -0.5px;
     z-index: 5;
+    width: inherit;
 }
 
 .frame-parent input:focus {
@@ -1782,8 +1848,12 @@ input[type="range"]::-moz-range-thumb {
 .frame-parent i {
     background: #23203a;
     border-radius: 5px 5px 0 0;
-    padding: 0.3em 0.5em 0 0.5em;
-    font-size: 0.6em;
+    padding: -3.7em 0.2em 0 0.5em;
+    color: white;
+    font-size: 0.8em;
+    padding: 1em;
+    margin: -14px 0 0 -0.5px;
+    z-index: 5;
 }
 
 .frame-parent div {
@@ -1801,8 +1871,8 @@ input[type="range"]::-moz-range-thumb {
     flex-direction: column;
     position: absolute;
     width: 185px;
-    left: 50%;
-    top: 50%;
+    top: 54px;
+    left: 979px;
     z-index: 12;
     background: #14112afa;
     box-shadow: 10px 5px 15px rgb(28 28 28 / 20%);
@@ -1929,13 +1999,10 @@ input[type="range"]::-moz-range-thumb {
         width: 25vw;
         max-width: 300px;
     }
-    #content {
+    /* #content {
         flex-direction: initial;
-    }
-    .panel-title {
-        font-size: 1.8rem;
-    }
-    #contain-canvas {
+    } */
+    .canvas-frame {
         padding: 1em;
     }
     .top-center {

@@ -102,6 +102,7 @@ const focusUI = () => {
         elem.classList.add("inactive-action");
     });
     focusButton.classList.remove("inactive-action");
+    document.getElementById("draw").classList.remove("inactive-action");
 
     undoButton.classList.add("inactive-action");
     redoButton.classList.add("inactive-action");

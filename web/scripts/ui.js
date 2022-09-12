@@ -3,7 +3,7 @@ const socketLight = document.querySelector(".socket-connect");
 // General UI
 const prompt = document.getElementById("messageText");
 const modal = document.getElementById("modal");
-const controlPanel = document.getElementById("control-panel");
+const controlPanel = document.querySelector(".control-panel");
 const sketchBook = document.getElementById("sketchbook-panel");
 const message = document.getElementById("message");
 const palette = document.getElementById("palette");
@@ -58,27 +58,32 @@ const redoButton = document.querySelector(".redo");
 const pickerSelect = document.getElementById("picker-ui");
 
 // Sketching UI
-const backDrop = document.getElementById("contain-canvas");
-const containerRect = backDrop.getBoundingClientRect();
+const canvasFrame = document.querySelector(".canvas-frame");
+const containerRect = canvasFrame.getBoundingClientRect();
 const padding = parseInt(
-    window.getComputedStyle(backDrop, null).getPropertyValue("padding")
+    window.getComputedStyle(canvasFrame, null).getPropertyValue("padding")
 );
-
 const canvas = document.getElementById("canvas");
-if (containerRect.width > window.innerHeight) {
-    canvas.width = window.innerHeight - padding * 2;
-    canvas.height = window.innerHeight - padding * 2;
-} else {
-    canvas.height = containerRect.width - padding * 2;
-    canvas.width = containerRect.width - padding * 2;
-}
-const canvasFrame = Math.min(canvas.width, canvas.height);
-
+canvas.width = window.innerHeight - padding * 2 - 30;
+canvas.height = window.innerHeight - padding * 2 - 30;
+canvasFrame.style.top = window.innerHeight - canvasFrame.clientHeight + "px";
+const frameOutline = Math.min(canvas.width, canvas.height);
 const sketchContainer = document.getElementById("canvas-drop");
+const canvasBounds = canvas.getBoundingClientRect();
 
 const sketchSize = 100;
-console.log(canvasFrame);
-const scaleRatio = 224 / canvasFrame;
+const scaleRatio = 224 / frameOutline;
 
 const reusableExemplar = sketchTemplate.cloneNode(true); //clone to use
 sketchTemplate.remove();
+
+canvasFrame.firstElementChild.style.left =
+    canvas.offsetParent.offsetLeft + "px";
+// canvasFrame.firstElementChild.style.top =
+//     window.innerHeight +
+//     // canvasBounds.height -
+//     canvasFrame.firstElementChild.offsetHeight +
+//     "px";
+
+canvasFrame.firstElementChild.style.top =
+    padding - canvasFrame.firstElementChild.offsetHeight + "px";

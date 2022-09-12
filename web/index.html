@@ -52,11 +52,6 @@
         </div>
     </div> -->
 
-    <div class="action">
-        <!-- <i class="fa-solid fa-book fa-fw" id="scrapbook"></i> -->
-        <i class="fa-solid fa-sliders fa-fw" id="palette"></i>
-    </div>
-
     <div class="action move-right">
         <i class="undo fa-solid fa-rotate-left fa-fw"></i>
         <i class="redo fa-solid fa-rotate-right fa-fw"></i>
@@ -78,22 +73,20 @@
         </div>
     </div>
 
-    <div id="local-prompts">
-        <h3>Focus Frames</h3>
-        <div id="prompt-info">
-            <div class="list-circle"><i class="fa-solid fa-info"></i></div>
-            <div>
-                <p>Drag to a frame and type to add a local prompt</p>
-            </div>
-        </div>
-        <ul></ul>
-    </div>
 
-    <div id="control-panel">
+    <section class="control-panel">
+        <header class="flex">
+            <div>
+                <img src="public/framer.svg" width="29" height="29" alt="framer-logo">
+                <span>Reframer</span>
+            </div>
+            <i class="fa-solid fa-sliders fa-fw" id="palette"></i>
+        </header>
         <div class="content-margin">
             <div id="ai-content">
                 <div class="panel-section">
-                    <!-- <h2 class="panel-title">Do something here!</h2> -->
+                    <h2 class="panel-title">Action</h2>
+                    <p class="control-subtitle">Enter a prompt to draw with AI!</p>
                     <input type="text" tabIndex="0" class="prompt-input" id="messageText" placeholder="Start by describing your sketch..." autocomplete="off" />
                 </div>
 
@@ -156,7 +149,83 @@
                 </div>
             </div>
         </div>
-    </div>
+        <div class="control-drawer">
+            <div></div>
+        </div>
+    </section>
+
+    <section class="project">
+        <div class="canvas-frame">
+            <p>Sketch of...</p>
+            <div class="canvas-standard-drop" id="canvas-drop">
+                <div class="flex" style="display: none">
+                    <h1 class="panel-title" id="message">
+                        What are we drawing?
+                    </h1>
+                </div>
+                <i class="fa-solid fa-spinner button-animation " id="loading"></i>
+                <h2 id="partial-message">Draw a drawing of a oubwego</h2>
+                <div id="fixed-handler" class="select-ui">
+                    <div>
+                        <i class="fa-solid fa-hand fa-fw"></i>
+                    </div>
+                </div>
+                <div id="delete-handler" class="select-ui default">
+                    <div>
+                        <i class="fa-solid fa-trash fa-fw"></i>
+                    </div>
+                </div>
+                <div id="toBack" class="select-ui default">
+                    <div>
+                        <i class="fa-solid fa-arrow-down-short-wide"></i>
+                    </div>
+                </div>
+                <div id="moveUp" class="select-ui default">
+                    <div>
+                        <i class="fa-solid fa-arrow-up-short-wide"></i>
+                    </div>
+                </div>
+                <div id="copy-handler" class="select-ui default">
+                    <div>
+                        <i class="fa-solid fa-copy fa-fw"></i>
+                    </div>
+                </div>
+                <div id="transform-ui" style="display: none">
+                    <div class="transformer">
+                        <div class="flex">
+                            <p>Rotate</p>
+                            <input type="number" id="rotate-number" value="0" min="-180" max="180" step="1">
+                        </div>
+                        <div id="rotate-handler">
+                            <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
+                        </div>
+                    </div>
+                    <div class="transformer">
+                        <div class="flex">
+                            <p>Scale</p>
+                            <input type="number" id="scale-number" value="10" min="1" max="20">
+                        </div>
+                        <div id="scale-handler">
+                            <input type="range" id="scale-slider" value="15" min="1" max="20">
+                        </div>
+                    </div>
+                </div>
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating UIs -->
+
+    <div id="local-prompts">
+        <h3>Focus Frames</h3>
+        <div id="prompt-info">
+            <div class="list-circle"><i class="fa-solid fa-info"></i></div>
+            <div>
+                <p>Drag to a frame and type to add a local prompt</p>
+            </div>
+        </div>
+        <ul></ul>
     </div>
 
     <div id="explore-margin">
@@ -329,7 +398,7 @@
                     <div class="flex">
                         <p class="slider-label">Stroke</p>
                     </div>
-                    <input type="number" id="width-slider" value="12" min="1" max="131">
+                    <input type="number" id="width-slider" value="7" min="1" max="131">
                 </div>
                 <div class="stroke-control">
                     <div class="flex">
@@ -353,70 +422,6 @@
     <div id="picker-ui">
         <div id="color-picker"></div>
     </div>
-
-    <div id="content">
-        <div id="sketch-view">
-            <div id="contain-canvas">
-                <div class="canvas-standard-drop" id="canvas-drop">
-                    <div class="flex" style="display: none">
-                        <h1 class="panel-title" id="message">
-                            What are we drawing?
-                        </h1>
-                    </div>
-                    <i class="fa-solid fa-spinner button-animation " id="loading"></i>
-                    <h2 id="partial-message">Draw a drawing of a oubwego</h2>
-                    <div id="fixed-handler" class="select-ui">
-                        <div>
-                            <i class="fa-solid fa-hand fa-fw"></i>
-                        </div>
-                    </div>
-                    <div id="delete-handler" class="select-ui default">
-                        <div>
-                            <i class="fa-solid fa-trash fa-fw"></i>
-                        </div>
-                    </div>
-                    <div id="toBack" class="select-ui default">
-                        <div>
-                            <i class="fa-solid fa-arrow-down-short-wide"></i>
-                        </div>
-                    </div>
-                    <div id="moveUp" class="select-ui default">
-                        <div>
-                            <i class="fa-solid fa-arrow-up-short-wide"></i>
-                        </div>
-                    </div>
-                    <div id="copy-handler" class="select-ui default">
-                        <div>
-                            <i class="fa-solid fa-copy fa-fw"></i>
-                        </div>
-                    </div>
-                    <div id="transform-ui" style="display: none">
-                        <div class="transformer">
-                            <div class="flex">
-                                <p>Rotate</p>
-                                <input type="number" id="rotate-number" value="0" min="-180" max="180" step="1">
-                            </div>
-                            <div id="rotate-handler">
-                                <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
-                            </div>
-                        </div>
-                        <div class="transformer">
-                            <div class="flex">
-                                <p>Scale</p>
-                                <input type="number" id="scale-number" value="10" min="1" max="20">
-                            </div>
-                            <div id="scale-handler">
-                                <input type="range" id="scale-slider" value="15" min="1" max="20">
-                            </div>
-                        </div>
-                    </div>
-                    <canvas id="canvas"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
 
     <!-- Future -->
     <!-- <div id="settings-ui">

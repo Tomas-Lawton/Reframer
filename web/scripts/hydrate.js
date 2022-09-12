@@ -33,6 +33,8 @@ for (let i = 0; i < 4; i++) {
 }
 
 localPrompts.style.display = "none";
+pickerSelect.style.display = "none";
+
 // document.querySelector(".tool-view").style.display = "none";
 
 setThisColor("rgb(54 54 54)");
