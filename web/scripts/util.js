@@ -45,6 +45,7 @@ const scaleGroup = (group, to) => {
 };
 
 const setPointSize = (s) => {
+    s = s.toPrecision(3);
     const point = document.getElementById("point-size");
     controller.strokeWidth = s;
     point.style.width = controller.strokeWidth + "px";
@@ -55,6 +56,8 @@ const setPointSize = (s) => {
             (item) => (item.strokeWidth = controller.strokeWidth)
         );
     }
+
+    widthSlider.value = controller.strokeWidth;
 };
 
 const ungroup = () => {

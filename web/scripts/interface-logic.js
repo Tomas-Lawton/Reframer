@@ -40,6 +40,7 @@ const activateUI = () => {
     actionControls.forEach((elem) => {
         elem.classList.add("inactive-action");
     });
+    focusButton.classList.remove("inactive-action");
     stopButton.classList.remove("inactive-action");
     stopButton.style.background = "#ff6060";
     stopButton.style.color = "#ffffff";
@@ -150,11 +151,13 @@ const setThisColor = (rgba) => {
 };
 
 const setAlpha = (a) => {
+    a = a.toFixed(2);
     let rgba = getRGBA(a);
     controller.alpha = a;
     controller.strokeColor = rgba;
     setThisColor(rgba);
-    setPenMode("pen", pen);
+    alphaSlider.value = a;
+    // setPenMode("pen", pen);
 };
 
 const setMouseOver = () => {

@@ -343,17 +343,23 @@ sketchTool.onMouseUp = function() {
             });
 
             grabFrame.onmousedown = (e) => {
-                // TO DOOOOOO O
+                sketchHistory.pushUndo();
+                pauseActiveDrawer();
+                ungroup();
+                let items = mainSketch.sketchLayer.getItems({
+                    inside: newFrame.bounds,
+                });
+                createGroup(items);
 
-                //
-                // ALSO MOVE THE STUFF INTHE LAYER BEHIND INTERSECTING WITH THE COORDS
-                //
-                //
                 if (window.innerWidth > 700) {
                     e = e || window.event;
                     pos3 = e.clientX;
                     pos4 = e.clientY;
-                    document.onmouseup = closeDragElement;
+                    document.onmouseup = () => {
+                        document.onmouseup = null;
+                        document.onmousemove = null;
+                        ungroup();
+                    };
                     document.onmousemove = (e) => {
                         elementDrag(e, frameUI);
                         newFrame.position.x += e.movementX;
@@ -365,6 +371,10 @@ sketchTool.onMouseUp = function() {
                             x1: bottomRight.x,
                             y1: bottomRight.y,
                         };
+
+                        controller.transformGroup.position.x += e.movementX;
+                        console.log(controller.transformGroup.position.x);
+                        controller.transformGroup.position.y += e.movementY;
                     };
                 }
             };

@@ -11,7 +11,7 @@ document.querySelectorAll(".swatch").forEach((elem) =>
         controller.strokeColor = col;
         getSelectedPaths().forEach((path) => (path.strokeColor = col));
         picker.setColor(col);
-        setPenMode("pen", pen);
+        // setPenMode("pen", pen);
     })
 );
 
@@ -129,9 +129,9 @@ alphaSlider.oninput = function() {
     setAlpha(this.value);
 };
 
-document.getElementById("width-slider").oninput = function() {
+widthSlider.oninput = function() {
     setPointSize(this.value);
-    setPenMode("pen", pen);
+    // setPenMode("pen", pen);
 };
 
 let dots = document.querySelectorAll(".stroke-circle");
@@ -372,7 +372,7 @@ focusButton.addEventListener("click", () => {
 
 // Controlpanel drawer drag
 
-controlDrawer.firstElementChild.onmousedown = (e) => {
+controlDrawer.onmousedown = (e) => {
     pos3 = e.clientX;
     document.onmouseup = closeDragElement;
     document.onmousemove = (e) => setDrawerSize(e);
@@ -479,7 +479,6 @@ function closeDragElement() {
 
 const shiftPen = (e) => {
     e = e || window.event;
-    // calulate the absolute x and y dist from the center
     let item = document.getElementById("stroke-dot");
     let bounds = item.getBoundingClientRect();
     var centerX = bounds.left + item.offsetWidth / 2;
@@ -487,8 +486,8 @@ const shiftPen = (e) => {
 
     let distX = Math.min(Math.abs(centerX - e.clientX) * 2, 131);
     let distY = Math.min(Math.abs(centerY - e.clientY) * 2, 131);
-
     let newAlpha = scaleRange(distX, 0, 131, 1, 0);
+
     setPointSize(distY);
     setAlpha(newAlpha);
 };
@@ -558,6 +557,10 @@ header.addEventListener("click", () => {
     } else {
         body.style.maxHeight = "0px";
     }
+});
+
+socketLight.addEventListener("click", () => {
+    if (!socket) connect();
 });
 
 toolToggle.addEventListener("click", () => {

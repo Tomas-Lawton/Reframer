@@ -983,6 +983,13 @@ input[type="number"] {
     width: 5px;
     height: 100%;
     background: rgba(217, 217, 217, 0.58);
+    cursor: col-resize;
+    transition-duration: 0.5s;
+}
+
+.control-drawer:hover {
+    transition-delay: 0.5s;
+    background: #1b1b1b;
 }
 
 .control-drawer>div {

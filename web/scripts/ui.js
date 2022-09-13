@@ -14,6 +14,8 @@ const localPrompts = document.getElementById("local-prompts");
 const setTraces = document.getElementById("num-traces");
 const selectDot = document.getElementById("contain-pen-dot");
 const alphaSlider = document.getElementById("alpha-slider");
+const widthSlider = document.getElementById("width-slider");
+
 const stopButton = document.getElementById("stop");
 const focusButton = document.getElementById("focus");
 const buttonPanel = document.querySelector(".action");
