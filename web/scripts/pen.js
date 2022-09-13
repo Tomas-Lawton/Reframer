@@ -43,12 +43,24 @@ sketchTool.onMouseDown = function(event) {
 
             if (hitResult) {
                 sketchHistory.pushUndo();
-                // should it also add to timeSlider here? No. probs when the pen goes up. Since it's a snapshot not a recovery.
                 pauseActiveDrawer();
                 ungroup();
                 path = hitResult.item;
-                path.selected = true;
-                let items = getSelectedPaths();
+
+                // if shift otherwise just group the one item
+                let items = [];
+                if (window.event.shiftKey) {
+                    path.selected = true;
+                    items = getSelectedPaths();
+                } else {
+                    mainSketch.sketchLayer.getItems().forEach((path) => {
+                        path.selected = false;
+                    });
+                    path.selected = true;
+                    ungroup();
+                    items = [path];
+                }
+
                 createGroup(items);
                 fitToSelection(items, "moving");
                 updateSelectUI();

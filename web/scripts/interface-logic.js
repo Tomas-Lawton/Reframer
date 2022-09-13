@@ -105,8 +105,8 @@ const focusUI = () => {
     focusButton.classList.remove("inactive-action");
     document.getElementById("draw").classList.remove("inactive-action");
 
-    undoButton.classList.add("inactive-action");
-    redoButton.classList.add("inactive-action");
+    // undoButton.classList.add("inactive-action");
+    // redoButton.classList.add("inactive-action");
 
     focusButton.style.background = "rgb(21 211 139";
     focusButton.style.color = "#ffffff";
