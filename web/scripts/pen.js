@@ -44,10 +44,8 @@ sketchTool.onMouseDown = function(event) {
             if (hitResult) {
                 sketchHistory.pushUndo();
                 // should it also add to timeSlider here? No. probs when the pen goes up. Since it's a snapshot not a recovery.
-
                 pauseActiveDrawer();
                 ungroup();
-
                 path = hitResult.item;
                 path.selected = true;
                 let items = getSelectedPaths();
@@ -58,9 +56,7 @@ sketchTool.onMouseDown = function(event) {
             break;
         case "pen":
             sketchHistory.pushUndo();
-
             pauseActiveDrawer();
-
             penPath = new Path({
                 strokeColor: controller.strokeColor,
                 strokeWidth: controller.strokeWidth,

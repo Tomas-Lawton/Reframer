@@ -1,5 +1,6 @@
+// spark.activate();
+const spark = new PaperScope();
 spark.setup(sparkCanvas);
-spark.activate();
 
 var rect = new Rectangle();
 rect.left = 100;
@@ -51,6 +52,7 @@ spark.view.onFrame = (event) => {
         knob.position.x -= 0.3;
         myPath.position.x -= 0.3;
     }
+    scope.activate();
 };
 
 // const ctx = sparkCanvas.getContext("2d");
@@ -83,3 +85,5 @@ spark.view.onFrame = (event) => {
 //         tension: 0.4,
 //     },
 // });
+
+// scope.activate();

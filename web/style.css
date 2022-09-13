@@ -867,15 +867,6 @@ input:focus {
     background: #9383ff;
 }
 
-.hint {
-    position: absolute;
-    bottom: 1em;
-    right: 1em;
-    width: 25px;
-    height: 25px;
-    cursor: pointer;
-}
-
 .swatch:after {
     content: "";
     display: block;
@@ -1337,20 +1328,6 @@ input[type="number"] {
     border-radius: 18px;
     height: 4px;
     width: 65px;
-}
-
-.tooltip>img {
-    margin: 0em 0.5em 0.5em 130px;
-    height: 41px;
-}
-
-.tool-color {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    background: #363636;
-    margin: 1em;
-    box-shadow: inset 2px 4px 10px rgb(0 0 0 / 20%);
 }
 
 .style-window-toggle {
@@ -1993,14 +1970,70 @@ input[type="range"]::-moz-range-thumb {
     border-bottom: none;
 }
 
-.tooltip {
-    position: relative;
+.tooltip>img {
+    margin: 0em 0.5em 0.5em 130px;
+    height: 41px;
+}
+
+.tool-color {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #363636;
+    margin: 1em;
+    box-shadow: inset 2px 4px 10px rgb(0 0 0 / 20%);
+}
+
+.hint {
+    height: 25px;
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+}
+
+.hint img {
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #363636;
+    box-shadow: inset 2px 4px 10px rgb(0 0 0 / 20%);
+}
+
+.hint .hint-text {
+    visibility: hidden;
+    width: 240px;
+    background: #363636;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 0.4em;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    /* left: 50%; */
+    right: -2px;
+}
+
+.hint .hint-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: calc(100% / 2 - 25px);
+    border-width: 10px;
+    border-style: solid;
+    border-color: #363636 transparent transparent transparent;
+}
+
+.hint:hover .hint-text {
+    visibility: visible;
 }
 
 .tooltip .tooltiptext {
     visibility: hidden;
     width: 120px;
-    background-color: black;
+    background: #363636;
     color: #fff;
     text-align: center;
     border-radius: 6px;

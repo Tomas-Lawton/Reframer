@@ -8,17 +8,17 @@ const base = "0.0.0.0:8000";
 let socket = false;
 
 const connect = () => {
-    const ws = new WebSocket("ws://" + base + "/ws");
-    ws.onclose = (event) => {
+    const connection = new WebSocket("ws://" + base + "/ws");
+    connection.onclose = (event) => {
         console.log("Closed socket... Running without AI\n" + event);
         socketLight.style.background = "#f6ab2a";
     };
-    ws.onopen = (event) => {
+    connection.onopen = (event) => {
         console.log("Connected AI Socket\n" + event);
         socket = true;
         socketLight.style.background = "#00d457";
     };
-    ws.onmessage = (event) => {
+    connection.onmessage = (event) => {
         try {
             loadResponse(JSON.parse(event.data));
         } catch (e) {
@@ -29,10 +29,11 @@ const connect = () => {
             controller.clipDrawing = false;
         }
     };
-    ws.onerror = (err) => {
+    connection.onerror = (err) => {
         console.error("Socket encountered error: ", err.message, "Closing socket");
         ws.close();
     };
+    return connection;
 };
 
 async function postData(url = "", data = {}) {
@@ -56,4 +57,4 @@ const logEventAPI = (latestJson) => {
         .catch((e) => console.error(e));
 };
 
-connect();
+const ws = connect();

@@ -177,16 +177,19 @@ const setActionUI = (state) => {
         case "drawing":
             activateUI();
             aiMessage.innerHTML = `Don't wait. Draw with me!`;
+            hint.innerHTML = `Don't wait. Draw with me!`;
             break;
         case "explore":
             activateUI();
             aiMessage.innerHTML = `I've got some ideas for ${controller.prompt}!`;
+            hint.innerHTML = `View creative possibilities in the explorer`;
             document.getElementById("history-block").style.display = "none";
             document.getElementById("explore-margin").style.display = "flex";
             break;
         case "continuing" || "continue-explore":
             activateUI();
             aiMessage.innerHTML = `I'll make that it into ${controller.prompt}.`;
+            hint.innerHTML = `Don't wait. Draw with me!`;
             break;
         case "pruning":
             inactiveStopUI();
@@ -197,6 +200,7 @@ const setActionUI = (state) => {
         case "focus":
             focusUI();
             aiMessage.innerHTML = "Specify local areas of the image!";
+            hint.innerHTML = `Creating prompt frames will give the AI context`;
             // canvas.classList.add("loading-canvas");
             break;
         case "stop-prune":
@@ -205,12 +209,14 @@ const setActionUI = (state) => {
         case "stop":
             stopDrawingUI();
             aiMessage.innerHTML = "All done! What should we draw next?";
+            hint.innerHTML = `Draw with AI by adding a prompt and clicking draw.`;
             sketchHistory.historyHolder.length > 1 &&
                 (document.getElementById("history-block").style.display = "block");
             break;
         case "stopSingle":
             stopDrawingUI();
             aiMessage.innerHTML = `Stopped a single sketch!`;
+            hint.innerHTML = `Draw with AI by adding a prompt and clicking draw.`;
             break;
     }
     controller.drawState = state;

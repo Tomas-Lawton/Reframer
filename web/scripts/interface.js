@@ -682,31 +682,31 @@ window.addEventListener("keydown", function(event) {
 //     controller.allowOverwrite = !controller.allowOverwrite;
 // });
 
-// function dragover(e) {
-//     e.preventDefault();
-// }
+function dragover(e) {
+    e.preventDefault();
+}
 
-// function dragentercanvas(e) {
-//     e.preventDefault();
-//     canvas.classList.add("drop-ready");
-// }
+function dragentercanvas(e) {
+    e.preventDefault();
+    canvas.classList.add("drop-ready");
+}
 
-// function dropCanvas(e) {
-//     canvas.classList.remove("drop-ready");
-//     let i = e.dataTransfer.getData("text/plain");
-//     // to do switch around mainsketch imports?
-//     controller.sketches[i].importTo(mainSketch);
-// }
+function dropCanvas(e) {
+    canvas.classList.remove("drop-ready");
+    let i = e.dataTransfer.getData("text/plain");
+    // to do switch around mainsketch imports?
+    controller.sketches[i].importTo(mainSketch);
+}
 
-// function dragleavecanvas(e) {
-//     e.preventDefault();
-//     canvas.classList.remove("drop-ready");
-// }
+function dragleavecanvas(e) {
+    e.preventDefault();
+    canvas.classList.remove("drop-ready");
+}
 
-// sketchContainer.addEventListener("dragover", dragover);
-// sketchContainer.addEventListener("dragenter", dragentercanvas);
-// sketchContainer.addEventListener("dragleave", dragleavecanvas);
-// sketchContainer.addEventListener("drop", dropCanvas);
+sketchContainer.addEventListener("dragover", dragover);
+sketchContainer.addEventListener("dragenter", dragentercanvas);
+sketchContainer.addEventListener("dragleave", dragleavecanvas);
+sketchContainer.addEventListener("drop", dropCanvas);
 
 // function dragoverhover(e) {
 //     e.preventDefault();

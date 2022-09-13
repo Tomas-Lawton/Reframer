@@ -64,6 +64,8 @@ const respectSlider = document.getElementById("respect-slider");
 
 const sparkCanvas = document.querySelector(".sparkline");
 
+const hint = document.querySelector(".hint-text");
+
 // Sketching UI
 const canvasFrame = document.querySelector(".canvas-frame");
 const containerRect = canvasFrame.getBoundingClientRect();
