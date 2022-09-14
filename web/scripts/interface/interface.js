@@ -200,8 +200,11 @@ timeKeeper.oninput = function() {
 };
 
 drawer.addEventListener("click", () => {
-    showHide(controlPanel);
-    drawer.classList.toggle("panel-closed");
+    showHide(document.querySelector(".control-panel .content-margin"));
+    showHide(document.querySelector("header>div"));
+    showHide(document.querySelector(".control-drawer"));
+    drawer.classList.toggle("fa-chevron-left");
+    drawer.classList.toggle("fa-chevron-right");
 });
 
 prompt.addEventListener("input", (e) => {

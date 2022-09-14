@@ -96,6 +96,7 @@ sketchTool.onMouseDown = function(event) {
 
             frameCross.classList.add("fa-solid", "fa-xmark");
             frameHand.classList.add("fa-solid", "fa-hand-back-fist");
+            frameInput.classList.add("frame-label-active");
             frameInput.style.background = frameCol;
             frameCross.style.background = frameCol;
             frameHand.style.background = frameCol;

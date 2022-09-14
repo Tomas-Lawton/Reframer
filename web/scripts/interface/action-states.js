@@ -113,7 +113,6 @@ const setModeFrame = () => {
 };
 
 const setModeActiveFrame = () => {
-    console.log("hereeeee");
     drawButton.className = "action-active";
     focusButton.className = "action-focus";
     exploreButton.className = "action-inactive";
@@ -134,6 +133,11 @@ const setModeActiveFrame = () => {
 
 drawButton.addEventListener("click", () => {
     if (socket) {
+        if (controller.drawState === "frame") {
+            setActionState("active-frame");
+        } else {
+            setActionState("draw");
+        }
         controller.draw();
         mainSketch.svg = paper.project.exportSVG({
             asString: true,
@@ -175,9 +179,16 @@ focusButton.addEventListener("click", () => {
             hide(styles);
 
             for (const item in mainSketch.localFrames) {
-                let frame = mainSketch.localFrames[item];
-                show(frame.frame);
-                frame.paperFrame.set(frameOptions);
+                let frameItem = mainSketch.localFrames[item];
+                frameItem.frame.querySelectorAll("i").forEach((icon) => show(icon));
+                show(frameItem.frame.querySelector("div"));
+                frameItem.frame
+                    .querySelector("input")
+                    .classList.remove("frame-label-inactive");
+                frameItem.frame
+                    .querySelector("input")
+                    .classList.add("frame-label-active");
+                frameItem.paperFrame.set(frameOptions);
             }
             break;
         case "draw":
@@ -187,11 +198,17 @@ focusButton.addEventListener("click", () => {
             setPenMode("local");
             show(localPrompts);
             hide(styles);
-
             for (const item in mainSketch.localFrames) {
-                let frame = mainSketch.localFrames[item];
-                show(frame.frame);
-                frame.paperFrame.set(frameOptions);
+                let frameItem = mainSketch.localFrames[item];
+                frameItem.frame.querySelectorAll("i").forEach((icon) => show(icon));
+                show(frameItem.frame.querySelector("div"));
+                frameItem.frame
+                    .querySelector("input")
+                    .classList.remove("frame-label-inactive");
+                frameItem.frame
+                    .querySelector("input")
+                    .classList.add("frame-label-active");
+                frameItem.paperFrame.set(frameOptions);
             }
             break;
 
@@ -205,17 +222,25 @@ focusButton.addEventListener("click", () => {
 
             canvasFrame.firstElementChild.innerHTML = `Sketch of ${controller.prompt}`;
 
+            // hide all frames
+
             for (const item in mainSketch.localFrames) {
-                let frame = mainSketch.localFrames[item];
-                hide(frame.frame);
-                frame.paperFrame.set({
+                let frameItem = mainSketch.localFrames[item];
+                frameItem.frame.querySelectorAll("i").forEach((icon) => hide(icon));
+                hide(frameItem.frame.querySelector("div"));
+                frameItem.frame
+                    .querySelector("input")
+                    .classList.remove("frame-label-active");
+                frameItem.frame
+                    .querySelector("input")
+                    .classList.add("frame-label-inactive");
+                frameItem.paperFrame.set({
                     fillColor: "rgba(226,226,226,0)",
                     strokeColor: "rgba(217, 217, 217, 0.8)",
                 });
             }
             break;
         case "active-frame":
-            console.log("I'm hereeeee");
             setActionState("draw");
 
             mainSketch.sketchLayer.activate();
@@ -224,9 +249,16 @@ focusButton.addEventListener("click", () => {
             show(styles);
 
             for (const item in mainSketch.localFrames) {
-                let frame = mainSketch.localFrames[item];
-                hide(frame.frame);
-                frame.paperFrame.set({
+                let frameItem = mainSketch.localFrames[item];
+                frameItem.frame.querySelectorAll("i").forEach((icon) => hide(icon));
+                hide(frameItem.frame.querySelector("div"));
+                frameItem.frame
+                    .querySelector("input")
+                    .classList.remove("frame-label-active");
+                frameItem.frame
+                    .querySelector("input")
+                    .classList.add("frame-label-inactive");
+                frameItem.paperFrame.set({
                     fillColor: "rgba(226,226,226,0)",
                     strokeColor: "rgba(217, 217, 217, 0.8)",
                 });
@@ -236,7 +268,11 @@ focusButton.addEventListener("click", () => {
 });
 
 stopButton.addEventListener("click", () => {
-    setActionState("inactive");
+    if (controller.drawState === "active-frame") {
+        setActionState("frame");
+    } else {
+        setActionState("inactive");
+    }
 
     if (controller.drawState === "explore") {
         killExploratorySketches();

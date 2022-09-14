@@ -1774,14 +1774,26 @@ input[type="range"]::-moz-range-thumb {
     background: #23203a;
     border-radius: 5px 5px 0 0;
     padding: -3.7em 0.2em 0 0.5em;
-    color: white;
     border: none;
     font-weight: 400;
+    z-index: 5;
+    width: inherit;
+}
+
+.frame-label-active {
+    color: white;
     font-size: 0.8em;
     padding: 0.6em 1em 0.2em 0.8em;
     margin: -14px 0 0 -0.5px;
-    z-index: 5;
-    width: inherit;
+}
+
+.frame-label-inactive {
+    background: transparent !important;
+    color: #404040;
+    font-size: 0.6em;
+    margin-left: -2px;
+    margin-bottom: -23px;
+    pointer-events: none;
 }
 
 .frame-parent input:focus {

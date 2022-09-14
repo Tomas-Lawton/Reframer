@@ -94,7 +94,6 @@ class Controller {
             });
             sketchHistory.pushUndo();
             this.prepare();
-            // this.resetMetaControls();
             this.updateDrawer({
                 status: "draw",
                 sketch: mainSketch.sketch,
@@ -105,7 +104,6 @@ class Controller {
                 frames: Object.values(mainSketch.localFrames).map((elem) => elem.data),
             });
             this.step = 0;
-            setActionState("draw");
         } else {
             throw new Error("Can't continue if already running");
         }

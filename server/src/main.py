@@ -78,83 +78,79 @@ def kill(d, a):
         drawer.is_running = False
         del drawer
 
-if not os.environ.get('CONNECTAI') == "True":
-    logging.info("Running without AI\n Connect with CMD: export CONNECTAI=True")
-else:
-    logging.info("Establishing Connection...")
+@app.websocket_route("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    try:
+        await websocket.accept()
+    except Exception as e:
+        logging.error("Bad socket")
 
-    @app.websocket_route("/ws")
-    async def websocket_endpoint(websocket: WebSocket):
-        try:
-            await websocket.accept()
-        except Exception as e:
-            logging.error("Bad socket")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print("Running with ", str(device))
+    model, preprocess = clip.load('ViT-B/32', device, jit=False)
+    main_sketch = CICADA(websocket, device, model)
 
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        model, preprocess = clip.load('ViT-B/32', device, jit=False)
-        main_sketch = CICADA(websocket, device, model)
+    #refactor in mainrefactor branch
+    sketches = []
+    pydiffvg.set_print_timing(False)
+    pydiffvg.set_use_gpu(torch.cuda.is_available())
+    pydiffvg.set_device(device)
 
-        #refactor in mainrefactor branch
-        sketches = []
-        pydiffvg.set_print_timing(False)
-        pydiffvg.set_use_gpu(torch.cuda.is_available())
-        pydiffvg.set_device(device)
+    try:
+        while True:
+            try:
+                data = await websocket.receive_json()
+                logging.info(data)
+            except RuntimeError:
+                logging.warning("Unexpected json received by socket")
+                await main_sketch.stop()
+                del main_sketch
+                for drawer in sketches:
+                    logging.info("Suspend Brainstorm")
+                    await drawer.stop()
+                    del drawer
 
-        try:
-            while True:
-                try:
-                    data = await websocket.receive_json()
-                    logging.info(data)
-                except RuntimeError:
-                    logging.warning("Unexpected json received by socket")
-                    await main_sketch.stop()
-                    del main_sketch
-                    for drawer in sketches:
-                        logging.info("Suspend Brainstorm")
+            if data["status"] == "draw":
+                main_sketch.use_sketch(data)
+                main_sketch.activate(True)
+                main_sketch.draw()
+
+            if data["status"] == "add_new_sketch":
+                new_sketch = CICADA(
+                        websocket, device, model, data["data"]["sketch_index"]
+                )
+                sketches.append(new_sketch)
+                new_sketch.use_sketch(data)
+                new_sketch.activate(True)
+                new_sketch.draw()
+
+            if data["status"] == "continue_sketch":
+                main_sketch.use_latest_sketch(data)
+                main_sketch.activate(False)
+                main_sketch.draw()
+
+            if data["status"] == "prune":
+                main_sketch.use_sketch(data)
+                main_sketch.activate(False)
+                main_sketch.prune()
+                await main_sketch.render_client(main_sketch.iteration, None, True)
+
+            if data["status"] == "stop_single_sketch":
+                for drawer in sketches:
+                    if (
+                        drawer.index
+                        == data["data"]['sketch_index']
+                    ):
                         await drawer.stop()
                         del drawer
 
-                if data["status"] == "draw":
-                    main_sketch.use_sketch(data)
-                    main_sketch.activate(True)
-                    main_sketch.draw()
-
-                if data["status"] == "add_new_sketch":
-                    new_sketch = CICADA(
-                         websocket, device, model, data["data"]["sketch_index"]
-                    )
-                    sketches.append(new_sketch)
-                    new_sketch.use_sketch(data)
-                    new_sketch.activate(True)
-                    new_sketch.draw()
-
-                if data["status"] == "continue_sketch":
-                    main_sketch.use_latest_sketch(data)
-                    main_sketch.activate(False)
-                    main_sketch.draw()
-
-                if data["status"] == "prune":
-                    main_sketch.use_sketch(data)
-                    main_sketch.activate(False)
-                    main_sketch.prune()
-                    await main_sketch.render_client(main_sketch.iteration, None, True)
-
-                if data["status"] == "stop_single_sketch":
-                    for drawer in sketches:
-                        if (
-                            drawer.index
-                            == data["data"]['sketch_index']
-                        ):
-                            await drawer.stop()
-                            del drawer
-
-                if data["status"] == "stop":
-                    await main_sketch.stop()
-        
-        # Use new refactor
-        except WebSocketDisconnect:
-            kill(sketches, main_sketch)
-            logging.info("Client disconnected")
+            if data["status"] == "stop":
+                await main_sketch.stop()
+    
+    # Use new refactor
+    except WebSocketDisconnect:
+        kill(sketches, main_sketch)
+        logging.info("Client disconnected")
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 8000))
