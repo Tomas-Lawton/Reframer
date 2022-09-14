@@ -195,9 +195,9 @@ timeKeeper.oninput = function() {
     );
 };
 
-palette.addEventListener("click", () => {
+drawer.addEventListener("click", () => {
     showHide(controlPanel);
-    palette.classList.toggle("panel-closed");
+    drawer.classList.toggle("panel-closed");
 });
 
 prompt.addEventListener("input", (e) => {

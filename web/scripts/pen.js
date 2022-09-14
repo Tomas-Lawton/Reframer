@@ -47,7 +47,6 @@ sketchTool.onMouseDown = function(event) {
                 ungroup();
                 path = hitResult.item;
 
-                // if shift otherwise just group the one item
                 let items = [];
                 if (window.event.shiftKey) {
                     path.selected = true;
@@ -56,9 +55,10 @@ sketchTool.onMouseDown = function(event) {
                     mainSketch.sketchLayer.getItems().forEach((path) => {
                         path.selected = false;
                     });
-                    path.selected = true;
-                    ungroup();
-                    items = [path];
+                    items = mainSketch.sketchLayer.getItems({
+                        inside: path.bounds,
+                    });
+                    items.forEach((item) => (item.selected = true));
                 }
 
                 createGroup(items);

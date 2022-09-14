@@ -37,9 +37,9 @@ const activateUI = () => {
     accordionItem.classList.add("open");
     accordionItem.classList.remove("closed");
 
-    actionControls.forEach((elem) => {
-        elem.classList.add("inactive-action");
-    });
+    // actionControls.forEach((elem) => {
+    //     elem.classList.add("inactive-action");
+    // });
     focusButton.classList.remove("inactive-action");
     stopButton.classList.remove("inactive-action");
     stopButton.style.background = "#ff6060";
@@ -84,9 +84,9 @@ const inactiveFocusUI = () => {
 
 const stopDrawingUI = () => {
     canvas.classList.remove("loading-canvas");
-    actionControls.forEach((elem) => {
-        elem.classList.remove("inactive-action");
-    });
+    // actionControls.forEach((elem) => {
+    //     elem.classList.remove("inactive-action");
+    // });
     document.getElementById("loading").style.display = "none";
     document.querySelector(".control-lines").style.display = "block";
     undoButton.classList.remove("inactive-action");
@@ -99,9 +99,9 @@ const focusUI = () => {
     accordionItem.classList.remove("open");
     accordionItem.classList.add("closed");
 
-    actionControls.forEach((elem) => {
-        elem.classList.add("inactive-action");
-    });
+    // actionControls.forEach((elem) => {
+    //     elem.classList.add("inactive-action");
+    // });
     focusButton.classList.remove("inactive-action");
     document.getElementById("draw").classList.remove("inactive-action");
 
@@ -195,7 +195,7 @@ const setActionUI = (state) => {
             inactiveStopUI();
             aiMessage.innerHTML = "Just a moment while I tidy up!";
             canvas.classList.add("loading-canvas");
-            actionControls.forEach((elem) => elem.classList.add("inactive-action"));
+            // actionControls.forEach((elem) => elem.classList.add("inactive-action"));
             break;
         case "focus":
             focusUI();
