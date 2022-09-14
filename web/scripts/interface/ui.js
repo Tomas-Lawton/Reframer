@@ -93,5 +93,6 @@ canvasFrame.firstElementChild.style.left =
 //     canvasFrame.firstElementChild.offsetHeight +
 //     "px";
 
+// fix
 canvasFrame.firstElementChild.style.top =
     padding - canvasFrame.firstElementChild.offsetHeight + "px";

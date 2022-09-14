@@ -187,8 +187,8 @@ body {
 
 .greeeeeen {
     transition: 0.5s;
-    background: #292929 !important;
     color: white !important;
+    background: linear-gradient(180deg, #a965ff 0%, #ff8935 100%) !important;
 }
 
 .project {
@@ -198,6 +198,7 @@ body {
     position: relative;
     background: linear-gradient(180deg, #a965ff 0%, #8e67ff 57.81%, #6850ff 100%);
     overflow: hidden;
+    transition: background 1s;
 }
 
 #sliding-overlay {

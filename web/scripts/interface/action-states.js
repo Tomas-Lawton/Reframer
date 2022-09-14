@@ -33,7 +33,6 @@ const setModeDefault = (hideExplorer = true) => {
     actions.forEach((button) => button.classList.add("tooltip"));
 
     document.querySelector(".project").classList.remove("greeeeeen");
-    canvasFrame.firstElementChild.classList.remove("greeeeeen");
     accordionItem.classList.remove("inactive-section");
 
     if (hideExplorer) hide(explorerPanel);
@@ -57,7 +56,6 @@ const setModeDraw = () => {
     actions.forEach((button) => button.classList.add("tooltip"));
 
     document.querySelector(".project").classList.remove("greeeeeen");
-    canvasFrame.firstElementChild.classList.remove("greeeeeen");
     accordionItem.classList.remove("inactive-section");
 
     hide(explorerPanel);
@@ -99,7 +97,6 @@ const setModeFrame = () => {
     actions.forEach((button) => button.classList.add("tooltip"));
 
     document.querySelector(".project").classList.add("greeeeeen");
-    canvasFrame.firstElementChild.classList.add("greeeeeen");
     accordionItem.classList.add("inactive-section");
 
     accordionItem.classList.remove("open");
@@ -120,7 +117,6 @@ const setModeActiveFrame = () => {
     actions.forEach((button) => button.classList.add("tooltip"));
 
     document.querySelector(".project").classList.add("greeeeeen");
-    canvasFrame.firstElementChild.classList.add("greeeeeen");
     accordionItem.classList.add("inactive-section");
 
     hint.innerHTML = `Creating prompt frames will give the AI context`;

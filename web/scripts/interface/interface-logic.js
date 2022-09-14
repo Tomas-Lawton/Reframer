@@ -64,17 +64,6 @@ const emptyExplorer = () => {
     }
 };
 
-const deleteFrame = (i) => {
-    let item = mainSketch.localFrames[i];
-    item.tag.remove();
-    item.frame.remove();
-    item.paperFrame.remove();
-    delete mainSketch.localFrames[i];
-    if (Object.keys(mainSketch.localFrames).length === 0) {
-        document.getElementById("prompt-info").style.display = "initial";
-    }
-};
-
 const inactiveStopUI = () => {
     stopButton.classList.add("inactive-action");
     stopButton.style.background = "#f5f5f5";
@@ -267,20 +256,78 @@ const openModal = (data) => {
     modal.style.display = "block";
 };
 
-const showHide = (item) => {
-    if (item.style.display === "flex" || item.style.display === "") {
-        item.style.display = "none";
-    } else {
-        item.style.display = "flex";
+const createFrame = () => {
+    frameContainer = document.createElement("div");
+    let frameInput = document.createElement("input");
+    let frameClose = document.createElement("i");
+    let frameGrab = document.createElement("i");
+    let cornerDrag = document.createElement("div");
+
+    frameContainer.classList.add("frame-parent");
+    frameClose.classList.add("fa-solid", "fa-xmark");
+    frameGrab.classList.add("fa-solid", "fa-hand-back-fist");
+    frameInput.classList.add("frame-label-active");
+
+    let frameCol = frameColors[Math.floor(Math.random() * frameColors.length)];
+    frameInput.style.background = frameCol;
+    frameClose.style.background = frameCol;
+    frameGrab.style.background = frameCol;
+
+    frameContainer.appendChild(frameInput);
+    frameContainer.appendChild(frameGrab);
+    frameContainer.appendChild(frameClose);
+    frameContainer.appendChild(cornerDrag);
+    sketchContainer.appendChild(frameContainer);
+
+    frameContainer.style.top =
+        controller.drawRegion.top - frameContainer.clientHeight + "px";
+    frameContainer.style.left = controller.drawRegion.left + "px";
+    frameContainer.style.width = controller.drawRegion.width + "px";
+    cornerDrag.style.top =
+        controller.drawRegion.height + frameContainer.clientHeight + "px";
+    cornerDrag.style.left = controller.drawRegion.width + "px";
+
+    return [
+        frameContainer,
+        frameInput,
+        frameClose,
+        frameGrab,
+        cornerDrag,
+        frameCol,
+    ];
+};
+
+const createFrameItem = (col = "blue") => {
+    let tag = document.createElement("li");
+    let c1 = document.createElement("div");
+    let c2 = document.createElement("div");
+    let text = document.createElement("p");
+    let circle = document.createElement("div");
+    let closeButton = document.createElement("i");
+
+    circle.classList.add("list-circle");
+    circle.style.background = col;
+    closeButton.classList.add("fa-solid", "fa-xmark");
+
+    c1.appendChild(circle);
+    c1.appendChild(text);
+    c2.appendChild(closeButton);
+    tag.appendChild(c1);
+    tag.appendChild(c2);
+    localPrompts.querySelector("ul").appendChild(tag);
+
+    return [tag, closeButton, text];
+};
+
+const deleteFrame = (i) => {
+    let item = mainSketch.localFrames[i];
+    item.tag.remove();
+    item.frame.remove();
+    item.paperFrame.remove();
+    delete mainSketch.localFrames[i];
+    if (Object.keys(mainSketch.localFrames).length === 0) {
+        document.getElementById("prompt-info").style.display = "initial";
     }
-};
-
-const show = (item) => {
-    item.style.display = "flex";
-};
-
-const hide = (item) => {
-    item.style.display = "none";
 };
 
 const setLineLabels = (layer) => {

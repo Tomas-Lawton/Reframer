@@ -298,3 +298,19 @@ const loadPartial = () => {
 const scaleRange = (number, inMin, inMax, outMin, outMax) => {
     return ((number - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
 };
+
+const showHide = (item) => {
+    if (item.style.display === "flex" || item.style.display === "") {
+        item.style.display = "none";
+    } else {
+        item.style.display = "flex";
+    }
+};
+
+const show = (item) => {
+    item.style.display = "flex";
+};
+
+const hide = (item) => {
+    item.style.display = "none";
+};
