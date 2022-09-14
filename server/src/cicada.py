@@ -24,9 +24,9 @@ class CICADA:
 
         # Variables
         self.iteration = 0
-        self.w_points = 0.01
-        self.w_colors = 0.1
-        self.w_widths = 0.01
+        self.w_points = 1
+        self.w_colors = 1
+        self.w_widths = 1
         self.w_img = 0.01
         self.w_full_img = 0.001
         prune_places = [round(num_iter * (k + 1) * 0.8 / 1) for k in range(1)]

@@ -19,7 +19,7 @@ picker.onChange = (color) => {
 };
 
 setLineLabels(mainSketch.sketchLayer);
-setActionUI("inactive");
+setActionState("inactive");
 setPointSize(controller.strokeWidth);
 
 const defaults = new PaperScope();
@@ -29,7 +29,7 @@ for (let i = 0; i < 4; i++) {
     let newElem = sketch.renderMini();
     // controller.sketchScopeIndex += 1; //remove later
     newElem.classList.add("inactive-sketch");
-    document.getElementById("explore-sketches").appendChild(newElem);
+    explorerPanel.firstElementChild.appendChild(newElem);
 }
 
 localPrompts.style.display = "none";

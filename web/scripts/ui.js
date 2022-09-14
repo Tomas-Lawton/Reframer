@@ -8,7 +8,10 @@ const controlDrawer = document.querySelector(".control-drawer");
 const sketchBook = document.getElementById("sketchbook-panel");
 const message = document.getElementById("message");
 const drawer = document.querySelector(".drawer-button");
+
 const timeKeeper = document.getElementById("time-slider");
+const historyBlock = document.querySelector(".history-block");
+
 const localPrompts = document.getElementById("local-prompts");
 // const lossText = document.getElementById("rolling-loss");
 const setTraces = document.getElementById("num-traces");
@@ -16,13 +19,10 @@ const selectDot = document.getElementById("contain-pen-dot");
 const alphaSlider = document.getElementById("alpha-slider");
 const widthSlider = document.getElementById("width-slider");
 
-const stopButton = document.getElementById("stop");
-const focusButton = document.getElementById("focus");
 const buttonPanel = document.querySelector(".action");
 const dropdown = document.getElementById("pen-dropdown");
-const aiMessage = document.getElementById("message");
 const staticSketches = document.getElementById("static-sketches");
-const explorer = document.getElementById("explore-sketches");
+const explorerPanel = document.querySelector(".explore-panel");
 const sketchGrid = document.getElementById("grid-container");
 const pen = document.getElementById("pen");
 // Actions

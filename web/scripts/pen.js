@@ -43,7 +43,7 @@ sketchTool.onMouseDown = function(event) {
 
             if (hitResult) {
                 sketchHistory.pushUndo();
-                pauseActiveDrawer();
+                controller.pause();
                 ungroup();
                 path = hitResult.item;
 
@@ -68,7 +68,7 @@ sketchTool.onMouseDown = function(event) {
             break;
         case "pen":
             sketchHistory.pushUndo();
-            pauseActiveDrawer();
+            controller.pause();
             penPath = new Path({
                 strokeColor: controller.strokeColor,
                 strokeWidth: controller.strokeWidth,
@@ -118,7 +118,7 @@ sketchTool.onMouseDown = function(event) {
         case "erase":
             sketchHistory.pushUndo();
 
-            pauseActiveDrawer();
+            controller.pause();
 
             erasorPath = new Path({
                 strokeWidth: controller.strokeWidth,
@@ -180,7 +180,7 @@ sketchTool.onMouseDrag = function(event) {
                 }
             } else if (controller.selectBox !== undefined) {
                 //creating box
-                pauseActiveDrawer();
+                controller.pause();
                 controller.selectBox.width += event.delta.x;
                 controller.selectBox.height += event.delta.y;
                 if (selectBox) {
@@ -352,7 +352,7 @@ sketchTool.onMouseUp = function() {
 
             grabFrame.onmousedown = (e) => {
                 sketchHistory.pushUndo();
-                pauseActiveDrawer();
+                controller.pause();
                 ungroup();
                 let items = mainSketch.sketchLayer.getItems({
                     inside: newFrame.bounds,

@@ -27,6 +27,8 @@ document.getElementById("delete").addEventListener("click", () =>
         title: "Clearing Canvas",
         message: "Are you sure you want to delete your drawing?",
         confirmAction: () => {
+            setActionState("inactive");
+
             ungroup();
             // Save before clearing
             mainSketch.svg = paper.project.exportSVG({
@@ -45,7 +47,8 @@ document.getElementById("delete").addEventListener("click", () =>
             }
 
             emptyExplorer();
-            document.getElementById("explore-margin").display = "none";
+
+            document.getElementById("explore-panel").display = "none";
             // document.getElementById("add-refine").style.display = "none";
 
             controller.lastPrompt = null;
@@ -151,11 +154,12 @@ dots.forEach((elem) =>
 
 document.getElementById("close-explorer").addEventListener("click", (e) => {
     emptyExplorer();
-    showHide(document.getElementById("explore-margin"));
+    setActionState("inactive");
 });
 
 document.getElementById("empty").addEventListener("click", (e) => {
     emptyExplorer();
+    generateExploreSketches();
 });
 
 eyeDropper.addEventListener("click", (e) => {
@@ -205,10 +209,8 @@ prompt.addEventListener("input", (e) => {
     // controller.prompt = e.target.value;
     canvasFrame.firstElementChild.innerHTML = `Sketch of ${controller.prompt}`;
     if (controller.prompt === "") {
-        aiMessage.innerHTML = ` What are we drawing?`;
         controllerUI.forEach((elem) => elem.classList.add("inactive-section"));
     } else {
-        aiMessage.innerHTML = `Ok, ${controller.prompt}.`;
         controllerUI.forEach((elem) => elem.classList.remove("inactive-section"));
     }
 });
@@ -223,67 +225,6 @@ prompt.addEventListener("blur", () => {
 // document.getElementById("user-name").addEventListener("input", (e) => {
 //     logger.userName = e.target.value;
 // });
-
-document.getElementById("draw").addEventListener("click", () => {
-    if (socket) {
-        controller.draw();
-        mainSketch.svg = paper.project.exportSVG({
-            asString: true,
-        });
-        logger.event("start-drawing");
-    }
-});
-
-document.getElementById("explore").addEventListener("click", () => {
-    if (socket) {
-        if (noPrompt()) {
-            openModal({
-                title: "Type a prompt first!",
-                message: "You need a target for AI sketchs.",
-                confirmAction: () => (controlPanel.style.display = "flex"),
-            });
-            return;
-        } else {
-            // TO DO: Clean up old scopes (now unused) // controller.exploreScopes
-            // const total = controller.sketchScopeIndex + Math.floor(Math.random() * 5);
-            sketchHistory.historyHolder.push({
-                svg: mainSketch.svg,
-            });
-            sketchHistory.pushUndo();
-            //
-            total = 4;
-            for (let i = 0; i < 4; i++) {
-                explorer.removeChild(explorer.firstChild);
-            }
-
-            for (let i = 0; i < 4; i++) {
-                let sketch = new Sketch(
-                    controller.sketchScopeIndex,
-                    sketchScope,
-                    sketchSize,
-                    "AI"
-                );
-                let newElem = sketch.renderMini();
-                controller.exploreScopes.push(controller.sketchScopeIndex);
-                explorer.appendChild(newElem);
-                controller.newExploreSketch(controller.sketchScopeIndex);
-                controller.sketchScopeIndex += 1;
-                // }
-            }
-            controller.clipDrawing = true;
-            setActionUI("explore");
-            mainSketch.svg = paper.project.exportSVG({
-                asString: true,
-            });
-            logger.event("start-exploring");
-        }
-    }
-});
-
-stopButton.addEventListener("click", () => {
-    console.log(controller.drawState);
-    stopDrawer();
-});
 
 sendToBack.addEventListener("click", () => {
     controller.transformGroup.sendToBack();
@@ -315,56 +256,12 @@ moveUp.addEventListener("click", () => {
 //     }
 // });
 
-focusButton.addEventListener("click", () => {
-    mainSketch.frameLayer.activate();
-    setPenMode("local", null);
-    showHide(localPrompts);
-    showHide(styles);
-
-    styles.classList.toggle("hidden");
-    document.querySelector(".project").classList.toggle("greeeeeen");
-    canvasFrame.firstElementChild.classList.toggle("greeeeeen");
-
-    accordionItem.classList.toggle("inactive-section");
-
-    let isFrameMode = localPrompts.style.display === "flex";
-
-    if (isFrameMode) {
-        setActionUI("focus");
-        // function to select specific prompt i in list
-        // FOCUS the list item also
-        // if (mainSketch.localFrames[0]) {
-        //     mainSketch.localFrames[0].frame.querySelector("input").focus();
-        // }
-        canvasFrame.firstElementChild.innerHTML = `Creating focus frames for: ${controller.prompt}`;
-        prompt.focus();
-    } else {
-        setActionUI("stop");
-        setPenMode("pen", pen);
-        canvasFrame.firstElementChild.innerHTML = `Sketch of ${controller.prompt}`;
-    }
-
-    for (const item in mainSketch.localFrames) {
-        let frame = mainSketch.localFrames[item];
-        showHide(frame.frame);
-        if (isFrameMode) {
-            frame.paperFrame.set(frameOptions);
-        } else {
-            frame.paperFrame.set({
-                fillColor: "rgba(226,226,226,0)",
-                strokeColor: "rgba(217, 217, 217, 0.8)",
-            });
-        }
-    }
-});
-
 // add back after the study.
 // document.getElementById("random-prompt").addEventListener("click", () => {
 //     let randomPrompt =
 //         promptList[Math.floor(Math.random() * promptList.length)].toLowerCase();
 //     prompt.value = randomPrompt;
 //     controller.prompt = randomPrompt;
-//     aiMessage.innerHTML = `Ok, ${randomPrompt}.`;
 //     document
 //         .querySelectorAll(".inactive-section")
 //         .forEach((elem) => elem.classList.remove("inactive-section"));
@@ -431,24 +328,19 @@ localPrompts.onmousedown = (e) => {
     }
 };
 
-document.getElementById("explore-margin").onmousedown = (e) => {
-    if (window.innerWidth > 700) {
-        let content = document.getElementById("explore-sketches");
-        let bounds = content.getBoundingClientRect();
-        e = e || window.event;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        if (
-            pos3 < bounds.left ||
-            pos3 > bounds.right ||
-            pos4 < bounds.top ||
-            pos4 > bounds.bottom
-        ) {
-            document.onmouseup = closeDragElement;
-            // document.onmousemove = (e) => elementDrag(e, sketchBook);
-            document.onmousemove = (e) =>
-                elementDrag(e, document.getElementById("explore-margin"));
-        }
+explorerPanel.onmousedown = (e) => {
+    let bounds = explorerPanel.firstElementChild.getBoundingClientRect();
+    e = e || window.event;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    if (
+        pos3 < bounds.left ||
+        pos3 > bounds.right ||
+        pos4 < bounds.top ||
+        pos4 > bounds.bottom
+    ) {
+        document.onmouseup = closeDragElement;
+        document.onmousemove = (e) => elementDrag(e, explorerPanel);
     }
 };
 
@@ -536,7 +428,7 @@ respectSlider.oninput = function() {
 };
 
 respectSlider.onmousedown = () => {
-    pauseActiveDrawer();
+    controller.pause();
     lastLearningRate = controller.learningRate;
 };
 
@@ -597,15 +489,15 @@ toolToggle.addEventListener("click", () => {
 });
 // Shortcuts
 window.addEventListener("keydown", function(event) {
-    if (event.metaKey && event.shiftKey) {
+    if (event.metaKey || event.shiftKey) {
         if (event.code === "KeyP") {
             setPenMode("pen", pen);
         }
         if (event.code === "KeyS") {
-            setPenMode("select", document.getElementById("select"));
+            setPenMode("select");
         }
         if (event.code === "KeyE") {
-            setPenMode("erase", document.getElementById("erase"));
+            setPenMode("erase");
         }
         if (event.code === "KeyU") {
             sketchHistory.undo();
@@ -613,11 +505,6 @@ window.addEventListener("keydown", function(event) {
         if (event.code === "KeyR") {
             sketchHistory.redo();
         }
-    }
-
-    if (event.key == "Escape") {
-        // close the frame mode
-        stopDrawer();
     }
 
     if (document.activeElement !== prompt) {

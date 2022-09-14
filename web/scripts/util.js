@@ -169,20 +169,6 @@ const incrementHistory = () => {
     });
 };
 
-const pauseActiveDrawer = () => {
-    if (
-        controller.drawState !== "explore" && //don't include this state
-        controller.activeStates.includes(controller.drawState)
-    ) {
-        // TO DO: check if can just check if clip is drawing.. should work?
-        controller.liveCollab = true;
-        controller.pause(); //continue on pen up
-        aiMessage.classList.remove("typed-out");
-        aiMessage.innerHTML = `I'mma let you finish...`;
-        aiMessage.classList.add("typed-out");
-    }
-};
-
 const getRGBA = (a) => {
     let rgba = controller.strokeColor.replace(/[^\d,]/g, "").split(",");
     rgba[3] = a;
@@ -261,7 +247,6 @@ const download = () => {
 
 const loadResponse = (result) => {
     console.log("Result: ", result);
-
     if (controller.clipDrawing) {
         if (result.status === "None") {
             loadUpdates(result);
@@ -276,14 +261,6 @@ const loadResponse = (result) => {
                 result.fixed,
                 sketch.sketchLayer
             );
-        }
-
-        if (controller.drawState == "pruning") {
-            loadUpdates(result);
-            setActionUI("stop-prune");
-            controller.clipDrawing = false; //single update
-            mainSketch.semanticLoss = parseFloat(result.loss);
-            incrementHistory();
         }
     }
 };
