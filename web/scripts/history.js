@@ -9,7 +9,7 @@ class SketchHistory {
         ungroup();
 
         this.undoStack.push({
-            svg: this.sketch.sketchLayer.project.exportSVG({
+            svg: paper.project.exportSVG({
                 asString: true,
             }),
         });
@@ -22,7 +22,7 @@ class SketchHistory {
         ungroup();
 
         this.redoStack.push({
-            svg: this.sketch.sketchLayer.project.exportSVG({
+            svg: paper.project.exportSVG({
                 asString: true,
             }),
         });
@@ -37,10 +37,10 @@ class SketchHistory {
 
             let last = this.undoStack.pop();
             this.pushRedo();
-            this.sketch.sketchLayer.clear();
-            this.sketch.load(1, last.svg); //change to fixed list
-            // logger.event("undo");
 
+            this.sketch.sketchLayer.clear();
+
+            this.sketch.load(1, last.svg); //change to fixed list
             this.undoStack.length === 0 && (undoButton.style.color = "#757575");
         }
     }
@@ -64,3 +64,5 @@ class SketchHistory {
 
     // To Do: Move time slider logic here I think
 }
+
+sketchHistory = new SketchHistory(mainSketch);

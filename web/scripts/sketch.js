@@ -14,53 +14,33 @@ class Sketch {
         controller.sketches[this.i] = this;
         // console.log("Created: ", this.i);
     }
-    load(s, svg, fixed = null, a = true, o = false) {
-            //+ SVG Arr
-            if (svg === "" || svg === undefined) return;
-            this.sketchLayer.clear();
-            let importGroup = this.sketchLayer.importSVG(svg);
-            // console.log(this.sketchLayer.exportSVG());
-
-            let g = importGroup.children[0];
-            let scaledGroup = scaleGroup(g, s);
-            // if (o) {
-            //     scaledGroup.position.x += offX;
-            //     scaledGroup.position.y += offY;
-            // }
-            let finalInserted = this.sketchLayer.insertChildren(
-                scaledGroup.index,
-                scaledGroup.removeChildren()
-            );
-            scaledGroup.remove();
-            importGroup.remove(); // not g
-            // console.log(finalInserted);
-            if (fixed !== null) {
-                for (let i = 0; i < fixed.length; i++) {
-                    finalInserted[i].data.fixed = fixed[i];
-                }
+    load(s, svg, fixed = null) {
+        if (svg === "" || svg === undefined) return;
+        this.sketchLayer.clear();
+        let importGroup = this.sketchLayer.importSVG(svg);
+        console.log(importGroup);
+        let g = importGroup.children[0];
+        console.group(g);
+        let scaledGroup = scaleGroup(g, s);
+        let finalInserted = this.sketchLayer.insertChildren(
+            scaledGroup.index,
+            scaledGroup.removeChildren()
+        );
+        scaledGroup.remove();
+        importGroup.remove(); // not g
+        if (fixed !== null) {
+            for (let i = 0; i < fixed.length; i++) {
+                finalInserted[i].data.fixed = fixed[i];
             }
-            // this.sketchLayer.getItems().forEach((path, i) => {
-            //     !path.data.fixed && (path.color.alpha *= 0.5);
-            // });
-            this.svg = this.sketchLayer.project.exportSVG({
-                asString: true,
-            });
-
-            // console.log("LOADED: ", this.sketchLayer);
         }
-        // arrange() {
-        //     let sorted = [...this.userPathList];
-        //     this.sketchLayer.getItems().forEach((item) => {
-        //         if (!this.userPathList.includes(item)) {
-        //             sorted.push(item);
-        //         }
-        //         item.remove(); //preserves reference
-        //     });
-        //     sorted.forEach((elem) => this.sketchLayer.addChild(elem));
-        //     this.svg = this.sketchLayer.project.exportSVG({
-        //         asString: true,
-        //     });
-        // }
+        // this.sketchLayer.getItems().forEach((path, i) => {
+        //     !path.data.fixed && (path.color.alpha *= 0.5);
+        // });
+        this.svg = this.sketchLayer.project.exportSVG({
+            asString: true,
+        });
+    }
+
     renderMini() {
         console.log("Rendering");
         let domIdx = this.i;
@@ -216,9 +196,7 @@ mainSketch.svg = paper.project.exportSVG({
     asString: true,
 }); //for svg parsing
 
-mainSketch.sketchLayer = new Layer();
 mainSketch.frameLayer = new Layer();
+mainSketch.sketchLayer = new Layer();
 mainSketch.sketchLayer.activate();
 // console.log(mainSketch.sketchLayer);
-
-sketchHistory = new SketchHistory(mainSketch);

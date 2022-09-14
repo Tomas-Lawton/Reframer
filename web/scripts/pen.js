@@ -351,7 +351,6 @@ sketchTool.onMouseUp = function() {
             });
 
             grabFrame.onmousedown = (e) => {
-                sketchHistory.pushUndo();
                 controller.pause();
                 ungroup();
                 let items = mainSketch.sketchLayer.getItems({
