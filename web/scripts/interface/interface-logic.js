@@ -282,7 +282,7 @@ const createFrame = () => {
     frameContainer.style.top =
         controller.drawRegion.top - frameContainer.clientHeight + "px";
     frameContainer.style.left = controller.drawRegion.left + "px";
-    frameContainer.style.width = controller.drawRegion.width + "px";
+    frameContainer.style.width = controller.drawRegion.width + 1 + "px";
     cornerDrag.style.top =
         controller.drawRegion.height + frameContainer.clientHeight + "px";
     cornerDrag.style.left = controller.drawRegion.width + "px";

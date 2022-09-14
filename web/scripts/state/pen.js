@@ -256,158 +256,167 @@ sketchTool.onMouseUp = function() {
             break;
         case "local":
             regionPath.remove();
-            const canvasFrame = new Path.Rectangle(controller.drawRegion);
-            canvasFrame.set(frameOptions); //completed
 
-            const [
-                frameContainer,
-                frameInput,
-                frameClose,
-                frameGrab,
-                cornerDrag,
-                col,
-            ] = createFrame();
-            const [tag, closeButton, text] = createFrameItem(col);
+            if (
+                controller.drawRegion.width > 78 &&
+                controller.drawRegion.height > 30
+            ) {
+                const canvasFrame = new Path.Rectangle(controller.drawRegion);
+                canvasFrame.set(frameOptions); //completed
 
-            let i = createUUID();
+                const [
+                    frameContainer,
+                    frameInput,
+                    frameClose,
+                    frameGrab,
+                    cornerDrag,
+                    col,
+                ] = createFrame();
+                const [tag, closeButton, text] = createFrameItem(col);
 
-            frameInput.addEventListener("input", (e) => {
-                text.innerHTML = e.target.value;
-                mainSketch.localFrames[i].data.prompt = e.target.value;
-                document.getElementById("prompt-info").style.display = "none";
-            });
+                let i = createUUID();
 
-            tag.addEventListener("click", (e) => {
-                frameInput.focus();
-                for (const key in mainSketch.localFrames) {
-                    let item = mainSketch.localFrames[key];
-                    item.tag.style.background = "";
-                    item.frame.style.opacity = 1;
-                }
-                frameContainer.style.opacity = 0.9;
-                tag.style.background = "#413d60";
-            });
-
-            frameClose.addEventListener("click", (e) => {
-                deleteFrame(i);
-            });
-
-            closeButton.addEventListener("click", (e) => {
-                deleteFrame(i);
-            });
-
-            frameGrab.onmousedown = (e) => {
-                controller.pause();
-                ungroup();
-                let items = mainSketch.sketchLayer.getItems({
-                    inside: canvasFrame.bounds,
+                frameInput.addEventListener("input", (e) => {
+                    text.innerHTML = e.target.value;
+                    mainSketch.localFrames[i].data.prompt = e.target.value;
+                    document.getElementById("prompt-info").style.display = "none";
                 });
-                createGroup(items);
 
-                if (window.innerWidth > 700) {
-                    e = e || window.event;
-                    pos3 = e.clientX;
-                    pos4 = e.clientY;
-                    document.onmouseup = () => {
-                        document.onmouseup = null;
-                        document.onmousemove = null;
-                        ungroup();
-                    };
-                    document.onmousemove = (e) => {
-                        elementDrag(e, frameContainer);
-                        canvasFrame.position.x += e.movementX;
-                        canvasFrame.position.y += e.movementY;
+                tag.addEventListener("click", (e) => {
+                    frameInput.focus();
+                    for (const key in mainSketch.localFrames) {
+                        let item = mainSketch.localFrames[key];
+                        item.tag.style.background = "";
+                        item.frame.style.opacity = 1;
+                    }
+                    frameContainer.style.opacity = 0.9;
+                    tag.style.background = "#413d60";
+                });
 
-                        mainSketch.localFrames[i].data.points = {
+                frameClose.addEventListener("click", (e) => {
+                    deleteFrame(i);
+                });
+
+                closeButton.addEventListener("click", (e) => {
+                    deleteFrame(i);
+                });
+
+                frameGrab.onmousedown = (e) => {
+                    controller.pause();
+                    ungroup();
+                    let items = mainSketch.sketchLayer.getItems({
+                        inside: canvasFrame.bounds,
+                    });
+                    createGroup(items);
+
+                    if (window.innerWidth > 700) {
+                        e = e || window.event;
+                        pos3 = e.clientX;
+                        pos4 = e.clientY;
+                        document.onmouseup = () => {
+                            document.onmouseup = null;
+                            document.onmousemove = null;
+                            ungroup();
+                        };
+                        document.onmousemove = (e) => {
+                            elementDrag(e, frameContainer);
+                            canvasFrame.position.x += e.movementX;
+                            canvasFrame.position.y += e.movementY;
+
+                            mainSketch.localFrames[i].data.points = {
+                                x0: canvasFrame.bounds.topLeft.x,
+                                y0: canvasFrame.bounds.topLeft.y,
+                                x1: canvasFrame.bounds.bottomRight.x,
+                                y1: canvasFrame.bounds.bottomRight.y,
+                            };
+
+                            controller.transformGroup.position.x += e.movementX;
+                            controller.transformGroup.position.y += e.movementY;
+                        };
+                    }
+                };
+
+                frameInput.onmousedown = (e) => {
+                    if (window.innerWidth > 700) {
+                        e = e || window.event;
+                        pos3 = e.clientX;
+                        pos4 = e.clientY;
+                        document.onmouseup = closeDragElement;
+                        document.onmousemove = (e) => {
+                            elementDrag(e, frameContainer);
+                            canvasFrame.position.x += e.movementX;
+                            canvasFrame.position.y += e.movementY;
+
+                            mainSketch.localFrames[i].data.points = {
+                                x0: canvasFrame.bounds.topLeft.x,
+                                y0: canvasFrame.bounds.topLeft.y,
+                                x1: canvasFrame.bounds.bottomRight.x,
+                                y1: canvasFrame.bounds.bottomRight.y,
+                            };
+                        };
+                    }
+                };
+
+                cornerDrag.onmousedown = (e) => {
+                    if (window.innerWidth > 700) {
+                        e = e || window.event;
+                        pos3 = e.clientX;
+                        pos4 = e.clientY;
+                        document.onmouseup = closeDragElement;
+                        document.onmousemove = (e) => {
+                            // TODO update other rects to do this instead . didn't work?
+                            let x = canvasFrame.bounds.width;
+                            let y = canvasFrame.bounds.height;
+                            if (x + e.movementX > 1) {
+                                canvasFrame.bounds.width += e.movementY;
+                            } else {
+                                canvasFrame.bounds.width = 1;
+                            }
+
+                            if (y + e.movementY > 1) {
+                                canvasFrame.bounds.height += e.movementY;
+                            } else {
+                                canvasFrame.bounds.height = 1;
+                            }
+
+                            frameContainer.style.width = canvasFrame.bounds.width + "px";
+                            cornerDrag.style.top =
+                                canvasFrame.bounds.height + frameContainer.clientHeight + "px";
+                            cornerDrag.style.left = canvasFrame.bounds.width + "px";
+
+                            mainSketch.localFrames[i].data.points = {
+                                x0: canvasFrame.bounds.topLeft.x,
+                                y0: canvasFrame.bounds.topLeft.y,
+                                x1: canvasFrame.bounds.bottomRight.x,
+                                y1: canvasFrame.bounds.bottomRight.y,
+                            };
+
+                            frameInput.focus();
+                        };
+                    }
+                };
+
+                mainSketch.localFrames[i] = {
+                    tag: tag,
+                    frame: frameContainer,
+                    paperFrame: canvasFrame,
+                    data: {
+                        prompt: "default",
+                        points: {
                             x0: canvasFrame.bounds.topLeft.x,
                             y0: canvasFrame.bounds.topLeft.y,
                             x1: canvasFrame.bounds.bottomRight.x,
                             y1: canvasFrame.bounds.bottomRight.y,
-                        };
-
-                        controller.transformGroup.position.x += e.movementX;
-                        console.log(controller.transformGroup.position.x);
-                        controller.transformGroup.position.y += e.movementY;
-                    };
-                }
-            };
-
-            frameInput.onmousedown = (e) => {
-                if (window.innerWidth > 700) {
-                    e = e || window.event;
-                    pos3 = e.clientX;
-                    pos4 = e.clientY;
-                    document.onmouseup = closeDragElement;
-                    document.onmousemove = (e) => {
-                        elementDrag(e, frameContainer);
-                        canvasFrame.position.x += e.movementX;
-                        canvasFrame.position.y += e.movementY;
-
-                        mainSketch.localFrames[i].data.points = {
-                            x0: canvasFrame.bounds.topLeft.x,
-                            y0: canvasFrame.bounds.topLeft.y,
-                            x1: canvasFrame.bounds.bottomRight.x,
-                            y1: canvasFrame.bounds.bottomRight.y,
-                        };
-                    };
-                }
-            };
-
-            cornerDrag.onmousedown = (e) => {
-                if (window.innerWidth > 700) {
-                    e = e || window.event;
-                    pos3 = e.clientX;
-                    pos4 = e.clientY;
-                    document.onmouseup = closeDragElement;
-                    document.onmousemove = (e) => {
-                        // TODO update other rects to do this instead . didn't work?
-                        let x = canvasFrame.bounds.width;
-                        let y = canvasFrame.bounds.height;
-                        if (x + e.movementX > 1) {
-                            canvasFrame.bounds.width += e.movementY;
-                        } else {
-                            canvasFrame.bounds.width = 1;
-                        }
-
-                        if (y + e.movementY > 1) {
-                            canvasFrame.bounds.height += e.movementY;
-                        } else {
-                            canvasFrame.bounds.height = 1;
-                        }
-
-                        frameContainer.style.width = canvasFrame.bounds.width + "px";
-                        cornerDrag.style.top =
-                            canvasFrame.bounds.height + frameContainer.clientHeight + "px";
-                        cornerDrag.style.left = canvasFrame.bounds.width + "px";
-
-                        mainSketch.localFrames[i].data.points = {
-                            x0: canvasFrame.bounds.topLeft.x,
-                            y0: canvasFrame.bounds.topLeft.y,
-                            x1: canvasFrame.bounds.bottomRight.x,
-                            y1: canvasFrame.bounds.bottomRight.y,
-                        };
-
-                        frameInput.focus();
-                    };
-                }
-            };
-
-            mainSketch.localFrames[i] = {
-                tag: tag,
-                frame: frameContainer,
-                paperFrame: canvasFrame,
-                data: {
-                    prompt: "default",
-                    points: {
-                        x0: canvasFrame.bounds.topLeft.x,
-                        y0: canvasFrame.bounds.topLeft.y,
-                        x1: canvasFrame.bounds.bottomRight.x,
-                        y1: canvasFrame.bounds.bottomRight.y,
+                        },
                     },
-                },
-            };
+                };
 
-            frameContainer.querySelector("input").focus();
+                frameContainer.querySelector("input").focus();
+            } else {
+                alert(
+                    `Minimum focus frame is 78x30: You draw a frame with size ${controller.drawRegion.width}x${controller.drawRegion.height}`
+                );
+            }
             break;
         case "erase":
             if (firstErasePoint && erasorPath.segments.length > 2) {

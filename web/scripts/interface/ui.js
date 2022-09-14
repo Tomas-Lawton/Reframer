@@ -12,7 +12,7 @@ const drawer = document.querySelector(".drawer-button");
 const timeKeeper = document.getElementById("time-slider");
 const historyBlock = document.querySelector(".history-block");
 
-const localPrompts = document.getElementById("local-prompts");
+const localPrompts = document.querySelector(".local-prompts");
 // const lossText = document.getElementById("rolling-loss");
 const setTraces = document.getElementById("num-traces");
 const selectDot = document.getElementById("contain-pen-dot");
