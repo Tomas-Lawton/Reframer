@@ -221,6 +221,10 @@ class CICADA:
         #     loss += args.w_geo * geo_loss[l_name]
 
         # Backpropagate the gradients.
+
+        self.rolling_losses.append(loss.item()) #before multiplying
+
+
         loss *= self.lr_control
         loss.backward()
 
@@ -240,7 +244,6 @@ class CICADA:
             # 'image': img_loss,
             # 'geometric': geo_loss,
         }
-        self.rolling_losses.append(loss.item())
         logging.info(f"Completed i:{t} on {self.index}")
 
     

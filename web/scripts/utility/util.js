@@ -139,7 +139,6 @@ const deleteItems = () => {
 const calcRollingLoss = () => {
     if (!(sketchHistory.historyHolder.length > 5 + 1)) return null; //ignore [0]
     let losses = sketchHistory.historyHolder.slice(-5);
-    console.log(losses.map((e) => e.loss));
     return losses.reduce((t, v) => t + v.loss, 0) / losses.length;
 };
 
@@ -253,6 +252,17 @@ const loadUpdates = (result) => {
     controller.lastIteration = result.iterations;
     mainSketch.load(scaleRatio, result.svg, result.fixed, true, true);
     mainSketch.semanticLoss = parseFloat(result.loss);
+    lossText[0].innerHTML = `Latest Loss: ${mainSketch.semanticLoss.toPrecision(
+    4
+  )}`;
+    lossText[1].innerHTML = `Interpret: ${scaleRange(
+    mainSketch.semanticLoss,
+    -1,
+    0,
+    0,
+    150
+  ).toFixed(2)}`;
+
     incrementHistory();
 };
 

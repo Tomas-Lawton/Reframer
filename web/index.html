@@ -23,9 +23,9 @@
     <script type="text/javascript" src="scripts/utility/network.js" defer></script>
     <script type="text/javascript" src="scripts/interface/ui.js" defer></script>
     <script type="text/javascript" src="scripts/setup/setup.js" defer></script>
-    <script type="text/javascript" src="scripts/setup/chart.js" defer></script>
     <script type="text/javascript" src="scripts/state/controller.js" defer></script>
     <script type="text/javascript" src="scripts/state/sketch.js" defer></script>
+    <script type="text/javascript" src="scripts/setup/chart.js" defer></script>
     <script type="text/javascript" src="scripts/state/history.js" defer></script>
     <script type="text/javascript" src="scripts/utility/util.js" defer></script>
 
@@ -116,7 +116,17 @@
                     </div>
                 </div>
 
-                <canvas class="sparkline"></canvas>
+                <div class="panel-section">
+                    <h3 class="panel-subtitle">Status</h3>
+                    <div class="spark-ui">
+                        <div class="spark-knob"></div>
+                        <canvas class="sparkline"></canvas>
+                    </div>
+                    <div class="flex spark-text">
+                        <p class="rolling-loss">Latest Loss: </p>
+                        <p class="rolling-confidence">Interpret: x/150</p>
+                    </div>
+                </div>
 
                 <div class="inactive-section closed panel-section accordion-item">
                     <header class="accordion-item-header">
@@ -312,8 +322,6 @@
             </div>
         </div>
     </div> -->
-
-    <!-- <p id="rolling-loss">Step: 0 Loss: 0</p> -->
 
     <div class="draw-tools">
         <div></div>

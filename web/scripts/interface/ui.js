@@ -14,8 +14,9 @@ const timeKeeper = document.getElementById("time-slider");
 const historyBlock = document.querySelector(".history-block");
 
 const localPrompts = document.querySelector(".local-prompts");
-// const lossText = document.getElementById("rolling-loss");
+const lossText = document.querySelectorAll(".spark-text p");
 const explorerSize = document.getElementById("sketch-size");
+const sparkKnob = document.querySelector(".spark-knob");
 
 const buttonPanel = document.querySelector(".action");
 const dropdown = document.getElementById("pen-dropdown");
@@ -78,6 +79,8 @@ sketchContainer.style.width = size + "px";
 sketchContainer.style.height = size + "px";
 canvas.width = size;
 canvas.height = size;
+sparkCanvas.height = 100;
+
 const frameOutline = size;
 const scaleRatio = frameOutline / 224;
 
