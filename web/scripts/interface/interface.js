@@ -424,6 +424,22 @@ frameDropIn.forEach((button) =>
     button.addEventListener("click", () => focusLogic())
 );
 
+document
+    .querySelector(".local-prompts>button")
+    .addEventListener("click", () => {
+        let w = parseInt(150 * Math.random() + 100);
+        let h = parseInt(150 * Math.random() + 100);
+        let x = parseInt((canvas.width * 0.5 - 1.5 * w) * Math.random() + w / 3);
+        let y = parseInt((canvas.width * 0.5 - 1.5 * w) * Math.random() + w / 3);
+        let b = new Rectangle({
+            x,
+            y,
+            width: w,
+            height: h,
+        });
+        createLocalPrompt(b, x, y, w, h);
+    });
+
 let lastLearningRate = controller.learningRate;
 respectSlider.oninput = () => {
     controller.learningRate = parseFloat(this.value);
