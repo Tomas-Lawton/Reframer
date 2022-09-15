@@ -114,16 +114,6 @@ const setThisColor = (rgba) => {
     }
 };
 
-const setAlpha = (a) => {
-    a = a.toFixed(2);
-    let rgba = getRGBA(a);
-    controller.alpha = a;
-    controller.strokeColor = rgba;
-    setThisColor(rgba);
-    alphaSlider.value = a;
-    // setPenMode("pen", pen);
-};
-
 const setMouseOver = () => {
     var div = document.getElementById("stroke-dot");
     div.mouseIsOver = false;

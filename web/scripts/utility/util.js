@@ -44,22 +44,6 @@ const scaleGroup = (group, to) => {
     return group;
 };
 
-const setPointSize = (s) => {
-    s = s.toPrecision(3);
-    const point = document.getElementById("point-size");
-    controller.strokeWidth = s;
-    point.style.width = controller.strokeWidth + "px";
-    point.style.height = controller.strokeWidth + "px";
-
-    if (controller.transformGroup) {
-        controller.transformGroup.getItems(
-            (item) => (item.strokeWidth = controller.strokeWidth)
-        );
-    }
-
-    widthSlider.value = controller.strokeWidth;
-};
-
 const ungroup = () => {
     let selected;
     if (controller.transformGroup !== null) {
