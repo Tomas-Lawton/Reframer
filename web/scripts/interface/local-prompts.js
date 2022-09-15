@@ -1,3 +1,5 @@
+const reset = document.querySelector(".reset-frames");
+
 const createLocalPrompt = (
     b = null,
     x = canvas.width / 2,
@@ -72,7 +74,6 @@ const createLocalPrompt = (
                     x1: frameParent.bounds.bottomRight.x,
                     y1: frameParent.bounds.bottomRight.y,
                 };
-
                 controller.transformGroup.position.x += e.movementX;
                 controller.transformGroup.position.y += e.movementY;
             };
@@ -154,6 +155,9 @@ const createLocalPrompt = (
         },
     };
 
+    if (Object.keys(mainSketch.localFrames).length > 5) {
+        show(document.querySelector(".reset-frames"));
+    }
     frameContainer.querySelector("input").focus();
 };
 
@@ -224,7 +228,21 @@ const deleteFrame = (i) => {
     item.frame.remove();
     item.paperFrame.remove();
     delete mainSketch.localFrames[i];
-    if (Object.keys(mainSketch.localFrames).length === 0) {
+
+    frameCount = Object.keys(mainSketch.localFrames).length;
+    if (frameCount === 0) {
         document.getElementById("prompt-info").style.display = "initial";
     }
+    if (frameCount <= 5) {
+        hide(document.querySelector(".reset-frames"));
+    }
 };
+
+reset.addEventListener("click", () =>
+    openModal({
+        title: "Deleting AI prompts",
+        message: "This will delete all the current canvas frames. Are you sure you wish to proceed?",
+        confirmAction: () =>
+            Object.keys(mainSketch.localFrames).forEach((i) => deleteFrame(i)),
+    })
+);

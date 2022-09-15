@@ -1841,6 +1841,14 @@ input[type="range"]::-moz-range-thumb {
     background: #383550;
 }
 
+.local-prompts .reset-frames {
+    font-size: 0.8em;
+    padding: 0.5em 0.5em 0 0;
+    display: none;
+    width: 100%;
+    justify-content: flex-end;
+}
+
 .local-prompts h3 {
     margin-bottom: 0.5em;
     font-weight: 400;
