@@ -112,41 +112,6 @@ document.getElementById("save").addEventListener("click", () => {
     download();
 });
 
-rotateSlider.oninput = () => {
-    transformGroup(controller.transformGroup, "rotation", this.value);
-};
-
-rotateNumber.oninput = () => {
-    transformGroup(controller.transformGroup, "rotation", this.value);
-};
-
-scaleSlider.oninput = () => {
-    transformGroup(controller.transformGroup, "scaling", this.value / 5);
-};
-
-scaleNumber.oninput = () => {
-    transformGroup(controller.transformGroup, "scaling", this.value / 5);
-};
-
-alphaSlider.oninput = () => {
-    setAlpha(this.value);
-};
-
-let dots = document.querySelectorAll(".stroke-circle");
-dots.forEach((elem) =>
-    elem.addEventListener("click", () => {
-        setPointSize(elem.offsetWidth - 4);
-        setPenMode("pen", pen);
-        dots.forEach((dot) => {
-            if (dot == elem) {
-                dot.classList.add("current-dot");
-            } else {
-                dot.classList.remove("current-dot");
-            }
-        });
-    })
-);
-
 document.getElementById("close-explorer").addEventListener("click", (e) => {
     emptyExplorer();
     setActionState("inactive");
@@ -158,24 +123,6 @@ document.getElementById("empty").addEventListener("click", (e) => {
     generateExploreSketches();
 });
 
-eyeDropper.addEventListener("click", (e) => {
-    if (controller.penMode !== "dropper") {
-        setPenMode("dropper", eyeDropper);
-        eyeDropper.classList.add("selected-mode");
-        eyeDropper.classList.remove("simple-hover");
-        eyeDropper.style.color = "#ffffff";
-    } else {
-        setPenMode("pen", pen);
-        eyeDropper.classList.remove("selected-mode");
-        eyeDropper.classList.add("simple-hover");
-        eyeDropper.style.color = "#363636;";
-    }
-});
-
-penTool.addEventListener("click", (e) => setPenMode("pen"));
-eraseTool.addEventListener("click", (e) => setPenMode("erase"));
-selectTool.addEventListener("click", (e) => setPenMode("select"));
-
 document.getElementById("settings").addEventListener("click", () => {
     showHide(dropdown);
     // openModal({
@@ -185,9 +132,9 @@ document.getElementById("settings").addEventListener("click", () => {
     // });
 });
 
-timeKeeper.oninput = () => {
+timeKeeper.oninput = (e) => {
     mainSketch.sketchLayer.clear();
-    let stored = sketchHistory.historyHolder[this.value];
+    let stored = sketchHistory.historyHolder[e.target.value];
     mainSketch.load(
         1,
         stored.svg,
@@ -415,8 +362,8 @@ document.querySelectorAll(".tab-item").forEach((tab) => {
     });
 });
 
-document.getElementById("num-squiggles").oninput = () => {
-    controller.maxCurves = parseInt(this.value);
+document.getElementById("num-squiggles").oninput = (e) => {
+    controller.maxCurves = parseInt(e.target.value);
     setLineLabels(mainSketch.sketchLayer);
 };
 
@@ -441,8 +388,8 @@ document
     });
 
 let lastLearningRate = controller.learningRate;
-respectSlider.oninput = () => {
-    controller.learningRate = parseFloat(this.value);
+respectSlider.oninput = (e) => {
+    controller.learningRate = parseFloat(e.target.value);
     let msg = controller.learningRate > 0.5 ? "More" : "Less";
     document.getElementById("fix-label").innerHTML = msg;
 };
@@ -578,8 +525,8 @@ window.addEventListener("keydown", (event) => {
 //     document.getElementById("show-all-paths").classList.toggle("inactive-pill");
 // });
 
-// document.getElementById("num-traces").oninput = () =>{
-//     controller.numTraces = parseInt(this.value);
+// document.getElementById("num-traces").oninput = (e) =>{
+//     controller.numTraces = parseInt(e.target.value);
 // };
 
 // document.getElementById("overwrite").addEventListener("click", () => {
