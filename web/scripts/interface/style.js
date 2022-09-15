@@ -1,3 +1,6 @@
+const alphaSlider = document.getElementById("alpha-slider");
+const widthSlider = document.getElementById("width-slider");
+
 let dots = document.querySelectorAll(".stroke-circle");
 dots.forEach((elem) =>
     elem.addEventListener("click", () => {

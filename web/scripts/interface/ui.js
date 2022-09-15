@@ -15,10 +15,6 @@ const historyBlock = document.querySelector(".history-block");
 
 const localPrompts = document.querySelector(".local-prompts");
 // const lossText = document.getElementById("rolling-loss");
-const setTraces = document.getElementById("num-traces");
-const selectDot = document.getElementById("contain-pen-dot");
-const alphaSlider = document.getElementById("alpha-slider");
-const widthSlider = document.getElementById("width-slider");
 const explorerSize = document.getElementById("sketch-size");
 
 const buttonPanel = document.querySelector(".action");
