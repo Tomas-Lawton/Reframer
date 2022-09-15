@@ -148,11 +148,11 @@ body {
     position: absolute;
     z-index: 5;
     font-weight: 400;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 18px;
     color: #ffffff;
     margin-left: 2em;
-    transform: translateY(-100%);
+    transform: translateY(-110%);
 }
 
 #partial-message {
@@ -1096,15 +1096,15 @@ input[type="number"] {
 }
 
 .explore-panel {
-    z-index: 50;
-    background: #f8f7f7;
+    z-index: 5;
+    background: #f3f1ff;
     border-radius: 1em;
     position: absolute;
     flex-direction: row;
     left: 50%;
     top: 100%;
     transform: translate(-50%, -100%);
-    padding: 1em;
+    padding: 0.5em;
     display: none;
 }
 
@@ -1814,6 +1814,18 @@ input[type="range"]::-moz-range-thumb {
     color: white;
 }
 
+.local-prompts button {
+    border-radius: 188px;
+    padding: 10px;
+    background: #2c2942;
+    color: white;
+    margin-top: 5px;
+}
+
+.local-prompts button:hover {
+    background: #383550;
+}
+
 .local-prompts h3 {
     margin-bottom: 0.5em;
     font-weight: 400;
@@ -1821,10 +1833,10 @@ input[type="range"]::-moz-range-thumb {
 }
 
 #prompt-info {
-    background: #413d60;
-    padding: 0.4em;
+    background: rgb(65, 61, 96);
+    padding: 1em;
     font-size: 0.9em;
-    border-radius: 0.5em;
+    border-radius: 1em;
     margin-bottom: 0.5em;
 }
 
@@ -1865,7 +1877,7 @@ input[type="range"]::-moz-range-thumb {
     margin: 0;
     padding: 0;
     background: #2c2942;
-    border-radius: 0.5em;
+    border-radius: 1em;
     overflow: hidden;
 }
 

@@ -105,7 +105,7 @@ const setModeFrame = () => {
 
     hide(explorerPanel);
 
-    frameName.innerHTML = `Creating focus frames for: ${controller.prompt}`;
+    frameName.innerHTML = `Creating focus frames the prompt: ${controller.prompt}`;
     prompt.focus();
 };
 
@@ -123,23 +123,12 @@ const setModeActiveFrame = () => {
 
     hide(explorerPanel);
 
-    frameName.innerHTML = `Creating focus frames for: ${controller.prompt}`;
+    frameName.innerHTML = `Creating focus frames the prompt: ${controller.prompt}`;
     prompt.focus();
 };
 
 drawButton.addEventListener("click", () => {
-    if (socket) {
-        if (controller.drawState === "frame") {
-            setActionState("active-frame");
-        } else {
-            setActionState("draw");
-        }
-        controller.draw();
-        mainSketch.svg = paper.project.exportSVG({
-            asString: true,
-        });
-        logger.event("start-drawing");
-    }
+    drawLogic();
 });
 
 exploreButton.addEventListener("click", () => {
@@ -165,6 +154,29 @@ exploreButton.addEventListener("click", () => {
 });
 
 focusButton.addEventListener("click", () => {
+    focusLogic();
+});
+
+stopButton.addEventListener("click", () => {
+    stopLogic();
+});
+
+const drawLogic = () => {
+    if (socket) {
+        if (controller.drawState === "frame") {
+            setActionState("active-frame");
+        } else {
+            setActionState("draw");
+        }
+        controller.draw();
+        mainSketch.svg = paper.project.exportSVG({
+            asString: true,
+        });
+        logger.event("start-drawing");
+    }
+};
+
+const focusLogic = () => {
     switch (controller.drawState) {
         case "inactive":
             setActionState("frame");
@@ -216,7 +228,7 @@ focusButton.addEventListener("click", () => {
             hide(localPrompts);
             show(styles);
 
-            frameName.innerHTML = `Sketch of ${controller.prompt}`;
+            frameName.innerHTML = `Prompted to draw a "${controller.prompt}"`;
 
             // hide all frames
 
@@ -261,11 +273,7 @@ focusButton.addEventListener("click", () => {
             }
             break;
     }
-});
-
-stopButton.addEventListener("click", () => {
-    stopLogic();
-});
+};
 
 const stopLogic = () => {
     if (controller.drawState === "active-frame") {

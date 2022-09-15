@@ -168,7 +168,7 @@
 
     <section class="project">
         <div class="canvas-ui-container" id="canvas-drop">
-            <p>Sketch of...</p>
+            <p>Add a prompt to real time draw together</p>
             <i class="fa-solid fa-spinner button-animation " id="loading"></i>
             <h2 id="partial-message">Draw a drawing of a oubwego</h2>
             <div id="fixed-handler" class="select-ui tooltip">
@@ -228,17 +228,20 @@
     <!-- Floating UIs -->
 
     <div class="local-prompts">
-        <h3>Focus Frames</h3>
+        <div class="flex">
+            <h3>Focus Prompts</h3>
+            <i class="switch-mode fa-solid fa-repeat"></i>
+        </div>
         <div id="prompt-info">
             <div>
                 <div class="list-circle">
                     <i class="fa-solid fa-info"></i>
                 </div>
-
                 <p>Drag to a frame and type to add a local prompt</p>
             </div>
         </div>
         <ul></ul>
+        <button>New Prompt</button>
     </div>
 
     <div class="explore-panel">

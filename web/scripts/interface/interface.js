@@ -112,29 +112,24 @@ document.getElementById("save").addEventListener("click", () => {
     download();
 });
 
-rotateSlider.oninput = function() {
+rotateSlider.oninput = () => {
     transformGroup(controller.transformGroup, "rotation", this.value);
 };
 
-scaleSlider.oninput = function() {
+scaleSlider.oninput = () => {
     transformGroup(controller.transformGroup, "scaling", this.value / 5);
 };
 
-rotateNumber.oninput = function() {
+rotateNumber.oninput = () => {
     transformGroup(controller.transformGroup, "rotation", this.value);
 };
 
-scaleNumber.oninput = function() {
+scaleNumber.oninput = () => {
     transformGroup(controller.transformGroup, "scaling", this.value / 5);
 };
 
-alphaSlider.oninput = function() {
+alphaSlider.oninput = () => {
     setAlpha(this.value);
-};
-
-widthSlider.oninput = function() {
-    setPointSize(this.value);
-    // setPenMode("pen", pen);
 };
 
 let dots = document.querySelectorAll(".stroke-circle");
@@ -190,7 +185,7 @@ document.getElementById("settings").addEventListener("click", () => {
     // });
 });
 
-timeKeeper.oninput = function() {
+timeKeeper.oninput = () => {
     mainSketch.sketchLayer.clear();
     let stored = sketchHistory.historyHolder[this.value];
     mainSketch.load(
@@ -211,7 +206,8 @@ drawer.addEventListener("click", () => {
 prompt.addEventListener("input", (e) => {
     controller.prompt = e.target.value.toLowerCase();
     // controller.prompt = e.target.value;
-    frameName.innerHTML = `Sketch of ${controller.prompt}`;
+    frameName.innerHTML = `Prompted to draw a "${controller.prompt}"`;
+
     if (controller.prompt === "") {
         controllerUI.forEach((elem) => elem.classList.add("inactive-section"));
     } else {
@@ -419,13 +415,13 @@ document.querySelectorAll(".tab-item").forEach((tab) => {
     });
 });
 
-document.getElementById("num-squiggles").oninput = function() {
+document.getElementById("num-squiggles").oninput = () => {
     controller.maxCurves = parseInt(this.value);
     setLineLabels(mainSketch.sketchLayer);
 };
 
 let lastLearningRate = controller.learningRate;
-respectSlider.oninput = function() {
+respectSlider.oninput = () => {
     controller.learningRate = parseFloat(this.value);
     let msg = controller.learningRate > 0.5 ? "More" : "Less";
     document.getElementById("fix-label").innerHTML = msg;
@@ -491,6 +487,11 @@ toolToggle.addEventListener("click", () => {
         styles.style.top = window.innerHeight / 2 + "px";
     }
 });
+
+document.querySelector(".switch-mode").addEventListener("click", () => {
+    focusLogic();
+});
+
 // Shortcuts
 window.addEventListener("keydown", (event) => {
     if (event.code === "Escape") {
@@ -518,15 +519,10 @@ window.addEventListener("keydown", (event) => {
         if (event.key == "Delete" || event.key == "Backspace") {
             deleteItems();
         }
-    } else {
+    }
+    if (document.activeElement === prompt) {
         if (event.key == "Enter") {
-            if (socket) {
-                controller.draw();
-                mainSketch.svg = paper.project.exportSVG({
-                    asString: true,
-                });
-                logger.event("start-drawing");
-            }
+            drawLogic();
         }
     }
 });
@@ -562,7 +558,7 @@ window.addEventListener("keydown", (event) => {
 //     document.getElementById("show-all-paths").classList.toggle("inactive-pill");
 // });
 
-// document.getElementById("num-traces").oninput = function() {
+// document.getElementById("num-traces").oninput = () =>{
 //     controller.numTraces = parseInt(this.value);
 // };
 

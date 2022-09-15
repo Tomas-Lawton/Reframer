@@ -148,7 +148,7 @@ class Sketch {
                 if (fromLayer.firstChild instanceof Group) {
                     fromLayer = fromLayer.children[0];
                 }
-                this.overwrite(overwriting, fromLayer, fullMiniRatio);
+                this.overwrite(overwriting, fromLayer, frameOutline / sketchSize);
             },
         });
     }

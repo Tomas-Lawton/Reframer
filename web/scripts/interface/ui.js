@@ -19,6 +19,7 @@ const setTraces = document.getElementById("num-traces");
 const selectDot = document.getElementById("contain-pen-dot");
 const alphaSlider = document.getElementById("alpha-slider");
 const widthSlider = document.getElementById("width-slider");
+const explorerSize = document.getElementById("sketch-size");
 
 const buttonPanel = document.querySelector(".action");
 const dropdown = document.getElementById("pen-dropdown");
@@ -73,15 +74,14 @@ const canvasBounds = canvas.getBoundingClientRect();
 const project = document.querySelector(".project");
 const projectBounds = project.getBoundingClientRect();
 
-const sketchSize = 130;
-const size = project.clientHeight * 0.93; //technically wrong
+const sketchSize = 150;
+const size = project.clientHeight * 0.92; //technically wrong
 sketchContainer.style.width = size + "px";
 sketchContainer.style.height = size + "px";
 canvas.width = size;
 canvas.height = size;
 const frameOutline = size;
 const scaleRatio = frameOutline / 224;
-const fullMiniRatio = frameOutline / sketchSize;
 
 const reusableExemplar = sketchTemplate.cloneNode(true); //clone to use
 sketchTemplate.remove();
