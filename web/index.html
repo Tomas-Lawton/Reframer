@@ -63,12 +63,6 @@
         </div>
     </div> -->
 
-    <div class="action move-right">
-        <i class="undo fa-solid fa-rotate-left fa-fw"></i>
-        <i class="redo fa-solid fa-rotate-right fa-fw"></i>
-        <i class="fa-solid fa-cog fa-fw" id="settings"></i>
-    </div>
-
     <div id="pen-dropdown">
         <div class="simple-drop pen-mode" id="save">
             <div>
@@ -167,6 +161,13 @@
     </section>
 
     <section class="project">
+        <div class="project-actions">
+            <i class="inactive-section canvas-focus fa-solid fa-note-sticky fa-fw"></i>
+            <i class="undo fa-solid fa-rotate-left fa-fw"></i>
+            <i class="redo fa-solid fa-rotate-right fa-fw"></i>
+            <i class="fa-solid fa-cog fa-fw" id="settings"></i>
+        </div>
+
         <div class="canvas-ui-container" id="canvas-drop">
             <p>Add a prompt to real time draw together</p>
             <i class="fa-solid fa-spinner button-animation " id="loading"></i>
@@ -218,6 +219,10 @@
                 </div>
             </div>
             <canvas id="canvas"></canvas>
+            <div class="inactive-section canvas-focus">
+                <p>Focus</p>
+                <i class="fa-solid fa-note-sticky fa-fw"></i>
+            </div>
         </div>
         <div class="hint">
             <span class="hint-text">Draw with AI by adding a prompt and clicking draw.</span>

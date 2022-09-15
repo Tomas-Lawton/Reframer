@@ -273,12 +273,16 @@ sketchTool.onMouseUp = function() {
                 ] = createFrame();
                 const [tag, closeButton, text] = createFrameItem(col);
 
-                let i = createUUID();
+                const i = createUUID();
 
                 frameInput.addEventListener("input", (e) => {
                     text.innerHTML = e.target.value;
                     mainSketch.localFrames[i].data.prompt = e.target.value;
                     document.getElementById("prompt-info").style.display = "none";
+                });
+
+                frameInput.addEventListener("blur", (e) => {
+                    if (e.target.value === "") deleteFrame(i);
                 });
 
                 tag.addEventListener("click", (e) => {

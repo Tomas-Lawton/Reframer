@@ -153,6 +153,23 @@ body {
     color: #ffffff;
     margin-left: 2em;
     transform: translateY(-110%);
+    cursor: grab;
+}
+
+.canvas-focus {
+    color: #7b66ff;
+}
+
+.canvas-ui-container .canvas-focus {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    font-weight: 500;
+    font-size: 0.8em;
+    /* color: #b5b5b5; */
+    cursor: pointer;
 }
 
 #partial-message {
@@ -167,7 +184,8 @@ body {
 .greeeeeen {
     transition: 0.5s;
     color: white !important;
-    background: linear-gradient(180deg, #a965ff 0%, #ff8935 100%) !important;
+    /* background: linear-gradient(180deg, #a965ff 0%, #ff8935 100%) !important; */
+    background: #15d38b !important;
 }
 
 .project {
@@ -355,29 +373,30 @@ hr {
     justify-content: center;
 }
 
-.move-right {
-    position: absolute;
-    right: 0;
-}
-
-.action {
+.project-actions {
     margin: 0.5em;
     position: absolute;
     z-index: 10;
     color: #7b66ff;
+    position: absolute;
+    right: 0;
+    background: #f7f6ff;
+    border-radius: 82px;
+    color: #b5b5b5;
+    padding: 0.4em 0.6em;
 }
 
-.action i {
-    /* border: 2px solid #7b66ff; */
-    padding: 0.6em;
-    /* border-radius: 50%; */
-    background: #f5f5f5;
+.project-actions i {
+    padding: 0 0.2em;
     border-radius: 50%;
+}
+
+#settings {
+    color: #757575;
 }
 
 .panel-closed {
     color: #757575;
-    /* border: 2px solid #757575; */
 }
 
 .top-center {
@@ -1735,14 +1754,6 @@ input[type="range"]::-moz-range-thumb {
     border-radius: 0 0 1.5em 0;
 }
 
-.undo {
-    color: #757575;
-}
-
-.redo {
-    color: #757575;
-}
-
 .frame-parent {
     position: absolute;
     display: flex;
@@ -1763,6 +1774,10 @@ input[type="range"]::-moz-range-thumb {
     z-index: 5;
     padding: 0.6em 0.7em 0.5em 0.7em;
     margin-left: 0.2em;
+}
+
+.fa-hand-back-fist {
+    cursor: grab;
 }
 
 .frame-parent input {
@@ -1889,6 +1904,7 @@ input[type="range"]::-moz-range-thumb {
     font-size: 0.8em;
     font-weight: 300;
     justify-content: space-between;
+    cursor: pointer;
 }
 
 .local-prompts li div:first-child {

@@ -63,20 +63,21 @@ const emptyExplorer = () => {
     }
 };
 
-const inactiveStopUI = () => {
-    stopButton.classList.add("inactive-action");
-    stopButton.style.background = "#f5f5f5";
-    stopButton.style.color = "#d2d2d2";
-    stopButton.querySelector("i").style.color = "#d2d2d2";
-    stopButton.style.cursor = "default";
-};
+// Delete?
+// const inactiveStopUI = () => {
+//     stopButton.classList.add("inactive-section");
+//     stopButton.style.background = "#f5f5f5";
+//     stopButton.style.color = "#d2d2d2";
+//     stopButton.querySelector("i").style.color = "#d2d2d2";
+//     stopButton.style.cursor = "default";
+// };
 
-const inactiveFocusUI = () => {
-    focusButton.style.background = "#f3f1ff";
-    focusButton.style.color = "#7b66ff";
-    focusButton.querySelector("i").style.color = "#7b66ff";
-    focusButton.style.cursor = "default";
-};
+// const inactiveFocusUI = () => {
+//     focusButton.style.background = "#f3f1ff";
+//     focusButton.style.color = "#7b66ff";
+//     focusButton.querySelector("i").style.color = "#7b66ff";
+//     focusButton.style.cursor = "default";
+// };
 
 const setThisColor = (rgba) => {
     document.getElementById("point-size").style.background = rgba;

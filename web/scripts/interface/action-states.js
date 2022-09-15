@@ -36,12 +36,14 @@ const setModeDefault = () => {
     accordionItem.classList.remove("inactive-section");
 
     // hide(explorerPanel);
+    frameDropIn[0].style.display = "initial";
+    frameDropIn[1].style.display = "flex";
 
     canvas.classList.remove("loading-canvas");
     document.getElementById("loading").style.display = "none";
     document.querySelector(".control-lines").style.display = "block";
-    undoButton.classList.remove("inactive-action");
-    redoButton.classList.remove("inactive-action");
+    undoButton.classList.remove("inactive-section");
+    redoButton.classList.remove("inactive-section");
     hint.innerHTML = `Draw with AI by adding a prompt and clicking draw.`;
     sketchHistory.historyHolder.length > 1 &&
         (historyBlock.style.display = "block");
@@ -59,11 +61,13 @@ const setModeDraw = () => {
     accordionItem.classList.remove("inactive-section");
 
     hide(explorerPanel);
+    frameDropIn[0].style.display = "initial";
+    frameDropIn[1].style.display = "flex";
 
     accordionItem.classList.add("open");
     accordionItem.classList.remove("closed");
-    undoButton.classList.add("inactive-action");
-    redoButton.classList.add("inactive-action");
+    undoButton.classList.add("inactive-section");
+    redoButton.classList.add("inactive-section");
     document.getElementById("loading").style.display = "flex";
     document.querySelector(".control-lines").style.display = "none";
 };
@@ -79,11 +83,12 @@ const setModeExplore = () => {
     hide(historyBlock);
 
     show(explorerPanel);
+    frameDropIn.forEach((button) => hide(button));
 
     accordionItem.classList.add("open");
     accordionItem.classList.remove("closed");
-    undoButton.classList.add("inactive-action");
-    redoButton.classList.add("inactive-action");
+    undoButton.classList.add("inactive-section");
+    redoButton.classList.add("inactive-section");
     document.getElementById("loading").style.display = "flex";
     document.querySelector(".control-lines").style.display = "none";
 };
@@ -98,6 +103,10 @@ const setModeFrame = () => {
 
     document.querySelector(".project").classList.add("greeeeeen");
     accordionItem.classList.add("inactive-section");
+
+    frameDropIn.forEach((button) => hide(button));
+    undoButton.classList.add("inactive-section");
+    redoButton.classList.add("inactive-section");
 
     accordionItem.classList.remove("open");
     accordionItem.classList.add("closed");
@@ -116,10 +125,15 @@ const setModeActiveFrame = () => {
     stopButton.className = "action-stop";
     actions.forEach((button) => button.classList.add("tooltip"));
 
+    frameDropIn.forEach((button) => hide(button));
+
     document.querySelector(".project").classList.add("greeeeeen");
     accordionItem.classList.add("inactive-section");
 
     hint.innerHTML = `Creating prompt frames will give the AI context`;
+
+    undoButton.classList.add("inactive-section");
+    redoButton.classList.add("inactive-section");
 
     hide(explorerPanel);
 

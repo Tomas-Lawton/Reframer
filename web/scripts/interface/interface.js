@@ -420,6 +420,10 @@ document.getElementById("num-squiggles").oninput = () => {
     setLineLabels(mainSketch.sketchLayer);
 };
 
+frameDropIn.forEach((button) =>
+    button.addEventListener("click", () => focusLogic())
+);
+
 let lastLearningRate = controller.learningRate;
 respectSlider.oninput = () => {
     controller.learningRate = parseFloat(this.value);
