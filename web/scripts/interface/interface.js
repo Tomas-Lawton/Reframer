@@ -116,12 +116,12 @@ rotateSlider.oninput = () => {
     transformGroup(controller.transformGroup, "rotation", this.value);
 };
 
-scaleSlider.oninput = () => {
-    transformGroup(controller.transformGroup, "scaling", this.value / 5);
-};
-
 rotateNumber.oninput = () => {
     transformGroup(controller.transformGroup, "rotation", this.value);
+};
+
+scaleSlider.oninput = () => {
+    transformGroup(controller.transformGroup, "scaling", this.value / 5);
 };
 
 scaleNumber.oninput = () => {
