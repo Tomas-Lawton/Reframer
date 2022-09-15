@@ -375,7 +375,7 @@ const setPenMode = (mode) => {
             eraseTool.classList.add("selected");
             penTool.classList.remove("selected");
             document.querySelector(".erase-preview").classList.add("current-tool");
-            canvas.style.cursor = "url('public/erase.svg') 8 11, move";
+            canvas.style.cursor = "url('public/cursor/erase.svg') 8 11, move";
             controller.penMode = mode;
             break;
         case "pen":
@@ -384,7 +384,7 @@ const setPenMode = (mode) => {
             penTool.classList.add("selected");
             document.querySelector(".pencil-preview").classList.add("current-tool");
 
-            canvas.style.cursor = "url('public/pen.svg') -1 20, move";
+            canvas.style.cursor = "url('public/cursor/pen.svg') -1 20, move";
 
             let swatches = document.getElementById("swatches");
 
@@ -409,7 +409,7 @@ const setPenMode = (mode) => {
             penTool.classList.remove("selected");
             document.querySelector(".finger-preview").classList.add("current-tool");
 
-            canvas.style.cursor = "url('public/select.svg') 3 2, move";
+            canvas.style.cursor = "url('public/cursor/select.svg') 3 2, move";
             controller.penMode = mode;
             break;
         case "local":
@@ -417,7 +417,7 @@ const setPenMode = (mode) => {
             controller.penMode = mode;
             break;
         case "dropper":
-            canvas.style.cursor = "url('public/dropper.svg') -1 20, move";
+            canvas.style.cursor = "url('public/icon/dropper.svg') -1 20, move";
             controller.penMode = mode;
     }
 

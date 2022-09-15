@@ -121,7 +121,7 @@ body {
 
 #canvas {
     background-color: white;
-    cursor: url("public/pen.svg") -1 20, move;
+    cursor: url("public/cursor/pen.svg") -1 20, move;
     border-radius: 2em;
 }
 
