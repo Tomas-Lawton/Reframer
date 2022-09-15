@@ -34,12 +34,3 @@ const frameColors = [
     "#00A5CF",
     "#25A18E",
 ];
-
-// const sketchSize =
-//     document.querySelectorAll("div#sketch-grid")[0].offsetWidth / 2 - 5;
-// canvas.width = window.innerWidth;
-// canvas.width = window.innerHeight;
-// const offX = Math.max(0, canvas.width - canvas.height) / 2;
-// const offY = Math.max(0, canvas.height - canvas.width) / 2;
-// const offY = 0;
-// const offX = (canvas.width - canvas.height) / 2;

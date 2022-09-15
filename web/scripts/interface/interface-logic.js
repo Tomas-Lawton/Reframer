@@ -1,5 +1,4 @@
-const killExploratorySketches = () => {
-    console.log(controller.exploreScopes);
+const removeExploreSketches = () => {
     if (controller.exploreScopes.length > 0) {
         explorerPanel.firstElementChild.childNodes.forEach((child, i) => {
             let stopButton = child.querySelector(".fa-hand");
@@ -48,7 +47,7 @@ const generateExploreSketches = () => {
 };
 
 const emptyExplorer = () => {
-    killExploratorySketches();
+    removeExploreSketches();
     controller.clipDrawing = false;
     // refactor into function
     for (let i = 0; i < 4; i++) {
@@ -135,22 +134,20 @@ const setMouseOver = () => {
     };
 };
 
-// dragging moves select elements + ui
 const hideSelectUI = (includeTransform = true) => {
-    // remove rect
     if (controller.boundingBox) {
-        controller.boundingBox.remove();
+        controller.boundingBox.remove(); // paper item
         controller.boundingBox = null;
     }
-    // hide ui
     if (includeTransform) {
         transformControl.style.display = "none";
     }
     deleteHandler.style.display = "none";
+    fixedHandler.style.display = "none";
     sendToBack.style.display = "none";
     moveUp.style.display = "none";
     copyHandler.style.display = "none";
-    fixedHandler.style.display = "none";
+    console.log("a");
 };
 
 const updateRectBounds = (from, to) => {
@@ -219,6 +216,7 @@ const updateSelectUI = () => {
         transformControl.style.display = "flex";
         updateFixedUI();
         updateSelectPosition();
+        console.log("b");
     }
 };
 

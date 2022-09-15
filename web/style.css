@@ -119,22 +119,10 @@ body {
     position: absolute;
 }
 
-
-/* #canvas-frame::before {
-    content: "";
-    background-image: url("public/paper.png");
-    background-size: cover;
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    bottom: 0px;
-    left: 0px;
-    opacity: 0.5;
-} */
-
 #canvas {
     background-color: white;
     cursor: url("public/pen.svg") -1 20, move;
+    border-radius: 2em;
 }
 
 .canvas-hover-light {
@@ -146,20 +134,17 @@ body {
     transition: 0.5s;
 }
 
-.canvas-standard-drop {
-    border-radius: 2em;
-    box-shadow: 4px 9px 27px rgb(48 48 48 / 18%);
-}
-
-.canvas-standard-drop {
+.canvas-ui-container {
     position: relative;
     display: flex;
-    overflow: hidden;
-    /* border: 2px dashed #a7a7a7;
-    border-radius: 2em; */
+    border-radius: 2em;
+    box-shadow: 4px 9px 27px rgb(48 48 48 / 18%);
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
 }
 
-.canvas-frame>p {
+.canvas-ui-container>p {
     position: absolute;
     z-index: 5;
     font-weight: 400;
@@ -167,6 +152,7 @@ body {
     line-height: 18px;
     color: #ffffff;
     margin-left: 2em;
+    transform: translateY(-100%);
 }
 
 #partial-message {
@@ -176,13 +162,6 @@ body {
     width: 100%;
     text-align: center;
     display: none;
-}
-
-#multiple-canvas {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding-left: 1vw;
 }
 
 .greeeeeen {
@@ -1802,9 +1781,10 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .frame-label-inactive {
-    background: transparent !important;
-    color: #404040;
+    color: rgba(217, 217, 217, 1);
     font-size: 0.6em;
+    background: transparent !important;
+    margin: 0 0 -35px -5px;
     pointer-events: none;
 }
 
@@ -1830,14 +1810,14 @@ input[type="range"]::-moz-range-thumb {
     box-shadow: 10px 5px 15px rgb(28 28 28 / 20%);
     overflow: hidden;
     border-radius: 0.6em;
-    padding: 1em 0.6em 0.6em 0.6em;
+    padding: 1em 0.8em 0.8em 0.8em;
     color: white;
 }
 
 .local-prompts h3 {
-    margin-bottom: 1em;
+    margin-bottom: 0.5em;
     font-weight: 400;
-    font-size: 0.8em;
+    font-size: 1em;
 }
 
 #prompt-info {
@@ -1857,15 +1837,21 @@ input[type="range"]::-moz-range-thumb {
 .list-circle {
     border-radius: 50%;
     background: #fecb16;
-    min-width: 25px;
-    min-height: 25px;
-    margin-right: 0.4em;
+    min-width: 35px;
+    min-height: 35px;
+    margin: 0.2em 0.6em 0.2em 0.2em;
 }
 
 #prompt-info p {
-    font-size: 0.6em;
+    font-size: 0.8em;
     font-weight: 300;
     margin-top: 0.5em;
+}
+
+#prompt-info>div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .local-prompts ul>div {
@@ -1888,7 +1874,7 @@ input[type="range"]::-moz-range-thumb {
     display: flex;
     align-items: center;
     padding: 0.4em;
-    font-size: 0.6em;
+    font-size: 0.8em;
     font-weight: 300;
     justify-content: space-between;
 }

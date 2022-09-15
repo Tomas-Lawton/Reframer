@@ -40,7 +40,7 @@ document.getElementById("delete").addEventListener("click", () =>
             sketchHistory.clear();
 
             if (controller.clipDrawing || controller.drawState === "pause") {
-                killExploratorySketches();
+                removeExploreSketches();
                 controller.stop();
                 controller.resetMetaControls();
                 controller.clipDrawing = false;
@@ -155,6 +155,7 @@ dots.forEach((elem) =>
 document.getElementById("close-explorer").addEventListener("click", (e) => {
     emptyExplorer();
     setActionState("inactive");
+    hide(explorerPanel);
 });
 
 document.getElementById("empty").addEventListener("click", (e) => {
@@ -210,7 +211,7 @@ drawer.addEventListener("click", () => {
 prompt.addEventListener("input", (e) => {
     controller.prompt = e.target.value.toLowerCase();
     // controller.prompt = e.target.value;
-    canvasFrame.firstElementChild.innerHTML = `Sketch of ${controller.prompt}`;
+    frameName.innerHTML = `Sketch of ${controller.prompt}`;
     if (controller.prompt === "") {
         controllerUI.forEach((elem) => elem.classList.add("inactive-section"));
     } else {
@@ -292,12 +293,12 @@ styles.onmousedown = (e) => {
     }
 };
 
-canvasFrame.firstElementChild.onmousedown = (e) => {
+frameName.onmousedown = (e) => {
     e = e || window.event;
     pos3 = e.clientX;
     pos4 = e.clientY;
     document.onmouseup = closeDragElement;
-    document.onmousemove = (e) => elementDrag(e, canvasFrame);
+    document.onmousemove = (e) => elementDrag(e, sketchContainer);
 };
 
 // sketchBook.onmousedown = (e) => {
@@ -491,7 +492,10 @@ toolToggle.addEventListener("click", () => {
     }
 });
 // Shortcuts
-window.addEventListener("keydown", function(event) {
+window.addEventListener("keydown", (event) => {
+    if (event.code === "Escape") {
+        stopLogic();
+    }
     if (event.metaKey || event.shiftKey) {
         if (event.code === "KeyP") {
             setPenMode("pen", pen);

@@ -167,59 +167,57 @@
     </section>
 
     <section class="project">
-        <div class="canvas-frame">
+        <div class="canvas-ui-container" id="canvas-drop">
             <p>Sketch of...</p>
-            <div class="canvas-standard-drop" id="canvas-drop">
-                <i class="fa-solid fa-spinner button-animation " id="loading"></i>
-                <h2 id="partial-message">Draw a drawing of a oubwego</h2>
-                <div id="fixed-handler" class="select-ui tooltip">
-                    <span class="tooltiptext">Unchecked lines will move</span>
-                    <div>
-                        <i class="fa-solid fa-minimize fa-fw"></i>
-                    </div>
+            <i class="fa-solid fa-spinner button-animation " id="loading"></i>
+            <h2 id="partial-message">Draw a drawing of a oubwego</h2>
+            <div id="fixed-handler" class="select-ui tooltip">
+                <span class="tooltiptext">Unchecked lines will move</span>
+                <div>
+                    <i class="fa-solid fa-minimize fa-fw"></i>
                 </div>
-                <div id="delete-handler" class="select-ui default">
-                    <div>
-                        <i class="fa-solid fa-trash fa-fw"></i>
-                    </div>
-                </div>
-                <div id="toBack" class="select-ui default">
-                    <div>
-                        <i class="fa-solid fa-arrow-down-short-wide"></i>
-                    </div>
-                </div>
-                <div id="moveUp" class="select-ui default">
-                    <div>
-                        <i class="fa-solid fa-arrow-up-short-wide"></i>
-                    </div>
-                </div>
-                <div id="copy-handler" class="select-ui default">
-                    <div>
-                        <i class="fa-solid fa-copy fa-fw"></i>
-                    </div>
-                </div>
-                <div id="transform-ui" style="display: none">
-                    <div class="transform-control">
-                        <div class="flex">
-                            <p>Rotate</p>
-                            <input type="number" id="rotate-number" value="0" min="-180" max="180" step="1">
-                        </div>
-                        <div id="rotate-handler">
-                            <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
-                        </div>
-                    </div>
-                    <div class="transform-control">
-                        <div class="flex">
-                            <p>Scale</p>
-                            <input type="number" id="scale-number" value="10" min="1" max="20">
-                        </div>
-                        <div id="scale-handler">
-                            <input type="range" id="scale-slider" value="15" min="1" max="20">
-                        </div>
-                    </div>
-                </div>
-                <canvas id="canvas"></canvas>
             </div>
+            <div id="delete-handler" class="select-ui default">
+                <div>
+                    <i class="fa-solid fa-trash fa-fw"></i>
+                </div>
+            </div>
+            <div id="toBack" class="select-ui default">
+                <div>
+                    <i class="fa-solid fa-arrow-down-short-wide"></i>
+                </div>
+            </div>
+            <div id="moveUp" class="select-ui default">
+                <div>
+                    <i class="fa-solid fa-arrow-up-short-wide"></i>
+                </div>
+            </div>
+            <div id="copy-handler" class="select-ui default">
+                <div>
+                    <i class="fa-solid fa-copy fa-fw"></i>
+                </div>
+            </div>
+            <div id="transform-ui" style="display: none">
+                <div class="transform-control">
+                    <div class="flex">
+                        <p>Rotate</p>
+                        <input type="number" id="rotate-number" value="0" min="-180" max="180" step="1">
+                    </div>
+                    <div id="rotate-handler">
+                        <input type="range" id="rotate-slider" value="0" min="-180" max="180" step="5">
+                    </div>
+                </div>
+                <div class="transform-control">
+                    <div class="flex">
+                        <p>Scale</p>
+                        <input type="number" id="scale-number" value="10" min="1" max="20">
+                    </div>
+                    <div id="scale-handler">
+                        <input type="range" id="scale-slider" value="15" min="1" max="20">
+                    </div>
+                </div>
+            </div>
+            <canvas id="canvas"></canvas>
         </div>
         <div class="hint">
             <span class="hint-text">Draw with AI by adding a prompt and clicking draw.</span>
@@ -232,8 +230,11 @@
     <div class="local-prompts">
         <h3>Focus Frames</h3>
         <div id="prompt-info">
-            <div class="list-circle"><i class="fa-solid fa-info"></i></div>
             <div>
+                <div class="list-circle">
+                    <i class="fa-solid fa-info"></i>
+                </div>
+
                 <p>Drag to a frame and type to add a local prompt</p>
             </div>
         </div>

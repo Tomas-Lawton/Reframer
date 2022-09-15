@@ -6,6 +6,7 @@ class Controller {
         this.prompt = null;
         this.exploreScopes = [];
         this.sketches = {};
+        this.activeExplorers = {};
 
         // Defaults
         this.strokeColor = "rgb(24,24,24)";
@@ -113,6 +114,7 @@ class Controller {
             if (!sketchSize) {
                 console.error("sketch size not found");
             }
+            this.activeExplorers[sketchCountIndex] = true; //keep track of running seperate from sketch data
             this.targetDrawing = true;
             this.prepare();
             // this.resetMetaControls();

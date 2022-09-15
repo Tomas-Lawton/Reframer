@@ -241,7 +241,7 @@ class CICADA:
             # 'geometric': geo_loss,
         }
         self.rolling_losses.append(loss.item())
-        logging.info(f"Completed {t}")
+        logging.info(f"Completed i:{t} on {self.index}")
 
     
     def prune(self):
@@ -346,7 +346,7 @@ class CICADA:
         }
         try:
             await self.ws.send_json(result)
-            logging.info(f"Update send for {self.index}")
+            logging.info(f"Update sent for {self.index}")
         except Exception as e:
             logging.error("Failed sending WS response")
             # logging.info(result)

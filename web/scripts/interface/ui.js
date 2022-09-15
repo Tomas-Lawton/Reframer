@@ -1,4 +1,5 @@
 const socketLight = document.querySelector(".socket-connect");
+const canvas = document.getElementById("canvas");
 
 // General UI
 const prompt = document.getElementById("messageText");
@@ -66,33 +67,21 @@ const sparkCanvas = document.querySelector(".sparkline");
 
 const hint = document.querySelector(".hint-text");
 
-// Sketching UI
-const canvasFrame = document.querySelector(".canvas-frame");
-const containerRect = canvasFrame.getBoundingClientRect();
-const padding = parseInt(window.getComputedStyle(canvasFrame).padding);
-const canvas = document.getElementById("canvas");
-canvas.width = window.innerHeight - padding * 2 - 30;
-canvas.height = window.innerHeight - padding * 2 - 30;
-canvasFrame.style.top = window.innerHeight - canvasFrame.clientHeight + "px";
-const frameOutline = Math.min(canvas.width, canvas.height);
+const frameName = document.querySelector(".canvas-ui-container>p");
 const sketchContainer = document.getElementById("canvas-drop");
 const canvasBounds = canvas.getBoundingClientRect();
+const project = document.querySelector(".project");
+const projectBounds = project.getBoundingClientRect();
 
 const sketchSize = 130;
+const size = project.clientHeight * 0.93; //technically wrong
+sketchContainer.style.width = size + "px";
+sketchContainer.style.height = size + "px";
+canvas.width = size;
+canvas.height = size;
+const frameOutline = size;
 const scaleRatio = frameOutline / 224;
 const fullMiniRatio = frameOutline / sketchSize;
 
 const reusableExemplar = sketchTemplate.cloneNode(true); //clone to use
 sketchTemplate.remove();
-
-canvasFrame.firstElementChild.style.left =
-    canvas.offsetParent.offsetLeft + "px";
-// canvasFrame.firstElementChild.style.top =
-//     window.innerHeight +
-//     // canvasBounds.height -
-//     canvasFrame.firstElementChild.offsetHeight +
-//     "px";
-
-// fix
-canvasFrame.firstElementChild.style.top =
-    padding - canvasFrame.firstElementChild.offsetHeight + "px";

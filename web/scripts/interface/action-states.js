@@ -25,7 +25,7 @@ const setActionState = (state) => {
     controller.drawState = state;
 };
 
-const setModeDefault = (hideExplorer = true) => {
+const setModeDefault = () => {
     drawButton.className = "action-default";
     focusButton.className = "action-default";
     exploreButton.className = "action-default";
@@ -35,7 +35,7 @@ const setModeDefault = (hideExplorer = true) => {
     document.querySelector(".project").classList.remove("greeeeeen");
     accordionItem.classList.remove("inactive-section");
 
-    if (hideExplorer) hide(explorerPanel);
+    // hide(explorerPanel);
 
     canvas.classList.remove("loading-canvas");
     document.getElementById("loading").style.display = "none";
@@ -105,7 +105,7 @@ const setModeFrame = () => {
 
     hide(explorerPanel);
 
-    canvasFrame.firstElementChild.innerHTML = `Creating focus frames for: ${controller.prompt}`;
+    frameName.innerHTML = `Creating focus frames for: ${controller.prompt}`;
     prompt.focus();
 };
 
@@ -123,7 +123,7 @@ const setModeActiveFrame = () => {
 
     hide(explorerPanel);
 
-    canvasFrame.firstElementChild.innerHTML = `Creating focus frames for: ${controller.prompt}`;
+    frameName.innerHTML = `Creating focus frames for: ${controller.prompt}`;
     prompt.focus();
 };
 
@@ -216,7 +216,7 @@ focusButton.addEventListener("click", () => {
             hide(localPrompts);
             show(styles);
 
-            canvasFrame.firstElementChild.innerHTML = `Sketch of ${controller.prompt}`;
+            frameName.innerHTML = `Sketch of ${controller.prompt}`;
 
             // hide all frames
 
@@ -264,15 +264,16 @@ focusButton.addEventListener("click", () => {
 });
 
 stopButton.addEventListener("click", () => {
+    stopLogic();
+});
+
+const stopLogic = () => {
     if (controller.drawState === "active-frame") {
         setActionState("frame");
-    } else {
-        setActionState("inactive");
-    }
-
-    if (controller.drawState === "explore") {
-        killExploratorySketches();
+    } else if (controller.drawState === "explore") {
+        removeExploreSketches();
         controller.clipDrawing = false;
+        setActionState("inactive");
         logger.event("stop-exploring");
     } else {
         if (controller.drawState === "pause") {
@@ -283,6 +284,7 @@ stopButton.addEventListener("click", () => {
         mainSketch.svg = paper.project.exportSVG({
             asString: true,
         });
+        setActionState("inactive");
         logger.event("stop-drawing");
     }
-});
+};

@@ -185,8 +185,7 @@ sketchTool.onMouseUp = function() {
     switch (controller.penMode) {
         case "select":
             if (selectBox) {
-                //after moving
-                //moving selection
+                //after moving selection
                 let items = mainSketch.sketchLayer.getItems({
                     inside: selectBox.bounds,
                 });
@@ -200,19 +199,19 @@ sketchTool.onMouseUp = function() {
                     selectBox.remove();
                     selectBox = null;
                 }
-                let path = fitToSelection(items, "moving"); //try update
-                // IS THIS STILL NEEDED?
-                if (!getSelectedPaths().length) {
-                    path.remove();
-                }
+                fitToSelection(items, "moving"); //try update
+                // // IS THIS STILL NEEDED?
+                // if (!getSelectedPaths().length) {
+                //     path.remove();
+                // }
                 createGroup(items); //transformGroup
-                // fit to selction?
                 updateSelectUI();
             }
             if (controller.boundingBox) {
                 //after creating selection by dragging
-                if (!getSelectedPaths().length) {
+                if (!controller.transformGroup.children.length) {
                     ungroup();
+                    hideSelectUI();
                 } else {
                     controller.boundingBox.data.state = "moving";
                 }
@@ -261,8 +260,8 @@ sketchTool.onMouseUp = function() {
                 controller.drawRegion.width > 78 &&
                 controller.drawRegion.height > 30
             ) {
-                const canvasFrame = new Path.Rectangle(controller.drawRegion);
-                canvasFrame.set(frameOptions); //completed
+                const frameParent = new Path.Rectangle(controller.drawRegion);
+                frameParent.set(frameOptions); //completed
 
                 const [
                     frameContainer,
@@ -305,7 +304,7 @@ sketchTool.onMouseUp = function() {
                     controller.pause();
                     ungroup();
                     let items = mainSketch.sketchLayer.getItems({
-                        inside: canvasFrame.bounds,
+                        inside: frameParent.bounds,
                     });
                     createGroup(items);
 
@@ -320,14 +319,14 @@ sketchTool.onMouseUp = function() {
                         };
                         document.onmousemove = (e) => {
                             elementDrag(e, frameContainer);
-                            canvasFrame.position.x += e.movementX;
-                            canvasFrame.position.y += e.movementY;
+                            frameParent.position.x += e.movementX;
+                            frameParent.position.y += e.movementY;
 
                             mainSketch.localFrames[i].data.points = {
-                                x0: canvasFrame.bounds.topLeft.x,
-                                y0: canvasFrame.bounds.topLeft.y,
-                                x1: canvasFrame.bounds.bottomRight.x,
-                                y1: canvasFrame.bounds.bottomRight.y,
+                                x0: frameParent.bounds.topLeft.x,
+                                y0: frameParent.bounds.topLeft.y,
+                                x1: frameParent.bounds.bottomRight.x,
+                                y1: frameParent.bounds.bottomRight.y,
                             };
 
                             controller.transformGroup.position.x += e.movementX;
@@ -344,14 +343,14 @@ sketchTool.onMouseUp = function() {
                         document.onmouseup = closeDragElement;
                         document.onmousemove = (e) => {
                             elementDrag(e, frameContainer);
-                            canvasFrame.position.x += e.movementX;
-                            canvasFrame.position.y += e.movementY;
+                            frameParent.position.x += e.movementX;
+                            frameParent.position.y += e.movementY;
 
                             mainSketch.localFrames[i].data.points = {
-                                x0: canvasFrame.bounds.topLeft.x,
-                                y0: canvasFrame.bounds.topLeft.y,
-                                x1: canvasFrame.bounds.bottomRight.x,
-                                y1: canvasFrame.bounds.bottomRight.y,
+                                x0: frameParent.bounds.topLeft.x,
+                                y0: frameParent.bounds.topLeft.y,
+                                x1: frameParent.bounds.bottomRight.x,
+                                y1: frameParent.bounds.bottomRight.y,
                             };
                         };
                     }
@@ -365,30 +364,30 @@ sketchTool.onMouseUp = function() {
                         document.onmouseup = closeDragElement;
                         document.onmousemove = (e) => {
                             // TODO update other rects to do this instead . didn't work?
-                            let x = canvasFrame.bounds.width;
-                            let y = canvasFrame.bounds.height;
-                            if (x + e.movementX > 1) {
-                                canvasFrame.bounds.width += e.movementY;
+                            let x = frameParent.bounds.width;
+                            let y = frameParent.bounds.height;
+                            if (x + e.movementX > 75) {
+                                frameParent.bounds.width += e.movementX;
                             } else {
-                                canvasFrame.bounds.width = 1;
+                                frameParent.bounds.width = 75;
                             }
 
-                            if (y + e.movementY > 1) {
-                                canvasFrame.bounds.height += e.movementY;
+                            if (y + e.movementY > 30) {
+                                frameParent.bounds.height += e.movementY;
                             } else {
-                                canvasFrame.bounds.height = 1;
+                                frameParent.bounds.height = 30;
                             }
 
-                            frameContainer.style.width = canvasFrame.bounds.width + "px";
+                            frameContainer.style.width = frameParent.bounds.width + "px";
                             cornerDrag.style.top =
-                                canvasFrame.bounds.height + frameContainer.clientHeight + "px";
-                            cornerDrag.style.left = canvasFrame.bounds.width + "px";
+                                frameParent.bounds.height + frameContainer.clientHeight + "px";
+                            cornerDrag.style.left = frameParent.bounds.width + "px";
 
                             mainSketch.localFrames[i].data.points = {
-                                x0: canvasFrame.bounds.topLeft.x,
-                                y0: canvasFrame.bounds.topLeft.y,
-                                x1: canvasFrame.bounds.bottomRight.x,
-                                y1: canvasFrame.bounds.bottomRight.y,
+                                x0: frameParent.bounds.topLeft.x,
+                                y0: frameParent.bounds.topLeft.y,
+                                x1: frameParent.bounds.bottomRight.x,
+                                y1: frameParent.bounds.bottomRight.y,
                             };
 
                             frameInput.focus();
@@ -399,14 +398,14 @@ sketchTool.onMouseUp = function() {
                 mainSketch.localFrames[i] = {
                     tag: tag,
                     frame: frameContainer,
-                    paperFrame: canvasFrame,
+                    paperFrame: frameParent,
                     data: {
                         prompt: "default",
                         points: {
-                            x0: canvasFrame.bounds.topLeft.x,
-                            y0: canvasFrame.bounds.topLeft.y,
-                            x1: canvasFrame.bounds.bottomRight.x,
-                            y1: canvasFrame.bounds.bottomRight.y,
+                            x0: frameParent.bounds.topLeft.x,
+                            y0: frameParent.bounds.topLeft.y,
+                            x1: frameParent.bounds.bottomRight.x,
+                            y1: frameParent.bounds.bottomRight.y,
                         },
                     },
                 };
