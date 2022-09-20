@@ -261,7 +261,7 @@ const loadUpdates = (result) => {
     0,
     0,
     150
-  ).toFixed(2)}`;
+  ).toFixed(2)}/150`;
 
     incrementHistory();
 };

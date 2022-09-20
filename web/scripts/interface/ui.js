@@ -14,9 +14,11 @@ const timeKeeper = document.getElementById("time-slider");
 const historyBlock = document.querySelector(".history-block");
 
 const localPrompts = document.querySelector(".local-prompts");
-const lossText = document.querySelectorAll(".spark-text p");
 const explorerSize = document.getElementById("sketch-size");
+
+const sparkUI = document.querySelector(".spark-ui");
 const sparkKnob = document.querySelector(".spark-knob");
+const lossText = document.querySelectorAll(".spark-text p");
 
 const buttonPanel = document.querySelector(".action");
 const dropdown = document.getElementById("pen-dropdown");
@@ -74,15 +76,23 @@ const projectBounds = project.getBoundingClientRect();
 const frameDropIn = document.querySelectorAll(".canvas-focus");
 
 const sketchSize = 150;
-const size = project.clientHeight * 0.92; //technically wrong
-sketchContainer.style.width = size + "px";
-sketchContainer.style.height = size + "px";
-canvas.width = size;
-canvas.height = size;
-sparkCanvas.height = 100;
 
-const frameOutline = size;
-const scaleRatio = frameOutline / 224;
+let size, frameOutline, scaleRatio;
+
+const setCanvasSize = () => {
+    size = project.clientHeight * 0.92; //technically wrong
+    sketchContainer.style.width = size + "px";
+    sketchContainer.style.height = size + "px";
+    canvas.width = size;
+    canvas.height = size;
+    sparkCanvas.height = 100;
+    sparkCanvas.width = sparkUI.clientWidth;
+    frameOutline = size;
+    scaleRatio = frameOutline / 224;
+};
+
+setCanvasSize();
+window.addEventListener("resize", () => setCanvasSize, true);
 
 const reusableExemplar = sketchTemplate.cloneNode(true); //clone to use
 sketchTemplate.remove();
