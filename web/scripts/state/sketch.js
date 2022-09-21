@@ -18,7 +18,6 @@ class Sketch {
         if (svg === "" || svg === undefined) return;
         this.sketchLayer.clear();
         let importGroup = this.sketchLayer.importSVG(svg);
-        console.log(importGroup);
         let g = importGroup.children[0];
         // console.group(g);
         let scaledGroup = scaleGroup(g, s);
@@ -100,7 +99,6 @@ class Sketch {
                 if (mainSketch) {
                     this.importTo(mainSketch);
                 }
-                // controller.resetMetaControls();
             });
             // Make draggable
             newElem.addEventListener(

@@ -255,9 +255,9 @@ const exploreLogic = () => {
             });
             return;
         } else {
-            // TO DO: Clean up old scopes (now unused) // controller.exploreScopes
             sketchHistory.historyHolder.push({
                 svg: mainSketch.svg,
+                loss: mainSketch.semanticLoss,
             });
             sketchHistory.pushUndo();
             generateExploreSketches();

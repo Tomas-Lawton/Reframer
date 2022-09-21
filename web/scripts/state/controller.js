@@ -15,7 +15,6 @@ class Controller {
         this.penMode = "pen";
         this.clipDrawing = false;
         this.maximumTraces = 1; // todo change
-        this.step = 0;
         this.linesDisabled = false;
         this.activeStates = [
             "draw",
@@ -92,6 +91,7 @@ class Controller {
 
             sketchHistory.historyHolder.push({
                 svg: mainSketch.svg,
+                loss: mainSketch.semanticLoss,
             });
             sketchHistory.pushUndo();
             this.prepare();
@@ -104,7 +104,6 @@ class Controller {
                 rate: this.learningRate,
                 frames: Object.values(mainSketch.localFrames).map((elem) => elem.data),
             });
-            this.step = 0;
         } else {
             throw new Error("Can't continue if already running");
         }
@@ -117,7 +116,7 @@ class Controller {
             this.activeExplorers[sketchCountIndex] = true; //keep track of running seperate from sketch data
             this.targetDrawing = true;
             this.prepare();
-            // this.resetMetaControls();
+
             this.updateDrawer({
                 status: "add_new_sketch",
                 sketch: mainSketch.sketch,
@@ -136,6 +135,7 @@ class Controller {
             try {
                 sketchHistory.historyHolder.push({
                     svg: mainSketch.svg,
+                    loss: mainSketch.semanticLoss,
                 });
                 sketchHistory.pushUndo();
                 this.prepare();
@@ -168,6 +168,7 @@ class Controller {
     stop() {
         sketchHistory.historyHolder.push({
             svg: mainSketch.svg,
+            loss: mainSketch.semanticLoss,
         });
         this.updateDrawer({ status: "stop" });
     }
@@ -202,7 +203,6 @@ class Controller {
     }
     resetMetaControls() {
         historyBlock.style.display = "none";
-        this.step = 0;
         timeKeeper.setAttribute("max", "0");
         timeKeeper.value = "0";
         sketchHistory.historyHolder = [];

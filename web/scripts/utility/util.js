@@ -136,22 +136,6 @@ const deleteItems = () => {
     // logger.event("deleted-path");
 };
 
-const calcRollingLoss = () => {
-    if (!(sketchHistory.historyHolder.length > 5 + 1)) return null; //ignore [0]
-    let losses = sketchHistory.historyHolder.slice(-5);
-    return losses.reduce((t, v) => t + v.loss, 0) / losses.length;
-};
-
-const incrementHistory = () => {
-    controller.step += 1;
-    timeKeeper.setAttribute("max", String(controller.step));
-    timeKeeper.value = String(controller.step);
-    sketchHistory.historyHolder.push({
-        svg: mainSketch.svg,
-        loss: mainSketch.semanticLoss,
-    });
-};
-
 const getRGBA = (a) => {
     let rgba = controller.strokeColor.replace(/[^\d,]/g, "").split(",");
     rgba[3] = a;
@@ -225,67 +209,6 @@ const download = () => {
             b.click();
             document.body.removeChild(b);
         }
-    });
-};
-
-const loadResponse = (result) => {
-    // console.log("Result: ", result);
-    if (controller.clipDrawing) {
-        if (result.status === "None") {
-            loadUpdates(result);
-        }
-        // To Do: Tidy
-        if (result.status.match(/\d+/g) != null) {
-            if (result.svg === "") return null;
-            let sketch = controller.sketches[parseInt(result.status)];
-            sketch.load(
-                sketchSize / 224,
-                result.svg,
-                result.fixed,
-                sketch.sketchLayer
-            );
-        }
-    }
-};
-
-const loadUpdates = (result) => {
-    controller.lastIteration = result.iterations;
-    mainSketch.load(scaleRatio, result.svg, result.fixed, true, true);
-    mainSketch.semanticLoss = parseFloat(result.loss);
-    console.log(mainSketch.semanticLoss.toPrecision(4));
-
-    document.querySelector(".prompt-match").innerHTML = `${scaleRange(
-    mainSketch.semanticLoss,
-    -1,
-    0,
-    0,
-    150
-  ).toFixed(2)}/150`;
-
-    incrementHistory();
-    setLineLabels(mainSketch.sketchLayer);
-};
-
-const loadPartial = () => {
-    const scaleTo = mainSketch.sketchLayer.view.viewSize.width;
-    const idx = Math.floor(Math.random() * partialSketches.length);
-    const partial = partialSketches[idx][0];
-    const drawPrompt = partialSketches[idx][1];
-    document.getElementById("partial-message").innerHTML = drawPrompt;
-    let loadedPartial = mainSketch.sketchLayer.importSVG(partial);
-
-    loadedPartial.getItems().forEach((item) => {
-        if (item instanceof Path) {
-            let newElem = mainSketch.sketchLayer.addChild(item.clone());
-            newElem.data.fixed = true;
-            newElem.strokeCap = "round";
-            newElem.strokeJoin = "round";
-        }
-    });
-    loadedPartial.remove();
-    scaleGroup(mainSketch.sketchLayer, scaleTo);
-    mainSketch.svg = paper.project.exportSVG({
-        asString: true,
     });
 };
 
