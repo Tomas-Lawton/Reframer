@@ -20,7 +20,7 @@ class Sketch {
         let importGroup = this.sketchLayer.importSVG(svg);
         console.log(importGroup);
         let g = importGroup.children[0];
-        console.group(g);
+        // console.group(g);
         let scaledGroup = scaleGroup(g, s);
         let finalInserted = this.sketchLayer.insertChildren(
             scaledGroup.index,

@@ -180,13 +180,15 @@ body {
 .canvas-ui-container>p {
     position: absolute;
     z-index: 5;
-    font-weight: 400;
-    font-size: 14px;
+    font-weight: 500;
+    font-size: 1.2em;
     line-height: 18px;
     color: #ffffff;
-    margin-left: 2em;
+    /* margin-left: 2em; */
     transform: translateY(-110%);
     cursor: grab;
+    width: 100%;
+    text-align: center;
 }
 
 .canvas-focus {
@@ -1283,7 +1285,7 @@ input[type="number"] {
     /* background: linear-gradient(173.58deg, #eeeeee 4.75%, #ffffff 88.29%); */
     box-shadow: 10px 11px 37px rgba(48, 48, 48, 0.29);
     /* width: 154px; */
-    width: 192px;
+    width: 204px;
     border-radius: 2em;
     margin-right: 1em;
     position: absolute;
@@ -1370,29 +1372,38 @@ input[type="number"] {
 }
 
 #basic-styles {
-    display: grid;
-    /* grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-template-rows: repeat(4, minmax(0, 1fr)); */
+    display: inherit;
     grid-gap: 5px;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     grid-auto-flow: dense;
+    padding: 0.5em;
 }
 
-#stroke-style {
+/* #stroke-style {
     display: flex;
     grid-template-columns: 1fr 1fr;
     grid-auto-flow: dense;
     margin-top: 0.4em;
     gap: 22px;
+} */
+
+#stroke-style {
+    display: flex;
+    /* width: 100%; */
+    /* grid-template-columns: 1fr 1fr; */
+    /* grid-auto-flow: dense; */
+    /* margin-top: 0.4em; */
+    /* gap: 22px; */
+    padding: 0.5em;
 }
 
-#stroke-style>div {
+/* #stroke-style>div {
     margin: 0 7px;
-}
+} */
 
 #expanded-styles {
     display: grid;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     align-items: center;
     position: relative;
     flex-flow: row wrap;
@@ -1468,11 +1479,13 @@ input[type="number"] {
 .stroke-control {
     color: #7b66ff;
     border-radius: 1em;
+
+    margin: 0 0.2em;
 }
 
-.stroke-control input {
+/* .stroke-control input {
     border: 2px solid #7b66ff;
-}
+} */
 
 #fine-control {
     width: 100%;

@@ -242,7 +242,7 @@ const focusLogic = () => {
             hide(localPrompts);
             show(styles);
 
-            frameName.innerHTML = `Prompted to draw "${controller.prompt}"`;
+            frameName.innerHTML = `I'm still drawing "${controller.prompt}"`;
 
             // hide all frames
 

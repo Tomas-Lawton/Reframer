@@ -229,7 +229,7 @@ const download = () => {
 };
 
 const loadResponse = (result) => {
-    console.log("Result: ", result);
+    // console.log("Result: ", result);
     if (controller.clipDrawing) {
         if (result.status === "None") {
             loadUpdates(result);
