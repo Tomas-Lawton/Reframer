@@ -5,15 +5,14 @@ cd server/
 ```
 
 ```
-source setup.sh
+source dev_setup.sh
 ```
 
-If it doesn't work, install packages in requirements.txt with conda install --file requirements and pip install -r requirements.txt. Then run...
-
+Run with
 ```
-source activate.sh
+python3 main.py
 ```
 
 # Run canvas
 
-Run the frontend canvas using a local server (Can use VS Code Live Server extension). Ensure it's in a seperate code window so file overwrites don't cause a restart.
+Run the frontend canvas using a local server or opening index.html in chrome (not firefox).
