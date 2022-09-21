@@ -18,7 +18,6 @@ const explorerSize = document.getElementById("sketch-size");
 
 const sparkUI = document.querySelector(".spark-ui");
 const sparkKnob = document.querySelector(".spark-knob");
-const lossText = document.querySelectorAll(".spark-text p");
 
 const buttonPanel = document.querySelector(".action");
 const dropdown = document.getElementById("pen-dropdown");

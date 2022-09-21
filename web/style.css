@@ -147,15 +147,24 @@ body {
 }
 
 .spark-knob {
-    min-width: 19px;
-    min-height: 19px;
-    background: rgb(123 102 255);
+    min-width: 12px;
+    min-height: 12px;
+    background: white;
     position: absolute;
     border-radius: 50%;
-    border: 4px solid white;
+    border: 3px solid #7b66ff;
     right: 0;
-    transform: translate(50%, -50%);
+    transform: translate(48%, -65%);
     top: 50%;
+}
+
+.prompt-match {
+    position: absolute;
+    color: #5a5a5a;
+    font-size: 0.6em;
+    bottom: 1.5em;
+    right: 1.5em;
+    font-weight: 500;
 }
 
 .current-status {
@@ -1528,10 +1537,6 @@ input[type="number"] {
 
 .panel-section {
     margin: 1em 0;
-}
-
-.panel-section>div:first-child {
-    margin-bottom: 0.5em;
 }
 
 .inactive-section {

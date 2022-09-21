@@ -252,10 +252,9 @@ const loadUpdates = (result) => {
     controller.lastIteration = result.iterations;
     mainSketch.load(scaleRatio, result.svg, result.fixed, true, true);
     mainSketch.semanticLoss = parseFloat(result.loss);
-    lossText[0].innerHTML = `Latest Loss: ${mainSketch.semanticLoss.toPrecision(
-    4
-  )}`;
-    lossText[1].innerHTML = `Interpret: ${scaleRange(
+    console.log(mainSketch.semanticLoss.toPrecision(4));
+
+    document.querySelector(".prompt-match").innerHTML = `${scaleRange(
     mainSketch.semanticLoss,
     -1,
     0,
