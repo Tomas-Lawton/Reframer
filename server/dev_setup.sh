@@ -1,4 +1,4 @@
-conda env create -n aidraw
+conda create -n aidraw
 conda activate aidraw
 
 cd src/
