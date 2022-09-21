@@ -1,10 +1,14 @@
 const actions = document.querySelectorAll(".clip-actions>div");
 const [drawButton, focusButton, exploreButton, stopButton] = actions;
 
+drawButton.addEventListener("click", () => drawLogic());
+focusButton.addEventListener("click", () => focusLogic());
+stopButton.addEventListener("click", () => stopLogic());
+exploreButton.addEventListener("click", () => exploreLogic());
+
 const setActionState = (state) => {
     switch (state) {
         case "inactive":
-            // Add the state stuff also??
             setModeDefault();
             break;
         case "draw":
@@ -41,12 +45,15 @@ const setModeDefault = () => {
 
     canvas.classList.remove("loading-canvas");
     document.getElementById("loading").style.display = "none";
-    document.querySelector(".control-lines").style.display = "block";
+    // document.querySelector(".control-lines").style.display = "block";
     undoButton.classList.remove("inactive-section");
     redoButton.classList.remove("inactive-section");
     hint.innerHTML = `Draw with AI by adding a prompt and clicking draw.`;
     sketchHistory.historyHolder.length > 1 &&
         (historyBlock.style.display = "block");
+
+    document.querySelector(".current-status").style.color = "#A0A0A0";
+    document.querySelector(".current-status").innerHTML = "Inactive";
 };
 
 const setModeDraw = () => {
@@ -69,7 +76,10 @@ const setModeDraw = () => {
     undoButton.classList.add("inactive-section");
     redoButton.classList.add("inactive-section");
     document.getElementById("loading").style.display = "flex";
-    document.querySelector(".control-lines").style.display = "none";
+    // document.querySelector(".control-lines").style.display = "none";
+
+    document.querySelector(".current-status").style.color = "#00e900";
+    document.querySelector(".current-status").innerHTML = "Drawing";
 };
 
 const setModeExplore = () => {
@@ -90,11 +100,13 @@ const setModeExplore = () => {
     undoButton.classList.add("inactive-section");
     redoButton.classList.add("inactive-section");
     document.getElementById("loading").style.display = "flex";
-    document.querySelector(".control-lines").style.display = "none";
+    // document.querySelector(".control-lines").style.display = "none";
+
+    document.querySelector(".current-status").style.color = "#00e900";
+    document.querySelector(".current-status").innerHTML = "Exploring";
 };
 
 const setModeFrame = () => {
-    console.log("frame");
     drawButton.className = "action-default";
     focusButton.className = "action-focus";
     exploreButton.className = "action-inactive";
@@ -112,10 +124,14 @@ const setModeFrame = () => {
     accordionItem.classList.add("closed");
     hint.innerHTML = `Creating prompt frames will give the AI context`;
 
+    hide(pickerSelect);
     hide(explorerPanel);
 
     frameName.innerHTML = `Creating focus frames the prompt: ${controller.prompt}`;
     prompt.focus();
+
+    document.querySelector(".current-status").style.color = "#A0A0A0";
+    document.querySelector(".current-status").innerHTML = "Framing";
 };
 
 const setModeActiveFrame = () => {
@@ -135,45 +151,46 @@ const setModeActiveFrame = () => {
     undoButton.classList.add("inactive-section");
     redoButton.classList.add("inactive-section");
 
+    hide(pickerSelect);
     hide(explorerPanel);
 
     frameName.innerHTML = `Creating focus frames the prompt: ${controller.prompt}`;
     prompt.focus();
+
+    document.querySelector(".current-status").style.color = "#00e900";
+    document.querySelector(".current-status").innerHTML = "Drawing";
 };
 
-drawButton.addEventListener("click", () => {
-    drawLogic();
-});
-
-exploreButton.addEventListener("click", () => {
-    if (socket) {
-        if (noPrompt()) {
-            openModal({
-                title: "Type a prompt first!",
-                message: "You need a target for AI sketchs.",
-                confirmAction: () => (controlPanel.style.display = "flex"),
-            });
-            return;
-        } else {
-            // TO DO: Clean up old scopes (now unused) // controller.exploreScopes
-            // const total = controller.sketchScopeIndex + Math.floor(Math.random() * 5);
-            sketchHistory.historyHolder.push({
-                svg: mainSketch.svg,
-            });
-            sketchHistory.pushUndo();
-
-            generateExploreSketches();
-        }
+const activateCanvasFrames = () => {
+    for (const item in mainSketch.localFrames) {
+        let frameItem = mainSketch.localFrames[item];
+        frameItem.frame.querySelectorAll("i").forEach((icon) => show(icon));
+        show(frameItem.frame.querySelector("div"));
+        frameItem.frame
+            .querySelector("input")
+            .classList.remove("frame-label-inactive");
+        frameItem.frame.querySelector("input").classList.add("frame-label-active");
+        frameItem.paperFrame.set(frameOptions);
     }
-});
+};
 
-focusButton.addEventListener("click", () => {
-    focusLogic();
-});
-
-stopButton.addEventListener("click", () => {
-    stopLogic();
-});
+const deactivateCanvasFrames = () => {
+    for (const item in mainSketch.localFrames) {
+        let frameItem = mainSketch.localFrames[item];
+        frameItem.frame.querySelectorAll("i").forEach((icon) => hide(icon));
+        hide(frameItem.frame.querySelector("div"));
+        frameItem.frame
+            .querySelector("input")
+            .classList.remove("frame-label-active");
+        frameItem.frame
+            .querySelector("input")
+            .classList.add("frame-label-inactive");
+        frameItem.paperFrame.set({
+            fillColor: "rgba(226,226,226,0)",
+            strokeColor: "rgba(180, 180, 180, 0.8)",
+        });
+    }
+};
 
 const drawLogic = () => {
     if (socket) {
@@ -194,104 +211,64 @@ const focusLogic = () => {
     switch (controller.drawState) {
         case "inactive":
             setActionState("frame");
-
             mainSketch.frameLayer.activate();
             setPenMode("local");
             show(localPrompts);
             hide(styles);
-
-            for (const item in mainSketch.localFrames) {
-                let frameItem = mainSketch.localFrames[item];
-                frameItem.frame.querySelectorAll("i").forEach((icon) => show(icon));
-                show(frameItem.frame.querySelector("div"));
-                frameItem.frame
-                    .querySelector("input")
-                    .classList.remove("frame-label-inactive");
-                frameItem.frame
-                    .querySelector("input")
-                    .classList.add("frame-label-active");
-                frameItem.paperFrame.set(frameOptions);
-            }
+            activateCanvasFrames();
             break;
         case "draw":
             setActionState("active-frame");
-
             mainSketch.frameLayer.activate();
             setPenMode("local");
             show(localPrompts);
             hide(styles);
-            for (const item in mainSketch.localFrames) {
-                let frameItem = mainSketch.localFrames[item];
-                frameItem.frame.querySelectorAll("i").forEach((icon) => show(icon));
-                show(frameItem.frame.querySelector("div"));
-                frameItem.frame
-                    .querySelector("input")
-                    .classList.remove("frame-label-inactive");
-                frameItem.frame
-                    .querySelector("input")
-                    .classList.add("frame-label-active");
-                frameItem.paperFrame.set(frameOptions);
-            }
+            activateCanvasFrames();
             break;
-
         case "frame":
             setActionState("inactive");
-
             mainSketch.sketchLayer.activate();
             setPenMode("pen");
             hide(localPrompts);
             show(styles);
-
             frameName.innerHTML = `I'm drawing "${controller.prompt}"`;
-
-            // hide all frames
-
-            for (const item in mainSketch.localFrames) {
-                let frameItem = mainSketch.localFrames[item];
-                frameItem.frame.querySelectorAll("i").forEach((icon) => hide(icon));
-                hide(frameItem.frame.querySelector("div"));
-                frameItem.frame
-                    .querySelector("input")
-                    .classList.remove("frame-label-active");
-                frameItem.frame
-                    .querySelector("input")
-                    .classList.add("frame-label-inactive");
-                frameItem.paperFrame.set({
-                    fillColor: "rgba(226,226,226,0)",
-                    strokeColor: "rgba(217, 217, 217, 0.8)",
-                });
-            }
+            deactivateCanvasFrames();
             break;
         case "active-frame":
             setActionState("draw");
-
             mainSketch.sketchLayer.activate();
             setPenMode("pen");
             hide(localPrompts);
             show(styles);
-
-            for (const item in mainSketch.localFrames) {
-                let frameItem = mainSketch.localFrames[item];
-                frameItem.frame.querySelectorAll("i").forEach((icon) => hide(icon));
-                hide(frameItem.frame.querySelector("div"));
-                frameItem.frame
-                    .querySelector("input")
-                    .classList.remove("frame-label-active");
-                frameItem.frame
-                    .querySelector("input")
-                    .classList.add("frame-label-inactive");
-                frameItem.paperFrame.set({
-                    fillColor: "rgba(226,226,226,0)",
-                    strokeColor: "rgba(217, 217, 217, 0.8)",
-                });
-            }
+            deactivateCanvasFrames();
             break;
+    }
+};
+
+const exploreLogic = () => {
+    if (socket) {
+        if (noPrompt()) {
+            openModal({
+                title: "Type a prompt first!",
+                message: "You need a target for AI sketchs.",
+                confirmAction: () => (controlPanel.style.display = "flex"),
+            });
+            return;
+        } else {
+            // TO DO: Clean up old scopes (now unused) // controller.exploreScopes
+            sketchHistory.historyHolder.push({
+                svg: mainSketch.svg,
+            });
+            sketchHistory.pushUndo();
+            generateExploreSketches();
+        }
     }
 };
 
 const stopLogic = () => {
     if (controller.drawState === "active-frame") {
-        setActionState("frame");
+        setActionState("inactive");
+        controller.stop(); //flag
     } else if (controller.drawState === "explore") {
         removeExploreSketches();
         controller.clipDrawing = false;

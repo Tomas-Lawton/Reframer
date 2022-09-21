@@ -23,7 +23,7 @@
     <script type="text/javascript" src="scripts/setup/setup.js" defer></script>
     <script type="text/javascript" src="scripts/state/controller.js" defer></script>
     <script type="text/javascript" src="scripts/state/sketch.js" defer></script>
-    <script type="text/javascript" src="scripts/setup/chart.js" defer></script>
+    <script type="text/javascript" src="scripts/setup/spark.js" defer></script>
     <script type="text/javascript" src="scripts/state/history.js" defer></script>
     <script type="text/javascript" src="scripts/utility/util.js" defer></script>
 
@@ -41,39 +41,6 @@
 </head>
 
 <body>
-    <div class="socket-connect"></div>
-
-    <div id="modal">
-        <div id="simple-modal">
-            <div class="flex">
-                <h2 id="modal-title"></h2>
-                <i id="modal-cross" class="fa-solid fa-xmark"></i>
-            </div>
-            <p id="modal-message"></p>
-            <div id="modalContent"></div>
-            <div id="action">
-                <button id="cancel-modal">Cancel</button>
-                <button id="confirm-modal" confirm right-button>Done</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="pen-dropdown">
-        <div class="simple-drop pen-mode" id="save">
-            <div>
-                <i class="fa-solid fa-save fa-fw"></i>
-            </div>
-            <p>Save</p>
-        </div>
-        <div class="simple-drop pen-mode" id="delete">
-            <div>
-                <i class="fa-solid fa-trash fa-fw"></i>
-            </div>
-            <p>Clear</p>
-        </div>
-    </div>
-
-
     <section class="control-panel">
         <header class="flex">
             <div>
@@ -115,7 +82,10 @@
                 </div>
 
                 <div class="panel-section">
-                    <h3 class="panel-subtitle">Status</h3>
+                    <div class="flex">
+                        <h3 class="panel-subtitle">Status</h3>
+                        <h3 class="current-status">Inactive</h3>
+                    </div>
                     <div class="spark-ui">
                         <div class="spark-knob"></div>
                         <canvas class="sparkline"></canvas>
@@ -126,29 +96,6 @@
                     </div>
                 </div>
 
-                <!-- <div class="inactive-section closed panel-section accordion-item">
-                    <header class="accordion-item-header">
-                        <button class="accordion-item-button">
-                            <i id="add-icon" class="fa-solid fa-plus"></i>
-                            <i id="subtract-icon" class="fa-solid fa-minus"></i>
-                        </button>
-                        <h3 class="accordion-item-question">StatusI</h3>
-                    </header>
-                    <div>
-                        <div class="panel-section">
-                            <div class="spark-ui">
-                                <div class="spark-knob"></div>
-                                <canvas class="sparkline"></canvas>
-                            </div>
-                            <div class="flex spark-text">
-                                <p class="rolling-loss">Latest Loss: </p>
-                                <p class="rolling-confidence">Interpret: x/150</p>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-
-
                 <div class="inactive-section closed panel-section accordion-item">
                     <header class="accordion-item-header">
                         <button class="accordion-item-button">
@@ -158,19 +105,19 @@
                         <h3 class="accordion-item-question">Control AI</h3>
                     </header>
                     <div class="accordion-item-body">
+                        <div class="control-lines">
+                            <div class="flex">
+                                <p class="slider-label" id="calc-lines">Add Lines </p>
+                                <p class="slider-label" id="max-lines">Total: </p>
+                            </div>
+                            <input id="num-squiggles" type="range" min="0" value="48" max="150">
+                        </div>
                         <div>
                             <div class="flex">
                                 <p class="slider-label">Line Freedom</p>
                                 <p class="slider-label" id="fix-label">More</p>
                             </div>
                             <input type="range" id="respect-slider" value="0.5" min="0" max="1" step="0.1">
-                        </div>
-                        <div class="control-lines">
-                            <div class="flex">
-                                <p class="slider-label" id="max-lines">Total Lines: </p>
-                                <p class="slider-label" id="calc-lines">Adding: </p>
-                            </div>
-                            <input id="num-squiggles" type="range" min="0" value="48" max="150">
                         </div>
                         <div class="history-block">
                             <div class="flex">
@@ -258,7 +205,43 @@
         </div>
     </section>
 
-    <!-- Floating UIs -->
+    <!-- Floating UI -->
+
+    <div id="picker-ui">
+        <div id="color-picker"></div>
+    </div>
+
+    <div class="socket-connect"></div>
+
+    <div id="modal">
+        <div id="simple-modal">
+            <div class="flex">
+                <h2 id="modal-title"></h2>
+                <i id="modal-cross" class="fa-solid fa-xmark"></i>
+            </div>
+            <p id="modal-message"></p>
+            <div id="modalContent"></div>
+            <div id="action">
+                <button id="cancel-modal">Cancel</button>
+                <button id="confirm-modal" confirm right-button>Done</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pen-dropdown">
+        <div class="simple-drop pen-mode" id="save">
+            <div>
+                <i class="fa-solid fa-save fa-fw"></i>
+            </div>
+            <p>Save</p>
+        </div>
+        <div class="simple-drop pen-mode" id="delete">
+            <div>
+                <i class="fa-solid fa-trash fa-fw"></i>
+            </div>
+            <p>Clear</p>
+        </div>
+    </div>
 
     <div class="local-prompts">
         <div class="flex">
@@ -344,12 +327,11 @@
         </div>
     </div> -->
 
-    <div class="draw-tools">
+    <div class="drawing-tool-panel">
         <div></div>
-        <!-- <div class="tool-color expanded"></div> -->
         <div class="style-window tool-view">
             <div class="animation-window">
-                <!-- Inline SVG for styling -->
+                <!-- Inline SVGs -->
                 <svg class="finger-preview window-tool" width="366" height="77" viewBox="0 0 366 77" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_560_143)">
                         <path
@@ -372,7 +354,6 @@
                             fill="#AF7E56" fill-opacity="0.6" />
                     </g>
                 </svg>
-
                 <svg class="erase-preview window-tool" width="189" height="41" viewBox="0 0 189 41" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_565_38)">
                         <path class="main-color"
@@ -395,7 +376,6 @@
                             fill="#F16C51" />
                     </g>
                 </svg>
-
                 <svg class="pencil-preview window-tool current-tool" width="366" height="80" viewBox="0 0 366 80" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path class="main-color"
                         d="M365.74 71.6499L53.3281 71.6499L53.3281 8L365.74 7.99995L365.74 71.6499Z" fill="#F5AB2A" />
@@ -466,18 +446,6 @@
         </div>
         <div class="style-window-toggle"><i class="fa-solid fa-minus"></i></div>
     </div>
-
-    <div id="picker-ui">
-        <div id="color-picker"></div>
-    </div>
-
-    <!-- Future -->
-    <!-- <div id="settings-ui">
-            <hr />
-            <label>Trace History (default: 1)</label>
-            <input id="num-traces" type="number" min="1" value="1" max="5">
-        </div> -->
-
 </body>
 
 </html>

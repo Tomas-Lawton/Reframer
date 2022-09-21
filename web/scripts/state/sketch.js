@@ -198,7 +198,7 @@ class Sketch {
     }
 }
 
-mainSketch = new Sketch("main-sketch", scope, frameOutline, "main");
+mainSketch = new Sketch("main-sketch", mainScope, frameOutline, "main");
 mainSketch.svg = paper.project.exportSVG({
     asString: true,
 }); //for svg parsing

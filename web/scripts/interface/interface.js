@@ -49,10 +49,12 @@ document.getElementById("delete").addEventListener("click", () =>
             emptyExplorer();
 
             document.getElementById("explore-panel").display = "none";
-            // document.getElementById("add-refine").style.display = "none";
 
             controller.lastPrompt = null;
             updateSelectUI();
+
+            sketchHistory = new SketchHistory(mainSketch);
+            Object.keys(mainSketch.localFrames).forEach((i) => deleteFrame(i));
         },
     })
 );
@@ -222,6 +224,7 @@ controlDrawer.onmousedown = (e) => {
     document.onmousemove = (e) => setDrawerSize(e);
 };
 
+// document.querySelector(".drawing-tool-panel :first-child")
 styles.onmousedown = (e) => {
     e = e || window.event;
     pos3 = e.clientX;

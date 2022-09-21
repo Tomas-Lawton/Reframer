@@ -147,8 +147,8 @@ body {
 }
 
 .spark-knob {
-    min-width: 15px;
-    min-height: 15px;
+    min-width: 19px;
+    min-height: 19px;
     background: rgb(123 102 255);
     position: absolute;
     border-radius: 50%;
@@ -156,6 +156,11 @@ body {
     right: 0;
     transform: translate(50%, -50%);
     top: 50%;
+}
+
+.current-status {
+    color: #a0a0a0;
+    font-weight: lighter;
 }
 
 .canvas-hover-light {
@@ -181,14 +186,14 @@ body {
     position: absolute;
     z-index: 5;
     font-weight: 500;
-    font-size: 1.2em;
-    line-height: 18px;
+    /* font-size: 1.2em; */
+    font-size: 1em;
     color: #ffffff;
-    /* margin-left: 2em; */
+    margin-left: 2em;
     transform: translateY(-110%);
     cursor: grab;
     width: 100%;
-    text-align: center;
+    /* text-align: center; */
 }
 
 .canvas-focus {
@@ -516,46 +521,6 @@ hr {
     background: #f5f5f5;
     border: none;
     border-radius: 0.5em;
-}
-
-#describe-top {
-    display: flex;
-    flex-flow: row wrap;
-    font-weight: lighter;
-    align-items: center;
-    margin-top: 1em;
-    color: #7b66ff;
-}
-
-#describe-card {
-    display: flex;
-    background-color: white;
-    border-radius: 1em;
-    flex-direction: column;
-    padding: 2.5em;
-    margin: 2em 2em 1.5em 0;
-    box-shadow: 10px 9px 27px rgba(48, 48, 48, 0.12);
-}
-
-#describe-card h1 {
-    font-size: 1.6em;
-    font-weight: 500;
-    line-height: 1em;
-    color: #7b66ff;
-}
-
-#describe-card p {
-    font-size: 0.75em;
-    font-weight: 600;
-}
-
-#describe-actions {
-    display: flex;
-    justify-content: center;
-}
-
-#top-right {
-    display: flex;
 }
 
 
@@ -983,7 +948,8 @@ input[type="number"] {
     padding: 2em 4.5em 0;
     min-width: 230px;
     max-width: 424px;
-    width: 297px;
+    /* width: 297px; */
+    width: 350px;
 }
 
 .control-panel>header {
@@ -1281,7 +1247,7 @@ input[type="number"] {
     }
 }
 
-.draw-tools {
+.drawing-tool-panel {
     /* background: linear-gradient(173.58deg, #eeeeee 4.75%, #ffffff 88.29%); */
     box-shadow: 10px 11px 37px rgba(48, 48, 48, 0.29);
     /* width: 154px; */
@@ -1301,12 +1267,13 @@ input[type="number"] {
     overflow: hidden;
 }
 
-.draw-tools>div:first-child {
-    margin: 0.5em;
+.drawing-tool-panel>div:first-child {
+    margin: 0.5em 1em 1em 1em;
     background: #dfdfdf;
     border-radius: 18px;
-    height: 4px;
+    height: 6px;
     width: 65px;
+    cursor: grab;
 }
 
 .style-window-toggle {
@@ -1379,6 +1346,7 @@ input[type="number"] {
     padding: 0.5em;
 }
 
+
 /* #stroke-style {
     display: flex;
     grid-template-columns: 1fr 1fr;
@@ -1396,6 +1364,7 @@ input[type="number"] {
     /* gap: 22px; */
     padding: 0.5em;
 }
+
 
 /* #stroke-style>div {
     margin: 0 7px;
@@ -1479,9 +1448,9 @@ input[type="number"] {
 .stroke-control {
     color: #7b66ff;
     border-radius: 1em;
-
     margin: 0 0.2em;
 }
+
 
 /* .stroke-control input {
     border: 2px solid #7b66ff;
@@ -1555,6 +1524,10 @@ input[type="number"] {
 
 .fa-spinner {
     color: #00e900;
+}
+
+.panel-section {
+    margin: 1em 0;
 }
 
 .panel-section>div:first-child {
@@ -1631,12 +1604,6 @@ input[type="number"] {
     display: flex;
 }
 
-
-/* .active-tool {
-    top: 0px;
-    transition: ease 0.5s;
-} */
-
 #stroke-dot div {
     position: absolute;
     border-radius: 50%;
@@ -1656,7 +1623,8 @@ input[type="number"] {
 #picker-ui {
     position: absolute;
     z-index: 12;
-    display: none;
+    background: #14112a;
+    border-radius: 0.5em;
 }
 
 .picker_hue {
@@ -1670,6 +1638,7 @@ input[type="number"] {
 .layout_default.picker_wrapper {
     padding: 0;
     font-size: 1em;
+    width: 18em !important;
 }
 
 .layout_default.picker_slider {
@@ -1677,7 +1646,7 @@ input[type="number"] {
 }
 
 .picker_wrapper {
-    box-shadow: none;
+    box-shadow: none !important;
 }
 
 .picker_done button {
@@ -1689,7 +1658,11 @@ input[type="number"] {
 }
 
 .layout_default.picker_wrapper>* {
-    margin: 0;
+    margin: 2px !important;
+}
+
+.picker_selector {
+    border-radius: 50% !important;
 }
 
 .picker_slider .picker_selector {
@@ -1707,7 +1680,7 @@ input[type="number"] {
 }
 
 .layout_default .picker_sl {
-    min-width: 150px;
+    /* min-width: 110px !important; */
     margin-top: 0.2em !important;
 }
 
@@ -1842,7 +1815,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .frame-label-inactive {
-    color: rgba(217, 217, 217, 1);
+    color: rgba(160, 160, 160, 1);
     font-size: 0.6em;
     background: transparent !important;
     margin: 0 0 -35px -5px;

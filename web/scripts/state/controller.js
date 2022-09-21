@@ -173,6 +173,7 @@ class Controller {
     }
     pause() {
         if (
+            //todo refactor
             this.drawState !== "explore" && //don't include this state
             this.activeStates.includes(controller.drawState)
         ) {
@@ -197,7 +198,7 @@ class Controller {
         });
         mainSketch.buildSketch();
         setLineLabels(mainSketch.sketchLayer);
-        document.getElementById("calc-lines").innerHTML = `Add : 0`;
+        // document.getElementById("calc-lines").innerHTML = `Add : 0`;
     }
     resetMetaControls() {
         historyBlock.style.display = "none";

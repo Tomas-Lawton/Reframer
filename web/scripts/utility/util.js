@@ -264,6 +264,7 @@ const loadUpdates = (result) => {
   ).toFixed(2)}/150`;
 
     incrementHistory();
+    setLineLabels(mainSketch.sketchLayer);
 };
 
 const loadPartial = () => {

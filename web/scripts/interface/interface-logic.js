@@ -245,15 +245,17 @@ const openModal = (data) => {
     modal.style.display = "block";
 };
 
+// Stops line overload by capping the max
 const setLineLabels = (layer) => {
     let res = controller.maxCurves - layer.children.length;
     controller.addLines = res > 0 ? res : 0;
-    document.getElementById(
-        "max-lines"
-    ).innerHTML = `Total Lines: ${controller.maxCurves}`;
+    let max = Math.max(controller.maxCurves, layer.children.length);
+    document.getElementById("max-lines").innerHTML = `Limit: ${
+    controller.maxCurves
+  }${max > controller.maxCurves ? "(Reached)" : ""}`;
     document.getElementById(
         "calc-lines"
-    ).innerHTML = `Adding: ${controller.addLines}`;
+    ).innerHTML = `Add ${controller.addLines} Lines`;
 };
 
 const setDefaultTransform = () => {
