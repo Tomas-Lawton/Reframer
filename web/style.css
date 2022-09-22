@@ -550,10 +550,23 @@ hr {
     justify-content: space-between;
 }
 
+.slider-container {
+    align-items: center;
+}
+
+.slider-container>div {
+    width: 80%;
+}
+
+.slider-container i {
+    font-size: 1.5em;
+    margin: 8px 1em 0 0;
+    width: 10%;
+}
+
 #time-slider {
     margin-right: 0;
     pointer-events: all;
-    background: #f5f5f5;
 }
 
 .icon-outer-circle {
@@ -591,7 +604,6 @@ hr {
 }
 
 #num-squiggles {
-    background: #f5f5f5;
     border: none;
     border-radius: 0.5em;
 }
@@ -607,7 +619,7 @@ hr {
     border-radius: 1.5em;
     background: linear-gradient(rgb(152, 70, 255) 0%, rgb(82, 54, 255) 100%);
     padding: 1em;
-    box-shadow: inset rgb(24 24 24 / 20%) 3px 2px 10px 7px;
+    /* box-shadow: inset rgb(24 24 24 / 20%) 3px 2px 10px 7px; */
 }
 
 .clip-actions>div {
@@ -1167,7 +1179,7 @@ input[type="number"] {
     padding: 0.2em 1em;
 }
 
-#history-block {
+.history-block {
     display: none;
 }
 
@@ -1833,19 +1845,19 @@ input[type="range"]::-webkit-slider-runnable-track {
     cursor: pointer;
     animate: 0.2s;
     box-shadow: 0px 0px 0px #fff5f2;
-    background: #ededed;
+    /* background: #ededed; */
     border-radius: 50px;
     border: 0px solid #000000;
-    box-shadow: inset 2px 4px 10px rgb(0 0 0 / 10%);
+    box-shadow: inset 2px 4px 10px rgb(0 0 0 / 30%);
 }
 
 input[type="range"]::-webkit-slider-thumb {
-    /* box-shadow: 2px 2px 1px #d1d1d1; */
+    box-shadow: 1px 1px 3px rgb(93 67 255);
     border: 4px solid #ffffff;
-    height: 28px;
-    width: 28px;
+    height: 33px;
+    width: 33px;
     border-radius: 41px;
-    margin-top: -2px;
+    margin-top: -3px;
     background: #7b66ff;
     cursor: pointer;
     -webkit-appearance: none;
@@ -1853,28 +1865,6 @@ input[type="range"]::-webkit-slider-thumb {
 
 input[type="range"]:focus::-webkit-slider-runnable-track {
     background: #ededed;
-}
-
-input[type="range"]::-moz-range-track {
-    width: 100%;
-    height: 26px;
-    cursor: pointer;
-    animate: 0.2s;
-    box-shadow: 0px 0px 0px #fff5f2;
-    background: #ededed;
-    border-radius: 50px;
-    border: 0px solid #000000;
-}
-
-input[type="range"]::-moz-range-thumb {
-    /* box-shadow: 2px 2px 1px #d1d1d1; */
-    border: 4px solid #ffffff;
-    height: 28px;
-    width: 28px;
-    border-radius: 41px;
-    margin-top: -8px;
-    background: #7b66ff;
-    cursor: pointer;
 }
 
 #settings-ui {

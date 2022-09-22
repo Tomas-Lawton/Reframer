@@ -92,7 +92,7 @@ spark.view.onFrame = () => {
         document.querySelectorAll(".spark-val")[1].innerHTML =
             Math.floor(normalised);
 
-        console.log(newY);
+        // console.log(newY);
     }
     mainScope.activate(); //return to main
 };

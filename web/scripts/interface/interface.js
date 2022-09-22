@@ -136,8 +136,6 @@ document.getElementById("settings").addEventListener("click", () => {
 timeKeeper.oninput = (e) => {
     mainSketch.sketchLayer.clear();
     let stored = sketchHistory.historyHolder[e.target.value];
-    console.log(sketchHistory.historyHolder);
-    console.log(e.target.value);
     mainSketch.load(
         1,
         stored.svg,
