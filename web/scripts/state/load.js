@@ -9,6 +9,9 @@ const loadResponse = (result) => {
             let normalised = scaleRange(mainSketch.semanticLoss, -1, 0, 0, 150);
             let norm = normalised.toFixed(2);
             document.querySelector(".prompt-match").innerHTML = `${norm}/150`;
+            document.querySelector(
+                ".prompt-loss"
+            ).innerHTML = `Loss: ${mainSketch.semanticLoss.toPrecision(4)}`;
 
             incrementHistory();
             setLineLabels(mainSketch.sketchLayer);

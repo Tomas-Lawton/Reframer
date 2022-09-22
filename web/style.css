@@ -166,7 +166,7 @@ body {
     border-radius: 50%;
     border: 3px solid #7b66ff;
     right: 0;
-    transform: translate(48%, -65%);
+    transform: translate(48%, -50%);
     top: 50%;
 }
 
@@ -176,7 +176,7 @@ body {
     color: #a0a0a0;
     font-size: 0.6em;
     bottom: 1.5em;
-    right: 1.5em;
+    right: 2rem;
     font-weight: 500;
 }
 
@@ -579,10 +579,10 @@ hr {
     gap: 0.8em;
     margin: 1.5em 0px;
     /* grid-template-columns: repeat(4, minmax(10px, 1fr)); */
-    grid-template-columns: auto auto auto auto;
+    /* grid-template-columns: auto auto auto auto; */
     /* grid-template-rows: repeat(1, minmax(7em, 2fr)); */
-    /* grid-template-columns: repeat(2, minmax(10px, 1fr));
-    grid-template-rows: repeat(2, minmax(7em, 2fr)); */
+    grid-template-columns: repeat(2, minmax(10px, 1fr));
+    grid-template-rows: repeat(2, minmax(7em, 2fr));
     border-radius: 2em;
     /* overflow: hidden; */
     /* background: #ffffff; */
@@ -1275,8 +1275,8 @@ input[type="number"] {
 .prompt-call {
     color: rgb(143, 143, 143);
     font-weight: 400;
-    font-size: 1.6rem;
-    margin: 0 1em 0.2em 0;
+    font-size: 1.8rem;
+    margin: 1em 1em 0.2em 0;
 }
 
 .prompt-call span {
