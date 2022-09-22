@@ -66,6 +66,7 @@ const sparkCanvas = document.querySelector(".sparkline");
 
 const hint = document.querySelector(".hint-text");
 
+const artBoard = document.querySelector(".canvas-ui-container");
 const frameName = document.querySelector(".canvas-ui-container>p");
 const sketchContainer = document.getElementById("canvas-drop");
 const canvasBounds = canvas.getBoundingClientRect();
@@ -77,9 +78,8 @@ const frameDropIn = document.querySelectorAll(".canvas-focus");
 const sketchSize = 190;
 
 let size, frameOutline, scaleRatio;
-
 const setCanvasSize = () => {
-    size = project.clientHeight * 0.92; //technically wrong
+    size = project.clientHeight * 0.91; //technically wrong
     sketchContainer.style.width = size + "px";
     sketchContainer.style.height = size + "px";
     canvas.width = size;
@@ -88,6 +88,12 @@ const setCanvasSize = () => {
     sparkCanvas.width = sparkUI.clientWidth;
     frameOutline = size;
     scaleRatio = frameOutline / 224;
+    artBoard.style.left =
+        (window.innerWidth - controlPanel.clientWidth - size) / 2 +
+        controlPanel.clientWidth +
+        size / 2 +
+        "px";
+    artBoard.style.top = (window.innerHeight - size) / 2 + size / 2 + 20 + "px";
 };
 
 setCanvasSize();

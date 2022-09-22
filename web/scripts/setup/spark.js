@@ -2,14 +2,15 @@ const spark = new PaperScope();
 spark.setup(sparkCanvas);
 spark.activate();
 
+sparkCanvas.style.width =
+    document.querySelector(".panel-section").clientWidth + "px";
+sparkCanvas.style.height = 150 + "px";
+// sparkCanvas.width = document.querySelector(".panel-section").clientWidth;
+// sparkCanvas.height = 150;
+
 const easing = 0.98;
 const speed = 0.6;
-
-let renderShape;
-let pointA = new Point(0, spark.view.bounds.centerY);
-let pointB = new Point(spark.view.bounds.right, spark.view.bounds.centerY);
-console.log(pointA);
-console.log(pointB);
+let renderShape, pointA, pointB, sparkPath;
 
 const createSparkShadow = () => {
     if (renderShape) renderShape.remove();
@@ -41,14 +42,22 @@ const createSparkShadow = () => {
     renderShape.sendToBack();
 };
 
-const sparkPath = new Path({
-    strokeColor: "#7B66FF",
-    strokeWidth: 3,
-    strokeCap: "round",
-});
-sparkPath.add(pointA);
-sparkPath.add(pointB);
-createSparkShadow();
+const setup = () => {
+    if (sparkPath) sparkPath.remove();
+
+    pointA = new Point(0, spark.view.bounds.centerY);
+    pointB = new Point(spark.view.bounds.right, spark.view.bounds.centerY);
+    sparkPath = new Path({
+        strokeColor: "#7B66FF",
+        strokeWidth: 3,
+        strokeCap: "round",
+    });
+    sparkPath.add(pointA);
+    sparkPath.add(pointB);
+    createSparkShadow();
+};
+
+setup();
 
 spark.view.onFrame = () => {
     if (

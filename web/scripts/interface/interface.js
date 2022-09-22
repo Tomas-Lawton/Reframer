@@ -156,7 +156,7 @@ drawer.addEventListener("click", () => {
 prompt.addEventListener("input", (e) => {
     controller.prompt = e.target.value.toLowerCase();
     // controller.prompt = e.target.value;
-    frameName.innerHTML = `I'm drawing "${controller.prompt}"`;
+    frameName.innerHTML = `System will try to draw "${controller.prompt}."`;
 
     if (controller.prompt === "") {
         controllerUI.forEach((elem) => elem.classList.add("inactive-section"));
@@ -336,12 +336,18 @@ const shiftPen = (e) => {
 };
 
 const setDrawerSize = (e) => {
-    let item = document.querySelector(".content-margin");
     e = e || window.event;
-    let controlPadding = window.getComputedStyle(item).paddingLeft;
+    let controlPadding = window.getComputedStyle(controlPanel).paddingLeft;
     controlPadding = parseInt(controlPadding);
     pos3 = e.clientX - controlPadding * 2;
-    item.style.width = pos3 + "px";
+    controlPanel.style.width = pos3 + "px";
+
+    // spark.activate(); //return to main
+    // setup();
+    // mainScope.activate(); //return to main
+    sparkCanvas.style.width =
+        document.querySelector(".panel-section").clientWidth + "px";
+    sparkCanvas.style.height = 150 + "px";
 };
 
 document.querySelectorAll(".tab-item").forEach((tab) => {
@@ -354,13 +360,11 @@ document.querySelectorAll(".tab-item").forEach((tab) => {
             if (tab.id == "style-tab") {
                 document.getElementById("style-content").parentElement.style.display =
                     "block";
-                document.getElementById("ai-content").parentElement.style.display =
-                    "none";
+                controlPanel.style.display = "none";
             } else {
                 document.getElementById("style-content").parentElement.style.display =
                     "none";
-                document.getElementById("ai-content").parentElement.style.display =
-                    "block";
+                controlPanel.style.display = "block";
             }
         }
     });

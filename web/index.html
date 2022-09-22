@@ -51,86 +51,86 @@
             <i class="drawer-button fa-solid fa-chevron-left fa-fw"></i>
         </header>
         <div class="content-margin">
-            <div id="ai-content">
-                <div class="panel-section">
-                    <h2 class="prompt-call">
-                        Enter your prompt for <span>AI drawing here! </span>
-                    </h2>
-                </div>
-                <div class="panel-section">
-                    <input type="text" tabIndex="0" class="prompt-input" id="messageText" placeholder="Start by describing your sketch..." autocomplete="off" />
-                </div>
+            <div class="panel-section">
+                <h2 class="prompt-call">
+                    Enter your AI drawing <span>prompt here!</span>
+                </h2>
+            </div>
+            <div class="panel-section">
+                <input type="text" tabIndex="0" class="prompt-input" id="messageText" placeholder="Start by describing your sketch..." autocomplete="off" />
+            </div>
 
-                <div class="panel-section">
-                    <div class="clip-actions inactive-section">
-                        <div class="action-default tooltip" id="draw">
-                            <span class="tooltiptext">Change the sketch using AI</span>
-                            <i class="fa-solid fa-robot fa-fw"></i>
-                            <p>Draw</p>
-                        </div>
-                        <div class="action-default tooltip" id="focus">
-                            <span class="tooltiptext">Labeling parts the image helps AI focus</span>
-                            <i class="fa-solid fa-note-sticky fa-fw" id="focus-icon"></i>
-                            <p>Focus</p>
-                        </div>
-                        <div class="action-default tooltip" id="explore">
-                            <span class="tooltiptext">Get options for developing the sketch</span>
-                            <i class="fa-solid fa-lightbulb fa-fw"></i>
-                            <p>Explore</p>
-                        </div>
-                        <div class="action-inactive" id="stop">
-                            <i class="fa-solid fa-hand fa-fw" id="stop-icon"></i>
-                            <p id="stop-text">Stop</p>
-                        </div>
+            <div class="panel-section">
+                <div class="clip-actions inactive-section">
+                    <div class="action-default tooltip" id="draw">
+                        <span class="tooltiptext">Change the sketch using AI</span>
+                        <i class="fa-solid fa-robot fa-fw"></i>
+                        <p>Draw</p>
+                    </div>
+                    <div class="action-default tooltip" id="focus">
+                        <span class="tooltiptext">Labeling parts the image helps AI focus</span>
+                        <i class="fa-solid fa-note-sticky fa-fw" id="focus-icon"></i>
+                        <p>Focus</p>
+                    </div>
+                    <div class="action-default tooltip" id="explore">
+                        <span class="tooltiptext">Get options for developing the sketch</span>
+                        <i class="fa-solid fa-lightbulb fa-fw"></i>
+                        <p>Explore</p>
+                    </div>
+                    <div class="action-inactive" id="stop">
+                        <i class="fa-solid fa-hand fa-fw" id="stop-icon"></i>
+                        <p id="stop-text">Stop</p>
                     </div>
                 </div>
+            </div>
 
-                <hr />
+            <hr />
 
-                <div class="status-section panel-section">
-                    <div class="spark-title flex">
-                        <h3 class="panel-subtitle">Status</h3>
-                        <h3 class="current-status">Inactive</h3>
-                    </div>
-                    <p class="spark-info">AI thinks the sketch resembles the prompt.</p>
-                    <h3 class="prompt-match">0/150</h3>
-                    <div class="spark-ui">
-                        <div class="spark-knob"></div>
-                        <p class="prompt-loss">Loss: 0</p>
-                        <canvas class="sparkline"></canvas>
-                    </div>
+            <div class="status-section panel-section">
+                <div class="spark-title flex">
+                    <h3 class="panel-subtitle">Status</h3>
+                    <h3 class="current-status">Inactive</h3>
                 </div>
+                <p class="spark-info">Sketch resembles the AI text prompt.</p>
+                <h3 class="prompt-match">0/150</h3>
+                <div class="spark-ui">
+                    <div class="spark-knob"></div>
+                    <p class="prompt-loss">Loss: 0</p>
+                    <canvas class="sparkline" resize></canvas>
+                </div>
+            </div>
 
-                <div class="inactive-section closed panel-section accordion-item">
-                    <header class="accordion-item-header">
-                        <button class="accordion-item-button">
-                            <i id="add-icon" class="fa-solid fa-plus"></i>
-                            <i id="subtract-icon" class="fa-solid fa-minus"></i>
-                        </button>
-                        <h3 class="accordion-item-question">Advanced</h3>
-                    </header>
-                    <div class="accordion-item-body">
-                        <div class="control-lines">
-                            <div class="flex">
-                                <p class="slider-label" id="calc-lines">Add Lines </p>
-                                <p class="slider-label" id="max-lines">Total: </p>
-                            </div>
-                            <input id="num-squiggles" type="range" min="0" value="48" max="150">
+            <hr />
+
+            <div class="inactive-section closed panel-section accordion-item">
+                <header class="accordion-item-header">
+                    <button class="accordion-item-button">
+                        <i id="add-icon" class="fa-solid fa-plus"></i>
+                        <i id="subtract-icon" class="fa-solid fa-minus"></i>
+                    </button>
+                    <h3 class="accordion-item-question">Advanced</h3>
+                </header>
+                <div class="accordion-item-body">
+                    <div class="control-lines">
+                        <div class="flex">
+                            <p class="slider-label" id="calc-lines">Add Lines </p>
+                            <p class="slider-label" id="max-lines">Total: </p>
                         </div>
-                        <div>
-                            <div class="flex">
-                                <p class="slider-label">Line Freedom</p>
-                                <p class="slider-label" id="fix-label">More</p>
-                            </div>
-                            <input type="range" id="respect-slider" value="0.5" min="0" max="1" step="0.1">
+                        <input id="num-squiggles" type="range" min="0" value="48" max="150">
+                    </div>
+                    <div>
+                        <div class="flex">
+                            <p class="slider-label">Line Freedom</p>
+                            <p class="slider-label" id="fix-label">More</p>
                         </div>
-                        <div class="history-block">
-                            <div class="flex">
-                                <p class="slider-label">History </p>
-                                <p class="slider-label">Latest</p>
-                            </div>
-                            <input type="range" id="time-slider" value="0" min="0" max="0">
+                        <input type="range" id="respect-slider" value="0.5" min="0" max="1" step="0.1">
+                    </div>
+                    <div class="history-block">
+                        <div class="flex">
+                            <p class="slider-label">History </p>
+                            <p class="slider-label">Latest</p>
                         </div>
+                        <input type="range" id="time-slider" value="0" min="0" max="0">
                     </div>
                 </div>
             </div>

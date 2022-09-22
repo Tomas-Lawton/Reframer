@@ -9,14 +9,61 @@
     user-select: none;
 }
 
-#upload {
-    font-size: 4em;
-    display: none;
+
+/* Main Views */
+
+
+/* To do remove class */
+
+body {
+    overflow: hidden;
+}
+
+.project {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    background: linear-gradient(180deg, #9846ff 0%, #5236ff 100%);
+    transition: background 1s;
+}
+
+.control-panel {
+    padding: 2em;
+    min-width: 230px;
+    max-width: 600px;
+    width: 417px;
+    box-shadow: 0px 5px 20px rgb(28 28 28 / 15%);
+    background: #ffffff;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    z-index: 500;
+    height: 100vh;
+}
+
+.control-panel:first-child {
+    margin-bottom: 1em;
+}
+
+.control-panel .content-margin {
+    height: 83vh;
+    overflow: auto;
+    padding: 1.5em 0.7em 0 2em;
 }
 
 span {
     font-weight: 300;
     color: #363636;
+}
+
+button {
+    font-weight: 400;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    transition: 0.5s;
 }
 
 ::placeholder {
@@ -51,22 +98,6 @@ input:-webkit-autofill {
     border-radius: 1em;
 }
 
-button {
-    font-weight: 400;
-    border: none;
-    border-radius: 5px;
-    padding: 10px;
-    transition: 0.5s;
-}
-
-body {
-    height: 100vh;
-    display: flex;
-    width: 100vw;
-    background: #e5e5e5;
-    overflow: hidden;
-}
-
 .page {
     display: flex;
 }
@@ -81,6 +112,7 @@ body {
     height: 12px;
     background: #f6ab2a;
     box-shadow: inset 1px 2px 4px rgb(0 0 0 / 15%);
+    z-index: 501;
 }
 
 #penmode-inner-circle {
@@ -135,6 +167,8 @@ body {
 .spark-ui {
     position: relative;
     display: flex;
+    /* height: 150px; */
+    width: 100%;
 }
 
 .spark-title {
@@ -184,7 +218,7 @@ body {
     font-size: 2.4em;
     font-weight: 400;
     color: #7b66ff;
-    padding: 0 2em 0 2rem;
+    padding: 0 2rem;
 }
 
 .current-status {
@@ -255,17 +289,6 @@ body {
     color: white !important;
     /* background: linear-gradient(180deg, #a965ff 0%, #ff8935 100%) !important; */
     background: #15d38b !important;
-}
-
-.project {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    position: relative;
-    /* background: linear-gradient(180deg, #a965ff 0%, #8e67ff 57.81%, #6850ff 100%); */
-    background: linear-gradient(180deg, #9846ff 0%, #5236ff 100%);
-    overflow: hidden;
-    transition: background 1s;
 }
 
 #sliding-overlay {
@@ -560,34 +583,13 @@ hr {
 /* Clip Actions */
 
 .clip-actions {
-    /* width: 100%;
-    display: grid;
-    grid-row: auto auto;
-    grid-gap: 0.8em;
-    margin-bottom: 1em;
-    grid-template-columns: repeat(2, minmax(10px, 1fr));
-    grid-template-rows: repeat(2, minmax(7em, 2fr)); */
-    /* display: grid;
-    grid-row: auto auto;
-    grid-gap: 0.8em;
-    margin: 1.5em 0;
-    grid-template-columns: repeat(2, minmax(10px, 1fr));
-    grid-template-rows: repeat(2, minmax(7em, 2fr));
-    border-radius: 2em;
-    overflow: hidden; */
-    display: grid;
-    gap: 0.8em;
-    margin: 1.5em 0px;
-    /* grid-template-columns: repeat(4, minmax(10px, 1fr)); */
-    /* grid-template-columns: auto auto auto auto; */
-    /* grid-template-rows: repeat(1, minmax(7em, 2fr)); */
-    grid-template-columns: repeat(2, minmax(10px, 1fr));
-    grid-template-rows: repeat(2, minmax(7em, 2fr));
-    border-radius: 2em;
-    /* overflow: hidden; */
-    /* background: #ffffff; */
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    gap: 0.3em;
+    border-radius: 1.5em;
     background: linear-gradient(rgb(152, 70, 255) 0%, rgb(82, 54, 255) 100%);
-    padding: 2.4em;
+    padding: 1em;
     box-shadow: inset rgb(24 24 24 / 20%) 3px 2px 10px 7px;
 }
 
@@ -598,13 +600,14 @@ hr {
     justify-content: center;
     box-shadow: none;
     cursor: pointer;
-    /* border-radius: 1.5em; */
     font-size: 0.8em;
     font-weight: 500;
     transition: 0.3s;
     position: relative;
     transition: 0.6s;
     border-radius: 1em;
+    padding: 1em;
+    flex: 1;
 }
 
 .clip-actions>div i {
@@ -988,15 +991,6 @@ input[type="number"] {
     color: #7b66ff;
 }
 
-.control-panel {
-    box-shadow: 0px 5px 20px rgb(28 28 28 / 15%);
-    background: #ffffff;
-    position: relative;
-    /* overflow-y: scroll; */
-    display: flex;
-    flex-direction: column;
-}
-
 .control-drawer {
     position: absolute;
     top: 0;
@@ -1006,6 +1000,7 @@ input[type="number"] {
     background: rgba(217, 217, 217, 0.58);
     cursor: col-resize;
     transition-duration: 0.5s;
+    /* display: none; */
 }
 
 .control-drawer:hover {
@@ -1024,21 +1019,6 @@ input[type="number"] {
     transform: translateX(-4px);
     cursor: col-resize;
     border: solid 3px #a091ff;
-}
-
-.control-panel .content-margin {
-    padding: 2em 4.5em 0;
-    min-width: 230px;
-    max-width: 431px;
-    /* width: 297px; */
-    width: 431px;
-    display: flex;
-    /* height: 90%; */
-    overflow: auto;
-}
-
-.control-panel>header {
-    padding: 1em;
 }
 
 .control-panel header div {
@@ -1081,6 +1061,7 @@ input[type="number"] {
     /* box-shadow: rgb(48 48 48 / 35%) 3px 6px 20px; */
     border: none;
     background: #f5f5f5;
+    margin-bottom: 9em;
 }
 
 .accordion-item-header {
@@ -1187,12 +1168,6 @@ input[type="number"] {
 
 #sketchbook-panel .panel-title {
     color: white;
-}
-
-.content-margin {
-    width: auto;
-    padding: 0.5em;
-    /* background: white; */
 }
 
 #sketchbook-content {
@@ -1661,8 +1636,7 @@ input[type="number"] {
 }
 
 .spark-info {
-    padding: 0 0 0 2em;
-    margin-bottom: 1em;
+    padding: 0 2em;
     font-weight: 500;
     font-size: 1em;
     color: #a091ff;
@@ -2175,77 +2149,7 @@ input[type="range"]::-moz-range-thumb {
     visibility: visible;
 }
 
-@media screen and (min-width: 700px) {
-    #pen-controls {
-        padding: 0.2em 0.5em;
-    }
-    #static-margin {
-        width: 25vw;
-        max-width: 300px;
-    }
-    /* #content {
-        flex-direction: initial;
-    } */
-    .canvas-frame {
-        padding: 1em;
-    }
-    .top-center {
-        width: auto;
-        left: 50%;
-        transform: translate(-50%, -100%);
-        display: flex;
-    }
-    #rolling-loss {
-        display: initial;
-    }
-    #sketchbook-panel {
-        display: flex;
-        width: auto;
-    }
-    /* body {
-        overflow: hidden;
-    } */
-    .fa-solid .fas {
-        font-size: 1.5em;
-    }
-    #control-panel {
-        left: 10%;
-        transform: initial;
-        top: 20%;
-        width: 30%;
-        min-width: 320px;
-    }
-    #sketchbook-panel {
-        transform: initial;
-        top: 8%;
-        left: 100%;
-        transform: translateX(-104%);
-    }
-    .tab-info {
-        margin: 1em 0;
-    }
-    .picker_sl {
-        box-shadow: none !important;
-    }
-    input[type="range"]::-webkit-slider-runnable-track {
-        width: 100%;
-        height: 13px;
-        border-radius: 25px;
-        border: 0px solid #000000;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-        border: 3px solid #ffffff;
-        height: 28px;
-        width: 28px;
-        border-radius: 41px;
-        margin-top: -8px;
-    }
-}
-
-@media screen and (min-width: 1000px) {
-    .swatch {
-        width: 1.1em;
-        height: 1.1em;
-        border-radius: 0.5em;
-    }
+canvas[resize] {
+    width: 100%;
+    height: 100%;
 }
