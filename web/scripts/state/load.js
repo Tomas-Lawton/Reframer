@@ -6,10 +6,10 @@ const loadResponse = (result) => {
             mainSketch.load(scaleRatio, result.svg, result.fixed, true, true);
             mainSketch.semanticLoss = parseFloat(result.loss);
 
-            let normalised = scaleRange(mainSketch.semanticLoss, -1, 0, 0, 150);
-            let norm = normalised.toFixed(2);
+            // for 150 range
+            let normalised = scaleRange(mainSketch.semanticLoss, -1.2, 1.2, 150, 0);
             document.querySelectorAll(".spark-val")[0].innerHTML = `${Math.floor(
-        norm
+        normalised
       )}/150`;
 
             document.querySelector(

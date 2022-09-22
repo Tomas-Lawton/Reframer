@@ -58,7 +58,7 @@ const setModeDefault = () => {
 
 const setModeDraw = () => {
     exploreButton.className = "action-inactive";
-    drawButton.className = "action-active";
+    drawButton.className = "action-current";
     hint.innerHTML = `Don't wait. Draw with me!`;
     focusButton.className = "action-default";
     stopButton.className = "action-stop";
@@ -83,7 +83,7 @@ const setModeDraw = () => {
 };
 
 const setModeExplore = () => {
-    exploreButton.className = "action-active";
+    exploreButton.className = "action-current";
     drawButton.className = "action-inactive";
     focusButton.className = "action-inactive";
     stopButton.className = "action-stop";
@@ -135,7 +135,7 @@ const setModeFrame = () => {
 };
 
 const setModeActiveFrame = () => {
-    drawButton.className = "action-active";
+    drawButton.className = "action-current";
     focusButton.className = "action-focus";
     exploreButton.className = "action-inactive";
     stopButton.className = "action-stop";

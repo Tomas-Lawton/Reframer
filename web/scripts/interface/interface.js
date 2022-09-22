@@ -47,7 +47,7 @@ document.getElementById("delete").addEventListener("click", () =>
 
             emptyExplorer();
 
-            document.getElementById("explore-panel").display = "none";
+            explorerPanel.display = "none";
 
             controller.lastPrompt = null;
             updateSelectUI();

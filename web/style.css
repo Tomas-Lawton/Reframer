@@ -621,7 +621,7 @@ hr {
     font-weight: 500;
     transition: 0.3s;
     position: relative;
-    transition: 0.6s;
+    /* transition: 0.6s; */
     border-radius: 1em;
     padding: 1em;
     flex: 1;
@@ -630,7 +630,7 @@ hr {
 .clip-actions>div i {
     margin-bottom: 0.3em;
     font-size: 1.4em;
-    transition: 0.6s;
+    /* transition: 0.6s; */
     padding: 0.8em;
     /* background: rgb(106 82 255 / 8%); */
     border-radius: 50%;
@@ -662,30 +662,31 @@ hr {
 }
 
 .action-default {
-    /* background: #f7f6ff; */
-    /* color: #7b66ff; */
-    /* color: white; */
-    /* background: linear-gradient(rgb(152 71 253) 0%, rgb(106 82 255) 100%); */
-    /* background: linear-gradient(rgb(152 71 253) 0%, rgb(106 82 255) 100%); */
-    /* background: #7b66ff; */
-    color: #7b66ff;
-    background: rgb(245 245 245);
+    background: linear-gradient(#15e797 0%, #00c47a 100%);
+    color: white;
 }
 
 .action-default i {
-    /* color: #7b66ff; */
-    /* color: white; */
-    background: rgb(106 82 255 / 8%);
-    color: #7b66ff;
+    background: rgb(255 255 255 / 10%);
+    color: white;
 }
 
 .action-default:hover {
-    /* background: #7b66ff; */
     background: linear-gradient(rgb(164, 90, 254) 0%, rgb(106 82 255) 100%);
     color: white;
 }
 
 .action-default:hover i {
+    background: rgb(255 255 255 / 10%);
+    color: white;
+}
+
+.action-current {
+    background: linear-gradient(rgb(164, 90, 254) 0%, rgb(106 82 255) 100%);
+    color: white;
+}
+
+.action-current i {
     background: rgb(255 255 255 / 10%);
     color: white;
 }
@@ -702,15 +703,14 @@ hr {
 }
 
 .action-focus {
-    /* background: #15d38b; */
-    /* background: linear-gradient(#52f8b9 0%, #15d38b 100%); */
     background: linear-gradient(#15e797 0%, #00c47a 100%);
-    color: white;
+    color: #7b66ff;
+    background: rgb(245 245 245);
 }
 
 .action-focus i {
-    background: rgb(255 255 255 / 10%);
-    color: white;
+    background: rgb(106 82 255 / 8%);
+    color: #7b66ff;
 }
 
 
@@ -1606,9 +1606,12 @@ input[type="number"] {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: none;
     border: 2px solid;
     cursor: pointer;
+}
+
+#empty {
+    background: none;
 }
 
 #close-explorer {

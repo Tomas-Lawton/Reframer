@@ -64,17 +64,35 @@ spark.view.onFrame = () => {
         (controller.drawState === "draw" || controller.drawState === "draw") &&
         mainSketch.semanticLoss
     ) {
-        let newY = scaleRange(mainSketch.semanticLoss, -1, 0, 0, 150);
+        // for 150 range
+        // let normalised = scaleRange(mainSketch.semanticLoss, -1, 0, 150, 0);
+        // document.querySelectorAll(".spark-val")[1].innerHTML =
+        //     Math.floor(normalised);
+
+        // for pixel range
+        let newY = scaleRange(
+            mainSketch.semanticLoss, -1.2,
+            1.2,
+            0,
+            spark.view.bounds.bottom
+        );
+        // for 150 range
+        // let normalised = scaleRange(newY, spark.view.bounds.bottom, 0, 0, 150);
+
         let dy = sparkPath.lastSegment.point.y - newY;
         newY += dy * easing;
-        sparkPath.position.x -= speed;
-        sparkKnob.style.top = newY + "px";
-        document.querySelectorAll(".spark-val")[1].innerHTML = `${Math.floor(
-      newY
-    )}`;
 
         sparkPath.add(new Point(spark.view.bounds.right, newY));
+        sparkKnob.style.top = newY + "px";
+        sparkPath.position.x -= speed;
         createSparkShadow();
+
+        let normalised = scaleRange(newY, spark.view.bounds.bottom, 0, 0, 150);
+
+        document.querySelectorAll(".spark-val")[1].innerHTML =
+            Math.floor(normalised);
+
+        console.log(newY);
     }
     mainScope.activate(); //return to main
 };
