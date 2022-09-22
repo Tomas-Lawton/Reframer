@@ -39,7 +39,7 @@ body {
     display: flex;
     flex-direction: column;
     position: absolute;
-    z-index: 500;
+    z-index: 20;
     height: 100vh;
 }
 
@@ -221,6 +221,20 @@ input:-webkit-autofill {
     padding: 0 2rem;
 }
 
+.spark-knob .spark-val {
+    background: #aeaeae;
+    border-radius: 3px;
+    color: white;
+    bottom: 9px;
+    width: 20px;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    font-size: 0.6em;
+    font-weight: 500;
+    text-align: center;
+}
+
 .current-status {
     font-weight: 500;
     font-style: italic;
@@ -331,10 +345,13 @@ input:-webkit-autofill {
     display: none;
     position: absolute;
     z-index: 11;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background-color: #1b1b1ba6;
     z-index: 50;
+    left: 0;
+    top: 0;
+    z-index: 21;
 }
 
 #modal-title {
@@ -356,7 +373,7 @@ input:-webkit-autofill {
     background-color: #ffffff;
     position: absolute;
     left: 50%;
-    top: 40%;
+    top: 50%;
     border-radius: 0.5em;
     flex-direction: column;
     padding: 3em;

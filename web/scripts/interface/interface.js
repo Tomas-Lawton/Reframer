@@ -345,9 +345,9 @@ const setDrawerSize = (e) => {
     // spark.activate(); //return to main
     // setup();
     // mainScope.activate(); //return to main
-    sparkCanvas.style.width =
-        document.querySelector(".panel-section").clientWidth + "px";
-    sparkCanvas.style.height = 150 + "px";
+    // sparkCanvas.style.width =
+    //     document.querySelector(".panel-section").clientWidth + "px";
+    // sparkCanvas.style.height = 150 + "px";
 };
 
 document.querySelectorAll(".tab-item").forEach((tab) => {

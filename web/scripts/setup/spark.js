@@ -2,9 +2,9 @@ const spark = new PaperScope();
 spark.setup(sparkCanvas);
 spark.activate();
 
-sparkCanvas.style.width =
-    document.querySelector(".panel-section").clientWidth + "px";
-sparkCanvas.style.height = 150 + "px";
+// sparkCanvas.style.width =
+//     document.querySelector(".panel-section").clientWidth + "px";
+// sparkCanvas.style.height = 150 + "px";
 // sparkCanvas.width = document.querySelector(".panel-section").clientWidth;
 // sparkCanvas.height = 150;
 
@@ -69,6 +69,9 @@ spark.view.onFrame = () => {
         newY += dy * easing;
         sparkPath.position.x -= speed;
         sparkKnob.style.top = newY + "px";
+        document.querySelectorAll(".spark-val")[1].innerHTML = `${Math.floor(
+      newY
+    )}`;
 
         sparkPath.add(new Point(spark.view.bounds.right, newY));
         createSparkShadow();
