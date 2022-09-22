@@ -73,7 +73,6 @@ class Controller {
                 sketch_index,
             },
         };
-        console.log(res);
         ws.send(JSON.stringify(res));
     }
     draw() {

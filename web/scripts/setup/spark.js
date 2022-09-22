@@ -27,7 +27,17 @@ const createSparkShadow = () => {
     let bl = renderShape.insert(0, bottomLeftPoint);
     let br = renderShape.add(bottomRightPoint);
     new Path.Line({ from: bl, to: br }); //connect
-    renderShape.set({ fillColor: "#DDD6FF", strokeColor: null });
+    renderShape.set({
+        fillColor: {
+            gradient: {
+                stops: ["#CAA9FF", "#f7f6ff"],
+            },
+            origin: spark.view.bounds.topCenter,
+            destination: spark.view.bounds.bottomCenter,
+        },
+        strokeColor: null,
+    });
+
     renderShape.sendToBack();
 };
 

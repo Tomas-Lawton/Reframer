@@ -138,7 +138,6 @@ const hideSelectUI = (includeTransform = true) => {
     sendToBack.style.display = "none";
     moveUp.style.display = "none";
     copyHandler.style.display = "none";
-    console.log("a");
 };
 
 const updateRectBounds = (from, to) => {

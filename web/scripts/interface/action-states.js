@@ -78,7 +78,7 @@ const setModeDraw = () => {
     document.getElementById("loading").style.display = "flex";
     // document.querySelector(".control-lines").style.display = "none";
 
-    document.querySelector(".current-status").style.color = "#00e900";
+    document.querySelector(".current-status").style.color = "#7b66ff";
     document.querySelector(".current-status").innerHTML = "Drawing";
 };
 
@@ -102,7 +102,7 @@ const setModeExplore = () => {
     document.getElementById("loading").style.display = "flex";
     // document.querySelector(".control-lines").style.display = "none";
 
-    document.querySelector(".current-status").style.color = "#00e900";
+    document.querySelector(".current-status").style.color = "#7b66ff";
     document.querySelector(".current-status").innerHTML = "Exploring";
 };
 
@@ -157,7 +157,7 @@ const setModeActiveFrame = () => {
     frameName.innerHTML = `Creating focus frames the prompt: ${controller.prompt}`;
     prompt.focus();
 
-    document.querySelector(".current-status").style.color = "#00e900";
+    document.querySelector(".current-status").style.color = "#7b66ff";
     document.querySelector(".current-status").innerHTML = "Drawing";
 };
 
@@ -193,6 +193,14 @@ const deactivateCanvasFrames = () => {
 };
 
 const drawLogic = () => {
+    if (noPrompt()) {
+        openModal({
+            title: "What are we drawing?",
+            message: "Without a prompt, the AI doesn't know what to draw!",
+        });
+        return;
+    }
+
     if (socket) {
         if (controller.drawState === "frame") {
             setActionState("active-frame");
@@ -208,6 +216,14 @@ const drawLogic = () => {
 };
 
 const focusLogic = () => {
+    if (noPrompt()) {
+        openModal({
+            title: "What are we drawing?",
+            message: "Without a prompt, the AI doesn't know what to draw!",
+        });
+        return;
+    }
+
     switch (controller.drawState) {
         case "inactive":
             setActionState("frame");
@@ -246,6 +262,14 @@ const focusLogic = () => {
 };
 
 const exploreLogic = () => {
+    if (noPrompt()) {
+        openModal({
+            title: "What are we drawing?",
+            message: "Without a prompt, the AI doesn't know what to draw!",
+        });
+        return;
+    }
+
     if (socket) {
         if (noPrompt()) {
             openModal({

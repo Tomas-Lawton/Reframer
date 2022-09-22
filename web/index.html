@@ -53,8 +53,11 @@
         <div class="content-margin">
             <div id="ai-content">
                 <div class="panel-section">
-                    <h2 class="panel-title">Action</h2>
-                    <p class="control-subtitle">Enter a prompt to draw with AI!</p>
+                    <h2 class="prompt-call">
+                        Enter your AI drawing <span>prompt here! </span>
+                    </h2>
+                </div>
+                <div class="panel-section">
                     <input type="text" tabIndex="0" class="prompt-input" id="messageText" placeholder="Start by describing your sketch..." autocomplete="off" />
                 </div>
 
@@ -82,14 +85,18 @@
                     </div>
                 </div>
 
-                <div class="panel-section">
-                    <div class="flex">
+                <hr />
+
+                <div class="status-section panel-section">
+                    <div class="spark-title flex">
                         <h3 class="panel-subtitle">Status</h3>
                         <h3 class="current-status">Inactive</h3>
                     </div>
+                    <p class="spark-info">AI thinks the sketch resembles the prompt.</p>
+                    <h3 class="prompt-match">0/150</h3>
                     <div class="spark-ui">
                         <div class="spark-knob"></div>
-                        <p class="prompt-match">Match</p>
+                        <p class="prompt-loss">Loss: 0</p>
                         <canvas class="sparkline"></canvas>
                     </div>
                 </div>
@@ -262,6 +269,8 @@
     <div class="explore-panel">
         <div id="explore-sketches"></div>
         <div id="explorer-buttons">
+            <h3 class="panel-subtitle">Explorer</h3>
+            <p class="control-subtitle">Try options by dragging sketches to the canvas</p>
             <p class="pill" id="empty">Refresh</p>
             <p class="pill" id="close-explorer">Close <i class="fa-solid fa-xmark"></i></p>
         </div>

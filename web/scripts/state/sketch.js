@@ -62,7 +62,8 @@ class Sketch {
 
             newElem.id = `${this.type}-sketch-item-${domIdx}`;
             sketchCanvas.id = `${this.type}-sketch-canvas-${domIdx}`;
-            newElem.querySelector("h3").innerHTML = `${this.type}${domIdx}`;
+            // newElem.querySelector("h3").innerHTML = `${this.type}${domIdx}`;
+            newElem.querySelector("h3").innerHTML = ``;
 
             if (this.type === "U") {
                 stopButton.style.display = "none";
