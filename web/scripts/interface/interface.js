@@ -154,7 +154,7 @@ drawer.addEventListener("click", () => {
 prompt.addEventListener("input", (e) => {
     controller.prompt = e.target.value.toLowerCase();
     // controller.prompt = e.target.value;
-    frameName.innerHTML = `System will try to draw "${controller.prompt}."`;
+    frameName.innerHTML = `System will draw "${controller.prompt}."`;
 
     if (controller.prompt === "") {
         controllerUI.forEach((elem) => elem.classList.add("inactive-section"));

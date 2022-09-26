@@ -246,7 +246,7 @@ const focusLogic = () => {
             setPenMode("pen");
             hide(localPrompts);
             show(styles);
-            frameName.innerHTML = `System will try to draw "${controller.prompt}."`;
+            frameName.innerHTML = `System will draw "${controller.prompt}."`;
             deactivateCanvasFrames();
             break;
         case "active-frame":
