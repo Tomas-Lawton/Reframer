@@ -71,8 +71,8 @@ spark.view.onFrame = () => {
 
         // for pixel range
         let newY = scaleRange(
-            mainSketch.semanticLoss, -1.2,
-            1.2,
+            mainSketch.semanticLoss, -1.7,
+            0,
             0,
             spark.view.bounds.bottom
         );

@@ -144,7 +144,18 @@ timeKeeper.oninput = (e) => {
 };
 
 drawer.addEventListener("click", () => {
-    showHide(document.querySelector(".control-panel .content-margin"));
+    let content = document.querySelector(".control-panel .content-margin")
+    if (content.style.display !== "none") {
+        hide(content)
+        controlPanel.style.minWidth = "0px"
+        controlPanel.style.width = "auto"
+
+    } else {
+        content.style.display = "initial"
+        controlPanel.style.minWidth = "230px";
+        controlPanel.style.width = "430px"
+    }
+
     showHide(document.querySelector("header>div"));
     showHide(document.querySelector(".control-drawer"));
     drawer.classList.toggle("fa-chevron-left");
