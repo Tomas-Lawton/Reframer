@@ -40,26 +40,40 @@ sketchTool.onMouseDown = function(event) {
                 controller.selectBox = new Rectangle(event.point);
             }
 
+            // if (hitResult) {
+            //     sketchHistory.pushUndo();
+            //     controller.pause();
+            //     ungroup();
+            //     path = hitResult.item;
+
+            //     let items = [];
+            //     if (window.event.shiftKey) {
+            //         path.selected = true;
+            //         items = getSelectedPaths();
+            //     } else {
+            //         mainSketch.sketchLayer.getItems().forEach((path) => {
+            //             path.selected = false;
+            //         });
+            //         items = mainSketch.sketchLayer.getItems({
+            //             inside: path.bounds,
+            //         });
+            //         items.forEach((item) => (item.selected = true));
+            //     }
+
+            //     createGroup(items);
+            //     fitToSelection(items, "moving");
+            //     updateSelectUI();
+            // }
+
+            // to do replace with above coe
             if (hitResult) {
                 sketchHistory.pushUndo();
                 controller.pause();
                 ungroup();
+
                 path = hitResult.item;
-
-                let items = [];
-                if (window.event.shiftKey) {
-                    path.selected = true;
-                    items = getSelectedPaths();
-                } else {
-                    mainSketch.sketchLayer.getItems().forEach((path) => {
-                        path.selected = false;
-                    });
-                    items = mainSketch.sketchLayer.getItems({
-                        inside: path.bounds,
-                    });
-                    items.forEach((item) => (item.selected = true));
-                }
-
+                path.selected = true;
+                let items = getSelectedPaths();
                 createGroup(items);
                 fitToSelection(items, "moving");
                 updateSelectUI();

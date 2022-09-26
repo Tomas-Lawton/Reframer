@@ -36,6 +36,7 @@ const setModeDefault = () => {
     stopButton.className = "action-inactive";
     actions.forEach((button) => button.classList.add("tooltip"));
 
+    prompt.classList.remove("inactive-prompt");
     document.querySelector(".project").classList.remove("greeeeeen");
     accordionItem.classList.remove("inactive-section");
 
@@ -63,6 +64,7 @@ const setModeDraw = () => {
     stopButton.className = "action-stop";
     actions.forEach((button) => button.classList.add("tooltip"));
 
+    prompt.classList.add("inactive-prompt")
     document.querySelector(".project").classList.remove("greeeeeen");
     accordionItem.classList.remove("inactive-section");
 
@@ -88,6 +90,7 @@ const setModeExplore = () => {
     stopButton.className = "action-stop";
     actions.forEach((button) => button.classList.add("tooltip"));
 
+    prompt.classList.add("inactive-prompt")
     hint.innerHTML = `View creative possibilities in the explorer`;
     hide(historyBlock);
 
@@ -111,6 +114,8 @@ const setModeFrame = () => {
     exploreButton.className = "action-inactive";
     stopButton.className = "action-inactive";
     actions.forEach((button) => button.classList.add("tooltip"));
+    prompt.classList.remove("inactive-prompt")
+
 
     document.querySelector(".project").classList.add("greeeeeen");
     accordionItem.classList.add("inactive-section");
@@ -139,6 +144,7 @@ const setModeActiveFrame = () => {
     exploreButton.className = "action-inactive";
     stopButton.className = "action-stop";
     actions.forEach((button) => button.classList.add("tooltip"));
+    prompt.classList.add("inactive-prompt")
 
     frameDropIn.forEach((button) => hide(button));
 
@@ -154,7 +160,6 @@ const setModeActiveFrame = () => {
     hide(explorerPanel);
 
     frameName.innerHTML = `Creating focus frames the prompt: ${controller.prompt}`;
-    prompt.focus();
 
     document.querySelector(".current-status").style.color = "#7b66ff";
     document.querySelector(".current-status").innerHTML = "Drawing";

@@ -696,6 +696,7 @@ hr {
 .action-current {
     background: linear-gradient(rgb(164, 90, 254) 0%, rgb(106 82 255) 100%);
     color: white;
+    pointer-events: none;
 }
 
 .action-current i {
@@ -754,6 +755,12 @@ hr {
 
 input:focus {
     outline-color: #7b66ff;
+}
+
+.inactive-prompt {
+    pointer-events: none;
+    background: #e1e1e1;
+    opacity: .7;
 }
 
 
