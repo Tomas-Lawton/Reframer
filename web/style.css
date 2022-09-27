@@ -1774,9 +1774,10 @@ display: none!important;
 
 #picker-ui {
     position: absolute;
-    z-index: 12;
-    background: #14112a;
+    z-index: 10;
+    background: #ffffff;
     border-radius: 0.5em;
+    box-shadow: 6px 6px 6px rgb(48 48 48 / 8%);
 }
 
 .picker_hue {
@@ -1790,7 +1791,7 @@ display: none!important;
 .layout_default.picker_wrapper {
     padding: 0;
     font-size: 1em;
-    width: 18em !important;
+    width: 24em !important;
 }
 
 .layout_default.picker_slider {

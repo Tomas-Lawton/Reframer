@@ -18,7 +18,7 @@ document.querySelectorAll(".swatch").forEach((elem) =>
 toolWindow.addEventListener("click", () => {
     showHide(pickerSelect);
     pickerSelect.style.left =
-        styles.getBoundingClientRect().left - pickerSelect.offsetWidth + "px";
+        styles.getBoundingClientRect().left - pickerSelect.offsetWidth - 2 + "px";
     pickerSelect.style.top = styles.getBoundingClientRect().top + "px";
 });
 
@@ -441,7 +441,7 @@ toolToggle.addEventListener("click", () => {
     // currentTool.style.height = "230px";
     // currentTool.classList.toggle("current-tool");
     pickerSelect.style.left =
-        styles.getBoundingClientRect().left - pickerSelect.offsetWidth + "px";
+        styles.getBoundingClientRect().left - pickerSelect.offsetWidth - 2 + "px";
     pickerSelect.style.top = styles.getBoundingClientRect().top + "px";
 
     if (toolToggle.firstChild.classList.contains("fa-minus")) {
