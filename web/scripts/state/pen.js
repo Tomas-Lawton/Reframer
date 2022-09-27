@@ -128,7 +128,6 @@ sketchTool.onMouseDown = function(event) {
             let col = hitResult ? hitResult.item.strokeColor._canvasStyle : "#ffffff";
             controller.strokeColor = col;
             controller.alpha = controller.strokeColor.alpha || 1;
-            console.log(controller.alpha);
             setThisColor(controller.strokeColor);
             picker.setColor(controller.strokeColor, true);
             console.log(controller.strokeColor);

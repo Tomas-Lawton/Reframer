@@ -20,7 +20,9 @@ picker.onChange = (color) => {
 
 setLineLabels(mainSketch.sketchLayer);
 setActionState("inactive");
+hide(historyBlock);
 setPointSize(controller.strokeWidth);
+setThisColor("rgb(54 54 54)");
 
 const defaults = new PaperScope();
 defaults.activate();
@@ -37,5 +39,3 @@ pickerSelect.style.display = "none";
 
 // document.querySelector(".tool-view").style.display = "none";
 
-setThisColor("rgb(54 54 54)");
-setMouseOver();

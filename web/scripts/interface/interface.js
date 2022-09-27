@@ -28,7 +28,6 @@ document.getElementById("delete").addEventListener("click", () =>
         message: "Are you sure you want to delete your drawing?",
         confirmAction: () => {
             setActionState("inactive");
-
             ungroup();
             // Save before clearing
             mainSketch.svg = paper.project.exportSVG({
@@ -38,7 +37,6 @@ document.getElementById("delete").addEventListener("click", () =>
             mainSketch.sketchLayer.clear();
             modal.style.display = "none";
             sketchHistory.clear();
-            setupSpark();
 
             if (controller.clipDrawing || controller.drawState === "pause") {
                 removeExploreSketches();
@@ -230,19 +228,22 @@ controlDrawer.onmousedown = (e) => {
     document.onmousemove = (e) => setDrawerSize(e);
 };
 
-// document.querySelector(".drawing-tool-panel :first-child")
-styles.onmousedown = (e) => {
+document.getElementById("stroke-dot").onmousedown = (e) => {
     e = e || window.event;
     pos3 = e.clientX;
-    pos4 = e.clientY;
-    if (!document.getElementById("stroke-dot").mouseIsOver) {
-        document.onmouseup = closeDragElement;
-        document.onmousemove = (e) => elementDrag(e, [pickerSelect, styles]);
-    } else {
+    pos4 = e.clientY;    
         console.log("moving hairs");
         document.onmouseup = closeDragElement;
         document.onmousemove = (e) => shiftPen(e);
-    }
+};
+
+
+document.querySelector(".drawing-tool-panel :first-child").onmousedown = (e) => {
+    e = e || window.event;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    document.onmousemove = (e) => elementDrag(e, [pickerSelect, styles]);
 };
 
 frameName.onmousedown = (e) => {

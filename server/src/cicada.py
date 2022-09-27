@@ -24,7 +24,7 @@ class CICADA:
 
         # Variables
         self.iteration = 0
-        self.w_points = 0.0008
+        self.w_points = 0.001
         self.w_colors = 0.1
         self.w_widths = 0.001
         self.w_img = 0.1
@@ -81,11 +81,16 @@ class CICADA:
             start_y = round(float(x0[1]) / self.user_canvas_h, 5)
             x0 = [start_x, start_y]
             points = [x0] + points_array
+            print(path)
+
+            fixed = False
+            if "fixed_path" in path:
+                fixed = path["fixed_path"]
 
             colors = [float(val) for val in path["color"]]
             if len(points) > 0:
                 path_list.append(data_to_tensor(colors, float(path["stroke_width"] * self.normaliseScaleFactor), 
-                    points, float(num_segments), path["fixed_path"]))
+                    points, float(num_segments), fixed))
         return path_list
 
     def activate(self, add_curves):

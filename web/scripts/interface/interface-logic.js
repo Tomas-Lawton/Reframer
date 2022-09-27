@@ -92,7 +92,6 @@ const setThisColor = (rgba) => {
     document
         .querySelectorAll(".tool-view .main-color")
         .forEach((elem) => (elem.style.fill = rgba));
-    console.log(controller.strokeColor);
     document
         .querySelectorAll(".tool-view .second-color")
         .forEach(
@@ -112,17 +111,6 @@ const setThisColor = (rgba) => {
             (child) => (child.strokeColor = rgba)
         );
     }
-};
-
-const setMouseOver = () => {
-    var div = document.getElementById("stroke-dot");
-    div.mouseIsOver = false;
-    div.onmouseover = function() {
-        this.mouseIsOver = true;
-    };
-    div.onmouseout = function() {
-        this.mouseIsOver = false;
-    };
 };
 
 const hideSelectUI = (includeTransform = true) => {

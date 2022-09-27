@@ -50,7 +50,10 @@ const setModeDefault = () => {
     undoButton.classList.remove("inactive-section");
     redoButton.classList.remove("inactive-section");
     hint.innerHTML = `Draw with AI by adding a prompt and clicking draw.`;
-    if (sketchHistory.historyHolder.length > 2) show(historyBlock); // 2 because stop also has event
+    if (sketchHistory.historyHolder.length > 2) {
+        show(historyBlock);
+        body.style.maxHeight = body.scrollHeight + "px";
+    } // 2 because stop also has event
 
     document.querySelector(".current-status").style.color = "#A0A0A0";
     document.querySelector(".current-status").innerHTML = "Inactive";
@@ -69,6 +72,8 @@ const setModeDraw = () => {
     accordionItem.classList.remove("inactive-section");
 
     hide(explorerPanel);
+    hide(historyBlock);
+
     frameDropIn[0].style.display = "initial";
     frameDropIn[1].style.display = "flex";
 
@@ -93,7 +98,6 @@ const setModeExplore = () => {
     prompt.classList.add("inactive-prompt")
     hint.innerHTML = `View creative possibilities in the explorer`;
     hide(historyBlock);
-
     show(explorerPanel);
     frameDropIn.forEach((button) => hide(button));
 
@@ -118,14 +122,11 @@ const setModeFrame = () => {
 
 
     document.querySelector(".project").classList.add("greeeeeen");
-    accordionItem.classList.add("inactive-section");
 
     frameDropIn.forEach((button) => hide(button));
     undoButton.classList.add("inactive-section");
     redoButton.classList.add("inactive-section");
 
-    accordionItem.classList.remove("open");
-    accordionItem.classList.add("closed");
     hint.innerHTML = `Creating prompt frames will give the AI context`;
 
     hide(pickerSelect);
@@ -158,6 +159,7 @@ const setModeActiveFrame = () => {
 
     hide(pickerSelect);
     hide(explorerPanel);
+    hide(historyBlock);
 
     frameName.innerHTML = `Creating focus frames the prompt: ${controller.prompt}`;
 

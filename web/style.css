@@ -237,7 +237,7 @@ input:-webkit-autofill {
 
 .current-status {
     font-weight: 500;
-    font-style: italic;
+    /* font-style: italic; */
     font-size: 1em;
 }
 
@@ -263,9 +263,9 @@ input:-webkit-autofill {
 .canvas-ui-container>p {
     position: absolute;
     z-index: 5;
-    font-weight: 400;
+    font-weight: 500;
     /* font-size: 1.2em; */
-    font-size: 1em;
+    font-size: 1.2em;
     color: #ffffff;
     margin-left: 2em;
     transform: translateY(-110%);
