@@ -246,6 +246,8 @@ const focusLogic = () => {
             activateCanvasFrames();
             break;
         case "frame":
+            controller.stop();
+            controller.clipDrawing = false;
             setActionState("inactive");
             mainSketch.sketchLayer.activate();
             setPenMode("pen");
@@ -296,7 +298,15 @@ const exploreLogic = () => {
 const stopLogic = () => {
     if (controller.drawState === "active-frame") {
         setActionState("inactive");
-        controller.stop(); //flag    
+        controller.stop(); //flag   
+        controller.clipDrawing = false;
+
+        mainSketch.sketchLayer.activate();
+        setPenMode("pen");
+        hide(localPrompts);
+        show(styles);
+        deactivateCanvasFrames();
+
         logger.event("stop-drawing");
     } else if (controller.drawState === "explore") {
         removeExploreSketches();
@@ -309,6 +319,7 @@ const stopLogic = () => {
         }
         controller.stop(); //flag
         controller.clipDrawing = false;
+
         mainSketch.svg = paper.project.exportSVG({
             asString: true,
         });
@@ -319,7 +330,6 @@ const stopLogic = () => {
         hide(localPrompts);
         show(styles);
         deactivateCanvasFrames();
-        console.log("HEREEEEE")
         
         logger.event("stop-drawing");
     }

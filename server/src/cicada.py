@@ -184,6 +184,8 @@ class CICADA:
                 loss += torch.cosine_similarity(self.text_features_neg1, img_features[n:n+1], dim=1) * 0.3
                 loss += torch.cosine_similarity(self.text_features_neg2, img_features[n:n+1], dim=1) * 0.3
 
+        self.rolling_losses.append(loss.item()) #before multiplying
+
         for att_region in self.attention_regions:
             cropped_batch = []
             cropped_img = img * att_region['mask'] + 1 - att_region['mask']
@@ -221,9 +223,6 @@ class CICADA:
         #     loss += args.w_geo * geo_loss[l_name]
 
         # Backpropagate the gradients.
-
-        self.rolling_losses.append(loss.item()) #before multiplying
-
 
         loss *= self.lr_control
         loss.backward()
