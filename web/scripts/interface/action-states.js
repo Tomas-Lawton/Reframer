@@ -50,7 +50,7 @@ const setModeDefault = () => {
     undoButton.classList.remove("inactive-section");
     redoButton.classList.remove("inactive-section");
     hint.innerHTML = `Draw with AI by adding a prompt and clicking draw.`;
-    sketchHistory.historyHolder.length > 2 && show(historyBlock); // 2 because stop also has event
+    if (sketchHistory.historyHolder.length > 2) show(historyBlock); // 2 because stop also has event
 
     document.querySelector(".current-status").style.color = "#A0A0A0";
     document.querySelector(".current-status").innerHTML = "Inactive";
@@ -296,7 +296,8 @@ const exploreLogic = () => {
 const stopLogic = () => {
     if (controller.drawState === "active-frame") {
         setActionState("inactive");
-        controller.stop(); //flag
+        controller.stop(); //flag    
+        logger.event("stop-drawing");
     } else if (controller.drawState === "explore") {
         removeExploreSketches();
         controller.clipDrawing = false;
@@ -312,6 +313,14 @@ const stopLogic = () => {
             asString: true,
         });
         setActionState("inactive");
+
+        mainSketch.sketchLayer.activate();
+        setPenMode("pen");
+        hide(localPrompts);
+        show(styles);
+        deactivateCanvasFrames();
+        console.log("HEREEEEE")
+        
         logger.event("stop-drawing");
     }
 };

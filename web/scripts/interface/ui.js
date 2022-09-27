@@ -20,7 +20,7 @@ const sparkUI = document.querySelector(".spark-ui");
 const sparkKnob = document.querySelector(".spark-knob");
 
 const buttonPanel = document.querySelector(".action");
-const dropdown = document.getElementById("pen-dropdown");
+const dropdown = document.querySelector(".pen-dropdown");
 const staticSketches = document.getElementById("static-sketches");
 const explorerPanel = document.querySelector(".explore-panel");
 const sketchGrid = document.getElementById("grid-container");

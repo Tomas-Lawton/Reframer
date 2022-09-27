@@ -42,7 +42,7 @@ const createSparkShadow = () => {
     renderShape.sendToBack();
 };
 
-const setup = () => {
+const setupSpark = () => {
     if (sparkPath) sparkPath.remove();
 
     pointA = new Point(0, spark.view.bounds.centerY);
@@ -57,11 +57,11 @@ const setup = () => {
     createSparkShadow();
 };
 
-setup();
+setupSpark();
 
 spark.view.onFrame = () => {
     if (
-        (controller.drawState === "draw" || controller.drawState === "draw") &&
+        (controller.drawState === "draw" || controller.drawState === "active-frame") &&
         mainSketch.semanticLoss
     ) {
         // for 150 range

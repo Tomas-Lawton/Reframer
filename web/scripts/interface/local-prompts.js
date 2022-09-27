@@ -24,6 +24,12 @@ const createLocalPrompt = (
         document.getElementById("prompt-info").style.display = "none";
     });
 
+    frameInput.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") {
+            e.target.blur();
+        }
+    });
+
     frameInput.addEventListener("blur", (e) => {
         if (e.target.value === "") deleteFrame(i);
         if (controller.liveCollab) {

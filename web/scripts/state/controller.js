@@ -48,6 +48,7 @@ class Controller {
         this.numTraces = 1;
 
         this.liveCollab = false;
+        this.previousDrawState;
     }
     updateDrawer({
         status,
@@ -143,7 +144,7 @@ class Controller {
                     sketch: mainSketch.sketch,
                     rate: this.learningRate,
                 });
-                setActionState("draw");
+                setActionState(this.previousDrawState);
             } catch (e) {
                 console.log("Problem with update");
             }
@@ -174,10 +175,11 @@ class Controller {
     pause() {
         if (
             //todo refactor
-            (this.drawState !== "explore" && //don't include this state
+          (  (this.drawState !== "explore" && //don't include this state
                 this.activeStates.includes(controller.drawState)) ||
-            this.drawState === "active-frame"
+            this.drawState === "active-frame" ) && this.drawState !== "pause"
         ) {
+            this.previousDrawState = this.drawState
             console.log("Pausing");
             document.querySelector(".current-status").style.color = "#ff9700";
             document.querySelector(".current-status").innerHTML = "Waiting";

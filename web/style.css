@@ -867,18 +867,18 @@ input:focus {
     flex-direction: column;
 }
 
-#pen-dropdown {
+.pen-dropdown {
     flex-direction: column;
     z-index: 25;
     position: absolute;
-    margin-top: 0.3em;
+    /* margin-top: 0.3em; */
     border-radius: 0.5em;
     background-color: #000000d6;
     margin-left: 1em;
     overflow: hidden;
-    display: none;
-    top: 60px;
+    top: 52px;
     right: 0;
+    margin-right: 1em;
 }
 
 .simple-drop {
@@ -947,6 +947,10 @@ input[type="number"] {
     display: none;
     display: flex;
     top: 1em;
+}
+
+.hidden-panel {
+display: none!important;
 }
 
 .transform-control {

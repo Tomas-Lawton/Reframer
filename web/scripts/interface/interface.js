@@ -38,6 +38,7 @@ document.getElementById("delete").addEventListener("click", () =>
             mainSketch.sketchLayer.clear();
             modal.style.display = "none";
             sketchHistory.clear();
+            setupSpark();
 
             if (controller.clipDrawing || controller.drawState === "pause") {
                 removeExploreSketches();
@@ -46,7 +47,7 @@ document.getElementById("delete").addEventListener("click", () =>
             }
 
             emptyExplorer();
-
+          
             explorerPanel.display = "none";
 
             controller.lastPrompt = null;
@@ -125,12 +126,7 @@ document.getElementById("empty").addEventListener("click", (e) => {
 });
 
 document.getElementById("settings").addEventListener("click", () => {
-    showHide(dropdown);
-    // openModal({
-    //     title: "Advanced",
-    //     message: "Change the drawing behaviour and UI.",
-    //     ui: document.getElementById("settings-ui"),
-    // });
+    dropdown.classList.toggle("hidden-panel")
 });
 
 timeKeeper.oninput = (e) => {

@@ -60,3 +60,4 @@ const logEventAPI = (latestJson) => {
         .catch((e) => console.error(e));
 };
 
+connect();
