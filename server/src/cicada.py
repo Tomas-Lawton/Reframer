@@ -24,11 +24,10 @@ class CICADA:
 
         # Variables
         self.iteration = 0
-        self.w_points = 1
-        self.w_colors = 1
-        self.w_widths = 1
-        self.w_img = 0.01
-        self.w_full_img = 0.001
+        self.w_points = 0.0008
+        self.w_colors = 0.1
+        self.w_widths = 0.001
+        self.w_img = 0.1
         prune_places = [round(num_iter * (k + 1) * 0.8 / 1) for k in range(1)]
         self.prune_ratio = p0 / len(prune_places)
         self.rolling_losses = []
@@ -184,6 +183,7 @@ class CICADA:
                 loss += torch.cosine_similarity(self.text_features_neg1, img_features[n:n+1], dim=1) * 0.3
                 loss += torch.cosine_similarity(self.text_features_neg2, img_features[n:n+1], dim=1) * 0.3
 
+        print(loss.item())
         self.rolling_losses.append(loss.item()) #before multiplying
 
         for att_region in self.attention_regions:
@@ -223,6 +223,7 @@ class CICADA:
         #     loss += args.w_geo * geo_loss[l_name]
 
         # Backpropagate the gradients.
+        
 
         loss *= self.lr_control
         loss.backward()

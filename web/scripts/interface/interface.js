@@ -403,7 +403,7 @@ document
 let lastLearningRate = controller.learningRate;
 respectSlider.oninput = (e) => {
     controller.learningRate = parseFloat(e.target.value);
-    let msg = controller.learningRate > 0.5 ? "More" : "Less";
+    let msg = controller.learningRate > 0.2 ? "More" : "Less";
     document.getElementById("fix-label").innerHTML = msg;
 };
 

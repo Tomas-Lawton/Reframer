@@ -155,9 +155,9 @@ sketchTool.onMouseDrag = function(event) {
                     controller.boundingBox.position.x += event.delta.x;
                     controller.boundingBox.position.y += event.delta.y;
 
-                    // controller.transformGroup.children.forEach((path) => {
-                    //     path.data.fixed = true;
-                    // });
+                    controller.transformGroup.children.forEach((path) => {
+                        path.data.fixed = true;
+                    });
                     updateSelectUI();
                 }
             } else if (controller.selectBox !== undefined) {
@@ -207,19 +207,18 @@ sketchTool.onMouseUp = function() {
                 if (rect) {
                     rect.remove(); // can be undefined if flat box
                 }
-                items.forEach((item) => (item.selected = true));
+                items.forEach((item) => 
+                    item.selected = true
+                );
                 if (controller.selectBox) {
                     controller.selectBox = null;
                     selectBox.remove();
                     selectBox = null;
                 }
                 fitToSelection(items, "moving"); //try update
-                // // IS THIS STILL NEEDED?
-                // if (!getSelectedPaths().length) {
-                //     path.remove();
-                // }
                 createGroup(items); //transformGroup
                 updateSelectUI();
+                console.log()
             }
             if (controller.boundingBox) {
                 //after creating selection by dragging
@@ -237,7 +236,7 @@ sketchTool.onMouseUp = function() {
             }
             penPath.simplify();
 
-            penPath.data.fixed = false;
+            penPath.data.fixed = true;
             // Update
             mainSketch.svg = paper.project.exportSVG({
                 asString: true,

@@ -246,8 +246,8 @@ const focusLogic = () => {
             activateCanvasFrames();
             break;
         case "frame":
-            controller.stop();
-            controller.clipDrawing = false;
+            // controller.stop();
+            // controller.clipDrawing = false;
             setActionState("inactive");
             mainSketch.sketchLayer.activate();
             setPenMode("pen");
@@ -301,11 +301,11 @@ const stopLogic = () => {
         controller.stop(); //flag   
         controller.clipDrawing = false;
 
-        mainSketch.sketchLayer.activate();
-        setPenMode("pen");
-        hide(localPrompts);
-        show(styles);
-        deactivateCanvasFrames();
+        // mainSketch.sketchLayer.activate();
+        // setPenMode("pen");
+        // hide(localPrompts);
+        // show(styles);
+        // deactivateCanvasFrames();
 
         logger.event("stop-drawing");
     } else if (controller.drawState === "explore") {
@@ -325,11 +325,11 @@ const stopLogic = () => {
         });
         setActionState("inactive");
 
-        mainSketch.sketchLayer.activate();
-        setPenMode("pen");
-        hide(localPrompts);
-        show(styles);
-        deactivateCanvasFrames();
+        // mainSketch.sketchLayer.activate();
+        // setPenMode("pen");
+        // hide(localPrompts);
+        // show(styles);
+        // deactivateCanvasFrames();
         
         logger.event("stop-drawing");
     }
