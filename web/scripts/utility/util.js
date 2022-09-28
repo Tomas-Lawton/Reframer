@@ -199,7 +199,10 @@ const download = () => {
             document.body.removeChild(a);
 
             let b = document.createElement("a");
-            let text = mainSketch.svg;
+            let text = `${controller.prompt}\n\n ${mainSketch.svg}`
+              
+            text.toString()
+
             b.setAttribute(
                 "href",
                 "data:text/plain;charset=utf-8," + encodeURIComponent(text)
