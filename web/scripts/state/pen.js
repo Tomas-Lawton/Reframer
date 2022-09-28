@@ -103,7 +103,7 @@ sketchTool.onMouseDown = function(event) {
             controller.pause();
 
             erasorPath = new Path({
-                strokeWidth: controller.strokeWidth,
+                strokeWidth: controller.strokeWidth /1,
                 strokeCap: "round",
                 strokeJoin: "round",
                 opacity: 0.85,
@@ -240,7 +240,7 @@ sketchTool.onMouseUp = function() {
             mainSketch.svg = paper.project.exportSVG({
                 asString: true,
             });
-            // incrementHistory();
+            incrementHistory();
 
             setLineLabels(mainSketch.sketchLayer);
             if (socket) {
@@ -280,7 +280,7 @@ sketchTool.onMouseUp = function() {
                 );
             } else {
                 alert(
-                    `Minimum focus frame is 78x30: You draw a frame with size ${controller.drawRegion.width}x${controller.drawRegion.height}`
+                    `Minimum focus frame is 78x30px: You draw a frame with size ${controller.drawRegion.width}x${controller.drawRegion.height}`
                 );
             }
             break;
@@ -288,7 +288,7 @@ sketchTool.onMouseUp = function() {
             if (firstErasePoint && erasorPath.segments.length > 2) {
                 firstErasePoint.remove();
             }
-            erasorPath.simplify();
+            // erasorPath.simplify();
             const eraseRadius = controller.strokeWidth;
             const outerPath = OffsetUtils.offsetPath(erasorPath, eraseRadius);
             const innerPath = OffsetUtils.offsetPath(erasorPath, -eraseRadius);
@@ -420,7 +420,6 @@ const setPenMode = (mode) => {
             eraseTool.classList.remove("selected");
             penTool.classList.remove("selected");
             document.querySelector(".finger-preview").classList.add("current-tool");
-
             canvas.style.cursor = "url('public/cursor/select.svg') 3 2, move";
             controller.penMode = mode;
             break;
@@ -431,6 +430,11 @@ const setPenMode = (mode) => {
         case "dropper":
             canvas.style.cursor = "url('public/icon/dropper.svg') -1 20, move";
             controller.penMode = mode;
+            selectTool.classList.remove("selected");
+            eraseTool.classList.remove("selected");
+            penTool.classList.remove("selected");
+            eyeDropper.style.color = "#ffffff";
+            eyeDropper.style.background = "#7b66ff";
     }
 
     if (controller.penMode !== "select" && controller.penMode !== "dropper") {
@@ -442,7 +446,6 @@ const setPenMode = (mode) => {
     if (controller.penMode !== "local" && controller.penMode !== "select") {
         controller.drawRegion = undefined;
         if (regionPath) regionPath.remove();
-        // penDrop.classList.remove("selected-mode");
     }
 
     if (controller.penMode !== "local") {
@@ -451,5 +454,6 @@ const setPenMode = (mode) => {
 
     if (controller.penMode !== "dropper") {
         eyeDropper.style.color = "#363636";
+        eyeDropper.style.background = "transparent";
     }
 };

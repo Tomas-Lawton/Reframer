@@ -17,17 +17,7 @@ dots.forEach((elem) =>
 );
 
 eyeDropper.addEventListener("click", () => {
-    if (controller.penMode !== "dropper") {
-        setPenMode("dropper", eyeDropper);
-        eyeDropper.classList.add("selected-mode");
-        eyeDropper.classList.remove("simple-hover");
-        eyeDropper.style.color = "#ffffff";
-    } else {
-        setPenMode("pen", pen);
-        eyeDropper.classList.remove("selected-mode");
-        eyeDropper.classList.add("simple-hover");
-        eyeDropper.style.color = "#363636;";
-    }
+    setPenMode("dropper");
 });
 
 penTool.addEventListener("click", () => setPenMode("pen"));

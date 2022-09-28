@@ -67,7 +67,7 @@
                         <i class="fa-solid fa-robot fa-fw"></i>
                         <p>Draw</p>
                     </div>
-                    <div class="action-default tooltip" id="focus">
+                    <div class="frame-ui action-default tooltip" id="focus">
                         <span class="tooltiptext">Labeling parts the image helps AI focus</span>
                         <i class="fa-solid fa-note-sticky fa-fw" id="focus-icon"></i>
                         <p>Focus</p>
@@ -120,7 +120,7 @@
                                 <p class="slider-label" id="calc-lines">Add Lines </p>
                                 <p class="slider-label" id="max-lines">Total: </p>
                             </div>
-                            <input id="num-squiggles" type="range" min="0" value="95" max="300">
+                            <input id="num-squiggles" type="range" min="0" value="100" max="300">
                         </div>
                     </div>
                     <div class="flex slider-container">
@@ -130,7 +130,7 @@
                                 <p class="slider-label">Freedom</p>
                                 <p class="slider-label" id="fix-label">More</p>
                             </div>
-                            <input type="range" id="respect-slider" value="0.1" min="0" max=".4" step="0.1">
+                            <input type="range" id="respect-slider" value="50" min="0" max="80" step="1">
                         </div>
                     </div>
                     <div class="history-block flex slider-container">
@@ -153,7 +153,7 @@
 
     <section class="project">
         <div class="project-actions">
-            <i class="inactive-section canvas-focus fa-solid fa-note-sticky fa-fw"></i>
+            <i class="frame-ui inactive-section canvas-focus fa-solid fa-note-sticky fa-fw"></i>
             <i class="undo fa-solid fa-rotate-left fa-fw"></i>
             <i class="redo fa-solid fa-rotate-right fa-fw"></i>
             <i class="fa-solid fa-cog fa-fw" id="settings"></i>
@@ -162,7 +162,6 @@
         <div class="canvas-ui-container" id="canvas-drop">
             <p>Add a prompt to draw together</p>
             <i class="fa-solid fa-spinner button-animation " id="loading"></i>
-            <h2 id="partial-message">Draw a drawing of a oubwego</h2>
             <div id="fixed-handler" class="select-ui tooltip">
                 <span class="tooltiptext">Checked lines won't move</span>
                 <div>
@@ -210,7 +209,7 @@
                 </div>
             </div>
             <canvas id="canvas"></canvas>
-            <div class="inactive-section canvas-focus">
+            <div class="frame-ui inactive-section canvas-focus">
                 <p>Focus</p>
                 <i class="fa-solid fa-note-sticky fa-fw"></i>
             </div>
@@ -413,15 +412,15 @@
         </div>
 
         <div class="pointer-tool tooltip expanded">
-            <span class="tooltiptext">Select</span>
+            <span class="tooltiptext">Select (⇧+S)</span>
             <img draggable="false" src="public/vector/tool-pointer.svg" alt="pointer"></img>
         </div>
         <div class="erase-tool tooltip expanded">
-            <span class="tooltiptext">Erase</span>
+            <span class="tooltiptext">Erase (⇧+E)</span>
             <img draggable="false" src="public/vector/erase-pencil.svg" alt="erasor"></img>
         </div>
         <div class="pen-tool tooltip selected expanded">
-            <span class="tooltiptext">Pencil</span>
+            <span class="tooltiptext">Pencil (⇧+P)</span>
             <img draggable="false" src="public/vector/tip-pencil.svg" alt="pencil"></img>
         </div>
         <div id="style-content">

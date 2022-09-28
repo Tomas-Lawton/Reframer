@@ -38,7 +38,6 @@ const setModeDefault = () => {
 
     prompt.classList.remove("inactive-prompt");
     document.querySelector(".project").classList.remove("greeeeeen");
-    accordionItem.classList.remove("inactive-section");
 
     // hide(explorerPanel);
     frameDropIn[0].style.display = "initial";
@@ -69,7 +68,6 @@ const setModeDraw = () => {
 
     prompt.classList.add("inactive-prompt")
     document.querySelector(".project").classList.remove("greeeeeen");
-    accordionItem.classList.remove("inactive-section");
 
     hide(explorerPanel);
     hide(historyBlock);
@@ -150,7 +148,6 @@ const setModeActiveFrame = () => {
     frameDropIn.forEach((button) => hide(button));
 
     document.querySelector(".project").classList.add("greeeeeen");
-    accordionItem.classList.add("inactive-section");
 
     hint.innerHTML = `Creating prompt frames will give the AI context`;
 
@@ -299,7 +296,7 @@ const exploreLogic = () => {
 
 const stopLogic = () => {
     if (controller.drawState === "active-frame") {
-        setActionState("inactive");
+        setActionState("frame");
         controller.stop(); //flag   
         controller.clipDrawing = false;
 

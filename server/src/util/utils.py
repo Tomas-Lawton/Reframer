@@ -38,12 +38,13 @@ def use_penalisation(i):
 
 
 def area_mask(width, height, drawing_area):
+    print(drawing_area)
     j0 = round(drawing_area['x0'] * width)
     j1 = round(drawing_area['x1'] * width)
-    i0 = round((1 - drawing_area['y1']) * height)
-    i1 = round((1 - drawing_area['y0']) * height)
+    i1 = round((drawing_area['y1']) * height)
+    i0 = round((drawing_area['y0']) * height)
     mask = torch.ones((height, width, 3))
-    mask[:i1 - i0, :j1 - j0, :] = torch.zeros((i1 - i0, j1 - j0, 3))
+    mask[i0:i1, j0:j1, :] = torch.zeros((i1 - i0, j1 - j0, 3))
     mask = mask[:, :, :3].unsqueeze(0).permute(0, 3, 1, 2)
     return mask
 

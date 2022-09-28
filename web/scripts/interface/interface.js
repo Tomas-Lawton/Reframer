@@ -45,7 +45,7 @@ document.getElementById("delete").addEventListener("click", () =>
             }
 
             emptyExplorer();
-          
+
             explorerPanel.display = "none";
 
             controller.lastPrompt = null;
@@ -231,10 +231,10 @@ controlDrawer.onmousedown = (e) => {
 document.getElementById("stroke-dot").onmousedown = (e) => {
     e = e || window.event;
     pos3 = e.clientX;
-    pos4 = e.clientY;    
-        console.log("moving hairs");
-        document.onmouseup = closeDragElement;
-        document.onmousemove = (e) => shiftPen(e);
+    pos4 = e.clientY;
+    console.log("moving hairs");
+    document.onmouseup = closeDragElement;
+    document.onmousemove = (e) => shiftPen(e);
 };
 
 
@@ -403,7 +403,7 @@ document
 
 let lastLearningRate = controller.learningRate;
 respectSlider.oninput = (e) => {
-    controller.learningRate = parseFloat(e.target.value);
+    controller.learningRate = e.target.value / 100;
     let msg = controller.learningRate > 0.2 ? "More" : "Less";
     document.getElementById("fix-label").innerHTML = msg;
 };
@@ -478,7 +478,11 @@ window.addEventListener("keydown", (event) => {
     if (event.code === "Escape") {
         stopLogic();
     }
-    if (event.metaKey || event.shiftKey) {
+    if (event.ctrlKey && event.shiftKey && event.code === "KeyZ") {
+        sketchHistory.redo();
+    } else if (event.ctrlKey && event.code === "KeyZ") {
+        sketchHistory.undo();
+    } else if (event.shiftKey) {
         if (event.code === "KeyP") {
             setPenMode("pen", pen);
         }
@@ -488,22 +492,17 @@ window.addEventListener("keydown", (event) => {
         if (event.code === "KeyE") {
             setPenMode("erase");
         }
-        if (event.code === "KeyU") {
-            sketchHistory.undo();
-        }
-        if (event.code === "KeyR") {
-            sketchHistory.redo();
-        }
     }
 
     if (document.activeElement !== prompt) {
-        if (event.key == "Delete" || event.key == "Backspace") {
+        if (event.key == "Delete" || event.key == "Backspace" && controller.transformGroup) {
             deleteItems();
         }
     }
     if (document.activeElement === prompt) {
         if (event.key == "Enter") {
             drawLogic();
+            prompt.blur();
         }
     }
 });

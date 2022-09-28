@@ -10,7 +10,7 @@ class Controller {
 
         // Defaults
         this.strokeColor = "rgb(24,24,24)";
-        this.strokeWidth = 7;
+        this.strokeWidth = 28;
         this.alpha = 1;
         this.penMode = "pen";
         this.clipDrawing = false;
@@ -75,6 +75,7 @@ class Controller {
             },
         };
         ws.send(JSON.stringify(res));
+        console.log("Update: ", res)
     }
     draw() {
         if (noPrompt()) {
@@ -143,6 +144,7 @@ class Controller {
                     status: "continue_sketch",
                     sketch: mainSketch.sketch,
                     rate: this.learningRate,
+                    frames: Object.values(mainSketch.localFrames).map((elem) => elem.data)
                 });
                 setActionState(this.previousDrawState);
             } catch (e) {
