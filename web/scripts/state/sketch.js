@@ -18,7 +18,6 @@ class Sketch {
         if (svg === "" || svg === undefined) return;
         this.sketchLayer.clear();
         let importGroup = this.sketchLayer.importSVG(svg);
-        console.log(importGroup);
         let g = importGroup.children[0];
         // console.group(g);
         let scaledGroup = scaleGroup(g, s);
@@ -63,7 +62,8 @@ class Sketch {
 
             newElem.id = `${this.type}-sketch-item-${domIdx}`;
             sketchCanvas.id = `${this.type}-sketch-canvas-${domIdx}`;
-            newElem.querySelector("h3").innerHTML = `${this.type}${domIdx}`;
+            // newElem.querySelector("h3").innerHTML = `${this.type}${domIdx}`;
+            newElem.querySelector("h3").innerHTML = ``;
 
             if (this.type === "U") {
                 stopButton.style.display = "none";
@@ -100,7 +100,6 @@ class Sketch {
                 if (mainSketch) {
                     this.importTo(mainSketch);
                 }
-                // controller.resetMetaControls();
             });
             // Make draggable
             newElem.addEventListener(
@@ -198,7 +197,7 @@ class Sketch {
     }
 }
 
-mainSketch = new Sketch("main-sketch", scope, frameOutline, "main");
+mainSketch = new Sketch("main-sketch", mainScope, frameOutline, "main");
 mainSketch.svg = paper.project.exportSVG({
     asString: true,
 }); //for svg parsing

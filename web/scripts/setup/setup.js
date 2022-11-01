@@ -1,9 +1,9 @@
 paper.install(window);
-const scope = new PaperScope();
+const mainScope = new PaperScope();
 const sketchScope = new PaperScope();
 
 // sketchScope.activate();
-scope.setup(canvas);
+mainScope.setup(canvas);
 
 const sketchTool = new Tool();
 

@@ -126,7 +126,6 @@ class Sketch:
             self.canvas_width, self.canvas_height, shapes, shape_groups
         )
         render = pydiffvg.RenderFunction.apply
-        print("TEST: ", pydiffvg.get_device())
         img = render(self.canvas_width, self.canvas_height, 2, 2, 0, None, *scene_args)
         img = img[:, :, 3:4] * img[:, :, :3] + torch.ones(
             img.shape[0], img.shape[1], 3, device=pydiffvg.get_device()

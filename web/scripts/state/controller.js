@@ -10,12 +10,11 @@ class Controller {
 
         // Defaults
         this.strokeColor = "rgb(24,24,24)";
-        this.strokeWidth = 7;
+        this.strokeWidth = 28;
         this.alpha = 1;
         this.penMode = "pen";
         this.clipDrawing = false;
         this.maximumTraces = 1; // todo change
-        this.step = 0;
         this.linesDisabled = false;
         this.activeStates = [
             "draw",
@@ -44,11 +43,12 @@ class Controller {
         // Settings panel
         this.useAdvanced = false;
         this.initRandomCurves = true;
-        this.maxCurves = 48;
+        this.maxCurves = 95;
         this.addLines = 0;
         this.numTraces = 1;
 
         this.liveCollab = false;
+        this.previousDrawState;
     }
     updateDrawer({
         status,
@@ -74,8 +74,8 @@ class Controller {
                 sketch_index,
             },
         };
-        console.log(res);
         ws.send(JSON.stringify(res));
+        console.log("Update: ", res)
     }
     draw() {
         if (noPrompt()) {
@@ -92,6 +92,7 @@ class Controller {
 
             sketchHistory.historyHolder.push({
                 svg: mainSketch.svg,
+                loss: mainSketch.semanticLoss,
             });
             sketchHistory.pushUndo();
             this.prepare();
@@ -104,7 +105,6 @@ class Controller {
                 rate: this.learningRate,
                 frames: Object.values(mainSketch.localFrames).map((elem) => elem.data),
             });
-            this.step = 0;
         } else {
             throw new Error("Can't continue if already running");
         }
@@ -117,7 +117,7 @@ class Controller {
             this.activeExplorers[sketchCountIndex] = true; //keep track of running seperate from sketch data
             this.targetDrawing = true;
             this.prepare();
-            // this.resetMetaControls();
+
             this.updateDrawer({
                 status: "add_new_sketch",
                 sketch: mainSketch.sketch,
@@ -136,6 +136,7 @@ class Controller {
             try {
                 sketchHistory.historyHolder.push({
                     svg: mainSketch.svg,
+                    loss: mainSketch.semanticLoss,
                 });
                 sketchHistory.pushUndo();
                 this.prepare();
@@ -143,8 +144,9 @@ class Controller {
                     status: "continue_sketch",
                     sketch: mainSketch.sketch,
                     rate: this.learningRate,
+                    frames: Object.values(mainSketch.localFrames).map((elem) => elem.data)
                 });
-                setActionState("draw");
+                setActionState(this.previousDrawState);
             } catch (e) {
                 console.log("Problem with update");
             }
@@ -168,15 +170,22 @@ class Controller {
     stop() {
         sketchHistory.historyHolder.push({
             svg: mainSketch.svg,
+            loss: mainSketch.semanticLoss,
         });
         this.updateDrawer({ status: "stop" });
     }
     pause() {
         if (
-            this.drawState !== "explore" && //don't include this state
-            this.activeStates.includes(controller.drawState)
+            //todo refactor
+          (  (this.drawState !== "explore" && //don't include this state
+                this.activeStates.includes(controller.drawState)) ||
+            this.drawState === "active-frame" ) && this.drawState !== "pause"
         ) {
-            console.log("pausing");
+            this.previousDrawState = this.drawState
+            console.log("Pausing");
+            document.querySelector(".current-status").style.color = "#ff9700";
+            document.querySelector(".current-status").innerHTML = "Waiting";
+
             controller.liveCollab = true;
             this.updateDrawer({ status: "stop" });
             this.clipDrawing = false;
@@ -197,11 +206,10 @@ class Controller {
         });
         mainSketch.buildSketch();
         setLineLabels(mainSketch.sketchLayer);
-        document.getElementById("calc-lines").innerHTML = `Add : 0`;
+        // document.getElementById("calc-lines").innerHTML = `Add : 0`;
     }
     resetMetaControls() {
         historyBlock.style.display = "none";
-        this.step = 0;
         timeKeeper.setAttribute("max", "0");
         timeKeeper.value = "0";
         sketchHistory.historyHolder = [];

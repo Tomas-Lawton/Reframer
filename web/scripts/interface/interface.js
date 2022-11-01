@@ -18,7 +18,7 @@ document.querySelectorAll(".swatch").forEach((elem) =>
 toolWindow.addEventListener("click", () => {
     showHide(pickerSelect);
     pickerSelect.style.left =
-        styles.getBoundingClientRect().left - pickerSelect.offsetWidth + "px";
+        styles.getBoundingClientRect().left - pickerSelect.offsetWidth - 2 + "px";
     pickerSelect.style.top = styles.getBoundingClientRect().top + "px";
 });
 
@@ -28,7 +28,6 @@ document.getElementById("delete").addEventListener("click", () =>
         message: "Are you sure you want to delete your drawing?",
         confirmAction: () => {
             setActionState("inactive");
-
             ungroup();
             // Save before clearing
             mainSketch.svg = paper.project.exportSVG({
@@ -42,17 +41,18 @@ document.getElementById("delete").addEventListener("click", () =>
             if (controller.clipDrawing || controller.drawState === "pause") {
                 removeExploreSketches();
                 controller.stop();
-                controller.resetMetaControls();
                 controller.clipDrawing = false;
             }
 
             emptyExplorer();
 
-            document.getElementById("explore-panel").display = "none";
-            // document.getElementById("add-refine").style.display = "none";
+            explorerPanel.display = "none";
 
             controller.lastPrompt = null;
             updateSelectUI();
+
+            sketchHistory = new SketchHistory(mainSketch);
+            Object.keys(mainSketch.localFrames).forEach((i) => deleteFrame(i));
         },
     })
 );
@@ -124,12 +124,7 @@ document.getElementById("empty").addEventListener("click", (e) => {
 });
 
 document.getElementById("settings").addEventListener("click", () => {
-    showHide(dropdown);
-    // openModal({
-    //     title: "Advanced",
-    //     message: "Change the drawing behaviour and UI.",
-    //     ui: document.getElementById("settings-ui"),
-    // });
+    dropdown.classList.toggle("hidden-panel")
 });
 
 timeKeeper.oninput = (e) => {
@@ -143,7 +138,18 @@ timeKeeper.oninput = (e) => {
 };
 
 drawer.addEventListener("click", () => {
-    showHide(document.querySelector(".control-panel .content-margin"));
+    let content = document.querySelector(".control-panel .content-margin")
+    if (content.style.display !== "none") {
+        hide(content)
+        controlPanel.style.minWidth = "0px"
+        controlPanel.style.width = "auto"
+
+    } else {
+        content.style.display = "initial"
+        controlPanel.style.minWidth = "230px";
+        controlPanel.style.width = "430px"
+    }
+
     showHide(document.querySelector("header>div"));
     showHide(document.querySelector(".control-drawer"));
     drawer.classList.toggle("fa-chevron-left");
@@ -153,7 +159,7 @@ drawer.addEventListener("click", () => {
 prompt.addEventListener("input", (e) => {
     controller.prompt = e.target.value.toLowerCase();
     // controller.prompt = e.target.value;
-    frameName.innerHTML = `I'm drawing "${controller.prompt}"`;
+    frameName.innerHTML = `System will draw "${controller.prompt}."`;
 
     if (controller.prompt === "") {
         controllerUI.forEach((elem) => elem.classList.add("inactive-section"));
@@ -222,18 +228,22 @@ controlDrawer.onmousedown = (e) => {
     document.onmousemove = (e) => setDrawerSize(e);
 };
 
-styles.onmousedown = (e) => {
+document.getElementById("stroke-dot").onmousedown = (e) => {
     e = e || window.event;
     pos3 = e.clientX;
     pos4 = e.clientY;
-    if (!document.getElementById("stroke-dot").mouseIsOver) {
-        document.onmouseup = closeDragElement;
-        document.onmousemove = (e) => elementDrag(e, [pickerSelect, styles]);
-    } else {
-        console.log("moving hairs");
-        document.onmouseup = closeDragElement;
-        document.onmousemove = (e) => shiftPen(e);
-    }
+    console.log("moving hairs");
+    document.onmouseup = closeDragElement;
+    document.onmousemove = (e) => shiftPen(e);
+};
+
+
+document.querySelector(".drawing-tool-panel :first-child").onmousedown = (e) => {
+    e = e || window.event;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    document.onmousemove = (e) => elementDrag(e, [pickerSelect, styles]);
 };
 
 frameName.onmousedown = (e) => {
@@ -332,12 +342,18 @@ const shiftPen = (e) => {
 };
 
 const setDrawerSize = (e) => {
-    let item = document.querySelector(".content-margin");
     e = e || window.event;
-    let controlPadding = window.getComputedStyle(item).paddingLeft;
+    let controlPadding = window.getComputedStyle(controlPanel).paddingLeft;
     controlPadding = parseInt(controlPadding);
     pos3 = e.clientX - controlPadding * 2;
-    item.style.width = pos3 + "px";
+    controlPanel.style.width = pos3 + "px";
+
+    // spark.activate(); //return to main
+    // setup();
+    // mainScope.activate(); //return to main
+    // sparkCanvas.style.width =
+    //     document.querySelector(".panel-section").clientWidth + "px";
+    // sparkCanvas.style.height = 150 + "px";
 };
 
 document.querySelectorAll(".tab-item").forEach((tab) => {
@@ -350,13 +366,11 @@ document.querySelectorAll(".tab-item").forEach((tab) => {
             if (tab.id == "style-tab") {
                 document.getElementById("style-content").parentElement.style.display =
                     "block";
-                document.getElementById("ai-content").parentElement.style.display =
-                    "none";
+                controlPanel.style.display = "none";
             } else {
                 document.getElementById("style-content").parentElement.style.display =
                     "none";
-                document.getElementById("ai-content").parentElement.style.display =
-                    "block";
+                controlPanel.style.display = "block";
             }
         }
     });
@@ -389,8 +403,8 @@ document
 
 let lastLearningRate = controller.learningRate;
 respectSlider.oninput = (e) => {
-    controller.learningRate = parseFloat(e.target.value);
-    let msg = controller.learningRate > 0.5 ? "More" : "Less";
+    controller.learningRate = e.target.value / 100;
+    let msg = controller.learningRate > 0.2 ? "More" : "Less";
     document.getElementById("fix-label").innerHTML = msg;
 };
 
@@ -427,7 +441,7 @@ toolToggle.addEventListener("click", () => {
     // currentTool.style.height = "230px";
     // currentTool.classList.toggle("current-tool");
     pickerSelect.style.left =
-        styles.getBoundingClientRect().left - pickerSelect.offsetWidth + "px";
+        styles.getBoundingClientRect().left - pickerSelect.offsetWidth - 2 + "px";
     pickerSelect.style.top = styles.getBoundingClientRect().top + "px";
 
     if (toolToggle.firstChild.classList.contains("fa-minus")) {
@@ -464,7 +478,11 @@ window.addEventListener("keydown", (event) => {
     if (event.code === "Escape") {
         stopLogic();
     }
-    if (event.metaKey || event.shiftKey) {
+    if (event.ctrlKey && event.shiftKey && event.code === "KeyZ") {
+        sketchHistory.redo();
+    } else if (event.ctrlKey && event.code === "KeyZ") {
+        sketchHistory.undo();
+    } else if (event.shiftKey) {
         if (event.code === "KeyP") {
             setPenMode("pen", pen);
         }
@@ -474,22 +492,17 @@ window.addEventListener("keydown", (event) => {
         if (event.code === "KeyE") {
             setPenMode("erase");
         }
-        if (event.code === "KeyU") {
-            sketchHistory.undo();
-        }
-        if (event.code === "KeyR") {
-            sketchHistory.redo();
-        }
     }
 
     if (document.activeElement !== prompt) {
-        if (event.key == "Delete" || event.key == "Backspace") {
+        if (event.key == "Delete" || event.key == "Backspace" && controller.transformGroup) {
             deleteItems();
         }
     }
     if (document.activeElement === prompt) {
         if (event.key == "Enter") {
             drawLogic();
+            prompt.blur();
         }
     }
 });

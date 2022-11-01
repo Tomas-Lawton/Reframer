@@ -24,17 +24,16 @@ class CICADA:
 
         # Variables
         self.iteration = 0
-        self.w_points = 1
-        self.w_colors = 1
-        self.w_widths = 1
-        self.w_img = 0.01
-        self.w_full_img = 0.001
+        self.w_points = 0.005
+        self.w_colors = 0.01
+        self.w_widths = 0.001
+        self.w_img = 0.1
         prune_places = [round(num_iter * (k + 1) * 0.8 / 1) for k in range(1)]
         self.prune_ratio = p0 / len(prune_places)
         self.rolling_losses = []
 
     def encode_text_classes(self, prompt):
-        text_input = clip.tokenize(prompt).to(self.device)
+        text_input = clip.tokenize(f"A simple line drawing of {prompt}").to(self.device)
         n1 = clip.tokenize("A badly drawn sketch.").to(self.device)
         n2 = clip.tokenize("Many ugly, messy drawings.").to(self.device)
 
@@ -82,11 +81,14 @@ class CICADA:
             start_y = round(float(x0[1]) / self.user_canvas_h, 5)
             x0 = [start_x, start_y]
             points = [x0] + points_array
+            fixed = False
+            if "fixed_path" in path:
+                fixed = path["fixed_path"]
 
             colors = [float(val) for val in path["color"]]
             if len(points) > 0:
                 path_list.append(data_to_tensor(colors, float(path["stroke_width"] * self.normaliseScaleFactor), 
-                    points, float(num_segments), path["fixed_path"]))
+                    points, float(num_segments), fixed))
         return path_list
 
     def activate(self, add_curves):
@@ -184,6 +186,8 @@ class CICADA:
                 loss += torch.cosine_similarity(self.text_features_neg1, img_features[n:n+1], dim=1) * 0.3
                 loss += torch.cosine_similarity(self.text_features_neg2, img_features[n:n+1], dim=1) * 0.3
 
+        self.rolling_losses.append(loss.item()) #before multiplying
+
         for att_region in self.attention_regions:
             cropped_batch = []
             cropped_img = img * att_region['mask'] + 1 - att_region['mask']
@@ -221,9 +225,7 @@ class CICADA:
         #     loss += args.w_geo * geo_loss[l_name]
 
         # Backpropagate the gradients.
-
-        self.rolling_losses.append(loss.item()) #before multiplying
-
+        
 
         loss *= self.lr_control
         loss.backward()
@@ -373,8 +375,9 @@ class CICADA:
     def use_latest_sketch(self, data):
         """Only for things that can be changed on the fly"""
         logging.info("Adding changes...")
-        self.lr_control = data["data"]["rate"]
+        self.lr_control = 10 * (data["data"]["rate"] ** 2.5)
         self.sketch_data = data["data"]["sketch"]
+        self.local_frames = data["data"]["frames"]
 
 
     async def stop(self):

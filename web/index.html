@@ -23,8 +23,9 @@
     <script type="text/javascript" src="scripts/setup/setup.js" defer></script>
     <script type="text/javascript" src="scripts/state/controller.js" defer></script>
     <script type="text/javascript" src="scripts/state/sketch.js" defer></script>
-    <script type="text/javascript" src="scripts/setup/chart.js" defer></script>
+    <script type="text/javascript" src="scripts/setup/spark.js" defer></script>
     <script type="text/javascript" src="scripts/state/history.js" defer></script>
+    <script type="text/javascript" src="scripts/state/load.js" defer></script>
     <script type="text/javascript" src="scripts/utility/util.js" defer></script>
 
     <script type="text/javascript" src="scripts/interface/interface-logic.js" defer></script>
@@ -41,39 +42,6 @@
 </head>
 
 <body>
-    <div class="socket-connect"></div>
-
-    <div id="modal">
-        <div id="simple-modal">
-            <div class="flex">
-                <h2 id="modal-title"></h2>
-                <i id="modal-cross" class="fa-solid fa-xmark"></i>
-            </div>
-            <p id="modal-message"></p>
-            <div id="modalContent"></div>
-            <div id="action">
-                <button id="cancel-modal">Cancel</button>
-                <button id="confirm-modal" confirm right-button>Done</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="pen-dropdown">
-        <div class="simple-drop pen-mode" id="save">
-            <div>
-                <i class="fa-solid fa-save fa-fw"></i>
-            </div>
-            <p>Save</p>
-        </div>
-        <div class="simple-drop pen-mode" id="delete">
-            <div>
-                <i class="fa-solid fa-trash fa-fw"></i>
-            </div>
-            <p>Clear</p>
-        </div>
-    </div>
-
-
     <section class="control-panel">
         <header class="flex">
             <div>
@@ -83,96 +51,91 @@
             <i class="drawer-button fa-solid fa-chevron-left fa-fw"></i>
         </header>
         <div class="content-margin">
-            <div id="ai-content">
-                <div class="panel-section">
-                    <h2 class="panel-title">Action</h2>
-                    <p class="control-subtitle">Enter a prompt to draw with AI!</p>
-                    <input type="text" tabIndex="0" class="prompt-input" id="messageText" placeholder="Start by describing your sketch..." autocomplete="off" />
-                </div>
+            <div class="panel-section">
+                <h2 class="prompt-call">
+                    Enter your AI drawing <span>prompt here!</span>
+                </h2>
+            </div>
+            <div class="panel-section">
+                <input type="text" tabIndex="0" class="prompt-input" id="messageText" placeholder="Start by describing your sketch..." autocomplete="off" />
+            </div>
 
-                <div class="panel-section">
-                    <div class="clip-actions inactive-section">
-                        <div class="action-default tooltip" id="draw">
-                            <span class="tooltiptext">Change the sketch using AI</span>
-                            <i class="fa-solid fa-robot fa-fw"></i>
-                            <p>Draw</p>
-                        </div>
-                        <div class="action-default tooltip" id="focus">
-                            <span class="tooltiptext">Labeling parts the image helps AI focus</span>
-                            <i class="fa-solid fa-note-sticky fa-fw" id="focus-icon"></i>
-                            <p>Focus</p>
-                        </div>
-                        <div class="action-default tooltip" id="explore">
-                            <span class="tooltiptext">Get options for developing the sketch</span>
-                            <i class="fa-solid fa-lightbulb fa-fw"></i>
-                            <p>Explore</p>
-                        </div>
-                        <div class="action-inactive" id="stop">
-                            <i class="fa-solid fa-hand fa-fw" id="stop-icon"></i>
-                            <p id="stop-text">Stop</p>
-                        </div>
+            <div class="panel-section">
+                <div class="clip-actions inactive-section">
+                    <div class="action-default tooltip" id="draw">
+                        <span class="tooltiptext">Change the sketch using AI</span>
+                        <i class="fa-solid fa-robot fa-fw"></i>
+                        <p>Draw</p>
+                    </div>
+                    <div class="frame-ui action-default tooltip" id="focus">
+                        <span class="tooltiptext">Labeling parts the image helps AI focus</span>
+                        <i class="fa-solid fa-note-sticky fa-fw" id="focus-icon"></i>
+                        <p>Focus</p>
+                    </div>
+                    <div class="action-default tooltip" id="explore">
+                        <span class="tooltiptext">Get options for developing the sketch</span>
+                        <i class="fa-solid fa-lightbulb fa-fw"></i>
+                        <p>Explore</p>
+                    </div>
+                    <div class="action-inactive" id="stop">
+                        <i class="fa-solid fa-hand fa-fw" id="stop-icon"></i>
+                        <p id="stop-text">Stop</p>
                     </div>
                 </div>
+            </div>
 
-                <div class="panel-section">
+            <!-- <hr /> -->
+
+            <div class="status-section panel-section">
+                <div class="spark-title flex">
                     <h3 class="panel-subtitle">Status</h3>
-                    <div class="spark-ui">
-                        <div class="spark-knob"></div>
-                        <canvas class="sparkline"></canvas>
-                    </div>
-                    <div class="flex spark-text">
-                        <p class="rolling-loss">Latest Loss: </p>
-                        <p class="rolling-confidence">Interpret: x/150</p>
-                    </div>
+                    <h3 class="current-status">Inactive</h3>
                 </div>
-
-                <!-- <div class="inactive-section closed panel-section accordion-item">
-                    <header class="accordion-item-header">
-                        <button class="accordion-item-button">
-                            <i id="add-icon" class="fa-solid fa-plus"></i>
-                            <i id="subtract-icon" class="fa-solid fa-minus"></i>
-                        </button>
-                        <h3 class="accordion-item-question">StatusI</h3>
-                    </header>
-                    <div>
-                        <div class="panel-section">
-                            <div class="spark-ui">
-                                <div class="spark-knob"></div>
-                                <canvas class="sparkline"></canvas>
-                            </div>
-                            <div class="flex spark-text">
-                                <p class="rolling-loss">Latest Loss: </p>
-                                <p class="rolling-confidence">Interpret: x/150</p>
-                            </div>
-                        </div>
+                <p class="spark-info">Sketch resembles the AI text prompt.</p>
+                <h3 class="spark-val prompt-match">0/150</h3>
+                <div class="spark-ui">
+                    <div class="spark-knob">
+                        <p class="spark-val"></p>
                     </div>
-                </div> -->
+                    <p class="prompt-loss">Loss: 0</p>
+                    <canvas class="sparkline" resize></canvas>
+                </div>
+            </div>
 
+            <hr />
 
-                <div class="inactive-section closed panel-section accordion-item">
-                    <header class="accordion-item-header">
-                        <button class="accordion-item-button">
-                            <i id="add-icon" class="fa-solid fa-plus"></i>
-                            <i id="subtract-icon" class="fa-solid fa-minus"></i>
-                        </button>
-                        <h3 class="accordion-item-question">Control AI</h3>
-                    </header>
-                    <div class="accordion-item-body">
+            <div class="inactive-section closed panel-section accordion-item">
+                <header class="accordion-item-header">
+                    <button class="accordion-item-button">
+                        <i id="add-icon" class="fa-solid fa-plus"></i>
+                        <i id="subtract-icon" class="fa-solid fa-minus"></i>
+                    </button>
+                    <h3 class="accordion-item-question">Advanced</h3>
+                </header>
+                <div class="accordion-item-body">
+                    <div class="control-lines flex slider-container">
+                        <i class="fa-solid fa-hashtag"></i>
                         <div>
                             <div class="flex">
-                                <p class="slider-label">Line Freedom</p>
+                                <p class="slider-label" id="calc-lines">Add Lines </p>
+                                <p class="slider-label" id="max-lines">Total: </p>
+                            </div>
+                            <input id="num-squiggles" type="range" min="0" value="100" max="300">
+                        </div>
+                    </div>
+                    <div class="flex slider-container">
+                        <i class="fa-solid fa-bolt"></i>
+                        <div>
+                            <div class="flex">
+                                <p class="slider-label">Freedom</p>
                                 <p class="slider-label" id="fix-label">More</p>
                             </div>
-                            <input type="range" id="respect-slider" value="0.5" min="0" max="1" step="0.1">
+                            <input type="range" id="respect-slider" value="50" min="0" max="80" step="1">
                         </div>
-                        <div class="control-lines">
-                            <div class="flex">
-                                <p class="slider-label" id="max-lines">Total Lines: </p>
-                                <p class="slider-label" id="calc-lines">Adding: </p>
-                            </div>
-                            <input id="num-squiggles" type="range" min="0" value="48" max="150">
-                        </div>
-                        <div class="history-block">
+                    </div>
+                    <div class="history-block flex slider-container">
+                        <i class="fa-regular fa-clock"></i>
+                        <div>
                             <div class="flex">
                                 <p class="slider-label">History </p>
                                 <p class="slider-label">Latest</p>
@@ -190,16 +153,15 @@
 
     <section class="project">
         <div class="project-actions">
-            <i class="inactive-section canvas-focus fa-solid fa-note-sticky fa-fw"></i>
+            <i class="frame-ui inactive-section canvas-focus fa-solid fa-note-sticky fa-fw"></i>
             <i class="undo fa-solid fa-rotate-left fa-fw"></i>
             <i class="redo fa-solid fa-rotate-right fa-fw"></i>
             <i class="fa-solid fa-cog fa-fw" id="settings"></i>
         </div>
 
         <div class="canvas-ui-container" id="canvas-drop">
-            <p>Add a prompt to real time draw together</p>
+            <p>Add a prompt to draw together</p>
             <i class="fa-solid fa-spinner button-animation " id="loading"></i>
-            <h2 id="partial-message">Draw a drawing of a oubwego</h2>
             <div id="fixed-handler" class="select-ui tooltip">
                 <span class="tooltiptext">Checked lines won't move</span>
                 <div>
@@ -247,7 +209,7 @@
                 </div>
             </div>
             <canvas id="canvas"></canvas>
-            <div class="inactive-section canvas-focus">
+            <div class="frame-ui inactive-section canvas-focus">
                 <p>Focus</p>
                 <i class="fa-solid fa-note-sticky fa-fw"></i>
             </div>
@@ -258,7 +220,43 @@
         </div>
     </section>
 
-    <!-- Floating UIs -->
+    <!-- Floating UI -->
+
+    <div id="picker-ui">
+        <div id="color-picker"></div>
+    </div>
+
+    <div class="socket-connect"></div>
+
+    <div id="modal">
+        <div id="simple-modal">
+            <div class="flex">
+                <h2 id="modal-title"></h2>
+                <i id="modal-cross" class="fa-solid fa-xmark"></i>
+            </div>
+            <p id="modal-message"></p>
+            <div id="modalContent"></div>
+            <div id="action">
+                <button id="cancel-modal">Cancel</button>
+                <button id="confirm-modal" confirm right-button>Done</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="pen-dropdown hidden-panel">
+        <div class="simple-drop pen-mode" id="save">
+            <div>
+                <i class="fa-solid fa-save fa-fw"></i>
+            </div>
+            <p>Save</p>
+        </div>
+        <div class="simple-drop pen-mode" id="delete">
+            <div>
+                <i class="fa-solid fa-trash fa-fw"></i>
+            </div>
+            <p>Clear</p>
+        </div>
+    </div>
 
     <div class="local-prompts">
         <div class="flex">
@@ -281,6 +279,8 @@
     <div class="explore-panel">
         <div id="explore-sketches"></div>
         <div id="explorer-buttons">
+            <h3 class="panel-subtitle">Explorer</h3>
+            <p class="control-subtitle">Try options by dragging sketches to the canvas</p>
             <p class="pill" id="empty">Refresh</p>
             <p class="pill" id="close-explorer">Close <i class="fa-solid fa-xmark"></i></p>
         </div>
@@ -344,13 +344,12 @@
         </div>
     </div> -->
 
-    <div class="draw-tools">
+    <div class="drawing-tool-panel">
         <div></div>
-        <!-- <div class="tool-color expanded"></div> -->
         <div class="style-window tool-view">
             <div class="animation-window">
-                <!-- Inline SVG for styling -->
-                <svg class="finger-preview window-tool" width="366" height="77" viewBox="0 0 366 77" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Inline SVGs -->
+                <svg draggable="false" class="finger-preview window-tool" width="366" height="77" viewBox="0 0 366 77" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_560_143)">
                         <path
                             d="M230.694 2.34161C232.661 2.24168 289.436 3.15687 289.436 3.15687L365.714 2.34161L369.667 76.5353C354.676 76.4572 339.692 75.8124 319.933 71.8513C287.422 65.3318 224.46 69.4698 168.867 67.0957C113.271 64.7217 56.6848 62.9117 39.8847 62.3831C23.0822 61.8546 1.92006 55.4463 1.4186 41.8616C0.605135 19.8245 17.0836 11.6407 109.881 7.73782C186.79 4.50528 221.165 2.82295 230.694 2.34161Z"
@@ -372,8 +371,7 @@
                             fill="#AF7E56" fill-opacity="0.6" />
                     </g>
                 </svg>
-
-                <svg class="erase-preview window-tool" width="189" height="41" viewBox="0 0 189 41" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg draggable="false" class="erase-preview window-tool" width="189" height="41" viewBox="0 0 189 41" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_565_38)">
                         <path class="main-color"
                             d="M14.9754 4.00078L189 4.00077L189 36.8008L14.9754 36.8008L14.9754 4.00078Z"
@@ -395,8 +393,7 @@
                             fill="#F16C51" />
                     </g>
                 </svg>
-
-                <svg class="pencil-preview window-tool current-tool" width="366" height="80" viewBox="0 0 366 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg draggable="false" class="pencil-preview window-tool current-tool" width="366" height="80" viewBox="0 0 366 80" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path class="main-color"
                         d="M365.74 71.6499L53.3281 71.6499L53.3281 8L365.74 7.99995L365.74 71.6499Z" fill="#F5AB2A" />
                     <path
@@ -415,16 +412,16 @@
         </div>
 
         <div class="pointer-tool tooltip expanded">
-            <span class="tooltiptext">Select</span>
-            <img src="public/vector/tool-pointer.svg" alt="pointer"></img>
+            <span class="tooltiptext">Select (⇧+S)</span>
+            <img draggable="false" src="public/vector/tool-pointer.svg" alt="pointer"></img>
         </div>
         <div class="erase-tool tooltip expanded">
-            <span class="tooltiptext">Erase</span>
-            <img src="public/vector/erase-pencil.svg" alt="erasor"></img>
+            <span class="tooltiptext">Erase (⇧+E)</span>
+            <img draggable="false" src="public/vector/erase-pencil.svg" alt="erasor"></img>
         </div>
         <div class="pen-tool tooltip selected expanded">
-            <span class="tooltiptext">Pencil</span>
-            <img src="public/vector/tip-pencil.svg" alt="pencil"></img>
+            <span class="tooltiptext">Pencil (⇧+P)</span>
+            <img draggable="false" src="public/vector/tip-pencil.svg" alt="pencil"></img>
         </div>
         <div id="style-content">
             <div class="expanded" id="basic-styles">
@@ -466,18 +463,6 @@
         </div>
         <div class="style-window-toggle"><i class="fa-solid fa-minus"></i></div>
     </div>
-
-    <div id="picker-ui">
-        <div id="color-picker"></div>
-    </div>
-
-    <!-- Future -->
-    <!-- <div id="settings-ui">
-            <hr />
-            <label>Trace History (default: 1)</label>
-            <input id="num-traces" type="number" min="1" value="1" max="5">
-        </div> -->
-
 </body>
 
 </html>

@@ -20,7 +20,9 @@ picker.onChange = (color) => {
 
 setLineLabels(mainSketch.sketchLayer);
 setActionState("inactive");
+hide(historyBlock);
 setPointSize(controller.strokeWidth);
+setThisColor("rgb(54 54 54)");
 
 const defaults = new PaperScope();
 defaults.activate();
@@ -35,7 +37,15 @@ for (let i = 0; i < 4; i++) {
 localPrompts.style.display = "none";
 pickerSelect.style.display = "none";
 
+
+if (!useTool) {
+    document.querySelectorAll(".frame-ui").forEach(elem => {
+        elem.style.visibility = "hidden";
+        elem.style.pointerEvents = "none";
+        // elem.style.marginLeft = "-9000px";
+    })
+    focusButton.style.visibility = "hidden";
+
+}
 // document.querySelector(".tool-view").style.display = "none";
 
-setThisColor("rgb(54 54 54)");
-setMouseOver();

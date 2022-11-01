@@ -92,7 +92,6 @@ const setThisColor = (rgba) => {
     document
         .querySelectorAll(".tool-view .main-color")
         .forEach((elem) => (elem.style.fill = rgba));
-    console.log(controller.strokeColor);
     document
         .querySelectorAll(".tool-view .second-color")
         .forEach(
@@ -114,17 +113,6 @@ const setThisColor = (rgba) => {
     }
 };
 
-const setMouseOver = () => {
-    var div = document.getElementById("stroke-dot");
-    div.mouseIsOver = false;
-    div.onmouseover = function() {
-        this.mouseIsOver = true;
-    };
-    div.onmouseout = function() {
-        this.mouseIsOver = false;
-    };
-};
-
 const hideSelectUI = (includeTransform = true) => {
     if (controller.boundingBox) {
         controller.boundingBox.remove(); // paper item
@@ -138,7 +126,6 @@ const hideSelectUI = (includeTransform = true) => {
     sendToBack.style.display = "none";
     moveUp.style.display = "none";
     copyHandler.style.display = "none";
-    console.log("a");
 };
 
 const updateRectBounds = (from, to) => {
@@ -245,15 +232,17 @@ const openModal = (data) => {
     modal.style.display = "block";
 };
 
+// Stops line overload by capping the max
 const setLineLabels = (layer) => {
     let res = controller.maxCurves - layer.children.length;
     controller.addLines = res > 0 ? res : 0;
-    document.getElementById(
-        "max-lines"
-    ).innerHTML = `Total Lines: ${controller.maxCurves}`;
+    let max = Math.max(controller.maxCurves, layer.children.length);
+    document.getElementById("max-lines").innerHTML = `Limit: ${
+    controller.maxCurves
+  }${max > controller.maxCurves ? "(Reached)" : ""}`;
     document.getElementById(
         "calc-lines"
-    ).innerHTML = `Adding: ${controller.addLines}`;
+    ).innerHTML = `Add ${controller.addLines} Lines`;
 };
 
 const setDefaultTransform = () => {

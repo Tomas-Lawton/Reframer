@@ -40,26 +40,40 @@ sketchTool.onMouseDown = function(event) {
                 controller.selectBox = new Rectangle(event.point);
             }
 
+            // if (hitResult) {
+            //     sketchHistory.pushUndo();
+            //     controller.pause();
+            //     ungroup();
+            //     path = hitResult.item;
+
+            //     let items = [];
+            //     if (window.event.shiftKey) {
+            //         path.selected = true;
+            //         items = getSelectedPaths();
+            //     } else {
+            //         mainSketch.sketchLayer.getItems().forEach((path) => {
+            //             path.selected = false;
+            //         });
+            //         items = mainSketch.sketchLayer.getItems({
+            //             inside: path.bounds,
+            //         });
+            //         items.forEach((item) => (item.selected = true));
+            //     }
+
+            //     createGroup(items);
+            //     fitToSelection(items, "moving");
+            //     updateSelectUI();
+            // }
+
+            // to do replace with above coe
             if (hitResult) {
                 sketchHistory.pushUndo();
                 controller.pause();
                 ungroup();
+
                 path = hitResult.item;
-
-                let items = [];
-                if (window.event.shiftKey) {
-                    path.selected = true;
-                    items = getSelectedPaths();
-                } else {
-                    mainSketch.sketchLayer.getItems().forEach((path) => {
-                        path.selected = false;
-                    });
-                    items = mainSketch.sketchLayer.getItems({
-                        inside: path.bounds,
-                    });
-                    items.forEach((item) => (item.selected = true));
-                }
-
+                path.selected = true;
+                let items = getSelectedPaths();
                 createGroup(items);
                 fitToSelection(items, "moving");
                 updateSelectUI();
@@ -89,7 +103,7 @@ sketchTool.onMouseDown = function(event) {
             controller.pause();
 
             erasorPath = new Path({
-                strokeWidth: controller.strokeWidth,
+                strokeWidth: controller.strokeWidth /1,
                 strokeCap: "round",
                 strokeJoin: "round",
                 opacity: 0.85,
@@ -114,7 +128,6 @@ sketchTool.onMouseDown = function(event) {
             let col = hitResult ? hitResult.item.strokeColor._canvasStyle : "#ffffff";
             controller.strokeColor = col;
             controller.alpha = controller.strokeColor.alpha || 1;
-            console.log(controller.alpha);
             setThisColor(controller.strokeColor);
             picker.setColor(controller.strokeColor, true);
             console.log(controller.strokeColor);
@@ -141,9 +154,9 @@ sketchTool.onMouseDrag = function(event) {
                     controller.boundingBox.position.x += event.delta.x;
                     controller.boundingBox.position.y += event.delta.y;
 
-                    // controller.transformGroup.children.forEach((path) => {
-                    //     path.data.fixed = true;
-                    // });
+                    controller.transformGroup.children.forEach((path) => {
+                        path.data.fixed = true;
+                    });
                     updateSelectUI();
                 }
             } else if (controller.selectBox !== undefined) {
@@ -193,19 +206,18 @@ sketchTool.onMouseUp = function() {
                 if (rect) {
                     rect.remove(); // can be undefined if flat box
                 }
-                items.forEach((item) => (item.selected = true));
+                items.forEach((item) => 
+                    item.selected = true
+                );
                 if (controller.selectBox) {
                     controller.selectBox = null;
                     selectBox.remove();
                     selectBox = null;
                 }
                 fitToSelection(items, "moving"); //try update
-                // // IS THIS STILL NEEDED?
-                // if (!getSelectedPaths().length) {
-                //     path.remove();
-                // }
                 createGroup(items); //transformGroup
                 updateSelectUI();
+                console.log()
             }
             if (controller.boundingBox) {
                 //after creating selection by dragging
@@ -223,12 +235,12 @@ sketchTool.onMouseUp = function() {
             }
             penPath.simplify();
 
-            penPath.data.fixed = false;
+            penPath.data.fixed = true;
             // Update
             mainSketch.svg = paper.project.exportSVG({
                 asString: true,
             });
-            // incrementHistory();
+            incrementHistory();
 
             setLineLabels(mainSketch.sketchLayer);
             if (socket) {
@@ -268,7 +280,7 @@ sketchTool.onMouseUp = function() {
                 );
             } else {
                 alert(
-                    `Minimum focus frame is 78x30: You draw a frame with size ${controller.drawRegion.width}x${controller.drawRegion.height}`
+                    `Minimum focus frame is 78x30px: You draw a frame with size ${controller.drawRegion.width}x${controller.drawRegion.height}`
                 );
             }
             break;
@@ -276,7 +288,7 @@ sketchTool.onMouseUp = function() {
             if (firstErasePoint && erasorPath.segments.length > 2) {
                 firstErasePoint.remove();
             }
-            erasorPath.simplify();
+            // erasorPath.simplify();
             const eraseRadius = controller.strokeWidth;
             const outerPath = OffsetUtils.offsetPath(erasorPath, eraseRadius);
             const innerPath = OffsetUtils.offsetPath(erasorPath, -eraseRadius);
@@ -408,7 +420,6 @@ const setPenMode = (mode) => {
             eraseTool.classList.remove("selected");
             penTool.classList.remove("selected");
             document.querySelector(".finger-preview").classList.add("current-tool");
-
             canvas.style.cursor = "url('public/cursor/select.svg') 3 2, move";
             controller.penMode = mode;
             break;
@@ -419,6 +430,11 @@ const setPenMode = (mode) => {
         case "dropper":
             canvas.style.cursor = "url('public/icon/dropper.svg') -1 20, move";
             controller.penMode = mode;
+            selectTool.classList.remove("selected");
+            eraseTool.classList.remove("selected");
+            penTool.classList.remove("selected");
+            eyeDropper.style.color = "#ffffff";
+            eyeDropper.style.background = "#7b66ff";
     }
 
     if (controller.penMode !== "select" && controller.penMode !== "dropper") {
@@ -430,7 +446,6 @@ const setPenMode = (mode) => {
     if (controller.penMode !== "local" && controller.penMode !== "select") {
         controller.drawRegion = undefined;
         if (regionPath) regionPath.remove();
-        // penDrop.classList.remove("selected-mode");
     }
 
     if (controller.penMode !== "local") {
@@ -439,5 +454,6 @@ const setPenMode = (mode) => {
 
     if (controller.penMode !== "dropper") {
         eyeDropper.style.color = "#363636";
+        eyeDropper.style.background = "transparent";
     }
 };

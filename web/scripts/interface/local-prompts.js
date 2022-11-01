@@ -18,13 +18,25 @@ const createLocalPrompt = (
     const [tag, closeButton, text] = createFrameItem(col);
 
     frameInput.addEventListener("input", (e) => {
+        controller.pause();
         text.innerHTML = e.target.value;
         mainSketch.localFrames[i].data.prompt = e.target.value;
         document.getElementById("prompt-info").style.display = "none";
     });
 
+    frameInput.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") {
+            e.target.blur();
+        }
+    });
+
     frameInput.addEventListener("blur", (e) => {
         if (e.target.value === "") deleteFrame(i);
+        if (controller.liveCollab) {
+            //resume
+            controller.continueSketch();
+            controller.liveCollab = false;
+        }
     });
 
     tag.addEventListener("click", (e) => {
@@ -62,6 +74,11 @@ const createLocalPrompt = (
                 document.onmouseup = null;
                 document.onmousemove = null;
                 ungroup();
+                if (controller.liveCollab) {
+                    //resume
+                    controller.continueSketch();
+                    controller.liveCollab = false;
+                }
             };
             document.onmousemove = (e) => {
                 elementDrag(e, frameContainer);
@@ -81,63 +98,76 @@ const createLocalPrompt = (
     };
 
     frameInput.onmousedown = (e) => {
-        if (window.innerWidth > 700) {
-            e = e || window.event;
-            pos3 = e.clientX;
-            pos4 = e.clientY;
-            document.onmouseup = closeDragElement;
-            document.onmousemove = (e) => {
-                elementDrag(e, frameContainer);
-                frameParent.position.x += e.movementX;
-                frameParent.position.y += e.movementY;
+        controller.pause();
+        e = e || window.event;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = () => {
+            closeDragElement();
+            if (controller.liveCollab) {
+                //resume
+                controller.continueSketch();
+                controller.liveCollab = false;
+            }
+        };
+        document.onmousemove = (e) => {
+            elementDrag(e, frameContainer);
+            frameParent.position.x += e.movementX;
+            frameParent.position.y += e.movementY;
 
-                mainSketch.localFrames[i].data.points = {
-                    x0: frameParent.bounds.topLeft.x,
-                    y0: frameParent.bounds.topLeft.y,
-                    x1: frameParent.bounds.bottomRight.x,
-                    y1: frameParent.bounds.bottomRight.y,
-                };
+            mainSketch.localFrames[i].data.points = {
+                x0: frameParent.bounds.topLeft.x,
+                y0: frameParent.bounds.topLeft.y,
+                x1: frameParent.bounds.bottomRight.x,
+                y1: frameParent.bounds.bottomRight.y,
             };
-        }
+        };
     };
 
     frameResize.onmousedown = (e) => {
-        if (window.innerWidth > 700) {
-            e = e || window.event;
-            pos3 = e.clientX;
-            pos4 = e.clientY;
-            document.onmouseup = closeDragElement;
-            document.onmousemove = (e) => {
-                // TODO update other rects to do this instead . didn't work?
-                let x = frameParent.bounds.width;
-                let y = frameParent.bounds.height;
-                if (x + e.movementX > 75) {
-                    frameParent.bounds.width += e.movementX;
-                } else {
-                    frameParent.bounds.width = 75;
-                }
+        controller.pause();
 
-                if (y + e.movementY > 30) {
-                    frameParent.bounds.height += e.movementY;
-                } else {
-                    frameParent.bounds.height = 30;
-                }
+        e = e || window.event;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = () => {
+            closeDragElement();
+            if (controller.liveCollab) {
+                //resume
+                controller.continueSketch();
+                controller.liveCollab = false;
+            }
+        };
+        document.onmousemove = (e) => {
+            // TODO update other rects to do this instead . didn't work?
+            let x = frameParent.bounds.width;
+            let y = frameParent.bounds.height;
+            if (x + e.movementX > 75) {
+                frameParent.bounds.width += e.movementX;
+            } else {
+                frameParent.bounds.width = 75;
+            }
 
-                frameContainer.style.width = frameParent.bounds.width + "px";
-                frameResize.style.top =
-                    frameParent.bounds.height + frameContainer.clientHeight + "px";
-                frameResize.style.left = frameParent.bounds.width + "px";
+            if (y + e.movementY > 30) {
+                frameParent.bounds.height += e.movementY;
+            } else {
+                frameParent.bounds.height = 30;
+            }
 
-                mainSketch.localFrames[i].data.points = {
-                    x0: frameParent.bounds.topLeft.x,
-                    y0: frameParent.bounds.topLeft.y,
-                    x1: frameParent.bounds.bottomRight.x,
-                    y1: frameParent.bounds.bottomRight.y,
-                };
+            frameContainer.style.width = frameParent.bounds.width + "px";
+            frameResize.style.top =
+                frameParent.bounds.height + frameContainer.clientHeight + "px";
+            frameResize.style.left = frameParent.bounds.width + "px";
 
-                frameInput.focus();
+            mainSketch.localFrames[i].data.points = {
+                x0: frameParent.bounds.topLeft.x,
+                y0: frameParent.bounds.topLeft.y,
+                x1: frameParent.bounds.bottomRight.x,
+                y1: frameParent.bounds.bottomRight.y,
             };
-        }
+
+            frameInput.focus();
+        };
     };
 
     mainSketch.localFrames[i] = {

@@ -1,3 +1,5 @@
+const useTool = false;
+
 const socketLight = document.querySelector(".socket-connect");
 const canvas = document.getElementById("canvas");
 
@@ -18,10 +20,9 @@ const explorerSize = document.getElementById("sketch-size");
 
 const sparkUI = document.querySelector(".spark-ui");
 const sparkKnob = document.querySelector(".spark-knob");
-const lossText = document.querySelectorAll(".spark-text p");
 
 const buttonPanel = document.querySelector(".action");
-const dropdown = document.getElementById("pen-dropdown");
+const dropdown = document.querySelector(".pen-dropdown");
 const staticSketches = document.getElementById("static-sketches");
 const explorerPanel = document.querySelector(".explore-panel");
 const sketchGrid = document.getElementById("grid-container");
@@ -45,7 +46,7 @@ const controllerUI = document.querySelectorAll(".inactive-section");
 const sketchTemplate = document.getElementById("sketch-template");
 const eyeDropper = document.getElementById("dropper");
 
-const styles = document.querySelector(".draw-tools");
+const styles = document.querySelector(".drawing-tool-panel");
 const penTool = document.querySelector(".pen-tool");
 const eraseTool = document.querySelector(".erase-tool");
 const selectTool = document.querySelector(".pointer-tool");
@@ -67,6 +68,7 @@ const sparkCanvas = document.querySelector(".sparkline");
 
 const hint = document.querySelector(".hint-text");
 
+const artBoard = document.querySelector(".canvas-ui-container");
 const frameName = document.querySelector(".canvas-ui-container>p");
 const sketchContainer = document.getElementById("canvas-drop");
 const canvasBounds = canvas.getBoundingClientRect();
@@ -75,12 +77,11 @@ const projectBounds = project.getBoundingClientRect();
 
 const frameDropIn = document.querySelectorAll(".canvas-focus");
 
-const sketchSize = 150;
+const sketchSize = 190;
 
 let size, frameOutline, scaleRatio;
-
 const setCanvasSize = () => {
-    size = project.clientHeight * 0.92; //technically wrong
+    size = project.clientHeight * 0.91; //technically wrong
     sketchContainer.style.width = size + "px";
     sketchContainer.style.height = size + "px";
     canvas.width = size;
@@ -89,6 +90,12 @@ const setCanvasSize = () => {
     sparkCanvas.width = sparkUI.clientWidth;
     frameOutline = size;
     scaleRatio = frameOutline / 224;
+    artBoard.style.left =
+        (window.innerWidth - controlPanel.clientWidth - size) / 2 +
+        controlPanel.clientWidth +
+        size / 2 +
+        "px";
+    artBoard.style.top = (window.innerHeight - size) / 2 + size / 2 + 20 + "px";
 };
 
 setCanvasSize();

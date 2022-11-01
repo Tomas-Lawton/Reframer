@@ -6,12 +6,14 @@
 const http = "http://";
 const base = "0.0.0.0:8000";
 let socket = false;
+let ws 
 
 const connect = () => {
     const connection = new WebSocket("ws://" + base + "/ws");
     connection.onclose = (event) => {
         console.log("Closed socket... Running without AI\n" + event);
         socketLight.style.background = "#f6ab2a";
+        socket = false;
     };
     connection.onopen = (event) => {
         console.log("Connected AI Socket\n" + event);
@@ -32,8 +34,9 @@ const connect = () => {
     connection.onerror = (err) => {
         console.error("Socket encountered error: ", err.message, "Closing socket");
         ws.close();
+        socket = false;
     };
-    return connection;
+    ws= connection;
 };
 
 async function postData(url = "", data = {}) {
@@ -57,4 +60,4 @@ const logEventAPI = (latestJson) => {
         .catch((e) => console.error(e));
 };
 
-const ws = connect();
+connect();

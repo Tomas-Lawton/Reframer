@@ -20,7 +20,6 @@ class UserData {
         //             sketch_size: controller.frameSize,
         //             mode: controller.penMode,
         //             last_iteration: controller.lastIteration,
-        //             draw_step: controller.step,
         //             region: controller.drawRegion,
         //         },
         //     },
