@@ -3,8 +3,9 @@
 // const base = "vector-logging-server.herokuapp.com";
 // const base = "localhost:8000";
 
-const http = "http://";
-const base = "0.0.0.0:8000";
+// const http = "http://";
+// const base = "0.0.0.0:8000";
+const base = "tlawton@10.147.18.230:8000"
 let socket = false;
 let ws 
 
