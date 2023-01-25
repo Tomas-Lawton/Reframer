@@ -1,9 +1,9 @@
-# Introduction
+# Reframer
 
 Maximal control, minimal obtrusiveness has long been the hallmark of creativity support (Shneiderman, 2000). Reframer (shown by Figure 4.1) is functioning platform disrupting the status-quo by combining sketching with state-of-the-art AI algorithms for agent-augmented conceptual design. Unlike the vast majority of text-to-image generative systems, users are directly involved in the process of creation, and the AI is capable of making suggestions based on the user prompt. Users can create a sketch and a enter a prompt and Reframer will add strokes and modify the sketch. As this happens, users maintain seamless editorial control as they accept, modify, or reject AI contributions in real-time. In the final version, users can even describe parts of the sketch to the AI, thereby creating a goal hierarchy composed of multiple overlapping prompts. As the user draws, sketch developments are used as model inputs and the AI agent develops the sketch through optimisation based on differentiable rendering and CLIP (Frans et al., 2021; Radford et al., 2021). The model makes changes by gradually moving the lines on the canvas to look like an image described by the prompt, according to CLIP encoding (Radford et al., 2021)
 
 <p align="center">
-<img src="https://github.com/Tomas-Lawton/AIDraw/blob/master/repo_img/reframer_interface.png" width="448"/>
+<img src="https://github.com/Tomas-Lawton/AIDraw/repo_img/reframer_interface.png" width="448"/>
 </p>
 
 # Running Reframer
