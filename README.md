@@ -52,6 +52,6 @@ python3 setup.py install
 
 
 
-# 3 Run Drawing Client
+# Run Drawing Client
 
 Run the drawing client by opening index.html in chrome or using a live server extension. Firefox works but will not render the same as chrome. The client will automatically connect, and if all goes well the server light in the bottom left corner will turn green. You can restart the server at anytime and reconnect by clicking on this light.
