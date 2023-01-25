@@ -1,4 +1,4 @@
-conda create -n aidraw
+conda env create --name aidraw --file=environment.yml
 conda activate aidraw
 
 cd src/

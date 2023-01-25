@@ -19,6 +19,8 @@ logging.basicConfig(
 )
 
 logging.info("Starting App")
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+logging.info(f"Running with {str(device)}")
 
 app = FastAPI(title="Clip Algorithm API")
 origins = [
@@ -48,7 +50,7 @@ except ValueError as e:
 @app.post("/save_interactions")
 async def getInformation(info: Request):
     interaction_json = await info.json()
-    print(interaction_json)
+    
     try:
         collection.find_one_and_update(
             {"log_time": interaction_json["log_time"]},  # Log mode

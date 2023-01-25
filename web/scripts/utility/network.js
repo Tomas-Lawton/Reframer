@@ -1,10 +1,6 @@
-//heroku
-// const http = "https://";
-// const base = "vector-logging-server.herokuapp.com";
-// const base = "localhost:8000";
-
-const http = "http://";
+// Default localhost but can use with a remote machine
 const base = "0.0.0.0:8000";
+
 let socket = false;
 let ws 
 
@@ -55,7 +51,7 @@ async function postData(url = "", data = {}) {
 
 const logEventAPI = (latestJson) => {
     console.log(latestJson);
-    postData(http + base + "/save_interactions", latestJson)
+    postData("http://" + base + "/save_interactions", latestJson)
         .then((res) => console.log(res))
         .catch((e) => console.error(e));
 };

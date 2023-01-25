@@ -33,7 +33,7 @@ class CICADA:
         self.rolling_losses = []
 
     def encode_text_classes(self, prompt):
-        text_input = clip.tokenize(f"A simple line drawing of {prompt}").to(self.device)
+        text_input = clip.tokenize(prompt).to(self.device)
         n1 = clip.tokenize("A badly drawn sketch.").to(self.device)
         n2 = clip.tokenize("Many ugly, messy drawings.").to(self.device)
 
