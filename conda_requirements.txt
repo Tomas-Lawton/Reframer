@@ -1,9 +1,0 @@
-python=3.8
-cudatoolkit
-pytorch::pytorch
-torchvision
-numpy
-scikit-image
-cmake
-ffmpeg
-pip
