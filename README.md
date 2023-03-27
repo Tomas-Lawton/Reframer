@@ -116,6 +116,7 @@ source dev_setup.sh
 
 starting fom Reframer folder
 ```
+conda activate aidraw
 cd /server/src
 python3 main.py
 ```
