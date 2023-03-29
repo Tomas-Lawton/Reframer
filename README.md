@@ -88,7 +88,7 @@ sudo apt install curl
 ### Anaconda
 ```
 curl -O https://repo.anaconda.com/archive/Anaconda3-2023.03-Linux-x86_64.sh
-bash https://repo.anaconda.com/archive/Anaconda3-2023.03-Linux-x86_64.sh
+bash Anaconda3-2023.03-Linux-x86_64.sh
 ```
 
 ### Chrome
@@ -101,6 +101,7 @@ sudo apt install ./google-chrome-stable_current_amd64.deb
 ### Clone this repo and go to this branch
 ```
 git clone https://github.com/Tomas-Lawton/Reframer.git
+cd Reframer/
 git checkout fi_alt_setup
 ```
 
