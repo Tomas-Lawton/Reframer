@@ -55,3 +55,75 @@ python3 setup.py install
 # Run Drawing Client
 
 Run the drawing client by opening index.html in chrome or using a live server extension. Firefox works but will not render the same as chrome. The client will automatically connect, and if all goes well the server light in the bottom left corner will turn green. You can restart the server at anytime and reconnect by clicking on this light.
+
+
+<br>
+
+# Step by Step Installation
+
+For setup in the dwail computers
+
+## Prerequisites
+
+### gcc
+
+Check version is 8 or lower
+```
+gcc --version
+```
+
+If not,
+```
+sudo apt install build-essential
+sudo apt -y install gcc-8
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 8
+sudo update-alternatives --config gcc
+```
+
+### curl
+```
+sudo apt install curl
+```
+
+### Anaconda
+```
+curl -O https://repo.anaconda.com/archive/Anaconda3-2023.03-Linux-x86_64.sh
+bash Anaconda3-2023.03-Linux-x86_64.sh
+```
+
+### Chrome
+download Google Chrome from [https://www.google.com/chrome/](https://www.google.com/chrome/)
+```
+cd <download foder path>
+sudo apt install ./google-chrome-stable_current_amd64.deb
+```
+
+### Clone this repo and go to this branch
+```
+git clone https://github.com/Tomas-Lawton/Reframer.git
+cd Reframer/
+git checkout fi_alt_setup
+```
+
+## Installation
+
+starting fom Reframer folder
+```
+cd /server
+source dev_setup.sh
+```
+
+## Usage
+
+starting fom Reframer folder
+```
+conda activate aidraw
+cd /server/src
+python3 main.py
+```
+
+in another terminal
+```
+cd /web
+google-chrome index.html
+```
