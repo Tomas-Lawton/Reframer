@@ -1,4 +1,4 @@
-conda env create --name aidraw --file=environment.yml
+conda create -n aidraw -y
 conda activate aidraw
 
 cd src/
@@ -13,7 +13,7 @@ cp fix.py diffvg/fix.py
 cd diffvg
 python3 fix.py
 git submodule update --init --recursive
-conda install -y pytorch torchvision -c pytorch
+conda install pytorch==1.12.0 torchvision==0.13.0 torchaudio==0.12.0 cudatoolkit=11.3 -c pytorch
 conda install -y numpy
 conda install -y scikit-image
 conda install -y -c anaconda cmake
