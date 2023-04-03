@@ -24,28 +24,20 @@ hide(historyBlock);
 setPointSize(controller.strokeWidth);
 setThisColor("rgb(54 54 54)");
 
+
+
+// TO DO Add back in
 const defaults = new PaperScope();
-defaults.activate();
-for (let i = 0; i < 4; i++) {
-    let sketch = new Sketch(null, defaults, sketchSize);
-    let newElem = sketch.renderMini();
-    // controller.sketchScopeIndex += 1; //remove later
-    newElem.classList.add("inactive-sketch");
-    explorerPanel.firstElementChild.appendChild(newElem);
-}
+// defaults.activate();
+// for (let i = 0; i < 4; i++) {
+//     let sketch = new Sketch(null, defaults, sketchSize);
+//     let newElem = sketch.renderMini();
+//     newElem.classList.add("inactive-sketch");
+//     explorerPanel.firstElementChild.appendChild(newElem);
+// }
+
+
+
 
 localPrompts.style.display = "none";
 pickerSelect.style.display = "none";
-
-
-if (!useTool) {
-    document.querySelectorAll(".frame-ui").forEach(elem => {
-        elem.style.visibility = "hidden";
-        elem.style.pointerEvents = "none";
-        // elem.style.marginLeft = "-9000px";
-    })
-    focusButton.style.visibility = "hidden";
-
-}
-// document.querySelector(".tool-view").style.display = "none";
-

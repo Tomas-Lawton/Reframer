@@ -112,16 +112,16 @@ document.getElementById("save").addEventListener("click", () => {
     download();
 });
 
-document.getElementById("close-explorer").addEventListener("click", (e) => {
+document.querySelector(".explorer-exit").addEventListener("click", (e) => {
     emptyExplorer();
     setActionState("inactive");
     hide(explorerPanel);
 });
 
-document.getElementById("empty").addEventListener("click", (e) => {
-    emptyExplorer();
-    generateExploreSketches();
-});
+// document.getElementById("empty").addEventListener("click", (e) => {
+//     emptyExplorer();
+//     generateExploreSketches();
+// });
 
 document.getElementById("settings").addEventListener("click", () => {
     dropdown.classList.toggle("hidden-panel")
@@ -501,7 +501,7 @@ window.addEventListener("keydown", (event) => {
     }
     if (document.activeElement === prompt) {
         if (event.key == "Enter") {
-            drawLogic();
+            exploreLogic();
             prompt.blur();
         }
     }

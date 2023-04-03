@@ -4,6 +4,8 @@ class Controller {
         this.drawState;
         // Sketching Data
         this.prompt = null;
+        this.d0 = null;
+        this.d1 = null;
         this.exploreScopes = [];
         this.sketches = {};
         this.activeExplorers = {};
@@ -77,38 +79,6 @@ class Controller {
         ws.send(JSON.stringify(res));
         console.log("Update: ", res)
     }
-    draw() {
-        if (noPrompt()) {
-            openModal({
-                title: "Type a prompt first!",
-                message: "You need a target for AI sketching.",
-                confirmAction: () => (controlPanel.style.display = "flex"),
-            });
-            return;
-        }
-        if (!this.clipDrawing) {
-            this.clipDrawing = true;
-            this.targetDrawing = false;
-
-            sketchHistory.historyHolder.push({
-                svg: mainSketch.svg,
-                loss: mainSketch.semanticLoss,
-            });
-            sketchHistory.pushUndo();
-            this.prepare();
-            this.updateDrawer({
-                status: "draw",
-                sketch: mainSketch.sketch,
-                frame_size: mainSketch.frameSize,
-                prompt: this.prompt,
-                random_curves: this.initRandomCurves ? this.addLines : 0, //adding
-                rate: this.learningRate,
-                frames: Object.values(mainSketch.localFrames).map((elem) => elem.data),
-            });
-        } else {
-            throw new Error("Can't continue if already running");
-        }
-    }
     newExploreSketch(sketchCountIndex) {
         if (!this.clipDrawing) {
             if (!sketchSize) {
@@ -130,68 +100,12 @@ class Controller {
             });
         }
     }
-    continueSketch() {
-        if (!this.clipDrawing) {
-            this.clipDrawing = true;
-            try {
-                sketchHistory.historyHolder.push({
-                    svg: mainSketch.svg,
-                    loss: mainSketch.semanticLoss,
-                });
-                sketchHistory.pushUndo();
-                this.prepare();
-                this.updateDrawer({
-                    status: "continue_sketch",
-                    sketch: mainSketch.sketch,
-                    rate: this.learningRate,
-                    frames: Object.values(mainSketch.localFrames).map((elem) => elem.data)
-                });
-                setActionState(this.previousDrawState);
-            } catch (e) {
-                console.log("Problem with update");
-            }
-        }
-    }
-    prune() {
-        if (!this.clipDrawing) {
-            this.clipDrawing = true;
-            this.prepare();
-            this.updateDrawer({
-                status: "prune",
-                sketch: mainSketch.sketch,
-                frame_size: mainSketch.frameSize,
-                prompt: this.prompt,
-                random_curves: this.initRandomCurves ? this.addLines : 0, //adding
-                rate: this.learningRate,
-            });
-            setActionState("pruning");
-        }
-    }
     stop() {
         sketchHistory.historyHolder.push({
             svg: mainSketch.svg,
             loss: mainSketch.semanticLoss,
         });
         this.updateDrawer({ status: "stop" });
-    }
-    pause() {
-        if (
-            //todo refactor
-          (  (this.drawState !== "explore" && //don't include this state
-                this.activeStates.includes(controller.drawState)) ||
-            this.drawState === "active-frame" ) && this.drawState !== "pause"
-        ) {
-            this.previousDrawState = this.drawState
-            console.log("Pausing");
-            document.querySelector(".current-status").style.color = "#ff9700";
-            document.querySelector(".current-status").innerHTML = "Waiting";
-
-            controller.liveCollab = true;
-            this.updateDrawer({ status: "stop" });
-            this.clipDrawing = false;
-            controller.drawState = "pause";
-            // setActionState("pause");
-        }
     }
     stopSingle(i) {
         this.updateDrawer({

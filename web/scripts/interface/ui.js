@@ -1,5 +1,3 @@
-const useTool = true;
-
 const socketLight = document.querySelector(".socket-connect");
 const canvas = document.getElementById("canvas");
 
@@ -24,7 +22,7 @@ const sparkKnob = document.querySelector(".spark-knob");
 const buttonPanel = document.querySelector(".action");
 const dropdown = document.querySelector(".pen-dropdown");
 const staticSketches = document.getElementById("static-sketches");
-const explorerPanel = document.querySelector(".explore-panel");
+const explorerPanel = document.querySelector(".generative-explorer");
 const sketchGrid = document.getElementById("grid-container");
 const pen = document.getElementById("pen");
 // Actions

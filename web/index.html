@@ -28,6 +28,8 @@
     <script type="text/javascript" src="scripts/state/load.js" defer></script>
     <script type="text/javascript" src="scripts/utility/util.js" defer></script>
 
+    <!-- UI -->
+    <script type="text/javascript" src="scripts/interface/explorer.js" defer></script>
     <script type="text/javascript" src="scripts/interface/interface-logic.js" defer></script>
     <script type="text/javascript" src="scripts/interface/local-prompts.js" defer></script>
     <script type="text/javascript" src="scripts/interface/controls.js" defer></script>
@@ -35,6 +37,7 @@
     <script type="text/javascript" src="scripts/interface/canvas.js" defer></script>
     <script type="text/javascript" src="scripts/interface/style.js" defer></script>
 
+    <!-- Interactive -->
     <script type="text/javascript" src="scripts/state/pen.js" defer></script>
     <script type="text/javascript" src="scripts/utility/logger.js" defer></script>
     <script type="text/javascript" src="scripts/interface/interface.js" defer></script>
@@ -62,16 +65,6 @@
 
             <div class="panel-section">
                 <div class="clip-actions inactive-section">
-                    <div class="action-default tooltip" id="draw">
-                        <span class="tooltiptext">Change the sketch using AI</span>
-                        <i class="fa-solid fa-robot fa-fw"></i>
-                        <p>Draw</p>
-                    </div>
-                    <div class="frame-ui action-default tooltip" id="focus">
-                        <span class="tooltiptext">Labeling parts the image helps AI focus</span>
-                        <i class="fa-solid fa-note-sticky fa-fw" id="focus-icon"></i>
-                        <p>Focus</p>
-                    </div>
                     <div class="action-default tooltip" id="explore">
                         <span class="tooltiptext">Get options for developing the sketch</span>
                         <i class="fa-solid fa-lightbulb fa-fw"></i>
@@ -153,7 +146,6 @@
 
     <section class="project">
         <div class="project-actions">
-            <i class="frame-ui inactive-section canvas-focus fa-solid fa-note-sticky fa-fw"></i>
             <i class="undo fa-solid fa-rotate-left fa-fw"></i>
             <i class="redo fa-solid fa-rotate-right fa-fw"></i>
             <i class="fa-solid fa-cog fa-fw" id="settings"></i>
@@ -209,10 +201,6 @@
                 </div>
             </div>
             <canvas id="canvas"></canvas>
-            <div class="frame-ui inactive-section canvas-focus">
-                <p>Focus</p>
-                <i class="fa-solid fa-note-sticky fa-fw"></i>
-            </div>
         </div>
         <div class="hint">
             <span class="hint-text">Draw with AI by adding a prompt and clicking draw.</span>
@@ -276,7 +264,7 @@
         <p class="reset-frames">Reset</p>
     </div>
 
-    <div class="explore-panel">
+    <!-- <div class="generative-explorer">
         <div id="explore-sketches"></div>
         <div id="explorer-buttons">
             <h3 class="panel-subtitle">Explorer</h3>
@@ -284,7 +272,61 @@
             <p class="pill" id="empty">Refresh</p>
             <p class="pill" id="close-explorer">Close <i class="fa-solid fa-xmark"></i></p>
         </div>
+    </div> -->
+
+
+    <div class="generative-explorer">
+        <div class="explorer-header flex">
+            <h1>Explorer</h1>
+            <div class="flex explorer-header-actions">
+                <div class="input-container">
+                    <input class="input-field" type="text" placeholder="Dimension One" name="d0">
+                    <i class="fa fa-xmark icon" name="x-d0"></i>
+                  </div>
+                  <div class="input-container">
+                    <input class="input-field" type="text" placeholder="Dimension Two" name="d1">
+                    <i class="fa fa-xmark icon" name="x-d1"></i>
+                  </div>
+                <button>Generate</button>
+            </div>
+        </div>
+
+        <h2>Generate alternative sketches using dimensions...</h2>
+
+        <div class="display-grid">
+            <p class="label-d2 dimension-label" label="d1">Dimension Two</p>
+
+            <div class="flex">
+                <div class="label-d1">
+                    <p class="dimension-label" label="d0">Dimension One</p>
+                    <!-- <hr/> -->
+                </div>
+            
+                <div class="example-grid">
+                    <div class="example"></div>
+                    <div class="example"></div>
+                    <div class="example"></div>
+                    <div class="example"></div>
+                    <div class="example"></div>
+                    <div class="example"></div>
+                    <div class="example"></div>
+                    <div class="example"></div>
+                    <div class="example"></div>
+                    <div class="example"></div>
+                    <div class="example"></div>
+                    <div class="example"></div>
+                    <div class="example"></div>
+                    <div class="example"></div>
+                    <div class="example"></div>
+                    <div class="example"></div>
+                </div>
+            </div>
+        </div>
+
+        <button class="explorer-exit">Close <i class="fa-solid fa-xmark"></i></button>
     </div>
+
+
 
     <div class="sketch-card" id="sketch-template" draggable="true">
         <div class="card-info">
@@ -301,48 +343,6 @@
             <canvas id="template-sketch" class="sketch-canvas"></canvas>
         </div>
     </div>
-
-    <!-- <div id="sketchbook-panel">
-        <div id="sketchbook-content">
-            <div id="static-margin">
-                <div id="static-sketches">
-                    <div class="flex" id="title-block">
-                        <div class="tab-info">
-                            <div>
-                                <h1 class="panel-title">
-                                    Sketchbook
-                                </h1>
-
-                                <h2 class="panel-subtitle">Save sketches for later!</h2>
-                                <p class="pill" id="overwrite">Overwrite</p>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="basic-background" id="grid-container">
-                        <div id="sketch-grid">
-                            <div class="sketch-card" id="sketch-template" draggable="true">
-                                <div class="card-info">
-                                    <div>
-                                        <i class="fa-solid fa-spinner button-animation card-loading"></i>
-                                        <h3></h3>
-                                    </div>
-                                    <div class="card-icon-background">
-                                        <i class="fa-solid fa-hand fa-fw"></i>
-                                        <i class="fa-solid fa-minus fa-fw"></i>
-                                    </div>
-                                </div>
-                                <div class="sketch">
-                                    <canvas id="template-sketch" class="sketch-canvas"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="pill" id="save-sketch">Add Sketch</hp>
-                </div>
-            </div>
-        </div>
-    </div> -->
 
     <div class="drawing-tool-panel">
         <div></div>
