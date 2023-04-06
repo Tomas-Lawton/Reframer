@@ -21,6 +21,7 @@ class CICADA:
         # self.clipConvLoss = CLIPConvLoss2(self.device)
         self.augment_trans = get_augment_trans(canvas_w, normalize_clip)
         self.attention_regions = []
+        self.behaviours = []
 
         # Variables
         self.iteration = 0
@@ -30,7 +31,7 @@ class CICADA:
         self.w_img = 0.1
         prune_places = [round(num_iter * (k + 1) * 0.8 / 1) for k in range(1)]
         self.prune_ratio = p0 / len(prune_places)
-        self.rolling_losses = []
+        self.rolling_losses = []        
 
     def encode_text_classes(self, prompt):
         text_input = clip.tokenize(prompt).to(self.device)
@@ -41,6 +42,11 @@ class CICADA:
             self.text_features = self.model.encode_text(text_input)
             self.text_features_neg1 = self.model.encode_text(n1)
             self.text_features_neg2 = self.model.encode_text(n2)
+
+    @torch.no_grad()
+    def add_behaviour(self, prompt, target_beh, weight=0.3):
+        z = self.model.encode_text(clip.tokenize(prompt).to(self.device))
+        self.behaviours.append({"z": z, "b": target_beh, "w": weight})
 
     def add_attention_region(self, prompt, drawing_area):
         text_input = clip.tokenize(prompt).to(self.device)
@@ -185,6 +191,14 @@ class CICADA:
             if use_negative:
                 loss += torch.cosine_similarity(self.text_features_neg1, img_features[n:n+1], dim=1) * 0.3
                 loss += torch.cosine_similarity(self.text_features_neg2, img_features[n:n+1], dim=1) * 0.3
+            
+            for behaviour in self.behaviours:
+                loss += behaviour["w"] * torch.abs(
+                    behaviour["b"]
+                    - torch.cosine_similarity(
+                        behaviour["z"], img_features[n : n + 1], dim=1
+                    )
+                )
 
         self.rolling_losses.append(loss.item()) #before multiplying
 
