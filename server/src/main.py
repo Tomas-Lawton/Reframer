@@ -112,6 +112,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     await drawer.stop()
                     del drawer
 
+
             if data["status"] == "draw":
                 main_sketch.use_sketch(data)
                 main_sketch.activate(True)

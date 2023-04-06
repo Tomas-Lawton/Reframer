@@ -100,6 +100,25 @@ class Controller {
             });
         }
     }
+    pause() {
+        if (
+            //todo refactor
+          (  (this.drawState !== "explore" && //don't include this state
+                this.activeStates.includes(controller.drawState)) ||
+            this.drawState === "active-frame" ) && this.drawState !== "pause"
+        ) {
+            this.previousDrawState = this.drawState
+            console.log("Pausing");
+            document.querySelector(".current-status").style.color = "#ff9700";
+            document.querySelector(".current-status").innerHTML = "Waiting";
+
+            controller.liveCollab = true;
+            this.updateDrawer({ status: "stop" });
+            this.clipDrawing = false;
+            controller.drawState = "pause";
+            // setActionState("pause");
+        }
+    }
     stop() {
         sketchHistory.historyHolder.push({
             svg: mainSketch.svg,

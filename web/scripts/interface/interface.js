@@ -274,16 +274,6 @@ frameName.onmousedown = (e) => {
 //     }
 // };
 
-localPrompts.onmousedown = (e) => {
-    if (window.innerWidth > 700) {
-        e = e || window.event;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        document.onmouseup = closeDragElement;
-        document.onmousemove = (e) => elementDrag(e, localPrompts);
-        console.log("dragging");
-    }
-};
 
 explorerPanel.onmousedown = (e) => {
     let bounds = explorerPanel.firstElementChild.getBoundingClientRect();
@@ -381,25 +371,6 @@ document.getElementById("num-squiggles").oninput = (e) => {
     setLineLabels(mainSketch.sketchLayer);
 };
 
-frameDropIn.forEach((button) =>
-    button.addEventListener("click", () => focusLogic())
-);
-
-document
-    .querySelector(".local-prompts>button")
-    .addEventListener("click", () => {
-        let w = parseInt(150 * Math.random() + 100);
-        let h = parseInt(150 * Math.random() + 100);
-        let x = parseInt((canvas.width * 0.4 - w) * Math.random() + w / 2);
-        let y = parseInt((canvas.width * 0.4 - h) * Math.random() + h / 2);
-        let b = new Rectangle({
-            x,
-            y,
-            width: w,
-            height: h,
-        });
-        createLocalPrompt(b, x, y, w, h);
-    });
 
 let lastLearningRate = controller.learningRate;
 respectSlider.oninput = (e) => {
@@ -408,19 +379,6 @@ respectSlider.oninput = (e) => {
     document.getElementById("fix-label").innerHTML = msg;
 };
 
-respectSlider.onmousedown = () => {
-    controller.pause();
-    lastLearningRate = controller.learningRate;
-};
-
-respectSlider.onmouseup = () => {
-    if (controller.liveCollab) {
-        if (controller.learningRate !== lastLearningRate) {
-            controller.continueSketch();
-        }
-        controller.liveCollab = false;
-    }
-};
 
 header.addEventListener("click", () => {
     accordionItem.classList.toggle("open");
@@ -467,10 +425,6 @@ toolToggle.addEventListener("click", () => {
         styles.style.left = window.innerWidth - 10 - styles.offsetWidth + "px";
         styles.style.top = window.innerHeight / 2 + "px";
     }
-});
-
-document.querySelector(".switch-mode").addEventListener("click", () => {
-    focusLogic();
 });
 
 // Shortcuts

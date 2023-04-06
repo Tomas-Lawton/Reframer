@@ -37,7 +37,4 @@ const defaults = new PaperScope();
 // }
 
 
-
-
-localPrompts.style.display = "none";
 pickerSelect.style.display = "none";
