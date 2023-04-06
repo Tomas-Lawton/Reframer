@@ -1,11 +1,35 @@
+'''
+Generate -> Return them to FE. 
+Set up the stuffs, and listen for a message with the prompt, sketch and dimensions
+Assuming a loading screen HTTP is better. But, assuming live loading they should be shown. However, since we only show a subset they should be loaded.
+Use standard CICADA. 
+
+SETUP
+Generate: Initialise text behvaiour class.
+
+DRAW
+Add behaviours. -> Add option for remove behaviours
+Evaluate the behaviours for starting values.
+Initialise the sketches (16 CICADAS): -----> Refactor to make them async based on model code.
+    For each, push the sketch to a new target by adding the BOOSTED dimensions
+    Wait for a while. 
+
+Run 16 sketches for 500 iterat ions and show the best subset (four) to the user. 
+Run top 8 sketches for 500 iterat ions and show the best subset (four) to the user. ------> Instead of the top sketches could take the sketches that are most diverse from each other.
+Now return only the top 4 sketches.
+
+We can display the top 4 sketches or the top 2 sketches for each dimension. Or we can get the four sketches which are most diverse.
+We don't need to tell a user which ones are more fluffy or real we can just let the user see the result. 
+Or maybe it's better to give values for how much of each dimension is in the result e.g 10% fluffy vs 5% real.
+'''
+
+
+
 import logging
 import os
 import uvicorn
 
-# from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pymongo import MongoClient
-
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from cicada import CICADA
 import torch
@@ -39,12 +63,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-try:
-    cluster = MongoClient(os.environ.get('MONGODB_URI'))
-    db = cluster["vector_ai"]
-    collection = db["interaction_events"]
-except ValueError as e:
-    logging.error("Bad credentials \n", e)
+
 
 
 @app.post("/save_interactions")
@@ -67,11 +86,6 @@ async def getInformation(info: Request):
         }
     except Exception as e:
         logging.error(e)
-
-
-@app.get("/")
-async def home():
-    return {"hello", "world"}
 
 # Refactor as dictionary
 def kill(d, a):
@@ -119,25 +133,6 @@ async def websocket_endpoint(websocket: WebSocket):
                 main_sketch.draw()
 
 
-
-# Setup
-# Generate: Initialise text behvaiour class.
-
-
-# DRAW
-# Add behaviours. -> Add option for remove behaviours
-# Evaluate the behaviours for starting values.
-# Initialise the sketches (16 CICADAS): -----> Refactor to make them async based on model code.
-#     For each, push the sketch to a new target by adding the BOOSTED dimensions
-#     Wait for a while. 
-
-# Run 16 sketches for 500 iterat ions and show the best subset (four) to the user. 
-# Run top 8 sketches for 500 iterat ions and show the best subset (four) to the user. ------> Instead of the top sketches could take the sketches that are most diverse from each other.
-# Now return only the top 4 sketches.
-
-# We can display the top 4 sketches or the top 2 sketches for each dimension. Or we can get the four sketches which are most diverse.
-# We don't need to tell a user which ones are more fluffy or real we can just let the user see the result. 
-# Or maybe it's better to give values for how much of each dimension is in the result e.g 10% fluffy vs 5% real.
 
 
             if data["status"] == "add_new_sketch":
