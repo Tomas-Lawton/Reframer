@@ -118,6 +118,28 @@ async def websocket_endpoint(websocket: WebSocket):
                 main_sketch.activate(True)
                 main_sketch.draw()
 
+
+
+# Setup
+# Generate: Initialise text behvaiour class.
+
+
+# DRAW
+# Add behaviours. -> Add option for remove behaviours
+# Evaluate the behaviours for starting values.
+# Initialise the sketches (16 CICADAS): -----> Refactor to make them async based on model code.
+#     For each, push the sketch to a new target by adding the BOOSTED dimensions
+#     Wait for a while. 
+
+# Run 16 sketches for 500 iterat ions and show the best subset (four) to the user. 
+# Run top 8 sketches for 500 iterat ions and show the best subset (four) to the user. ------> Instead of the top sketches could take the sketches that are most diverse from each other.
+# Now return only the top 4 sketches.
+
+# We can display the top 4 sketches or the top 2 sketches for each dimension. Or we can get the four sketches which are most diverse.
+# We don't need to tell a user which ones are more fluffy or real we can just let the user see the result. 
+# Or maybe it's better to give values for how much of each dimension is in the result e.g 10% fluffy vs 5% real.
+
+
             if data["status"] == "add_new_sketch":
                 new_sketch = CICADA(
                         websocket, device, model, data["data"]["sketch_index"]
