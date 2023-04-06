@@ -1,5 +1,6 @@
 import torch
 import pydiffvg
+import shortuuid
 
 
 class Trace:
@@ -15,6 +16,7 @@ class Drawing:
         self.canvas_height = canvas_height
         self.traces = []
         self.img = None
+        self.id = shortuuid.uuid()
 
     def add_paths(self, path_list):
         shapes = []
@@ -91,6 +93,18 @@ class Drawing:
         count = 0
         for n, trace in enumerate(self.traces):
             if n != k:
+                shapes.append(trace.shape)
+                trace.shape_group.shape_ids = torch.tensor([count])
+                shape_groups.append(trace.shape_group)
+                count += 1
+        return shapes, shape_groups
+
+    def all_shapes_except(self, inds):
+        shapes = []
+        shape_groups = []
+        count = 0
+        for n, trace in enumerate(self.traces):
+            if n not in inds:
                 shapes.append(trace.shape)
                 trace.shape_group.shape_ids = torch.tensor([count])
                 shape_groups.append(trace.shape_group)

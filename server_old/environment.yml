@@ -1,0 +1,17 @@
+name: env
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - cudatoolkit
+  - thrust
+  - pytorch
+  - torchvision
+  - numpy
+  - scikit-image
+  - cmake
+  - ffmpeg
+  - pip
+prefix: C:\Users\ABC\.conda\envs\env

@@ -11,9 +11,12 @@ class TextBehaviour:
         self.behaviours = []
 
     @torch.no_grad()
-    def add_behaviour(self, prompt):
-        z = self.model.encode_text(clip.tokenize(prompt).to(self.device))
-        self.behaviours.append({"name": prompt, "z": z})
+    def add_behaviour(self, word_0, word_1):
+        z_0 = self.model.encode_text(clip.tokenize(word_0).to(self.device))
+        z_1 = self.model.encode_text(clip.tokenize(word_1).to(self.device))
+        self.behaviours.append(
+            {"name": f"{word_0} vs {word_1}", "z_0": z_0, "z_1": z_1}
+        )
 
     @torch.no_grad()
     def eval_behaviours(self, img, showme=False, num_augs=4):
@@ -28,11 +31,11 @@ class TextBehaviour:
         for behaviour in self.behaviours:
             score = 0
             for n in range(num_augs):
-                score += (
-                    torch.cosine_similarity(
-                        behaviour["z"], img_features[n : n + 1], dim=1
-                    )
-                    / num_augs
+                score += torch.cosine_similarity(
+                    behaviour["z_0"], img_features[n : n + 1], dim=1
+                )
+                score -= torch.cosine_similarity(
+                    behaviour["z_1"], img_features[n : n + 1], dim=1
                 )
             beh_scores.append(score)
             if showme:
