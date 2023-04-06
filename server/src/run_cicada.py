@@ -58,9 +58,13 @@ def run_single_sketch(text_behaviour):
                 gamma=1,
             )
 
-        # ToDO fix this line for initial image!!!!!
-        # text_behaviour.eval_behaviours(cicada.img, showme=True)
+        # this is gonna be the same for every sketch but it's fine
+        img = cicada.build_img("deprecated")
+        cicada.img = img.cpu().permute(0, 2, 3, 1).squeeze(0)
+        text_behaviour.eval_behaviours(cicada.img, showme=True)
 
+        # need to pass in the dimension prompt as well as the target val e.g .2, .4, .6 depending on how it should explore.
+        cicada.add_behaviour()
 
         # Run the main optimization loop
         for t in range(args.num_iter):

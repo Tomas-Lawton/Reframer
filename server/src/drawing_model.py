@@ -287,12 +287,12 @@ class Cicada:
         self.drawing.remove_traces(removal_inds)
         self.add_random_shapes(len(removal_inds))
 
-    def run_epoch(self, t="deprecated", num_augs=4):
+    def run_epoch(self, num_augs=4):
         self.points_optim.zero_grad()
         self.width_optim.zero_grad()
         self.color_optim.zero_grad()
 
-        img = self.build_img(t)
+        img = self.build_img("deprecated")
 
         img_loss = (
             torch.norm((img - self.img0) * self.mask)
