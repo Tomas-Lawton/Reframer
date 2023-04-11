@@ -3,11 +3,14 @@ import os
 import torch
 import uvicorn
 
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
+# from fastapi import FastAPI, Request
+# from fastapi.middleware.cors import CORSMiddleware
 
-from src.behaviour import TextBehaviour
-from src.run_cicada import run_single_sketch
+# from src.behaviour import TextBehaviour
+# from src.run_cicada import run_single_sketch
+
+if not torch.cuda.device_count():
+    raise Exception("No CUDA Devices :(")
 
 '''
 Generate -> Return them to FE. 
@@ -78,8 +81,12 @@ text_behaviour = TextBehaviour()
 text_behaviour.add_behaviour(user_behaviour_one, user_behaviour_two)
 # text_behaviour.add_behaviour("simple", "complex")
 
+
+# for i in range(4):
+#     for j in range(4):
+#         bias_a = i*.2
+#         bias_b = j*.2
+#         run_single_sketch(text_behaviour, bias_a, bias_b)
+
 run_single_sketch(text_behaviour)
 
-# for i in range(16):
-#     run_single_sketch(text_behaviour)
-    

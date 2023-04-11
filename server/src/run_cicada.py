@@ -58,13 +58,20 @@ def run_single_sketch(text_behaviour):
                 gamma=1,
             )
 
-        # this is gonna be the same for every sketch but it's fine
-        img = cicada.build_img("deprecated")
-        cicada.img = img.cpu().permute(0, 2, 3, 1).squeeze(0)
-        text_behaviour.eval_behaviours(cicada.img, showme=True)
+        # # this is gonna be the same for every sketch but it's fine
+        # img = cicada.build_img("deprecated")
+        # cicada.img = img.cpu().permute(0, 2, 3, 1).squeeze(0)
+        # evaluation_scores = text_behaviour.eval_behaviours(cicada.img, showme=True)
+        
+        # # need to pass in the dimension prompt as well as the target val e.g .2, .4, .6 depending on how it should explore.
 
-        # need to pass in the dimension prompt as well as the target val e.g .2, .4, .6 depending on how it should explore.
-        cicada.add_behaviour()
+        # behaviour_a_name = text_behaviour.behaviours[0]["name"]
+        # bahaviour_a_target = evaluation_scores[0].item() + bias_a
+        # cicada.add_behaviour(behaviour_a_name, bahaviour_a_target)
+
+        # behaviour_b_name = text_behaviour.behaviours[1]["name"]
+        # bahaviour_b_target = evaluation_scores[1].item() + bias_b
+        # cicada.add_behaviour(behaviour_b_name, bahaviour_b_target)
 
         # Run the main optimization loop
         for t in range(args.num_iter):
@@ -82,4 +89,4 @@ def run_single_sketch(text_behaviour):
         #     cicada.img, save_path + time_str + '.png', gamma=1,
         # )
         # utils.save_data(save_path, time_str, args)
-
+    print("DONE")
