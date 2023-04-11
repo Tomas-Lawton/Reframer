@@ -19,11 +19,11 @@ const generateExploreSketches = () => {
 
     // Remove the place holder ones
     total = 4;
-    for (let i = 0; i < 4; i++) {
-        explorerPanel.firstElementChild.removeChild(
-            explorerPanel.firstElementChild.firstElementChild
-        );
-    }
+    // for (let i = 0; i < 4; i++) {
+    //     explorerPanel.firstElementChild.removeChild(
+    //         explorerPanel.firstElementChild.firstElementChild
+    //     );
+    // }
     // Replace
     for (let i = 0; i < 4; i++) {
         let sketch = new Sketch(
