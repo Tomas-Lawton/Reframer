@@ -50,28 +50,6 @@ const setModeDefault = () => {
     document.querySelector(".current-status").innerHTML = "Inactive";
 };
 
-const setModeDraw = () => {
-    exploreButton.className = "action-inactive";
-    hint.innerHTML = `Don't wait. Draw with me!`;
-    stopButton.className = "action-stop";
-    actions.forEach((button) => button.classList.add("tooltip"));
-
-    prompt.classList.add("inactive-prompt")
-    document.querySelector(".project").classList.remove("greeeeeen");
-
-    hide(explorerPanel);
-    hide(historyBlock);
-
-    accordionItem.classList.add("open");
-    accordionItem.classList.remove("closed");
-    undoButton.classList.add("inactive-section");
-    redoButton.classList.add("inactive-section");
-    document.getElementById("loading").style.display = "flex";
-    // document.querySelector(".control-lines").style.display = "none";
-
-    document.querySelector(".current-status").style.color = "#7b66ff";
-    document.querySelector(".current-status").innerHTML = "Drawing";
-};
 
 const setModeExplore = () => {
     exploreButton.className = "action-current";
@@ -134,23 +112,22 @@ const exploreLogic = () => {
         return;
     }
 
-    if (socket) {
-        if (noPrompt()) {
-            openModal({
-                title: "Type a prompt first!",
-                message: "You need a target for AI sketchs.",
-                confirmAction: () => (controlPanel.style.display = "flex"),
-            });
-            return;
-        } else {
-            sketchHistory.historyHolder.push({
-                svg: mainSketch.svg,
-                loss: mainSketch.semanticLoss,
-            });
-            sketchHistory.pushUndo();
-            generateExploreSketches();
-        }
+    if (noPrompt()) {
+        openModal({
+            title: "Type a prompt first!",
+            message: "You need a target for AI sketchs.",
+            confirmAction: () => (controlPanel.style.display = "flex"),
+        });
+        return;
+    } else {
+        sketchHistory.historyHolder.push({
+            svg: mainSketch.svg,
+            loss: mainSketch.semanticLoss,
+        });
+        sketchHistory.pushUndo();
+        generateExploreSketches();
     }
+
 };
 
 const stopLogic = () => {
@@ -188,7 +165,7 @@ const stopLogic = () => {
         // hide(localPrompts);
         // show(styles);
         // deactivateCanvasFrames();
-        
+
         logger.event("stop-drawing");
     }
 };

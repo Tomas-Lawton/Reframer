@@ -4,8 +4,6 @@ class Controller {
         this.drawState;
         // Sketching Data
         this.prompt = null;
-        this.d0 = null;
-        this.d1 = null;
         this.exploreScopes = [];
         this.sketches = {};
         this.activeExplorers = {};
@@ -52,7 +50,7 @@ class Controller {
         this.liveCollab = false;
         this.previousDrawState;
     }
-    updateDrawer({
+    async updateDrawer({
         status,
         sketch,
         frame_size,
@@ -76,10 +74,33 @@ class Controller {
                 sketch_index,
             },
         };
-        ws.send(JSON.stringify(res));
-        console.log("Update: ", res)
+        // ws.send(JSON.stringify(res));
+
+        // JSON.stringify(res)
+
+
+        const sketches = postData("https://" + base + "/explore_diverse_sketches", res)
+            .then((res) => console.log(res))
+            .catch((e) => console.error(e));
+
+        // const response = await fetch($`${base}/explore_diverse_sketches`, {
+        //     method: 'POST',
+        //     headers: {
+        //       'Accept': 'application/json',
+        //       'Content-Type': 'application/json'
+        //     },
+        //     body: JSON.stringify(res),
+        // });
+
+        // response.json().then(data => {
+        //     let string = JSON.stringify(data);
+        //     console.log(string);
+        // });
+
     }
+
     newExploreSketch(sketchCountIndex) {
+
         if (!this.clipDrawing) {
             if (!sketchSize) {
                 console.error("sketch size not found");
@@ -98,25 +119,6 @@ class Controller {
                 rate: this.learningRate,
                 frames: Object.values(mainSketch.localFrames).map((elem) => elem.data),
             });
-        }
-    }
-    pause() {
-        if (
-            //todo refactor
-          (  (this.drawState !== "explore" && //don't include this state
-                this.activeStates.includes(controller.drawState)) ||
-            this.drawState === "active-frame" ) && this.drawState !== "pause"
-        ) {
-            this.previousDrawState = this.drawState
-            console.log("Pausing");
-            document.querySelector(".current-status").style.color = "#ff9700";
-            document.querySelector(".current-status").innerHTML = "Waiting";
-
-            controller.liveCollab = true;
-            this.updateDrawer({ status: "stop" });
-            this.clipDrawing = false;
-            controller.drawState = "pause";
-            // setActionState("pause");
         }
     }
     stop() {
