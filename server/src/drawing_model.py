@@ -5,7 +5,7 @@ from src.drawing import Drawing
 from src.processing import get_augment_trans
 from src.svg_extraction import get_drawing_paths
 import clip
-from src.utils import get_nouns
+from src.utils import get_nouns, data_to_tensor
 import torch
 import pydiffvg
 import copy
@@ -41,6 +41,7 @@ class Cicada:
         self.attention_regions = []
         self.max_width = max_width
         self.t = 0
+        self.behaviours = []
 
     def process_text(self, prompt, neg_prompts=["Written words.", "Text."]):
         self.nouns, noun_prompts = get_nouns()
@@ -57,6 +58,53 @@ class Cicada:
                 )
                 for prompt in neg_prompts
             ]
+
+
+    @torch.no_grad()
+    def add_behaviour(self, prompt, target_beh, weight=0.3):
+        z = self.model.encode_text(clip.tokenize(prompt).to(self.device))
+        self.behaviours.append({"z": z, "b": target_beh, "w": weight})
+
+    def process_sketch(self, data, user_frame_size):
+        path_list = []
+        for path in data: 
+            points = []
+            num_segments = len(path['path_data'].split(',')) // 3
+            spaced_data = path['path_data'].split('c')
+            x0 = spaced_data[0][1:].split(',')  # only thing different is M instead of m
+            curve_list = [
+                spaced_data.split(' ') for spaced_data in spaced_data[1:]
+            ]  # exclude move to
+            point_list = []
+            for curve in curve_list:
+                for i in range(3):
+                    point_list.append(curve[i])
+            tuple_array = [
+                tuple.split(',') for tuple in point_list
+            ]  # split each curve by spaces, then comma for points
+            points_array = [
+                [
+                    round(float(x) *  1 / user_frame_size, 5),
+                    round(float(y) * 1 / user_frame_size, 5),
+                ]
+                for [x, y] in tuple_array
+            ]
+            start_x = round(float(x0[0]) / user_frame_size, 5)
+            start_y = round(float(x0[1]) / user_frame_size, 5)
+            x0 = [start_x, start_y]
+            points = [x0] + points_array
+            fixed = False
+            if "fixed_path" in path:
+                fixed = path["fixed_path"]
+
+            colors = [float(val) for val in path["color"]]
+            if len(points) > 0:
+                path_list.append(data_to_tensor(colors, float(path["stroke_width"] * self.normaliseScaleFactor), 
+                    points, float(num_segments), fixed))
+        
+        self.drawing.add_paths(path_list)
+        return path_list
+
 
     def load_svg_shapes(self, svg_path):
         '''
@@ -320,6 +368,14 @@ class Cicada:
                         neg_text_feat, img_features[n : n + 1], dim=1
                     )
                     * 0.3
+                )
+
+            for behaviour in self.behaviours:
+                loss += behaviour["w"] * torch.abs(
+                    behaviour["b"]
+                    - torch.cosine_similarity(
+                        behaviour["z"], img_features[n : n + 1], dim=1
+                    )
                 )
 
         for att_region in self.attention_regions:

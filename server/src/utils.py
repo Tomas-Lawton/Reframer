@@ -157,3 +157,16 @@ def get_augment_trans(canvas_width, normalize_clip=False):
         )
 
     return augment_trans
+
+
+def data_to_tensor(color, stroke_width, path, num_segments, tie):
+    color = torch.tensor(color)
+    stroke_width = torch.tensor(stroke_width)
+    v0 = torch.tensor([0, 0])
+    path = torch.tensor(path)
+    tie = torch.tensor(tie)
+    for k in range(path.size(0)):
+        path[k, :] += v0
+        if k % 3 == 0:
+            v0 = path[k, :]
+    return DrawingPath(path, color, stroke_width, num_segments, tie)

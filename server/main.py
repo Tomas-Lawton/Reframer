@@ -3,14 +3,14 @@ import os
 import torch
 import uvicorn
 
-# from fastapi import FastAPI, Request
-# from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 
-# from src.behaviour import TextBehaviour
-# from src.run_cicada import run_single_sketch
+from src.behaviour import TextBehaviour
+from src.run_cicada import create_cicada, run_cicada
 
 if not torch.cuda.device_count():
-    raise Exception("No CUDA Devices :(")
+    raise Exception("No CUDA Devices Found")
 
 '''
 Generate -> Return them to FE. 
@@ -40,53 +40,65 @@ Or maybe it's better to give values for how much of each dimension is in the res
 
 
 
-# app = FastAPI(title="CICADA Backend")
-# origins = [
-#     "http://127.0.0.1:8000",
-#     "https://tomas-lawton.github.io/drawing-client",
-#     "https://tomas-lawton.github.io",
-#     "http://localhost:5500",
-#     "http://127.0.0.1:5500"
-# ]
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=origins,
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
+app = FastAPI(title="CICADA Backend")
+origins = [
+    "http://127.0.0.1:8000",
+    "https://tomas-lawton.github.io/drawing-client",
+    "https://tomas-lawton.github.io",
+    "http://localhost:5500",
+    "http://127.0.0.1:5500"
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# @app.post("/explore_diverse_sketches")
-# async def explore(user_inputs: Request):
-#     json_data = await user_inputs.json()
-#     print(json_data)
+@app.get("/explore_diverse_sketches")
+async def explore(user_inputs: Request):
+    return {
+        "status": "SUCCESS",
+        "hello": "world"
+    }
 
-##INSERT CODE HERE
-
-#     diverse_sketches = []
-#     return {
-#         "status": "SUCCESS",
-#         "diverse_sketches": diverse_sketches
-#     }
-
-
-# Test here first
-
-user_behaviour_one = "drawing"
-user_behaviour_two = "photo"
-user_sketch = ""
-user_prompt = ""
-
-text_behaviour = TextBehaviour()
-text_behaviour.add_behaviour(user_behaviour_one, user_behaviour_two)
-# text_behaviour.add_behaviour("simple", "complex")
+@app.post("/explore_diverse_sketches")
+async def explore(user_inputs: Request):
+    json = await user_inputs.json()
+    # results = explore(json, 16) # could repeat this over
+    print(json)
+    return {
+        "status": "SUCCESS",
+        "diverse_sketches": "done"
+    }
 
 
-# for i in range(4):
-#     for j in range(4):
-#         bias_a = i*.2
-#         bias_b = j*.2
-#         run_single_sketch(text_behaviour, bias_a, bias_b)
+def get_loss(s):
+  return s.losses['global'].item()
 
-run_single_sketch(text_behaviour)
+def explore(user_data):
+    text_behaviour = TextBehaviour()
+    b0 = user_data["behaviours"][0]
+    b1 = user_data["behaviours"][1]
+    text_behaviour.add_behaviour(b0, b1)    
 
+    top_sketches = []
+    for b in range(4):
+        for a in range(4):
+            user_data["behaviours"]["bias_a"] = a*.2 -.3
+            user_data["behaviours"]["bias_b"] = b*.2 -.3
+
+            cicada = create_cicada(text_behaviour, user_data)
+            cicada = run_cicada(cicada)
+            top_sketches.append(cicada)
+
+    top_sketches.sort(key=get_loss)
+    top_sketches = top_sketches[:4]
+    return top_sketches
+
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

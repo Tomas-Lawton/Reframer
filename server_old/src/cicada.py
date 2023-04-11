@@ -43,11 +43,6 @@ class CICADA:
             self.text_features_neg1 = self.model.encode_text(n1)
             self.text_features_neg2 = self.model.encode_text(n2)
 
-    @torch.no_grad()
-    def add_behaviour(self, prompt, target_beh, weight=0.3):
-        z = self.model.encode_text(clip.tokenize(prompt).to(self.device))
-        self.behaviours.append({"z": z, "b": target_beh, "w": weight})
-
     def add_attention_region(self, prompt, drawing_area):
         text_input = clip.tokenize(prompt).to(self.device)
         with torch.no_grad():
