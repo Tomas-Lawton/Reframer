@@ -25,19 +25,22 @@ const generateExploreSketches = () => {
     //     );
     // }
     // Replace
-    for (let i = 0; i < 4; i++) {
-        let sketch = new Sketch(
-            controller.sketchScopeIndex,
-            sketchScope,
-            sketchSize,
-            "AI"
-        );
-        let newElem = sketch.renderMini();
-        controller.exploreScopes.push(controller.sketchScopeIndex);
-        explorerPanel.firstElementChild.appendChild(newElem);
-        controller.newExploreSketch(controller.sketchScopeIndex);
-        controller.sketchScopeIndex += 1;
-    }
+    // for (let i = 0; i < 4; i++) {
+    //     let sketch = new Sketch(
+    //         controller.sketchScopeIndex,
+    //         sketchScope,
+    //         sketchSize,
+    //         "AI"
+    //     );
+    //     let newElem = sketch.renderMini();
+    //     controller.exploreScopes.push(controller.sketchScopeIndex);
+    //     explorerPanel.firstElementChild.appendChild(newElem);
+    //     controller.newExploreSketch(controller.sketchScopeIndex);
+    //     controller.sketchScopeIndex += 1;
+    // }
+
+    controller.startExplorer();
+
     controller.clipDrawing = true;
     setActionState("explore");
     mainSketch.svg = paper.project.exportSVG({
@@ -70,8 +73,9 @@ const clearButtons = document.querySelectorAll(".input-container i");
 dimensionInputs.forEach(child => {
     child.addEventListener("input", (e) => {
         e.target.name === "d0" ? dimensionLabels[1].innerHTML = e.target.value : dimensionLabels[0].innerHTML = e.target.value; 
-        controller[e.target.name] = e.target.value;
+        controller["behaviours"][e.target.name] = e.target.value;
     });
+    console.log(controller)
 });
 
 clearButtons.forEach(child => {
@@ -84,7 +88,7 @@ clearButtons.forEach(child => {
             dimensionInputs[1].value = "";
             dimensionLabels[0].innerHTML = ""; 
         }
-        controller[i === "x-d0" ? "d0" : "d1"] = "";
+        controller["behaviours"][i === "x-d0" ? "d0" : "d1"] = "";
     }); 
 });
 

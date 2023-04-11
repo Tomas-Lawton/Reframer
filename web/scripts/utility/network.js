@@ -6,6 +6,7 @@ async function postData(url = "", data = {}) {
         method: "POST",
         cache: "no-cache",
         headers: {
+            'Accept': 'application/json',
             "Content-Type": "application/json",
         },
         redirect: "follow",

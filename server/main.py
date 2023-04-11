@@ -46,7 +46,8 @@ origins = [
     "https://tomas-lawton.github.io/drawing-client",
     "https://tomas-lawton.github.io",
     "http://localhost:5500",
-    "http://127.0.0.1:5500"
+    "http://127.0.0.1:5500",
+    "127.0.0.1:5500/web"
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -64,10 +65,11 @@ async def explore(user_inputs: Request):
     }
 
 @app.post("/explore_diverse_sketches")
-async def explore(user_inputs: Request):
-    json = await user_inputs.json()
-    # results = explore(json, 16) # could repeat this over
-    print(json)
+async def explore(req: Request):
+    user_data = await req.json()
+    print(user_data["data"])
+    results = explore(user_data["data"]) # could repeat this over
+
     return {
         "status": "SUCCESS",
         "diverse_sketches": "done"
@@ -79,8 +81,8 @@ def get_loss(s):
 
 def explore(user_data):
     text_behaviour = TextBehaviour()
-    b0 = user_data["behaviours"][0]
-    b1 = user_data["behaviours"][1]
+    b0 = user_data["behaviours"]["d0"]
+    b1 = user_data["behaviours"]["d1"]
     text_behaviour.add_behaviour(b0, b1)    
 
     top_sketches = []
@@ -101,4 +103,4 @@ def explore(user_data):
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run("__main__:app", host="0.0.0.0", port=port, reload=True)

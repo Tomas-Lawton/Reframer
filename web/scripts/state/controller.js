@@ -49,6 +49,11 @@ class Controller {
 
         this.liveCollab = false;
         this.previousDrawState;
+
+        this.behaviours = {
+            d0: null,
+            d1: null
+        }
     }
     async updateDrawer({
         status,
@@ -58,7 +63,7 @@ class Controller {
         random_curves,
         sketch_index,
         rate,
-        frames,
+        behaviours
     }) {
         this.isFirstIteration = true; //reset canvas
         this.lastPrompt = prompt;
@@ -66,6 +71,7 @@ class Controller {
             status: status,
             data: {
                 prompt,
+                behaviours,
                 sketch,
                 random_curves,
                 frame_size,
@@ -79,11 +85,11 @@ class Controller {
         // JSON.stringify(res)
 
 
-        const sketches = postData("https://" + base + "/explore_diverse_sketches", res)
+        const sketches = postData("http://" + base + "/explore_diverse_sketches", res)
             .then((res) => console.log(res))
             .catch((e) => console.error(e));
 
-        // const response = await fetch($`${base}/explore_diverse_sketches`, {
+        // const response = await fetch(`${base}/explore_diverse_sketches`, {
         //     method: 'POST',
         //     headers: {
         //       'Accept': 'application/json',
@@ -97,25 +103,27 @@ class Controller {
         //     console.log(string);
         // });
 
+        console.log(res)
+
     }
 
-    newExploreSketch(sketchCountIndex) {
-
+    startExplorer() {
         if (!this.clipDrawing) {
             if (!sketchSize) {
                 console.error("sketch size not found");
             }
-            this.activeExplorers[sketchCountIndex] = true; //keep track of running seperate from sketch data
+            // this.activeExplorers[sketchCountIndex] = true; //keep track of running seperate from sketch data
             this.targetDrawing = true;
             this.prepare();
 
             this.updateDrawer({
-                status: "add_new_sketch",
+                status: "explore_diverse_sketches",
+                behaviours: this.behaviours,
                 sketch: mainSketch.sketch,
                 frame_size: mainSketch.frameSize,
                 prompt: this.prompt,
                 random_curves: this.addLines,
-                sketch_index: sketchCountIndex,
+                // sketch_index: sketchCountIndex,
                 rate: this.learningRate,
                 frames: Object.values(mainSketch.localFrames).map((elem) => elem.data),
             });

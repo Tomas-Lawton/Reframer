@@ -4,3 +4,5 @@ tqdm
 git+https://github.com/openai/CLIP.git
 shortuuid
 plotly
+fastapi
+uvicorn
