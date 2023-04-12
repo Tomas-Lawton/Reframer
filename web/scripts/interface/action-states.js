@@ -31,6 +31,9 @@ const setModeDefault = () => {
     stopButton.className = "action-inactive";
     actions.forEach((button) => button.classList.add("tooltip"));
 
+    accordionItem.classList.add("open");
+    accordionItem.classList.remove("closed");
+
     prompt.classList.remove("inactive-prompt");
     document.querySelector(".project").classList.remove("greeeeeen");
 
@@ -61,8 +64,6 @@ const setModeExplore = () => {
     hide(historyBlock);
     show(explorerPanel);
 
-    accordionItem.classList.add("open");
-    accordionItem.classList.remove("closed");
     undoButton.classList.add("inactive-section");
     redoButton.classList.add("inactive-section");
     document.getElementById("loading").style.display = "flex";
