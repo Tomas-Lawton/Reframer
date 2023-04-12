@@ -69,7 +69,7 @@ class Controller {
                     rate: this.learningRate,
                 },
             })
-
+            console.log(sketches)
             // clearExplorerSketches();
             for (const sketch of sketches) {
                 createDiverseSketches(sketch);

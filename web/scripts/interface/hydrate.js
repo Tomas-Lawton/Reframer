@@ -38,3 +38,6 @@ for (let i = 0; i < 4; i++) {
 
 
 pickerSelect.style.display = "none";
+
+
+    hide(explorerPanel);

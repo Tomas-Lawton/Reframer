@@ -59,7 +59,7 @@ const setModeExplore = () => {
     prompt.classList.add("inactive-prompt")
     hint.innerHTML = `View creative possibilities in the explorer`;
     hide(historyBlock);
-    // show(explorerPanel);
+    show(explorerPanel);
 
     accordionItem.classList.add("open");
     accordionItem.classList.remove("closed");
@@ -112,60 +112,20 @@ const exploreLogic = () => {
         return;
     }
 
-    if (noPrompt()) {
-        openModal({
-            title: "Type a prompt first!",
-            message: "You need a target for AI sketchs.",
-            confirmAction: () => (controlPanel.style.display = "flex"),
-        });
-        return;
-    } else {
-        sketchHistory.historyHolder.push({
-            svg: mainSketch.svg,
-            loss: mainSketch.semanticLoss,
-        });
-        sketchHistory.pushUndo();
-        generateExploreSketches();
-    }
-
+   
+    sketchHistory.historyHolder.push({
+        svg: mainSketch.svg,
+        loss: mainSketch.semanticLoss,
+    });
+    sketchHistory.pushUndo();
+    generateExploreSketches();
 };
 
 const stopLogic = () => {
-    if (controller.drawState === "active-frame") {
-        setActionState("frame");
-        controller.stop(); //flag   
-        controller.clipDrawing = false;
-
-        // mainSketch.sketchLayer.activate();
-        // setPenMode("pen");
-        // hide(localPrompts);
-        // show(styles);
-        // deactivateCanvasFrames();
-
-        logger.event("stop-drawing");
-    } else if (controller.drawState === "explore") {
+    if (controller.drawState === "explore") {
         removeExploreSketches();
         controller.clipDrawing = false;
         setActionState("inactive");
         logger.event("stop-exploring");
-    } else {
-        if (controller.drawState === "pause") {
-            controller.liveCollab = false;
-        }
-        controller.stop(); //flag
-        controller.clipDrawing = false;
-
-        mainSketch.svg = paper.project.exportSVG({
-            asString: true,
-        });
-        setActionState("inactive");
-
-        // mainSketch.sketchLayer.activate();
-        // setPenMode("pen");
-        // hide(localPrompts);
-        // show(styles);
-        // deactivateCanvasFrames();
-
-        logger.event("stop-drawing");
-    }
+    } 
 };

@@ -1,6 +1,6 @@
 const removeExploreSketches = () => {
     if (controller.exploreScopes.length > 0) {
-        explorerPanel.firstElementChild.childNodes.forEach((child, i) => {
+        diverseSketcheContainer.childNodes.forEach((child, i) => {
             let stopButton = child.querySelector(".fa-hand");
             let loader = child.querySelector(".card-loading");
             loader.classList.remove("button-animation");
@@ -36,10 +36,11 @@ const createExplorerUI = () => {
 
 const generateExploreSketches = () => {
     createExplorerUI();
+    setActionState("explore");
+
     controller.startExplorer();
 
     controller.clipDrawing = true;
-    setActionState("explore");
     mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
@@ -52,13 +53,13 @@ const emptyExplorer = () => {
     controller.clipDrawing = false;
     // refactor into function
     for (let i = 0; i < 4; i++) {
-        if (explorerPanel.firstElementChild) {
-            explorerPanel.firstElementChild.removeChild(
-                explorerPanel.firstElementChild.firstChild
+        if (diverseSketcheContainer.firstElementChild) {
+            diverseSketcheContainer.removeChild(
+                diverseSketcheContainer.firstChild
             );
             let sketch = new Sketch(null, defaults, sketchSize);
             let newElem = sketch.renderMini();
-            explorerPanel.firstElementChild.appendChild(newElem);
+            diverseSketcheContainer.appendChild(newElem);
             newElem.classList.add("inactive-sketch");
         }
     }
@@ -70,7 +71,7 @@ const clearButtons = document.querySelectorAll(".input-container i");
 
 dimensionInputs.forEach(child => {
     child.addEventListener("input", (e) => {
-        e.target.name === "d0" ? dimensionLabels[1].innerHTML = e.target.value : dimensionLabels[0].innerHTML = e.target.value; 
+        // e.target.name === "d0" ? dimensionLabels[1].innerHTML = e.target.value : dimensionLabels[0].innerHTML = e.target.value; 
         controller["behaviours"][e.target.name]["name"] = e.target.value;
     });
     console.log(controller)
@@ -81,10 +82,10 @@ clearButtons.forEach(child => {
         let i = child.getAttribute("name");
         if (i === "x-d0") {
             dimensionInputs[0].value = "" ;
-            dimensionLabels[1].innerHTML = "";
+            // dimensionLabels[1].innerHTML = "";
         } else {
             dimensionInputs[1].value = "";
-            dimensionLabels[0].innerHTML = ""; 
+            // dimensionLabels[0].innerHTML = ""; 
         }
         controller["behaviours"][i === "x-d0" ? "d0" : "d1"]["name"] = "";
     }); 

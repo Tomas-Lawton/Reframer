@@ -111,13 +111,6 @@ document.getElementById("save").addEventListener("click", () => {
     download();
 });
 
-document.querySelector(".explorer-exit").addEventListener("click", (e) => {
-    emptyExplorer();
-    setActionState("inactive");
-    hide(explorerPanel);
-});
-
-
 document.getElementById("settings").addEventListener("click", () => {
     dropdown.classList.toggle("hidden-panel")
 });
