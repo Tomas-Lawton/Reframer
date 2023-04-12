@@ -14,31 +14,28 @@ const removeExploreSketches = () => {
     }
 };
 
+const createExplorerUI = () => {
+    for (let i = 0; i < 4; i++) {
+        diverseSketcheContainer.removeChild(
+            diverseSketcheContainer.firstElementChild
+        );
+    }
+    
+    for (let i = 0; i < 4; i++) {
+        let sketch = new Sketch(
+            controller.sketchScopeIndex,
+            sketchScope,
+            sketchSize,
+            "AI"
+        );
+        diverseSketcheContainer.appendChild(
+            sketch.renderMini()
+        );
+    }
+}
+
 const generateExploreSketches = () => {
-    // To do: make sketches fit in place holder rather than replace
-
-    // Remove the place holder ones
-    total = 4;
-    // for (let i = 0; i < 4; i++) {
-    //     explorerPanel.firstElementChild.removeChild(
-    //         explorerPanel.firstElementChild.firstElementChild
-    //     );
-    // }
-    // Replace
-    // for (let i = 0; i < 4; i++) {
-    //     let sketch = new Sketch(
-    //         controller.sketchScopeIndex,
-    //         sketchScope,
-    //         sketchSize,
-    //         "AI"
-    //     );
-    //     let newElem = sketch.renderMini();
-    //     controller.exploreScopes.push(controller.sketchScopeIndex);
-    //     explorerPanel.firstElementChild.appendChild(newElem);
-    //     controller.newExploreSketch(controller.sketchScopeIndex);
-    //     controller.sketchScopeIndex += 1;
-    // }
-
+    createExplorerUI();
     controller.startExplorer();
 
     controller.clipDrawing = true;
@@ -46,6 +43,7 @@ const generateExploreSketches = () => {
     mainSketch.svg = paper.project.exportSVG({
         asString: true,
     });
+
     logger.event("start-exploring");
 };
 
@@ -73,7 +71,7 @@ const clearButtons = document.querySelectorAll(".input-container i");
 dimensionInputs.forEach(child => {
     child.addEventListener("input", (e) => {
         e.target.name === "d0" ? dimensionLabels[1].innerHTML = e.target.value : dimensionLabels[0].innerHTML = e.target.value; 
-        controller["behaviours"][e.target.name] = e.target.value;
+        controller["behaviours"][e.target.name]["name"] = e.target.value;
     });
     console.log(controller)
 });
@@ -88,7 +86,7 @@ clearButtons.forEach(child => {
             dimensionInputs[1].value = "";
             dimensionLabels[0].innerHTML = ""; 
         }
-        controller["behaviours"][i === "x-d0" ? "d0" : "d1"] = "";
+        controller["behaviours"][i === "x-d0" ? "d0" : "d1"]["name"] = "";
     }); 
 });
 

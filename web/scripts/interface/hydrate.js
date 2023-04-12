@@ -28,13 +28,13 @@ setThisColor("rgb(54 54 54)");
 
 // TO DO Add back in
 const defaults = new PaperScope();
-// defaults.activate();
-// for (let i = 0; i < 4; i++) {
-//     let sketch = new Sketch(null, defaults, sketchSize);
-//     let newElem = sketch.renderMini();
-//     newElem.classList.add("inactive-sketch");
-//     explorerPanel.firstElementChild.appendChild(newElem);
-// }
+defaults.activate();
+for (let i = 0; i < 4; i++) {
+    let sketch = new Sketch(null, defaults, sketchSize);
+    let newElem = sketch.renderMini();
+    newElem.classList.add("inactive-sketch");
+    diverseSketcheContainer.appendChild(newElem);
+}
 
 
 pickerSelect.style.display = "none";

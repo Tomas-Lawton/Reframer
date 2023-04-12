@@ -40,21 +40,33 @@ def create_cicada(text_behaviour, user_data):
         w_geo=args.w_geo,
     )
 
-    cicada.process_text(user_data["prompt"], user_data["data"]["frame_size"])
-    cicada.process_sketch(user_data["sketch"])
-
-    # resizeScaleFactor = 224 / user_data["data"]["frame_size"]
-    # self.lr_control = 10 * (user_data["data"]["rate"] ** 2.5)
-    
-    # self.encode_text_classes(user_data["data"]["prompt"])
-    # self.local_frames = user_data["data"]["frames"]
-    # self.user_canvas_w = self.frame_size
-    # self.user_canvas_h = self.frame_size
+    cicada.process_text(user_data["prompt"])
+    cicada.process_sketch(user_data["sketch"], user_data["frame_size"])
 
     if len(cicada.drawing.traces) > 0 and cicada.drawing.img is not None:
-        cicada.add_random_shapes(user_data["num_paths"])
+        cicada.add_random_shapes(user_data["random_curves"])
         cicada.initialize_variables()
         cicada.initialize_optimizer()
+
+
+    # is this right or do i eval for each individual behaviour
+    img = cicada.build_img("deprecated")
+    cicada.img = img.cpu().permute(0, 2, 3, 1).squeeze(0)
+    evaluation_score = text_behaviour.eval_behaviours(cicada.img, showme=True)
+    print("Evaluation score: ", float(evaluation_score.item()))
+
+    cicada.add_behaviour(user_data["behaviours"]["d0"]["name"], 
+        float(user_data["behaviours"]["d0"]["value"]) + float(evaluation_score.item()))
+
+    cicada.add_behaviour(user_data["behaviours"]["d1"]["name"], 
+        float(user_data["behaviours"]["d1"]["value"]) + float(evaluation_score.item()))
+
+    return cicada
+
+
+# Initialise from user sketch
+def run_cicada(cicada, c):
+    # Run the main optimization loop
 
     time_str = (datetime.datetime.today() + datetime.timedelta(hours=11)).strftime(
         "%Y_%m_%d_%H_%M_%S"
@@ -63,36 +75,24 @@ def create_cicada(text_behaviour, user_data):
     with torch.no_grad():
         pydiffvg.imwrite(
             cicada.img0.detach().cpu().squeeze(0).permute(1, 2, 0),
-            save_path + time_str + '00.png',
+            save_path + time_str + str(c) + '00.png',
             gamma=1,
         )
 
-    # is this right or do i eval for each individual behaviour
-    img = cicada.build_img("deprecated")
-    cicada.img = img.cpu().permute(0, 2, 3, 1).squeeze(0)
-    evaluation_scores = text_behaviour.eval_behaviours(cicada.img, showme=True)
-    for behaviour in user_data["behaviours"]:
-        cicada.add_behaviour(behaviour["name"], behaviour["bias"] * evaluation_scores.item())
-    
-    return cicada
-
-
-# Initialise from user sketch
-def run_cicada(cicada):
-    # Run the main optimization loop
     for t in range(args.num_iter):
         if (t + 1) % args.num_iter // 50:
             with torch.no_grad():
                 pydiffvg.imwrite(
-                    cicada.img, save_path + time_str + '.png', gamma=1,
+                    cicada.img, save_path + time_str + str(c) +  '.png', gamma=1,
                 )
 
         cicada.run_epoch()
 
         utils.printProgressBar(t + 1, args.num_iter, cicada.losses['global'].item())
 
-    # pydiffvg.imwrite(
-    #     cicada.img, save_path + time_str + '.png', gamma=1,
-    # )
-    # utils.save_data(save_path, time_str, args)
+    pydiffvg.imwrite(
+        cicada.img, save_path + time_str + str(c) + '.png', gamma=1,
+    )
+    utils.save_data(save_path, time_str + str(c), args)
+    # could evaluate again and return to user
     return cicada

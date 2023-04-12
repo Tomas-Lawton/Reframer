@@ -59,7 +59,7 @@ const setModeExplore = () => {
     prompt.classList.add("inactive-prompt")
     hint.innerHTML = `View creative possibilities in the explorer`;
     hide(historyBlock);
-    show(explorerPanel);
+    // show(explorerPanel);
 
     accordionItem.classList.add("open");
     accordionItem.classList.remove("closed");

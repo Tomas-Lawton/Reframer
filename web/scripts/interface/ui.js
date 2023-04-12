@@ -23,6 +23,7 @@ const buttonPanel = document.querySelector(".action");
 const dropdown = document.querySelector(".pen-dropdown");
 const staticSketches = document.getElementById("static-sketches");
 const explorerPanel = document.querySelector(".generative-explorer");
+const diverseSketcheContainer = document.querySelector(".diverse-sketch-container");
 const sketchGrid = document.getElementById("grid-container");
 const pen = document.getElementById("pen");
 // Actions

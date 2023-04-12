@@ -48,7 +48,6 @@ document.getElementById("delete").addEventListener("click", () =>
 
             explorerPanel.display = "none";
 
-            controller.lastPrompt = null;
             updateSelectUI();
 
             sketchHistory = new SketchHistory(mainSketch);
@@ -118,10 +117,6 @@ document.querySelector(".explorer-exit").addEventListener("click", (e) => {
     hide(explorerPanel);
 });
 
-// document.getElementById("empty").addEventListener("click", (e) => {
-//     emptyExplorer();
-//     generateExploreSketches();
-// });
 
 document.getElementById("settings").addEventListener("click", () => {
     dropdown.classList.toggle("hidden-panel")
@@ -390,9 +385,7 @@ header.addEventListener("click", () => {
     }
 });
 
-socketLight.addEventListener("click", () => {
-    if (!socket) connect();
-});
+
 
 toolToggle.addEventListener("click", () => {
     // let currentTool = document.querySelector(".animation-window");

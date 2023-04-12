@@ -34,7 +34,7 @@ class Cicada:
             self.drawing = Drawing(canvas_w, canvas_h)
         else:
             self.drawing = drawing
-        self.augment_trans = get_augment_trans(
+        self.augment_trans = get_augment_trans( #refactor to get val
             self.drawing.canvas_width, normalize_clip
         )
         self.drawing_area = drawing_area
@@ -93,16 +93,20 @@ class Cicada:
             start_y = round(float(x0[1]) / user_frame_size, 5)
             x0 = [start_x, start_y]
             points = [x0] + points_array
+            
             fixed = False
             if "fixed_path" in path:
                 fixed = path["fixed_path"]
 
             colors = [float(val) for val in path["color"]]
+            
             if len(points) > 0:
-                path_list.append(data_to_tensor(colors, float(path["stroke_width"] * self.normaliseScaleFactor), 
-                    points, float(num_segments), fixed))
+                path_list.append(data_to_tensor(colors, float(path["stroke_width"] * 1 / user_frame_size), 
+                    points, int(num_segments), fixed))
         
-        self.drawing.add_paths(path_list)
+        if len(path_list) > 0:
+            self.drawing.add_paths(path_list)
+        
         return path_list
 
 

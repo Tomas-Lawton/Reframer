@@ -15,6 +15,7 @@ class Drawing:
         self.canvas_width = canvas_width
         self.canvas_height = canvas_height
         self.traces = []
+        self.fixed_list = []
         self.img = None
         self.id = shortuuid.uuid()
 
@@ -25,6 +26,8 @@ class Drawing:
             path = dpath.path.detach().clone()
             width = dpath.width.detach().clone()
             color = dpath.color.detach().clone()
+            is_fixed = dpath.is_tied.detach().clone()
+
             num_control_points = torch.zeros(dpath.num_segments, dtype=torch.int32) + 2
             points = torch.zeros_like(path)
             stroke_width = width * 100
@@ -44,6 +47,7 @@ class Drawing:
             )
             shape_groups.append(shape_group)
             self.traces.append(Trace(shape, shape_group, True))
+            self.fixed_list.append(is_fixed.item())
 
         if not path_list:
             self.img = torch.ones(
