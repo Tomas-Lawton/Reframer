@@ -22,7 +22,7 @@ prune_places = [
 p0 = args.prune_ratio
 
 
-def create_cicada(text_behaviour, user_data):
+def create_cicada(text_behaviour, user_data, a, b):
     args.prune_ratio = p0 / len(prune_places)
 
     cicada = Cicada(
@@ -56,10 +56,10 @@ def create_cicada(text_behaviour, user_data):
     print("Evaluation score: ", float(evaluation_score.item()))
 
     cicada.add_behaviour(user_data["behaviours"]["d0"]["name"], 
-        float(user_data["behaviours"]["d0"]["value"]) + float(evaluation_score.item()))
+        float(a*.2 -.3) + float(evaluation_score.item()))
 
     cicada.add_behaviour(user_data["behaviours"]["d1"]["name"], 
-        float(user_data["behaviours"]["d1"]["value"]) + float(evaluation_score.item()))
+        float(b*.2 -.3) + float(evaluation_score.item()))
 
     return cicada
 

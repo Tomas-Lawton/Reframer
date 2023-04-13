@@ -70,7 +70,7 @@ class Controller {
                     },
                 })
             console.log(response);
-            if (response.status === "returning_diverse_sketches") {
+            if (response.status === "returned_diverse_sketches") {
                 response.diverse_sketches.map((exemplar, i) => 
                     controller.sketches[i.toString()].load(
                         sketchSize / 224,
