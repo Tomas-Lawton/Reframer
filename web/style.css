@@ -111,7 +111,7 @@ input:-webkit-autofill {
     z-index: 5;
     width: 12px;
     height: 12px;
-    background: #f6ab2a;
+    background: #15c01d;
     box-shadow: inset 1px 2px 4px rgb(0 0 0 / 15%);
     z-index: 501;
 }

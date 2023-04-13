@@ -35,6 +35,10 @@ def render_results(top_sketches: List, frame_size: int) -> List:
         shapes = [trace.shape for trace in cicada.drawing.traces]
         groups = [trace.shape_group for trace in cicada.drawing.traces]
         pydiffvg.save_svg(filename, frame_size, frame_size, shapes, groups)
+
+        # re-evaluate the score for the dimensions and return them
+        # evaluation_score = text_behaviour.eval_behaviours(cicada.img, showme=True)
+        
         with open(f"results/temp-sketch-{i}.svg", "r") as f:
             rendered_results.append({
                 "svg": f.read(),

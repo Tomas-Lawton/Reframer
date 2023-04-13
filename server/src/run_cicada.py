@@ -48,12 +48,18 @@ def create_cicada(text_behaviour, user_data, a, b):
         cicada.initialize_variables()
         cicada.initialize_optimizer()
 
-
-    # is this right or do i eval for each individual behaviour
-    img = cicada.build_img("deprecated")
+    img = cicada.build_img("deprecated") #slightly different every time
     cicada.img = img.cpu().permute(0, 2, 3, 1).squeeze(0)
     evaluation_score = text_behaviour.eval_behaviours(cicada.img, showme=True)
+    print(evaluation_score)
     print("Evaluation score: ", float(evaluation_score.item()))
+    
+    print(evaluation_score[0])
+    print(evaluation_score[1])
+    print(evaluation_score[0, 0])
+    print(evaluation_score[0, 1])
+    print(evaluation_score[1, 0])
+    print(evaluation_score[1, 1])
 
     cicada.add_behaviour(user_data["behaviours"]["d0"]["name"], 
         float(a*.2 -.3) + float(evaluation_score.item()))

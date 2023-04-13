@@ -84,6 +84,8 @@ class Controller {
                     elem.classList.remove("fa-spinner");
                     elem.classList.add("fa-check");
                 });
+
+                setModeDefault();
             }
         }
     }
