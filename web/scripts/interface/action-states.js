@@ -1,7 +1,21 @@
 const actions = document.querySelectorAll(".clip-actions>div");
 const [exploreButton, stopButton] = actions;
 stopButton.addEventListener("click", () => stopLogic());
-exploreButton.addEventListener("click", () => exploreLogic());
+exploreButton.addEventListener("click", () => {
+    if (explorerPanel.style.display === "flex") {
+        hide(explorerPanel)
+    } else {
+        if (noPrompt()) {
+            openModal({
+                title: "What are we drawing?",
+                message: "Without a prompt, the AI doesn't know what to draw!",
+            });
+            return;
+        }
+        show(explorerPanel)
+    }
+});
+document.querySelector(".explorer-header-actions button ").addEventListener("click", () => exploreLogic());
 
 const setActionState = (state) => {
     switch (state) {
@@ -27,6 +41,8 @@ const setActionState = (state) => {
 };
 
 const setModeDefault = () => {
+    loadingBar.style.display = "none"
+
     exploreButton.className = "action-default";
     stopButton.className = "action-inactive";
     actions.forEach((button) => button.classList.add("tooltip"));
@@ -55,6 +71,8 @@ const setModeDefault = () => {
 
 
 const setModeExplore = () => {
+    loadingBar.style.display = "block"
+
     exploreButton.className = "action-current";
     stopButton.className = "action-stop";
     actions.forEach((button) => button.classList.add("tooltip"));
@@ -105,15 +123,15 @@ const deactivateCanvasFrames = () => {
 };
 
 const exploreLogic = () => {
-    if (noPrompt()) {
+
+    if (!dimensionInputs[0].value || !dimensionInputs[1].value) {
         openModal({
-            title: "What are we drawing?",
-            message: "Without a prompt, the AI doesn't know what to draw!",
+            title: "Add dimensions",
+            message: "Sarch diverse options by adding dimensions.",
         });
         return;
     }
 
-   
     sketchHistory.historyHolder.push({
         svg: mainSketch.svg,
         loss: mainSketch.semanticLoss,

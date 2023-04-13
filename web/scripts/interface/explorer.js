@@ -1,3 +1,6 @@
+const loadingBar = document.querySelector(".loading-bar")
+
+
 const removeExploreSketches = () => {
     if (controller.exploreScopes.length > 0) {
         diverseSketcheContainer.childNodes.forEach((child, i) => {
@@ -14,29 +17,28 @@ const removeExploreSketches = () => {
     }
 };
 
-const createExplorerUI = () => {
+
+const generateExploreSketches = () => {
+    setActionState("explore");
+
     for (let i = 0; i < 4; i++) {
         diverseSketcheContainer.removeChild(
             diverseSketcheContainer.firstElementChild
         );
     }
-    
     for (let i = 0; i < 4; i++) {
+        // create paper.js scopes
         let sketch = new Sketch(
-            controller.sketchScopeIndex,
+            i,
             sketchScope,
             sketchSize,
             "AI"
         );
+        // create ui
         diverseSketcheContainer.appendChild(
             sketch.renderMini()
         );
     }
-}
-
-const generateExploreSketches = () => {
-    createExplorerUI();
-    setActionState("explore");
 
     controller.startExplorer();
 

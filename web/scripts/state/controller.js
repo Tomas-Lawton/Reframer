@@ -48,8 +48,8 @@ class Controller {
         this.previousDrawState;
 
         this.behaviours = {
-            d0: {name : null, value: null},
-            d1: {name : null, value: null},
+            d0: { name: null, value: null },
+            d1: { name: null, value: null },
         }
     }
 
@@ -57,24 +57,28 @@ class Controller {
         if (!this.clipDrawing) {
             this.prepare();
             const route = "/explore_diverse_sketches";
-            const sketches = await postData("http://" + base + route, 
-            {
-                status: "explore_diverse_sketches",
-                user_data: {
-                    prompt: this.prompt,
-                    behaviours: this.behaviours,
-                    sketch: mainSketch.sketch,
-                    frame_size: mainSketch.frameSize,
-                    random_curves: this.addLines,
-                    rate: this.learningRate,
-                },
-            })
-            console.log(sketches)
-            // clearExplorerSketches();
-            for (const sketch of sketches) {
-                createDiverseSketches(sketch);
+            const response = await postData("http://" + base + route,
+                {
+                    status: "explore_diverse_sketches",
+                    user_data: {
+                        prompt: this.prompt,
+                        behaviours: this.behaviours,
+                        sketch: mainSketch.sketch,
+                        frame_size: mainSketch.frameSize,
+                        random_curves: this.addLines,
+                        rate: this.learningRate,
+                    },
+                })
+            console.log(response);
+            if (response.status === "returning_diverse_sketches") {
+                response.diverse_sketches.map((exemplar, i) => 
+                    controller.sketches[i.toString()].load(
+                        sketchSize / 224,
+                        exemplar.svg,
+                        exemplar.fixed,
+                    ));
+                hide(loadingBar)
             }
-
         }
     }
     prepare() {

@@ -72,7 +72,7 @@ async def explore(req: Request):
     results = render_results(top_sketches, response["user_data"]["frame_size"])
 
     return {
-        "status": "SUCCESS",
+        "status": "returning_diverse_sketches",
         "diverse_sketches": results
     }
 
@@ -126,10 +126,7 @@ def render_results(top_sketches, frame_size):
                 "fixed": cicada.drawing.fixed_list
             })
 
-    return {
-        "status": "returning_diverse_sketches",
-        "diverse_sketches": diverse_sketches
-    }
+    return diverse_sketches
 
 
 
