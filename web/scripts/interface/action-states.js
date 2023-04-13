@@ -127,7 +127,7 @@ const exploreLogic = () => {
     if (!dimensionInputs[0].value || !dimensionInputs[1].value) {
         openModal({
             title: "Add dimensions",
-            message: "Sarch diverse options by adding dimensions.",
+            message: "Search diverse options by adding dimensions.",
         });
         return;
     }

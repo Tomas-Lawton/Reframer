@@ -67,8 +67,9 @@ async def explore(user_inputs: Request):
 @app.post("/explore_diverse_sketches")
 async def explore(req: Request):
     response = await req.json()
-    
+    print("exploring")
     top_sketches = explore(response["user_data"]) # could repeat this
+    print("rendering")
     results = render_results(top_sketches, response["user_data"]["frame_size"])
 
     return {

@@ -62,6 +62,7 @@ class Drawing:
         for k in range(len(shapes)):
             shape_groups[k].shape_ids = torch.tensor([k + N])
             self.traces.append(Trace(shapes[k], shape_groups[k], fixed))
+            self.fixed_list.append(fixed)
 
         self.render_img()
 

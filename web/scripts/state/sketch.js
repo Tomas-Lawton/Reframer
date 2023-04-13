@@ -57,8 +57,10 @@ class Sketch {
             }
 
             let removeButton = newElem.querySelector(".fa-minus");
-            let stopButton = newElem.querySelector(".fa-hand");
+            // let stopButton = newElem.querySelector(".fa-hand");
             let loader = newElem.querySelector(".card-loading");
+                            //     loader.classList.remove("fa-spinner");
+                //     loader.classList.add("fa-check");
 
             newElem.id = `${this.type}-sketch-item-${domIdx}`;
             sketchCanvas.id = `${this.type}-sketch-canvas-${domIdx}`;
@@ -66,28 +68,28 @@ class Sketch {
             newElem.querySelector("h3").innerHTML = ``;
 
             if (this.type === "U") {
-                stopButton.style.display = "none";
+                // stopButton.style.display = "none";
                 loader.style.display = "none";
                 removeButton.addEventListener("click", () => {
                     newElem.remove();
                 });
             } else {
-                stopButton.addEventListener("click", () => {
-                    loader.classList.remove("button-animation");
-                    loader.classList.remove("fa-spinner");
-                    loader.classList.add("fa-check");
-                    stopButton.style.background = "#f5f5f5";
-                    stopButton.style.background = "#d2d2d2";
+                // stopButton.addEventListener("click", () => {
+                //     loader.classList.remove("button-animation");
+                //     loader.classList.remove("fa-spinner");
+                //     loader.classList.add("fa-check");
+                //     stopButton.style.background = "#f5f5f5";
+                //     stopButton.style.background = "#d2d2d2";
 
-                    controller.stopSingle(domIdx);
-                    delete controller.activeExplorers[domIdx];
-                    if (Object.keys(controller.activeExplorers).length === 0) {
-                        setActionState("inactive");
-                    }
-                });
+                //     // controller.stopSingle(domIdx);
+                //     delete controller.activeExplorers[domIdx];
+                //     if (Object.keys(controller.activeExplorers).length === 0) {
+                //         setActionState("inactive");
+                //     }
+                // });
                 removeButton.addEventListener("click", () => {
                     newElem.classList.add("inactive-sketch");
-                    controller.stopSingle(domIdx);
+                    // controller.stopSingle(domIdx);
                     delete controller.activeExplorers[domIdx];
                     if (Object.keys(controller.activeExplorers).length === 0) {
                         setActionState("inactive");

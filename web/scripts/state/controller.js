@@ -78,6 +78,12 @@ class Controller {
                         exemplar.fixed,
                     ));
                 hide(loadingBar)
+
+                let loaders = diverseSketcheContainer.querySelectorAll(".card-loading").forEach(elem => {
+                    elem.classList.remove("button-animation");
+                    elem.classList.remove("fa-spinner");
+                    elem.classList.add("fa-check");
+                });
             }
         }
     }
