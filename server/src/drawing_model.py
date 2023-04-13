@@ -170,10 +170,11 @@ class Cicada:
         input:
             num_rnd_traces: Int;
         '''
-        shapes, shape_groups = treebranch_initialization(
-            self.drawing, num_rnd_traces, self.drawing_area,
-        )
-        self.drawing.add_shapes(shapes, shape_groups, fixed=False)
+        if num_rnd_traces > 0:
+            shapes, shape_groups = treebranch_initialization(
+                self.drawing, num_rnd_traces, self.drawing_area,
+            )
+            self.drawing.add_shapes(shapes, shape_groups, fixed=False)
 
     def remove_traces(self, idx_list):
         '''

@@ -40,5 +40,5 @@ class TextBehaviour:
             beh_scores.append(score)
             if showme:
                 print(f"{behaviour['name']} score: {score.item()}")
-        print(beh_scores) #rm
+
         return torch.tensor(beh_scores)

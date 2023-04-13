@@ -24,7 +24,7 @@ p0 = args.prune_ratio
 
 def create_cicada(text_behaviour, user_data, a, b):
     args.prune_ratio = p0 / len(prune_places)
-
+    print("a1")
     cicada = Cicada(
         device=device,
         canvas_w=args.canvas_w,
@@ -39,6 +39,7 @@ def create_cicada(text_behaviour, user_data, a, b):
         w_img=args.w_img,
         w_geo=args.w_geo,
     )
+    print("a2")
 
     cicada.process_text(user_data["prompt"])
     cicada.process_sketch(user_data["sketch"], user_data["frame_size"])
@@ -47,33 +48,21 @@ def create_cicada(text_behaviour, user_data, a, b):
         cicada.add_random_shapes(user_data["random_curves"])
         cicada.initialize_variables()
         cicada.initialize_optimizer()
+    print("a3")
 
     img = cicada.build_img("deprecated") #slightly different every time
     cicada.img = img.cpu().permute(0, 2, 3, 1).squeeze(0)
     evaluation_score = text_behaviour.eval_behaviours(cicada.img, showme=True)
-    print(evaluation_score)
-    print("Evaluation score: ", float(evaluation_score.item()))
-    
-    print(evaluation_score[0])
-    print(evaluation_score[1])
-    print(evaluation_score[0, 0])
-    print(evaluation_score[0, 1])
-    print(evaluation_score[1, 0])
-    print(evaluation_score[1, 1])
+    print("a4")
 
-    cicada.add_behaviour(user_data["behaviours"]["d0"]["name"], 
-        float(a*.2 -.3) + float(evaluation_score.item()))
-
-    cicada.add_behaviour(user_data["behaviours"]["d1"]["name"], 
-        float(b*.2 -.3) + float(evaluation_score.item()))
+    cicada.add_behaviour(user_data["behaviours"]["d0"]["name"], a + float(evaluation_score.item()))
+    cicada.add_behaviour(user_data["behaviours"]["d1"]["name"], b + float(evaluation_score.item()))
 
     return cicada
 
 
-# Initialise from user sketch
 def run_cicada(cicada, c):
     # Run the main optimization loop
-
     time_str = (datetime.datetime.today() + datetime.timedelta(hours=11)).strftime(
         "%Y_%m_%d_%H_%M_%S"
     )
@@ -100,5 +89,5 @@ def run_cicada(cicada, c):
         cicada.img, save_path + time_str + str(c) + '.png', gamma=1,
     )
     utils.save_data(save_path, time_str + str(c), args)
-    # could evaluate again and return to user
+
     return cicada
