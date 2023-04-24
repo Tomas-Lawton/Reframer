@@ -4,13 +4,12 @@ class Controller {
         this.drawState;
         // Sketching Data
         this.prompt = null;
-        this.exploreScopes = [];
         this.sketches = {};
         this.activeExplorers = {};
 
         // Defaults
         this.strokeColor = "rgb(24,24,24)";
-        this.strokeWidth = 28;
+        this.strokeWidth = 14;
         this.alpha = 1;
         this.penMode = "pen";
         this.clipDrawing = false;
@@ -57,6 +56,7 @@ class Controller {
         if (!this.clipDrawing) {
             this.prepare();
             const route = "/explore_diverse_sketches";
+            // To do change to websocket and process each sketch as it is loaded.
             const response = await postData("http://" + base + route,
                 {
                     status: "explore_diverse_sketches",
@@ -85,7 +85,11 @@ class Controller {
                     elem.classList.add("fa-check");
                 });
 
-                setModeDefault();
+                controller.clipDrawing = false;
+                setActionState("inactive");
+                show(explorerPanel)
+                logger.event("stop-exploring");
+                // setModeDefault();
             }
         }
     }

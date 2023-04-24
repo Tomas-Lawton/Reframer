@@ -65,10 +65,15 @@
 
             <div class="panel-section">
                 <div class="clip-actions inactive-section">
+                    <div class="action-default tooltip" id="draw">
+                        <span class="tooltiptext">Change the sketch using AI</span>
+                        <i class="fa-solid fa-robot fa-fw"></i>
+                        <p>Draw</p>
+                    </div>
                     <div class="action-default tooltip" id="explore">
                         <span class="tooltiptext">Get options for developing the sketch</span>
                         <i class="fa-solid fa-lightbulb fa-fw"></i>
-                        <p>Explore</p>
+                        <p>Explorer</p>
                     </div>
                     <div class="action-inactive" id="stop">
                         <i class="fa-solid fa-hand fa-fw" id="stop-icon"></i>
@@ -152,7 +157,7 @@
         </div>
 
         <div class="canvas-ui-container" id="canvas-drop">
-            <p>Add a prompt to draw together</p>
+            <p>Tell Reframer what to draw on the left!</p>
             <i class="fa-solid fa-spinner button-animation " id="loading"></i>
             <div id="fixed-handler" class="select-ui tooltip">
                 <span class="tooltiptext">Checked lines won't move</span>
@@ -247,26 +252,17 @@
     </div>
 
 
-    <!-- <div class="generative-explorer">
-        <div id="explore-sketches"></div>
-        <div id="explorer-buttons">
-            <h3 class="panel-subtitle">Explorer</h3>
-            <p class="control-subtitle">Try options by dragging sketches to the canvas</p>
-            <p class="pill" id="empty">Refresh</p>
-            <p class="pill" id="close-explorer">Close <i class="fa-solid fa-xmark"></i></p>
-        </div>
-    </div> -->
-
-
     <div class="generative-explorer">
         <div class="drag-gutter">
+
             <div class="explorer-header flex">
                 <div class="explorer-header-left">
                     <div class="bulb-icon-background">
                         <i class="fa fa-lightbulb"></i>
                     </div>
-                    <h1>Explorer</h1>
+                    <!-- <h1>Explore</h1> -->
                 </div>
+
                 <div class="flex explorer-header-actions">
                     <div class="input-container">
                         <input class="input-field" type="text" placeholder="Dimension One" name="d0">
@@ -281,26 +277,44 @@
             </div>
 
             <div class="display-grid">
-                    <div class="diverse-sketch-container flex"></div>
+                <p class="label-d0 dimension-label" label="d0">Dimension One (Left-Right) vs Realistic (Top-Bottom)</p>
+                    <div class="diverse-sketch-container flex">
+                        <div class="bias-label top">
+                            <p>Bias: -1.5</p>
+                            <p>Bias: 0</p>
+                            <p>Bias: +1.5</p>
+                        </div>
+                        <div class="bias-label left">
+                            <p>Bias: +1.5</p>
+                            <p>Bias: 0</p>
+                            <p>Bias: -1.5</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="loading-bar"></div>
+            <div class="flex loading-container">
+                <div class="loading-bar" style="display: block;"></div>
+                <h1 class="progress-count">3/16</h1>
+            </div>
+
+            <p>Add dimensions to search diverse sketching options of the prompt.</p>
         </div>
     </div>
 
 
 
     <div class="sketch-card" id="sketch-template" draggable="true">
-        <div class="card-info">
+        <!-- <div class="card-info">
             <div>
                 <i class="fa-solid fa-spinner button-animation card-loading"></i>
                 <h3></h3>
             </div>
             <div class="card-icon-background">
-                <!-- <i class="fa-solid fa-hand fa-fw"></i> -->
+                <i class="fa-solid fa-hand fa-fw"></i>
                 <i class="fa-solid fa-minus fa-fw"></i>
             </div>
-        </div>
+        </div> -->
         <div class="sketch">
             <canvas id="template-sketch" class="sketch-canvas"></canvas>
         </div>

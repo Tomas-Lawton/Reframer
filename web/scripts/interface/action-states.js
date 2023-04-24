@@ -53,7 +53,6 @@ const setModeDefault = () => {
     prompt.classList.remove("inactive-prompt");
     document.querySelector(".project").classList.remove("greeeeeen");
 
-
     canvas.classList.remove("loading-canvas");
     document.getElementById("loading").style.display = "none";
     // document.querySelector(".control-lines").style.display = "block";
@@ -71,9 +70,9 @@ const setModeDefault = () => {
 
 
 const setModeExplore = () => {
-    loadingBar.style.display = "block"
+    loadingBar.style.display = "flex"
 
-    exploreButton.className = "action-current";
+    // exploreButton.className = "action-current";
     stopButton.className = "action-stop";
     actions.forEach((button) => button.classList.add("tooltip"));
 
@@ -123,7 +122,6 @@ const deactivateCanvasFrames = () => {
 };
 
 const exploreLogic = () => {
-
     if (!dimensionInputs[0].value || !dimensionInputs[1].value) {
         openModal({
             title: "Add dimensions",
@@ -137,12 +135,13 @@ const exploreLogic = () => {
         loss: mainSketch.semanticLoss,
     });
     sketchHistory.pushUndo();
+    setActionState("explore");
+    removeSketches();
     generateExploreSketches();
 };
 
 const stopLogic = () => {
     if (controller.drawState === "explore") {
-        removeExploreSketches();
         controller.clipDrawing = false;
         setActionState("inactive");
         logger.event("stop-exploring");

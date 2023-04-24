@@ -80,7 +80,7 @@ const sketchSize = 190;
 
 let size, frameOutline, scaleRatio;
 const setCanvasSize = () => {
-    size = project.clientHeight * 0.91; //technically wrong
+    size = project.clientHeight * 0.91;
     sketchContainer.style.width = size + "px";
     sketchContainer.style.height = size + "px";
     canvas.width = size;
@@ -89,11 +89,19 @@ const setCanvasSize = () => {
     sparkCanvas.width = sparkUI.clientWidth;
     frameOutline = size;
     scaleRatio = frameOutline / 224;
+    
+    // Do not remove, centers board
+    // artBoard.style.left =
+    //     (window.innerWidth - controlPanel.clientWidth - size) / 2 +
+    //     controlPanel.clientWidth +
+    //     size / 2 +
+    //     "px";
+
     artBoard.style.left =
-        (window.innerWidth - controlPanel.clientWidth - size) / 2 +
-        controlPanel.clientWidth +
-        size / 2 +
-        "px";
+    40 +
+    controlPanel.clientWidth +
+    size / 2 +
+    "px";
     artBoard.style.top = (window.innerHeight - size) / 2 + size / 2 + 20 + "px";
 };
 

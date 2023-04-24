@@ -1,32 +1,17 @@
-const loadingBar = document.querySelector(".loading-bar")
+const loadingBar = document.querySelector(".loading-container")
 
-
-const removeExploreSketches = () => {
-    if (controller.exploreScopes.length > 0) {
-        diverseSketcheContainer.childNodes.forEach((child, i) => {
-            let stopButton = child.querySelector(".fa-hand");
-            let loader = child.querySelector(".card-loading");
-            loader.classList.remove("button-animation");
-            loader.classList.remove("fa-spinner");
-            loader.classList.add("fa-check");
-            stopButton.style.background = "#f5f5f5";
-            stopButton.style.background = "#d2d2d2";
-            controller.stopSingle(controller.exploreScopes[i]);
-        });
-        controller.exploreScopes = [];
+const removeSketches = () => {
+    for (const [key, sketch] of Object.entries(controller.sketches)) {
+        if (key !== 'main-sketch') {
+            sketch.scope.remove();
+            sketch.elem.remove()
+        }
     }
 };
 
 
 const generateExploreSketches = () => {
-    setActionState("explore");
-
-    for (let i = 0; i < 4; i++) {
-        diverseSketcheContainer.removeChild(
-            diverseSketcheContainer.firstElementChild
-        );
-    }
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 16; i++) {
         // create paper.js scopes
         let sketch = new Sketch(
             i,
@@ -50,31 +35,19 @@ const generateExploreSketches = () => {
     logger.event("start-exploring");
 };
 
-const emptyExplorer = () => {
-    removeExploreSketches();
-    controller.clipDrawing = false;
-    // refactor into function
-    for (let i = 0; i < 4; i++) {
-        if (diverseSketcheContainer.firstElementChild) {
-            diverseSketcheContainer.removeChild(
-                diverseSketcheContainer.firstChild
-            );
-            let sketch = new Sketch(null, defaults, sketchSize);
-            let newElem = sketch.renderMini();
-            diverseSketcheContainer.appendChild(newElem);
-            newElem.classList.add("inactive-sketch");
-        }
-    }
-};
-
 const dimensionInputs = document.querySelectorAll(".input-container input");
-const dimensionLabels = document.querySelectorAll(".dimension-label");
+const dimensionLabels = document.querySelector(".dimension-label");
 const clearButtons = document.querySelectorAll(".input-container i");
+const updateLabels = () => {
+    let d1 = controller["behaviours"]["d0"]["name"]
+    let d2 = controller["behaviours"]["d1"]["name"]
+    dimensionLabels.innerHTML = `${d1 || "Dimension One"} (Left-Right) ${d2 ? `vs ${d2} (Top-Bottom)` : ""}`;
+}
 
 dimensionInputs.forEach(child => {
     child.addEventListener("input", (e) => {
-        // e.target.name === "d0" ? dimensionLabels[1].innerHTML = e.target.value : dimensionLabels[0].innerHTML = e.target.value; 
-        controller["behaviours"][e.target.name]["name"] = e.target.value;
+        controller["behaviours"][e.target.name]["name"] = capitalizeFirstLetter(e.target.value);
+        updateLabels()
     });
     console.log(controller)
 });
@@ -82,18 +55,35 @@ dimensionInputs.forEach(child => {
 clearButtons.forEach(child => {
     child.addEventListener("click", (e) => {
         let i = child.getAttribute("name");
+        controller["behaviours"][i === "x-d0" ? "d0" : "d1"]["name"] = "";
+
         if (i === "x-d0") {
-            dimensionInputs[0].value = "" ;
-            // dimensionLabels[1].innerHTML = "";
+            dimensionInputs[0].value = "";
+            updateLabels();
         } else {
             dimensionInputs[1].value = "";
-            // dimensionLabels[0].innerHTML = ""; 
+            updateLabels();
         }
-        controller["behaviours"][i === "x-d0" ? "d0" : "d1"]["name"] = "";
-    }); 
+    });
 });
 
 
-document.querySelector(".explorer-header-actions button").addEventListener("click", e => {
-    // trigger generation with dimensions.
-})
+// document.querySelector(".explorer-header-actions button").addEventListener("click", e => {
+//     // trigger generation with dimensions.
+// })
+
+explorerPanel.onmousedown = (e) => {
+    let bounds = explorerPanel.firstElementChild.getBoundingClientRect();
+    e = e || window.event;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    if (
+        pos3 < bounds.left ||
+        pos3 > bounds.right ||
+        pos4 < bounds.top ||
+        pos4 > bounds.bottom
+    ) {
+        document.onmouseup = closeDragElement;
+        document.onmousemove = (e) => elementDrag(e, explorerPanel);
+    }
+};
