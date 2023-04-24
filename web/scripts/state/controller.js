@@ -56,6 +56,7 @@ class Controller {
         if (!this.clipDrawing) {
             this.prepare();
             const route = "/explore_diverse_sketches";
+            // To do change to websocket and process each sketch as it is loaded.
             const response = await postData("http://" + base + route,
                 {
                     status: "explore_diverse_sketches",

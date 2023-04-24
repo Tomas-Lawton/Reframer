@@ -1361,7 +1361,7 @@ input[type="number"] {
     position: relative;
     background: #f5f5f5;
     padding: 1.5em 0.5em 0.5em 1.5em;
-        border-radius: 10px;
+    border-radius: 10px;
     margin-top: 1em;
 }
 
@@ -1370,13 +1370,14 @@ input[type="number"] {
     color: #7b66ff;
     margin-bottom: 1em;
     margin-left: -11px;
+    text-align: center;
 }
 
 
 
 .diverse-sketch-container {
     flex-wrap: wrap;
-    width: 78vh;
+    width: 65vh;
     position: relative;
 }
 

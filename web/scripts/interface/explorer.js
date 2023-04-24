@@ -41,12 +41,12 @@ const clearButtons = document.querySelectorAll(".input-container i");
 const updateLabels = () => {
     let d1 = controller["behaviours"]["d0"]["name"]
     let d2 = controller["behaviours"]["d1"]["name"]
-    dimensionLabels.innerHTML = `${d1 || "Dimension One"} (Top-Bottom) ${d2 ? `vs ${d2} (Left-Right)` : ""}`;
+    dimensionLabels.innerHTML = `${d1 || "Dimension One"} (Left-Right) ${d2 ? `vs ${d2} (Top-Bottom)` : ""}`;
 }
 
 dimensionInputs.forEach(child => {
     child.addEventListener("input", (e) => {
-        controller["behaviours"][e.target.name]["name"] = e.target.value;
+        controller["behaviours"][e.target.name]["name"] = capitalizeFirstLetter(e.target.value);
         updateLabels()
     });
     console.log(controller)
