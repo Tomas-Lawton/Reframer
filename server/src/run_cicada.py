@@ -7,7 +7,6 @@ from src.drawing_model import Cicada
 from src import utils
 from src.config import args
 
-
 device = torch.device('cuda:0') if torch.cuda.is_available() else 'cpu'
 
 # Build dir if does not exist & make sure using a
@@ -24,7 +23,7 @@ p0 = args.prune_ratio
 
 def create_cicada(text_behaviour, user_data, a, b):
     args.prune_ratio = p0 / len(prune_places)
-    print("a1")
+
     cicada = Cicada(
         device=device,
         canvas_w=args.canvas_w,
@@ -39,21 +38,21 @@ def create_cicada(text_behaviour, user_data, a, b):
         w_img=args.w_img,
         w_geo=args.w_geo,
     )
-    print("a2")
 
-    cicada.process_text(user_data["prompt"])
-    cicada.process_sketch(user_data["sketch"], user_data["frame_size"])
+    try:
+        cicada.process_text(user_data["prompt"])
+        cicada.process_sketch(user_data["sketch"], user_data["frame_size"])
+    except Exception as e:
+            print("Problem during initialization \n", e)
 
     if len(cicada.drawing.traces) > 0 and cicada.drawing.img is not None:
-        cicada.add_random_shapes(user_data["random_curves"])
-        cicada.initialize_variables()
-        cicada.initialize_optimizer()
-    print("a3")
+            cicada.add_random_shapes(user_data["random_curves"])
+            cicada.initialize_variables()
+            cicada.initialize_optimizer()
 
     img = cicada.build_img("deprecated") #slightly different every time
     cicada.img = img.cpu().permute(0, 2, 3, 1).squeeze(0)
     evaluation_score = text_behaviour.eval_behaviours(cicada.img, showme=True)
-    print("a4")
 
     cicada.add_behaviour(user_data["behaviours"]["d0"]["name"], a + float(evaluation_score.item()))
     cicada.add_behaviour(user_data["behaviours"]["d1"]["name"], b + float(evaluation_score.item()))

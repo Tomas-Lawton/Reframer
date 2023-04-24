@@ -23,13 +23,12 @@ def get_top_sketches(user_data: Dict, behaviours_range: int = 4,
     
     # Generate a list of top sketches
     for (behaviour_a, behaviour_b) in behaviour_grid:
-        print("a")
         cicada = create_cicada(text_behaviour, user_data, behaviour_a, behaviour_b)
-        print("b")
         top_sketches.append(run_cicada(cicada, behaviour_a + behaviour_b))
     
     # Sort top sketches by global loss and return top 4
-    return sorted(top_sketches, key=get_loss)[:4]
+    # return sorted(top_sketches, key=get_loss)[:4]
+    return top_sketches
 
 def render_results(top_sketches: List, frame_size: int) -> List:
     """
