@@ -7,7 +7,6 @@ from src.drawing_model import Cicada
 from src import utils
 from src.config import args
 
-
 device = torch.device('cuda:0') if torch.cuda.is_available() else 'cpu'
 
 # Build dir if does not exist & make sure using a
@@ -44,7 +43,7 @@ def create_cicada(text_behaviour, user_data, a, b):
         cicada.process_text(user_data["prompt"])
         cicada.process_sketch(user_data["sketch"], user_data["frame_size"])
     except Exception as e:
-            print("Probmlem during intialisation \n", e)
+            print("Problem during initialization \n", e)
 
     if len(cicada.drawing.traces) > 0 and cicada.drawing.img is not None:
             cicada.add_random_shapes(user_data["random_curves"])
