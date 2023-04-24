@@ -29,7 +29,8 @@ def get_top_sketches(user_data: Dict, behaviours_range: int = 4,
         top_sketches.append(run_cicada(cicada, behaviour_a + behaviour_b))
     
     # Sort top sketches by global loss and return top 4
-    return sorted(top_sketches, key=get_loss)[:4]
+    # return sorted(top_sketches, key=get_loss)[:4]
+    return top_sketches
 
 def render_results(top_sketches: List, frame_size: int) -> List:
     """
