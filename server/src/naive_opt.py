@@ -1,4 +1,4 @@
-from cicada2 import Cicada
+from cicada import Cicada
 from behaviour import TextBehaviour
 from mapelites_config import args
 import pandas as pd

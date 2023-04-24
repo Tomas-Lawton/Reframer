@@ -46,16 +46,10 @@ async def explore(request: RequestModel) -> ResponseModel:
     """
     Given a user's data, returns a list of diverse sketches.
     """
-    print('here')
-
 
     try:
         top_sketches = get_top_sketches(request.user_data)
-        print('here2')
-
         results = render_results(top_sketches, request.user_data["frame_size"])
-        print('here3')
-
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
