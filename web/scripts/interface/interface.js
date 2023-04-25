@@ -324,10 +324,14 @@ document.getElementById("num-squiggles").oninput = (e) => {
 
 let lastLearningRate = controller.learningRate;
 respectSlider.oninput = (e) => {
-    controller.pause();
     controller.learningRate = e.target.value / 100;
     let msg = controller.learningRate > 0.2 ? "More" : "Less";
     document.getElementById("fix-label").innerHTML = msg;
+};
+
+respectSlider.onmousedown = () => {
+    controller.pause();
+    lastLearningRate = controller.learningRate;
 };
 
 respectSlider.onmouseup = () => {

@@ -13,11 +13,14 @@ exploreButton.addEventListener("click", () => {
                 message: "Without a prompt, the AI doesn't know what to draw!",
             });
             return;
+        } else {
+            show(explorerPanel)
+            dimensionInputs[0].focus()
         }
-        show(explorerPanel)
     }
 });
-document.querySelector(".explorer-header-actions button ").addEventListener("click", () => exploreLogic());
+
+generateButton.addEventListener("click", () => exploreLogic());
 
 const setActionState = (state) => {
     switch (state) {
@@ -41,6 +44,7 @@ const setModeDefault = () => {
     exploreButton.className = "action-default";
     stopButton.className = "action-inactive";
     actions.forEach((button) => button.classList.add("tooltip"));
+    generateButton.classList.remove("action-inactive")
 
     accordionItem.classList.add("open");
     accordionItem.classList.remove("closed");
@@ -93,7 +97,8 @@ const setModeExplore = () => {
     loadingBar.style.display = "flex"
 
     // exploreButton.className = "action-current";
-    stopButton.className = "action-stop";
+    stopButton.className = "action-inactive";
+    generateButton.className = "action-inactive";
     actions.forEach((button) => button.classList.add("tooltip"));
 
     prompt.classList.add("inactive-prompt")
@@ -180,8 +185,8 @@ const exploreLogic = () => {
 };
 
 const stopLogic = () => {
+    controller.clipDrawing = false;
     if (controller.drawState === "explore") {
-        controller.clipDrawing = false;
         logger.event("stop-exploring");
     } 
     if (controller.drawState === "draw") {

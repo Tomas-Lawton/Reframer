@@ -65,12 +65,12 @@ class Controller {
                 sketch: mainSketch.sketch,
                 frame_size: mainSketch.frameSize,
                 random_curves: this.addLines,
-                rate: this.learningRate,
+                learning_rate: this.learningRate,
             }
         }));
     }
     pause() {
-        if (this.drawState !== "explore" && this.drawState !== "pause") {
+        if (this.drawState === "draw") {
             this.previousDrawState = this.drawState
             console.log("Pausing");
             controller.liveCollab = true;
@@ -94,7 +94,7 @@ class Controller {
                 socket.send(JSON.stringify({
                     status: "continue_sketch", user_data: {
                         sketch: mainSketch.sketch,
-                        rate: this.learningRate,
+                        learning_rate: this.learningRate,
                     }
                 }))
                 setActionState(this.previousDrawState);
@@ -104,8 +104,16 @@ class Controller {
         }
     }
     startExplorer() {
+        console.log('t?')
+
         if (!this.clipDrawing) {
+            console.log('d?')
+
+            this.clipDrawing = true;
+            console.log('wnqwfd?')
+
             this.prepare();
+            console.log('sewnd?')
             socket.send(JSON.stringify({
                 status: "explore_diverse_sketches",
                 user_data: {

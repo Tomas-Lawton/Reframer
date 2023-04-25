@@ -165,6 +165,7 @@ const openModal = (data) => {
     document.getElementById("confirm-modal").onclick = () => {
         confirm();
         close();
+        prompt.focus()
     };
     modal.style.display = "block";
 };

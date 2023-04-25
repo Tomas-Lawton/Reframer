@@ -9,7 +9,6 @@ const removeSketches = () => {
     }
 };
 
-
 const generateExploreSketches = () => {
     for (let i = 0; i < 16; i++) {
         // create paper.js scopes
@@ -38,10 +37,21 @@ const generateExploreSketches = () => {
 const dimensionInputs = document.querySelectorAll(".input-container input");
 const dimensionLabels = document.querySelector(".dimension-label");
 const clearButtons = document.querySelectorAll(".input-container i");
+const generateButton = document.querySelector(".explorer-header-actions button ")
+
 const updateLabels = () => {
     let d1 = controller["behaviours"]["d0"]["name"]
     let d2 = controller["behaviours"]["d1"]["name"]
     dimensionLabels.innerHTML = `${d1 || "Dimension One"} (Left-Right) ${d2 ? `vs ${d2} (Top-Bottom)` : ""}`;
+    if (d1 === "") {
+        generateButton.classList.add("action-inactive")
+        dimensionInputs[1].parentElement.classList.add("action-inactive")
+    } else {
+        if (controller.drawState !== "explore") {
+            generateButton.classList.remove("action-inactive")
+        }
+        dimensionInputs[1].parentElement.classList.remove("action-inactive")
+    }
 }
 
 dimensionInputs.forEach(child => {

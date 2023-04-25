@@ -24,7 +24,7 @@ const createSocketConnection = () => {
             const response = JSON.parse(event.data)
             console.log(response);
 
-            if (response.status === "Update_Main") {
+            if (controller.drawState === "draw" && response.status === "Update_Main") {
                 const data = response.data;
 
                 controller.lastIteration = data.i;
@@ -38,7 +38,8 @@ const createSocketConnection = () => {
                 incrementHistory();
                 setLineLabels(mainSketch.sketchLayer);
             }
-            if (response.status === "Returned_Diverse_Sketch") {
+
+            if (controller.drawState === "explore" && response.status === "Returned_Diverse_Sketch") {
                 const data = response.data;
 
                 controller.sketches[data.i.toString()].load(
