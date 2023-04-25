@@ -1,16 +1,10 @@
-import uvicorn
 import os
-import torch
-from typing import List, Dict, Any
-from pydantic import BaseModel
-from fastapi import FastAPI, Request, HTTPException
+import uvicorn
+from fastapi import FastAPI, Request, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from src.explorer import get_top_sketches, render_results
+from ConnectionManager import ConnectionManager
 
-if not torch.cuda.device_count():
-    raise Exception("No CUDA devices found, running with CPU")
-
-app = FastAPI(title="CICADA Backend")
+app = FastAPI(title="CICADA/Reframer Backend")
 
 ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
@@ -25,31 +19,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class RequestModel(BaseModel):
-    user_data: Dict[str, Any]
-class ResponseModel(BaseModel):
-    status: str
-    diverse_sketches: List[Dict[str, Any]]
+manager = ConnectionManager()
 
-@app.get("/explore_diverse_sketches")
-async def explore() -> Dict[str, str]:
-    return {
-        "status": "SUCCESS",
-    }
-
-@app.post("/explore_diverse_sketches")
-async def explore(request: RequestModel) -> ResponseModel:
-    """
-    Given a user's data, returns a list of diverse sketches.
-    """
-
+@app.websocket("/ws/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: int):
+    await manager.connect(websocket)
     try:
-        top_sketches = get_top_sketches(request.user_data)
-        results = render_results(top_sketches, request.user_data["frame_size"])
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    return ResponseModel(status="returned_diverse_sketches", diverse_sketches=results)
+        while True:
+            user_data = await websocket.receive_json()
+            await manager.process_user_request(user_data.status, user_data.data)
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        print(f"Disconnected Client: #{client_id}.")
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 8000))
