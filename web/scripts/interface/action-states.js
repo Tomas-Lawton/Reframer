@@ -37,7 +37,7 @@ const setActionState = (state) => {
 
 const setModeDefault = () => {
     loadingBar.style.display = "none"
-
+    drawButton.className = "action-default"
     exploreButton.className = "action-default";
     stopButton.className = "action-inactive";
     actions.forEach((button) => button.classList.add("tooltip"));
@@ -182,11 +182,12 @@ const exploreLogic = () => {
 const stopLogic = () => {
     if (controller.drawState === "explore") {
         controller.clipDrawing = false;
-        setActionState("inactive");
         logger.event("stop-exploring");
     } 
     if (controller.drawState === "draw") {
         socket.send(JSON.stringify({ status: "stop" }))
+        logger.event("stop-drawing");
     }
+    setActionState("inactive");
     console.log(controller.drawState)
 };
