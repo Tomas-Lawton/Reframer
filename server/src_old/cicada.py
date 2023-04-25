@@ -375,10 +375,14 @@ class Old_Cicada:
         self.normaliseScaleFactor = 1 / self.frame_size
         self.resizeScaleFactor = 224 / self.frame_size
 
+    def use_latest_sketch(self, data):
+        print("Adding changes...")
+        self.lr_control = 10 * (data["data"]["rate"] ** 2.5)
+        self.sketch_data = data["data"]["sketch"]
+
     async def stop(self):
         print(f"Stopping... {self.index}")
         self.is_running = False
-        del self
 
     async def loop(self):
         while self.is_running and self.iteration < num_iter:
