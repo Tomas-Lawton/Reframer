@@ -1,15 +1,15 @@
 import copy
 import torch
 import pydiffvg
-from util.processing import get_augment_trans
-from util.utils import area_mask, use_penalisation, k_min_elements, scale_points
-from util.clip_utility import  data_to_tensor
+from src_old.util.processing import get_augment_trans
+from src_old.util.utils import area_mask, use_penalisation, k_min_elements, scale_points
+from src_old.util.clip_utility import  data_to_tensor
 
 import clip
 import logging
 import asyncio
-from sketch import Sketch
-from constants import *
+from src_old.sketch import Sketch
+from src_old.constants import *
 
 class Old_Cicada:
     def __init__(self, websocket, device, model, index=None):
@@ -95,10 +95,6 @@ class Old_Cicada:
     def activate(self, add_curves=True):
         self.drawing = Sketch(canvas_w, canvas_h)
     
-        for l in self.local_frames:
-            attention_area = scale_points(l['points'], self.normaliseScaleFactor)
-            self.add_attention_region(l['prompt'], attention_area)
-
         self.is_active = True
         paths = self.extract_points(self.sketch_data)
 
@@ -352,42 +348,32 @@ class Old_Cicada:
 
         # print(svg)
         result = {
-            "status": status,
-            "svg": svg,
-            "iterations": t,
-            "loss": rolling_loss,
-            "fixed": self.drawing.fixed_list
+            "status": "Update_Main",
+            "data": {
+                "svg": svg,
+                "i": t,
+                "loss": rolling_loss,
+                "fixed": self.drawing.fixed_list
+            }
         }
         try:
             await self.ws.send_json(result)
             print(f"Update sent for {self.index}")
         except Exception as e:
             print("Failed sending WS response")
-            # print(result)
-            pass
 
     def use_sketch(self, data):
         print("Updating...")
         self.iteration = 0
-        self.frame_size = data["data"]["frame_size"]
-        self.num_paths = data["data"]["random_curves"]
-        self.sketch_data = data["data"]["sketch"]
-        self.lr_control = 10 * (data["data"]["rate"] ** 2.5)
-        self.encode_text_classes(data["data"]["prompt"])
-        self.local_frames = data["data"]["frames"]
+        self.frame_size = data["frame_size"]
+        self.num_paths = data["random_curves"]
+        self.sketch_data = data["sketch"]
+        self.lr_control = 10 * (data["rate"] ** 2.5)
+        self.encode_text_classes(data["prompt"])
         self.user_canvas_w = self.frame_size
         self.user_canvas_h = self.frame_size
         self.normaliseScaleFactor = 1 / self.frame_size
         self.resizeScaleFactor = 224 / self.frame_size
-
-
-    def use_latest_sketch(self, data):
-        """Only for things that can be changed on the fly"""
-        print("Adding changes...")
-        self.lr_control = 10 * (data["data"]["rate"] ** 2.5)
-        self.sketch_data = data["data"]["sketch"]
-        self.local_frames = data["data"]["frames"]
-
 
     async def stop(self):
         print(f"Stopping... {self.index}")

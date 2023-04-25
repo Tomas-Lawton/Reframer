@@ -1,8 +1,9 @@
 import os
 import uvicorn
+import json
 from fastapi import FastAPI, Request, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from ConnectionManager import ConnectionManager
+from Connection_Manager import Connection_Manager
 
 app = FastAPI(title="CICADA/Reframer Backend")
 
@@ -19,15 +20,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-manager = ConnectionManager()
+manager = Connection_Manager()
 
 @app.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int):
+async def websocket_endpoint(websocket: WebSocket, client_id: str):
     await manager.connect(websocket)
+    print("User connected: ", client_id)
     try:
         while True:
             user_data = await websocket.receive_json()
-            await manager.process_user_request(user_data.status, user_data.data)
+            await manager.process_user_request(user_data)
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         print(f"Disconnected Client: #{client_id}.")

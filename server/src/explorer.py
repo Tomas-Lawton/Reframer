@@ -17,7 +17,7 @@ def get_behaviour_grid(user_data: Dict, behaviours_range: int = 4,
     grid = [(a, b) for a in behaviour_values for b in behaviour_values]
     return grid, text_behaviour
 
-def create_response(sketch: List, i, frame_size: int) -> List:
+def create_response(sketch: List, i: int, frame_size: int):
     """
     Renders a list of Cicada sketches to SVG files and returns a list of results dictionaries.
     """
@@ -31,4 +31,5 @@ def create_response(sketch: List, i, frame_size: int) -> List:
             "svg": f.read(),
             "iterations": args.num_iter,
             "fixed": sketch.drawing.fixed_list,
+            "i": i
         }
