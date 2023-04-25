@@ -28,13 +28,6 @@ const setActionState = (state) => {
         case "explore":
             setModeExplore();
             break;
-        case "frame":
-            setModeFrame();
-            hint.innerHTML = `Creating prompt frames will give the AI context`;
-            break;
-        case "active-frame":
-            setModeActiveFrame();
-            break;
     }
     console.log(`%c Status: ${state}`, `color:green`);
     controller.drawState = state;
@@ -66,6 +59,31 @@ const setModeDefault = () => {
 
     document.querySelector(".current-status").style.color = "#A0A0A0";
     document.querySelector(".current-status").innerHTML = "Inactive";
+};
+
+const setModeDraw = () => {
+    exploreButton.className = "action-inactive";
+    drawButton.className = "action-current";
+    hint.innerHTML = `Don't wait. Draw with me!`;
+    focusButton.className = "action-default";
+    stopButton.className = "action-stop";
+    actions.forEach((button) => button.classList.add("tooltip"));
+
+    prompt.classList.add("inactive-prompt")
+    document.querySelector(".project").classList.remove("greeeeeen");
+
+    hide(explorerPanel);
+    hide(historyBlock);
+
+    accordionItem.classList.add("open");
+    accordionItem.classList.remove("closed");
+    undoButton.classList.add("inactive-section");
+    redoButton.classList.add("inactive-section");
+    document.getElementById("loading").style.display = "flex";
+    // document.querySelector(".control-lines").style.display = "none";
+
+    document.querySelector(".current-status").style.color = "#7b66ff";
+    document.querySelector(".current-status").innerHTML = "Drawing";
 };
 
 
@@ -120,6 +138,25 @@ const deactivateCanvasFrames = () => {
         });
     }
 };
+
+
+const drawLogic = () => {
+        if (noPrompt()) {
+            openModal({
+                title: "Type a prompt first!",
+                message: "You need a target for AI sketching.",
+                confirmAction: () => (controlPanel.style.display = "flex"),
+            });
+            return;
+        }
+
+    if (socket) {
+        setActionState("draw");
+        controller.draw();
+        logger.event("start-drawing");
+    }
+};
+
 
 const exploreLogic = () => {
     if (!dimensionInputs[0].value || !dimensionInputs[1].value) {

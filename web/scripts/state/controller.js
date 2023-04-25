@@ -52,23 +52,85 @@ class Controller {
         }
     }
 
-    async startExplorer() {
+    draw() {
+            this.clipDrawing = true;
+            this.targetDrawing = false;
+            mainSketch.svg = paper.project.exportSVG({
+                asString: true,
+            });
+            sketchHistory.historyHolder.push({
+                svg: mainSketch.svg,
+                loss: mainSketch.semanticLoss,
+            });
+            sketchHistory.pushUndo();
+            this.prepare();
+            this.updateDrawer({
+                status: "draw",
+                prompt: this.prompt,
+                sketch: mainSketch.sketch,
+                frame_size: mainSketch.frameSize,
+                random_curves: this.addLines,
+                rate: this.learningRate,
+            });
+    }
+    pause() {
+        if (
+            //todo refactor
+          (  (this.drawState !== "explore" && //don't include this state
+                this.activeStates.includes(controller.drawState)) ||
+            this.drawState === "active-frame" ) && this.drawState !== "pause"
+        ) {
+            this.previousDrawState = this.drawState
+            console.log("Pausing");
+            document.querySelector(".current-status").style.color = "#ff9700";
+            document.querySelector(".current-status").innerHTML = "Waiting";
+
+            controller.liveCollab = true;
+            this.updateDrawer({ status: "stop" });
+            this.clipDrawing = false;
+            controller.drawState = "pause";
+            // setActionState("pause");
+        }
+    }
+    continueSketch() {
+        if (!this.clipDrawing) {
+            this.clipDrawing = true;
+            try {
+                sketchHistory.historyHolder.push({
+                    svg: mainSketch.svg,
+                    loss: mainSketch.semanticLoss,
+                });
+                sketchHistory.pushUndo();
+                this.prepare();
+                this.updateDrawer({
+                    status: "continue_sketch",
+                    sketch: mainSketch.sketch,
+                    rate: this.learningRate,
+                    frames: Object.values(mainSketch.localFrames).map((elem) => elem.data)
+                });
+                setActionState(this.previousDrawState);
+            } catch (e) {
+                console.log("Problem with update");
+            }
+        }
+    }
+    startExplorer() {
         if (!this.clipDrawing) {
             this.prepare();
-            const route = "/explore_diverse_sketches";
-            // To do change to websocket and process each sketch as it is loaded.
-            const response = await postData("http://" + base + route,
-                {
-                    status: "explore_diverse_sketches",
-                    user_data: {
-                        prompt: this.prompt,
-                        behaviours: this.behaviours,
-                        sketch: mainSketch.sketch,
-                        frame_size: mainSketch.frameSize,
-                        random_curves: this.addLines,
-                        rate: this.learningRate,
-                    },
-                })
+            socket.send(JSON.stringify({
+                status: "explore_diverse_sketches",
+                user_data: {
+                    prompt: this.prompt,
+                    behaviours: this.behaviours,
+                    sketch: mainSketch.sketch,
+                    frame_size: mainSketch.frameSize,
+                    random_curves: this.addLines,
+                    rate: this.learningRate,
+                },
+            }));
+
+
+            // TO DO MOVE TO SOCKET RESPONSE EVENT IN HANDLER
             console.log(response);
             if (response.status === "returned_diverse_sketches") {
                 response.diverse_sketches.map((exemplar, i) => 

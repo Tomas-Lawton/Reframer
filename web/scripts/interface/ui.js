@@ -1,4 +1,3 @@
-const socketLight = document.querySelector(".socket-connect");
 const canvas = document.getElementById("canvas");
 
 // General UI
