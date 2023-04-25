@@ -357,10 +357,11 @@ class Old_Cicada:
             }
         }
         try:
-            await self.ws.send_json(result)
-            print(f"Update sent for {self.index}")
+            if (t % 10) == 0:
+                await self.ws.send_json(result)
+                print(f"Update sent for {self.index}")
         except Exception as e:
-            print("Failed sending WS response")
+            print("Failed sending WS response, ", e)
 
     def use_sketch(self, data):
         print("Updating...")
@@ -368,7 +369,7 @@ class Old_Cicada:
         self.frame_size = data["frame_size"]
         self.num_paths = data["random_curves"]
         self.sketch_data = data["sketch"]
-        self.lr_control = 10 * (data["rate"] ** 2.5)
+        self.lr_control = 10 * (data["learning_rate"] ** 2.5)
         self.encode_text_classes(data["prompt"])
         self.user_canvas_w = self.frame_size
         self.user_canvas_h = self.frame_size
@@ -377,8 +378,8 @@ class Old_Cicada:
 
     def use_latest_sketch(self, data):
         print("Adding changes...")
-        self.lr_control = 10 * (data["data"]["rate"] ** 2.5)
-        self.sketch_data = data["data"]["sketch"]
+        self.lr_control = 10 * (data["learning_rate"] ** 2.5)
+        self.sketch_data = data["sketch"]
 
     async def stop(self):
         print(f"Stopping... {self.index}")
