@@ -35,12 +35,18 @@ class Connection_Manager:
     async def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
         await self.main_sketch.stop()
+        del self.main_sketch
 
     async def process_user_request(self, request: RequestModel):
             if request["status"] == "draw":
                 self.main_sketch.use_sketch(request["user_data"])
                 self.main_sketch.activate()
                 self.main_sketch.draw() # socket included in loop for non-blocking socket
+
+            if request["status"] == "continue_sketch":
+                self.main_sketch.use_latest_sketch(request["user_data"])
+                self.main_sketch.activate(False)
+                self.main_sketch.draw()
 
             if request["status"] == "stop":
                 await self.main_sketch.stop()
