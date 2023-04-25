@@ -648,8 +648,8 @@ hr {
 }
 
 .action-inactive {
-    background: #f5f5f5;
-    color: #d2d2d2;
+    background: #f5f5f5 !important;
+    color: #d2d2d2 !important;
     cursor: default;
     pointer-events: none;
 }
@@ -830,10 +830,10 @@ input:focus {
 .card-info {
     display: flex;
     align-items: center;
-    background: #f5f5f5;
     border-radius: 5px;
     justify-content: space-between;
     padding: 0.6em 1em;
+    position: absolute;
 }
 
 .card-info div {
@@ -1292,19 +1292,28 @@ input[type="number"] {
     font-weight: 500;
     pointer-events: all;
     font-size: 0.8em;
-    border: none;
-    color: white;
+    /* border: none; */
     background: #f5f5f5;
-    color: #7b66ff;
     width: 100%;
     padding: 1.6em;
     align-items: center;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    transition: .3s;
 }
 
-.input-container:focus {
-    border-color: #7B66ff;
+
+.input-container:focus-within {
+    outline: 2px solid #7B66ff;
 }
 
+.input-container.action-inactive input::placeholder {
+    color: #d2d2d2 !important;
+}
+.input-container.action-inactive i {
+    color: #d2d2d2 !important;
+}
 
 .input-container input {
     background: none;
@@ -1312,6 +1321,11 @@ input[type="number"] {
     color: #7B66ff;
     width: 120px;
     margin-left: 0;
+}
+
+.input-container i {
+    color: #a0a0a0;
+    font-size: 1.5em;
 }
 
 .input-container input::placeholder {
@@ -1330,11 +1344,6 @@ input[type="number"] {
     outline: none;
 }
 
-.input-container i {
-    color: #a0a0a0;
-    font-size: 1.5em;
-}
-
 .explorer-header-actions {
     height: 50px;
 }
@@ -1347,8 +1356,10 @@ input[type="number"] {
     border-radius: 3em;
 }
 
+
 .explorer-header-actions button:hover {
-    background: #9585fa;
+    background: #15bc1c;
+    transform: scale(1.03);
     animation-duration: .5s;
 }
 
@@ -1372,8 +1383,6 @@ input[type="number"] {
     margin-left: -11px;
     text-align: center;
 }
-
-
 
 .diverse-sketch-container {
     flex-wrap: wrap;

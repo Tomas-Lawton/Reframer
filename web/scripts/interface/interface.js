@@ -329,6 +329,20 @@ respectSlider.oninput = (e) => {
     document.getElementById("fix-label").innerHTML = msg;
 };
 
+respectSlider.onmousedown = () => {
+    controller.pause();
+    lastLearningRate = controller.learningRate;
+};
+
+respectSlider.onmouseup = () => {
+    if (controller.liveCollab) {
+        if (controller.learningRate !== lastLearningRate) {
+            controller.continueSketch();
+        }
+        controller.liveCollab = false;
+    }
+};
+
 
 header.addEventListener("click", () => {
     accordionItem.classList.toggle("open");

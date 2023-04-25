@@ -1,5 +1,7 @@
 const actions = document.querySelectorAll(".clip-actions>div");
-const [exploreButton, stopButton] = actions;
+const [drawButton, exploreButton, stopButton] = actions;
+
+drawButton.addEventListener("click", () => drawLogic());
 stopButton.addEventListener("click", () => stopLogic());
 exploreButton.addEventListener("click", () => {
     if (explorerPanel.style.display === "flex") {
@@ -11,11 +13,14 @@ exploreButton.addEventListener("click", () => {
                 message: "Without a prompt, the AI doesn't know what to draw!",
             });
             return;
+        } else {
+            show(explorerPanel)
+            dimensionInputs[0].focus()
         }
-        show(explorerPanel)
     }
 });
-document.querySelector(".explorer-header-actions button ").addEventListener("click", () => exploreLogic());
+
+generateButton.addEventListener("click", () => exploreLogic());
 
 const setActionState = (state) => {
     switch (state) {
@@ -35,10 +40,11 @@ const setActionState = (state) => {
 
 const setModeDefault = () => {
     loadingBar.style.display = "none"
-
+    drawButton.className = "action-default"
     exploreButton.className = "action-default";
     stopButton.className = "action-inactive";
     actions.forEach((button) => button.classList.add("tooltip"));
+    generateButton.classList.remove("action-inactive")
 
     accordionItem.classList.add("open");
     accordionItem.classList.remove("closed");
@@ -65,8 +71,8 @@ const setModeDraw = () => {
     exploreButton.className = "action-inactive";
     drawButton.className = "action-current";
     hint.innerHTML = `Don't wait. Draw with me!`;
-    focusButton.className = "action-default";
     stopButton.className = "action-stop";
+    stopButton.classList.remove("action-inactive")
     actions.forEach((button) => button.classList.add("tooltip"));
 
     prompt.classList.add("inactive-prompt")
@@ -91,7 +97,8 @@ const setModeExplore = () => {
     loadingBar.style.display = "flex"
 
     // exploreButton.className = "action-current";
-    stopButton.className = "action-stop";
+    stopButton.className = "action-inactive";
+    generateButton.className = "action-inactive";
     actions.forEach((button) => button.classList.add("tooltip"));
 
     prompt.classList.add("inactive-prompt")
@@ -178,9 +185,14 @@ const exploreLogic = () => {
 };
 
 const stopLogic = () => {
+    controller.clipDrawing = false;
     if (controller.drawState === "explore") {
-        controller.clipDrawing = false;
-        setActionState("inactive");
         logger.event("stop-exploring");
     } 
+    if (controller.drawState === "draw") {
+        socket.send(JSON.stringify({ status: "stop" }))
+        logger.event("stop-drawing");
+    }
+    setActionState("inactive");
+    console.log(controller.drawState)
 };

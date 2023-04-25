@@ -40,34 +40,9 @@ sketchTool.onMouseDown = function (event) {
                 controller.selectBox = new Rectangle(event.point);
             }
 
-            // if (hitResult) {
-            //     sketchHistory.pushUndo();
-            //     controller.pause();
-            //     ungroup();
-            //     path = hitResult.item;
-
-            //     let items = [];
-            //     if (window.event.shiftKey) {
-            //         path.selected = true;
-            //         items = getSelectedPaths();
-            //     } else {
-            //         mainSketch.sketchLayer.getItems().forEach((path) => {
-            //             path.selected = false;
-            //         });
-            //         items = mainSketch.sketchLayer.getItems({
-            //             inside: path.bounds,
-            //         });
-            //         items.forEach((item) => (item.selected = true));
-            //     }
-
-            //     createGroup(items);
-            //     fitToSelection(items, "moving");
-            //     updateSelectUI();
-            // }
-
-            // to do replace with above coe
             if (hitResult) {
                 sketchHistory.pushUndo();
+                controller.pause();
                 ungroup();
 
                 path = hitResult.item;
@@ -80,6 +55,7 @@ sketchTool.onMouseDown = function (event) {
             break;
         case "pen":
             sketchHistory.pushUndo();
+            controller.pause();
             penPath = new Path({
                 strokeColor: controller.strokeColor,
                 strokeWidth: controller.strokeWidth,
@@ -98,7 +74,7 @@ sketchTool.onMouseDown = function (event) {
         case "erase":
             sketchHistory.pushUndo();
 
-
+            controller.pause();
             erasorPath = new Path({
                 strokeWidth: controller.strokeWidth / 1,
                 strokeCap: "round",
@@ -158,6 +134,7 @@ sketchTool.onMouseDrag = function (event) {
                 }
             } else if (controller.selectBox !== undefined) {
                 //creating box
+                controller.pause();
                 controller.selectBox.width += event.delta.x;
                 controller.selectBox.height += event.delta.y;
                 if (selectBox) {
