@@ -1,5 +1,7 @@
 const actions = document.querySelectorAll(".clip-actions>div");
-const [exploreButton, stopButton] = actions;
+const [drawButton, exploreButton, stopButton] = actions;
+
+drawButton.addEventListener("click", () => drawLogic());
 stopButton.addEventListener("click", () => stopLogic());
 exploreButton.addEventListener("click", () => {
     if (explorerPanel.style.display === "flex") {
@@ -65,8 +67,8 @@ const setModeDraw = () => {
     exploreButton.className = "action-inactive";
     drawButton.className = "action-current";
     hint.innerHTML = `Don't wait. Draw with me!`;
-    focusButton.className = "action-default";
     stopButton.className = "action-stop";
+    stopButton.classList.remove("action-inactive")
     actions.forEach((button) => button.classList.add("tooltip"));
 
     prompt.classList.add("inactive-prompt")
@@ -183,4 +185,8 @@ const stopLogic = () => {
         setActionState("inactive");
         logger.event("stop-exploring");
     } 
+    if (controller.drawState === "draw") {
+        socket.send(JSON.stringify({ status: "stop" }))
+    }
+    console.log(controller.drawState)
 };

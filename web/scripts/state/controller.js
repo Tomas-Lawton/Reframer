@@ -15,11 +15,6 @@ class Controller {
         this.clipDrawing = false;
         this.maximumTraces = 1; // todo change
         this.linesDisabled = false;
-        this.activeStates = [
-            "draw",
-            "explore",
-            "pause", //for continue
-        ];
         this.lastHistoryIndex = 0;
         // this.penDropMode = "select";
         this.sketchScopeIndex = 0;
@@ -51,45 +46,39 @@ class Controller {
             d1: { name: null, value: null },
         }
     }
-
     draw() {
-            this.clipDrawing = true;
-            this.targetDrawing = false;
-            mainSketch.svg = paper.project.exportSVG({
-                asString: true,
-            });
-            sketchHistory.historyHolder.push({
-                svg: mainSketch.svg,
-                loss: mainSketch.semanticLoss,
-            });
-            sketchHistory.pushUndo();
-            this.prepare();
-            this.updateDrawer({
-                status: "draw",
+        this.clipDrawing = true;
+        this.targetDrawing = false;
+        mainSketch.svg = paper.project.exportSVG({
+            asString: true,
+        });
+        sketchHistory.historyHolder.push({
+            svg: mainSketch.svg,
+            loss: mainSketch.semanticLoss,
+        });
+        sketchHistory.pushUndo();
+        this.prepare();
+        socket.send(JSON.stringify({
+            status: "draw",
+            user_data: {
                 prompt: this.prompt,
                 sketch: mainSketch.sketch,
                 frame_size: mainSketch.frameSize,
                 random_curves: this.addLines,
                 rate: this.learningRate,
-            });
+            }
+        }));
     }
     pause() {
-        if (
-            //todo refactor
-          (  (this.drawState !== "explore" && //don't include this state
-                this.activeStates.includes(controller.drawState)) ||
-            this.drawState === "active-frame" ) && this.drawState !== "pause"
-        ) {
+        if (this.drawState !== "explore" && this.drawState !== "pause") {
             this.previousDrawState = this.drawState
             console.log("Pausing");
-            document.querySelector(".current-status").style.color = "#ff9700";
-            document.querySelector(".current-status").innerHTML = "Waiting";
-
             controller.liveCollab = true;
-            this.updateDrawer({ status: "stop" });
+            socket.send(JSON.stringify({ status: "stop" }))
             this.clipDrawing = false;
             controller.drawState = "pause";
-            // setActionState("pause");
+            document.querySelector(".current-status").style.color = "#ff9700";
+            document.querySelector(".current-status").innerHTML = "Waiting";
         }
     }
     continueSketch() {
@@ -102,12 +91,12 @@ class Controller {
                 });
                 sketchHistory.pushUndo();
                 this.prepare();
-                this.updateDrawer({
-                    status: "continue_sketch",
-                    sketch: mainSketch.sketch,
-                    rate: this.learningRate,
-                    frames: Object.values(mainSketch.localFrames).map((elem) => elem.data)
-                });
+                socket.send(JSON.stringify({
+                    status: "continue_sketch", user_data: {
+                        sketch: mainSketch.sketch,
+                        rate: this.learningRate,
+                    }
+                }))
                 setActionState(this.previousDrawState);
             } catch (e) {
                 console.log("Problem with update");
@@ -128,31 +117,6 @@ class Controller {
                     rate: this.learningRate,
                 },
             }));
-
-
-            // TO DO MOVE TO SOCKET RESPONSE EVENT IN HANDLER
-            console.log(response);
-            if (response.status === "returned_diverse_sketches") {
-                response.diverse_sketches.map((exemplar, i) => 
-                    controller.sketches[i.toString()].load(
-                        sketchSize / 224,
-                        exemplar.svg,
-                        exemplar.fixed,
-                    ));
-                hide(loadingBar)
-
-                let loaders = diverseSketcheContainer.querySelectorAll(".card-loading").forEach(elem => {
-                    elem.classList.remove("button-animation");
-                    elem.classList.remove("fa-spinner");
-                    elem.classList.add("fa-check");
-                });
-
-                controller.clipDrawing = false;
-                setActionState("inactive");
-                show(explorerPanel)
-                logger.event("stop-exploring");
-                // setModeDefault();
-            }
         }
     }
     prepare() {
