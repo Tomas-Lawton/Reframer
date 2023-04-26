@@ -1,3 +1,4 @@
+import asyncio
 import torch
 import clip
 import json
@@ -16,7 +17,7 @@ class ResponseModel(BaseModel):
     status: str
     result_sketch: Dict[str, Any]
 
-def create_cicada_sync(websocket): #refactor out socket?
+def create_async_cicada(websocket): #refactor out socket?
     if not torch.cuda.device_count():
         raise Exception("No CUDA devices found, running with CPU")
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -26,18 +27,25 @@ def create_cicada_sync(websocket): #refactor out socket?
 class Connection_Manager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
+        self.process_is_active = False
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.append(websocket)
-        self.main_sketch = create_cicada_sync(websocket)
+        self.main_sketch = create_async_cicada(websocket)
 
     async def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
         await self.main_sketch.stop()
         del self.main_sketch
 
+    async def broadcast_explore_sketch(self, result_sketch: ResponseModel):
+        for connection in self.active_connections:
+            await connection.send_json(result_sketch)
+
     async def process_user_request(self, request: RequestModel):
+            print(request)
+
             if request["status"] == "draw":
                 self.main_sketch.use_sketch(request["user_data"])
                 self.main_sketch.activate()
@@ -51,15 +59,21 @@ class Connection_Manager:
             if request["status"] == "stop":
                 await self.main_sketch.stop()
 
-            if request["status"] == "explore_diverse_sketches":
-                behaviour_grid, text_behaviour = get_behaviour_grid(request["user_data"])
-                
-                for i, (behaviour_a, behaviour_b) in enumerate(behaviour_grid):
-                    cicada = create_cicada(text_behaviour, request["user_data"], behaviour_a, behaviour_b)
-                    result_sketch = run_cicada(cicada, behaviour_a + behaviour_b)
-                    response = create_response(result_sketch, i, request["user_data"]["frame_size"])
-                    await self.broadcast_explore_sketch({"status":"Returned_Diverse_Sketch", "data": response})
+            if request["status"] == "stop_explorer":
+                self.process_is_active = False
 
-    async def broadcast_explore_sketch(self, result_sketch: ResponseModel):
-        for connection in self.active_connections:
-            await connection.send_json(result_sketch)
+            if request["status"] == "explore_diverse_sketches":
+                self.process_is_active = True
+                loop = asyncio.get_running_loop()
+                loop.run_in_executor(None, lambda: asyncio.run(self.start_generate_exemplars_process(request)))
+
+    async def start_generate_exemplars_process(self, request: RequestModel):
+        print("started explorer task")
+        behaviour_grid, text_behaviour = get_behaviour_grid(request["user_data"])
+        for i, (behaviour_a, behaviour_b) in enumerate(behaviour_grid):
+            if self.process_is_active == False:
+                break # exit task
+            cicada = create_cicada(text_behaviour, request["user_data"], behaviour_a, behaviour_b)
+            result_sketch = run_cicada(cicada, behaviour_a + behaviour_b)
+            response = create_response(result_sketch, i, request["user_data"]["frame_size"])
+            await self.broadcast_explore_sketch({"status":"Returned_Diverse_Sketch", "data": response})

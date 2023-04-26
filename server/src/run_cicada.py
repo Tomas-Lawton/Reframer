@@ -52,11 +52,19 @@ def create_cicada(text_behaviour, user_data, a, b):
 
     img = cicada.build_img("deprecated") #slightly different every time
     cicada.img = img.cpu().permute(0, 2, 3, 1).squeeze(0)
-    evaluation_score = text_behaviour.eval_behaviours(cicada.img, showme=True)
 
-    cicada.add_behaviour(user_data["behaviours"]["d0"]["name"], a + float(evaluation_score.item()))
-    cicada.add_behaviour(user_data["behaviours"]["d1"]["name"], b + float(evaluation_score.item()))
-
+    try:
+        use_one_dimension = user_data["behaviours"]["d1"]["name"] == "" or user_data["behaviours"]["d1"]["name"] == None
+        if (use_one_dimension):    
+            evaluation_score = text_behaviour.eval_single_behaviour(cicada.img, showme=True)
+            cicada.add_behaviour(user_data["behaviours"]["d0"]["name"], a + float(evaluation_score.item()))       
+        else:
+            evaluation_score = text_behaviour.eval_behaviours(cicada.img, showme=True)
+            cicada.add_behaviour(user_data["behaviours"]["d0"]["name"], a + float(evaluation_score.item()))
+            cicada.add_behaviour(user_data["behaviours"]["d1"]["name"], b + float(evaluation_score.item()))
+    except KeyError:
+        print("Missing dimension prompt(s)")
+        
     return cicada
 
 

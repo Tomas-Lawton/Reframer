@@ -59,7 +59,6 @@ class Cicada:
                 for prompt in neg_prompts
             ]
 
-
     @torch.no_grad()
     def add_behaviour(self, prompt, target_beh, weight=0.3):
         z = self.model.encode_text(clip.tokenize(prompt).to(self.device))

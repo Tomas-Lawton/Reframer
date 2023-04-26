@@ -11,8 +11,16 @@ def get_behaviour_grid(user_data: Dict, behaviours_range: int = 4,
     """
     Generates a grid of behaviour offsets for Cicada to target.
     """
-    text_behaviour = TextBehaviour()
-    text_behaviour.add_behaviour(user_data["behaviours"]["d0"]["name"], user_data["behaviours"]["d1"]["name"])
+    try:
+        text_behaviour = TextBehaviour()
+        use_one_dimension = user_data["behaviours"]["d1"]["name"] == "" or user_data["behaviours"]["d1"]["name"] == None
+        if (use_one_dimension):
+            text_behaviour.add_single_behaviour(user_data["behaviours"]["d0"]["name"])
+        else:
+            text_behaviour.add_behaviours(user_data["behaviours"]["d0"]["name"], user_data["behaviours"]["d1"]["name"])
+    except KeyError:
+        print("Missing dimension prompt(s)")
+
     behaviour_values = [i * behaviour_step - 1.5 for i in range(behaviours_range)]
     grid = [(a, b) for a in behaviour_values for b in behaviour_values]
     return grid, text_behaviour
@@ -24,7 +32,7 @@ def create_response(sketch: List, i: int, frame_size: int):
     filename = f"results/temp-sketch-{i}.svg"
     shapes = [trace.shape for trace in sketch.drawing.traces]
     groups = [trace.shape_group for trace in sketch.drawing.traces]
-    # dimension_scores = text_behaviour.eval_behaviours(cicada.img, showme=True)
+
     pydiffvg.save_svg(filename, frame_size, frame_size, shapes, groups)
     with open(f"results/temp-sketch-{i}.svg", "r") as f:
         return {
