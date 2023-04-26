@@ -392,7 +392,10 @@ toolToggle.addEventListener("click", () => {
 // Shortcuts
 window.addEventListener("keydown", (event) => {
     if (event.code === "Escape") {
-        stopLogic();
+        if (controller.drawState === "draw") {
+            stopLogic();
+        }
+        hide(explorerPanel)
     }
     if (event.ctrlKey && event.shiftKey && event.code === "KeyZ") {
         sketchHistory.redo();
@@ -411,13 +414,16 @@ window.addEventListener("keydown", (event) => {
     }
 
     if (document.activeElement !== prompt) {
+        if (event.key == "Enter" && explorerPanel.style.display == "flex") {
+            exploreLogic();
+        }
         if (event.key == "Delete" || event.key == "Backspace" && controller.transformGroup) {
             deleteItems();
         }
     }
     if (document.activeElement === prompt) {
         if (event.key == "Enter") {
-            exploreLogic();
+            drawLogic();
             prompt.blur();
         }
     }
