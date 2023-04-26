@@ -37,18 +37,18 @@ const generateExploreSketches = () => {
 const dimensionInputs = document.querySelectorAll(".input-container input");
 const dimensionLabels = document.querySelector(".dimension-label");
 const clearButtons = document.querySelectorAll(".input-container i");
-const generateButton = document.querySelector(".explorer-header-actions button ")
+const generateButton = document.querySelector(".explorer-header-actions button")
 
 const updateLabels = () => {
     let d1 = controller["behaviours"]["d0"]["name"]
     let d2 = controller["behaviours"]["d1"]["name"]
     dimensionLabels.innerHTML = `${d1 || "Dimension One"} (Left-Right) ${d2 ? `vs ${d2} (Top-Bottom)` : ""}`;
     if (d1 === "") {
-        generateButton.classList.add("action-inactive")
+        generateButton.classList = "action-inactive"
         dimensionInputs[1].parentElement.classList.add("action-inactive")
     } else {
         if (controller.drawState !== "explore") {
-            generateButton.classList.remove("action-inactive")
+            generateButton.classList = "action-default"
         }
         dimensionInputs[1].parentElement.classList.remove("action-inactive")
     }

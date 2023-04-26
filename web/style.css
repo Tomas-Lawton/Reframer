@@ -852,7 +852,7 @@ input:focus {
 }
 
 .card-loading {
-    color: #00e900;
+    color: #cdcdcd;
     font-size: 1.1em;
     margin-right: 0.2em;
 }
@@ -1349,16 +1349,24 @@ input[type="number"] {
 }
 
 .explorer-header-actions button {
+    border-radius: 3em;
+    padding: 0 20px;
+}
+
+.explorer-header-actions .action-inactive button {
     /* background: #7B66ff; */
     background: #15bc1c;
-    padding: 0 20px;
     color: #fff;
-    border-radius: 3em;
+}
+
+.explorer-header-actions .action-stop button {
+    /* background: #ff6060; */
+    background: linear-gradient(#fc9393 0%, #ff6060 100%);
+    color: white;
 }
 
 
 .explorer-header-actions button:hover {
-    background: #15bc1c;
     transform: scale(1.03);
     animation-duration: .5s;
 }
@@ -1937,7 +1945,7 @@ input[type="number"] {
 }
 
 .fa-spinner {
-    color: #6a52ff;
+    color: #cdcdcd;
     font-size: 1.4em;
 }
 

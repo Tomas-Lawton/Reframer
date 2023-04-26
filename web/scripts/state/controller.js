@@ -42,8 +42,8 @@ class Controller {
         this.previousDrawState;
 
         this.behaviours = {
-            d0: { name: null, value: null },
-            d1: { name: null, value: null },
+            d0: { name: "", value: null },
+            d1: { name: "", value: null },
         }
     }
     draw() {
@@ -104,16 +104,9 @@ class Controller {
         }
     }
     startExplorer() {
-        console.log('t?')
-
         if (!this.clipDrawing) {
-            console.log('d?')
-
             this.clipDrawing = true;
-            console.log('wnqwfd?')
-
             this.prepare();
-            console.log('sewnd?')
             socket.send(JSON.stringify({
                 status: "explore_diverse_sketches",
                 user_data: {

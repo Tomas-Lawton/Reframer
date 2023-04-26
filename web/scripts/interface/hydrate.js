@@ -24,8 +24,6 @@ hide(historyBlock);
 setPointSize(controller.strokeWidth);
 setThisColor("rgb(54 54 54)");
 
-
-
 // TO DO Add back in
 const defaults = new PaperScope();
 defaults.activate();
@@ -35,7 +33,6 @@ for (let i = 0; i < 16; i++) {
     newElem.classList.add("inactive-sketch");
     diverseSketcheContainer.appendChild(newElem);
 }
-
 
 pickerSelect.style.display = "none";
 

@@ -20,7 +20,15 @@ exploreButton.addEventListener("click", () => {
     }
 });
 
-generateButton.addEventListener("click", () => exploreLogic());
+generateButton.addEventListener("click", () => {
+    if (controller.drawState !== "explore") {
+        exploreLogic()
+    } else {
+        setActionState("inactive")
+        controller.clipDrawing = false;
+        socket.send(JSON.stringify({ status: "stop_explorer" }))
+    }
+});
 
 const setActionState = (state) => {
     switch (state) {
@@ -39,12 +47,19 @@ const setActionState = (state) => {
 };
 
 const setModeDefault = () => {
+    let loaders = diverseSketcheContainer.querySelectorAll(".card-loading").forEach(elem => {
+        elem.classList.remove("button-animation");
+        elem.classList.remove("fa-spinner");
+        elem.classList.add("fa-check");
+    });
+
     loadingBar.style.display = "none"
     drawButton.className = "action-default"
     exploreButton.className = "action-default";
     stopButton.className = "action-inactive";
+    generateButton.classList = controller.behaviours["d0"]["name"] === "" ? "action-inactive" : "action-default";
+    generateButton.innerHTML = "Generate"
     actions.forEach((button) => button.classList.add("tooltip"));
-    generateButton.classList.remove("action-inactive")
 
     accordionItem.classList.add("open");
     accordionItem.classList.remove("closed");
@@ -53,7 +68,6 @@ const setModeDefault = () => {
     document.querySelector(".project").classList.remove("greeeeeen");
 
     canvas.classList.remove("loading-canvas");
-    document.getElementById("loading").style.display = "none";
     // document.querySelector(".control-lines").style.display = "block";
     undoButton.classList.remove("inactive-section");
     redoButton.classList.remove("inactive-section");
@@ -85,7 +99,6 @@ const setModeDraw = () => {
     accordionItem.classList.remove("closed");
     undoButton.classList.add("inactive-section");
     redoButton.classList.add("inactive-section");
-    document.getElementById("loading").style.display = "flex";
     // document.querySelector(".control-lines").style.display = "none";
 
     document.querySelector(".current-status").style.color = "#7b66ff";
@@ -95,10 +108,10 @@ const setModeDraw = () => {
 
 const setModeExplore = () => {
     loadingBar.style.display = "flex"
-
+    generateButton.innerHTML = "Stop"
     // exploreButton.className = "action-current";
     stopButton.className = "action-inactive";
-    generateButton.className = "action-inactive";
+    generateButton.className = "action-stop";
     actions.forEach((button) => button.classList.add("tooltip"));
 
     prompt.classList.add("inactive-prompt")
@@ -108,7 +121,6 @@ const setModeExplore = () => {
 
     undoButton.classList.add("inactive-section");
     redoButton.classList.add("inactive-section");
-    document.getElementById("loading").style.display = "flex";
     // document.querySelector(".control-lines").style.display = "none";
 
     document.querySelector(".current-status").style.color = "#7b66ff";
@@ -166,10 +178,10 @@ const drawLogic = () => {
 
 
 const exploreLogic = () => {
-    if (!dimensionInputs[0].value || !dimensionInputs[1].value) {
+    if (!dimensionInputs[0].value) {
         openModal({
             title: "Add dimensions",
-            message: "Search diverse options by adding dimensions.",
+            message: "Add at least one dimension to explore options.",
         });
         return;
     }
