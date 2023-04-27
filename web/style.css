@@ -114,6 +114,7 @@ input:-webkit-autofill {
     background: #15c01d;
     box-shadow: inset 1px 2px 4px rgb(0 0 0 / 15%);
     z-index: 501;
+    cursor: pointer;
 }
 
 #penmode-inner-circle {
@@ -1426,6 +1427,7 @@ input[type="number"] {
     bottom: 0;
     left: -5px;
     margin-bottom: 5px;
+    display: none;
 }
 
 .loading-container {

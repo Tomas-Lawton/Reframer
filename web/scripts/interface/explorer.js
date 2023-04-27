@@ -43,6 +43,12 @@ const updateLabels = () => {
     let d1 = controller["behaviours"]["d0"]["name"]
     let d2 = controller["behaviours"]["d1"]["name"]
     dimensionLabels.innerHTML = `${d1 || "Dimension One"} (Left-Right) ${d2 ? `vs ${d2} (Top-Bottom)` : ""}`;
+    if (d2 === "") {
+        hide(document.querySelectorAll(".bias-label")[1])
+    } else {
+        show(document.querySelectorAll(".bias-label")[1])
+    }
+    
     if (d1 === "") {
         generateButton.classList = "action-inactive"
         dimensionInputs[1].parentElement.classList.add("action-inactive")
