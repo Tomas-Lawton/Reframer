@@ -1,5 +1,6 @@
 import torch
 import pydiffvg
+import shortuuid
 
 
 class Trace:
@@ -14,7 +15,9 @@ class Drawing:
         self.canvas_width = canvas_width
         self.canvas_height = canvas_height
         self.traces = []
+        self.fixed_list = []
         self.img = None
+        self.id = shortuuid.uuid()
 
     def add_paths(self, path_list):
         shapes = []
@@ -23,6 +26,8 @@ class Drawing:
             path = dpath.path.detach().clone()
             width = dpath.width.detach().clone()
             color = dpath.color.detach().clone()
+            is_fixed = dpath.is_tied.detach().clone()
+
             num_control_points = torch.zeros(dpath.num_segments, dtype=torch.int32) + 2
             points = torch.zeros_like(path)
             stroke_width = width * 100
@@ -42,6 +47,7 @@ class Drawing:
             )
             shape_groups.append(shape_group)
             self.traces.append(Trace(shape, shape_group, True))
+            self.fixed_list.append(is_fixed.item())
 
         if not path_list:
             self.img = torch.ones(
@@ -56,6 +62,7 @@ class Drawing:
         for k in range(len(shapes)):
             shape_groups[k].shape_ids = torch.tensor([k + N])
             self.traces.append(Trace(shapes[k], shape_groups[k], fixed))
+            self.fixed_list.append(fixed)
 
         self.render_img()
 
@@ -91,6 +98,18 @@ class Drawing:
         count = 0
         for n, trace in enumerate(self.traces):
             if n != k:
+                shapes.append(trace.shape)
+                trace.shape_group.shape_ids = torch.tensor([count])
+                shape_groups.append(trace.shape_group)
+                count += 1
+        return shapes, shape_groups
+
+    def all_shapes_except(self, inds):
+        shapes = []
+        shape_groups = []
+        count = 0
+        for n, trace in enumerate(self.traces):
+            if n not in inds:
                 shapes.append(trace.shape)
                 trace.shape_group.shape_ids = torch.tensor([count])
                 shape_groups.append(trace.shape_group)
