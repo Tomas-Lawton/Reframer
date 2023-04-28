@@ -41,12 +41,14 @@ def create_cicada(text_behaviour, user_data, a, b):
 
     try:
         cicada.process_text(user_data["prompt"])
-        cicada.process_sketch(user_data["sketch"], user_data["frame_size"])
+        if "sketch" in user_data:
+            cicada.process_sketch(user_data["sketch"], user_data["frame_size"])
     except Exception as e:
             print("Problem during initialization \n", e)
 
+    cicada.add_random_shapes(user_data["random_curves"])
+
     if len(cicada.drawing.traces) > 0 and cicada.drawing.img is not None:
-            cicada.add_random_shapes(user_data["random_curves"])
             cicada.initialize_variables()
             cicada.initialize_optimizer()
 
