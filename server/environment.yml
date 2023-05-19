@@ -1,10 +1,10 @@
-name: cicada
+name: env
 channels:
   - pytorch
   - conda-forge
   - defaults
 dependencies:
-  - python
+  - python=3.8
   - cudatoolkit
   - thrust
   - pytorch
@@ -14,4 +14,4 @@ dependencies:
   - cmake
   - ffmpeg
   - pip
-prefix: C:\Users\ABC\.conda\envs\cicada
+prefix: C:\Users\ABC\.conda\envs\env

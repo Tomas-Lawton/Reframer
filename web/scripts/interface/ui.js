@@ -1,3 +1,6 @@
+const useTool = true;
+
+const socketLight = document.querySelector(".socket-connect");
 const canvas = document.getElementById("canvas");
 
 // General UI
@@ -21,8 +24,7 @@ const sparkKnob = document.querySelector(".spark-knob");
 const buttonPanel = document.querySelector(".action");
 const dropdown = document.querySelector(".pen-dropdown");
 const staticSketches = document.getElementById("static-sketches");
-const explorerPanel = document.querySelector(".generative-explorer");
-const diverseSketcheContainer = document.querySelector(".diverse-sketch-container");
+const explorerPanel = document.querySelector(".explore-panel");
 const sketchGrid = document.getElementById("grid-container");
 const pen = document.getElementById("pen");
 // Actions
@@ -79,7 +81,7 @@ const sketchSize = 190;
 
 let size, frameOutline, scaleRatio;
 const setCanvasSize = () => {
-    size = project.clientHeight * 0.91;
+    size = project.clientHeight * 0.91; //technically wrong
     sketchContainer.style.width = size + "px";
     sketchContainer.style.height = size + "px";
     canvas.width = size;
@@ -88,19 +90,11 @@ const setCanvasSize = () => {
     sparkCanvas.width = sparkUI.clientWidth;
     frameOutline = size;
     scaleRatio = frameOutline / 224;
-    
-    // Do not remove, centers board
-    // artBoard.style.left =
-    //     (window.innerWidth - controlPanel.clientWidth - size) / 2 +
-    //     controlPanel.clientWidth +
-    //     size / 2 +
-    //     "px";
-
     artBoard.style.left =
-    40 +
-    controlPanel.clientWidth +
-    size / 2 +
-    "px";
+        (window.innerWidth - controlPanel.clientWidth - size) / 2 +
+        controlPanel.clientWidth +
+        size / 2 +
+        "px";
     artBoard.style.top = (window.innerHeight - size) / 2 + size / 2 + 20 + "px";
 };
 

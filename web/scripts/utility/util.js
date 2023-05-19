@@ -234,8 +234,3 @@ const show = (item) => {
 const hide = (item) => {
     item.style.display = "none";
 };
-
-
-const capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}

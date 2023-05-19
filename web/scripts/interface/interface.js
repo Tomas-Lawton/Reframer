@@ -11,7 +11,7 @@ document.querySelectorAll(".swatch").forEach((elem) =>
         controller.strokeColor = col;
         getSelectedPaths().forEach((path) => (path.strokeColor = col));
         picker.setColor(col);
-        setPenMode("pen", pen);
+        // setPenMode("pen", pen);
     })
 );
 
@@ -39,14 +39,16 @@ document.getElementById("delete").addEventListener("click", () =>
             sketchHistory.clear();
 
             if (controller.clipDrawing || controller.drawState === "pause") {
+                removeExploreSketches();
                 controller.stop();
                 controller.clipDrawing = false;
             }
 
-            removeSketches();
+            emptyExplorer();
 
             explorerPanel.display = "none";
 
+            controller.lastPrompt = null;
             updateSelectUI();
 
             sketchHistory = new SketchHistory(mainSketch);
@@ -110,6 +112,17 @@ document.getElementById("save").addEventListener("click", () => {
     download();
 });
 
+document.getElementById("close-explorer").addEventListener("click", (e) => {
+    emptyExplorer();
+    setActionState("inactive");
+    hide(explorerPanel);
+});
+
+document.getElementById("empty").addEventListener("click", (e) => {
+    emptyExplorer();
+    generateExploreSketches();
+});
+
 document.getElementById("settings").addEventListener("click", () => {
     dropdown.classList.toggle("hidden-panel")
 });
@@ -146,7 +159,7 @@ drawer.addEventListener("click", () => {
 prompt.addEventListener("input", (e) => {
     controller.prompt = e.target.value.toLowerCase();
     // controller.prompt = e.target.value;
-    frameName.innerHTML = `Reframer will draw ${controller.prompt}.`;
+    frameName.innerHTML = `System will draw "${controller.prompt}."`;
 
     if (controller.prompt === "") {
         controllerUI.forEach((elem) => elem.classList.add("inactive-section"));
@@ -241,6 +254,53 @@ frameName.onmousedown = (e) => {
     document.onmousemove = (e) => elementDrag(e, sketchContainer);
 };
 
+// sketchBook.onmousedown = (e) => {
+//     if (window.innerWidth > 700) {
+//         let content = document.getElementById("static-sketches");
+//         let bounds = content.getBoundingClientRect();
+//         e = e || window.event;
+//         pos3 = e.clientX;
+//         pos4 = e.clientY;
+//         if (
+//             pos3 < bounds.left ||
+//             pos3 > bounds.right ||
+//             pos4 < bounds.top ||
+//             pos4 > bounds.bottom
+//         ) {
+//             document.onmouseup = closeDragElement;
+//             document.onmousemove = (e) => elementDrag(e, sketchBook);
+//             console.log("dragging");
+//         }
+//     }
+// };
+
+localPrompts.onmousedown = (e) => {
+    if (window.innerWidth > 700) {
+        e = e || window.event;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = (e) => elementDrag(e, localPrompts);
+        console.log("dragging");
+    }
+};
+
+explorerPanel.onmousedown = (e) => {
+    let bounds = explorerPanel.firstElementChild.getBoundingClientRect();
+    e = e || window.event;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    if (
+        pos3 < bounds.left ||
+        pos3 > bounds.right ||
+        pos4 < bounds.top ||
+        pos4 > bounds.bottom
+    ) {
+        document.onmouseup = closeDragElement;
+        document.onmousemove = (e) => elementDrag(e, explorerPanel);
+    }
+};
+
 const elementDrag = (e, arr) => {
     e = e || window.event;
     // e.preventDefault();
@@ -321,6 +381,25 @@ document.getElementById("num-squiggles").oninput = (e) => {
     setLineLabels(mainSketch.sketchLayer);
 };
 
+frameDropIn.forEach((button) =>
+    button.addEventListener("click", () => focusLogic())
+);
+
+document
+    .querySelector(".local-prompts>button")
+    .addEventListener("click", () => {
+        let w = parseInt(150 * Math.random() + 100);
+        let h = parseInt(150 * Math.random() + 100);
+        let x = parseInt((canvas.width * 0.4 - w) * Math.random() + w / 2);
+        let y = parseInt((canvas.width * 0.4 - h) * Math.random() + h / 2);
+        let b = new Rectangle({
+            x,
+            y,
+            width: w,
+            height: h,
+        });
+        createLocalPrompt(b, x, y, w, h);
+    });
 
 let lastLearningRate = controller.learningRate;
 respectSlider.oninput = (e) => {
@@ -343,7 +422,6 @@ respectSlider.onmouseup = () => {
     }
 };
 
-
 header.addEventListener("click", () => {
     accordionItem.classList.toggle("open");
     accordionItem.classList.toggle("closed");
@@ -354,7 +432,9 @@ header.addEventListener("click", () => {
     }
 });
 
-
+socketLight.addEventListener("click", () => {
+    if (!socket) connect();
+});
 
 toolToggle.addEventListener("click", () => {
     // let currentTool = document.querySelector(".animation-window");
@@ -389,6 +469,10 @@ toolToggle.addEventListener("click", () => {
     }
 });
 
+document.querySelector(".switch-mode").addEventListener("click", () => {
+    focusLogic();
+});
+
 // Shortcuts
 window.addEventListener("keydown", (event) => {
     if (event.code === "Escape") {
@@ -417,7 +501,7 @@ window.addEventListener("keydown", (event) => {
     }
     if (document.activeElement === prompt) {
         if (event.key == "Enter") {
-            exploreLogic();
+            drawLogic();
             prompt.blur();
         }
     }
@@ -493,5 +577,34 @@ sketchContainer.addEventListener("dragover", dragover);
 sketchContainer.addEventListener("dragenter", dragentercanvas);
 sketchContainer.addEventListener("dragleave", dragleavecanvas);
 sketchContainer.addEventListener("drop", dropCanvas);
+
+// function dragoverhover(e) {
+//     e.preventDefault();
+//     sketchGrid.classList.add("drop-ready");
+//     sketchGrid.classList.remove("basic-background");
+// }
+
+// function dragleavesketch(e) {
+//     e.preventDefault();
+//     sketchGrid.classList.remove("drop-ready");
+//     sketchGrid.classList.add("basic-background");
+// }
+
+// function dropSketch(e) {
+//     // AI to Static
+//     sketchGrid.classList.remove("drop-ready");
+//     const sketchCountIndex = e.dataTransfer.getData("text/plain");
+//     if (document.querySelector(`#AI-sketch-item-${sketchCountIndex}`)) {
+//         let importing = controller.sketches[sketchCountIndex];
+//         importing.saveStatic(importing.extractSVG());
+//     }
+// }
+
+// sketchGrid.addEventListener("dragover", dragoverhover);
+// sketchGrid.addEventListener("dragleave", dragleavesketch);
+// sketchGrid.addEventListener("drop", dropSketch);
+
+// sketchBook.style.left =
+//     window.innerWidth - sketchBook.getBoundingClientRect().width - 5 + "px";
 
 console.info("Page loaded");

@@ -9,7 +9,7 @@ let sketchTimer,
     firstPoint,
     firstErasePoint;
 
-sketchTool.onMouseDown = function (event) {
+sketchTool.onMouseDown = function(event) {
     clearTimeout(sketchTimer);
     let hitResult = mainSketch.sketchLayer.hitTest(event.point);
 
@@ -40,6 +40,32 @@ sketchTool.onMouseDown = function (event) {
                 controller.selectBox = new Rectangle(event.point);
             }
 
+            // if (hitResult) {
+            //     sketchHistory.pushUndo();
+            //     controller.pause();
+            //     ungroup();
+            //     path = hitResult.item;
+
+            //     let items = [];
+            //     if (window.event.shiftKey) {
+            //         path.selected = true;
+            //         items = getSelectedPaths();
+            //     } else {
+            //         mainSketch.sketchLayer.getItems().forEach((path) => {
+            //             path.selected = false;
+            //         });
+            //         items = mainSketch.sketchLayer.getItems({
+            //             inside: path.bounds,
+            //         });
+            //         items.forEach((item) => (item.selected = true));
+            //     }
+
+            //     createGroup(items);
+            //     fitToSelection(items, "moving");
+            //     updateSelectUI();
+            // }
+
+            // to do replace with above coe
             if (hitResult) {
                 sketchHistory.pushUndo();
                 controller.pause();
@@ -75,8 +101,9 @@ sketchTool.onMouseDown = function (event) {
             sketchHistory.pushUndo();
 
             controller.pause();
+
             erasorPath = new Path({
-                strokeWidth: controller.strokeWidth / 1,
+                strokeWidth: controller.strokeWidth /1,
                 strokeCap: "round",
                 strokeJoin: "round",
                 opacity: 0.85,
@@ -110,7 +137,7 @@ sketchTool.onMouseDown = function (event) {
     }
 };
 
-sketchTool.onMouseDrag = function (event) {
+sketchTool.onMouseDrag = function(event) {
     switch (controller.penMode) {
         case "pen":
             penPath.add(event.point);
@@ -162,7 +189,7 @@ sketchTool.onMouseDrag = function (event) {
     }
 };
 
-sketchTool.onMouseUp = function () {
+sketchTool.onMouseUp = function() {
     // so the latest sketch is available to the drawer
     mainSketch.svg = paper.project.exportSVG({
         asString: true,
@@ -179,7 +206,7 @@ sketchTool.onMouseUp = function () {
                 if (rect) {
                     rect.remove(); // can be undefined if flat box
                 }
-                items.forEach((item) =>
+                items.forEach((item) => 
                     item.selected = true
                 );
                 if (controller.selectBox) {
@@ -216,25 +243,26 @@ sketchTool.onMouseUp = function () {
             incrementHistory();
 
             setLineLabels(mainSketch.sketchLayer);
-            if (controller.liveCollab) {
-                controller.continueSketch();
-                controller.liveCollab = false;
-            } else if (!noPrompt() && controller.doneSketching !== null) {
-                //stopped with collab draw
-                {
-                    clearTimeout(sketchTimer);
-                    sketchTimer = setTimeout(() => {
-                        controller.draw();
-                        let time = (Math.floor(Math.random() * 5) + 5) * 1000;
-                        setTimeout(() => {
-                            console.log("drawing for: ", time);
-                            controller.stop();
-                            controller.clipDrawing = false;
-                        }, time);
-                    }, controller.doneSketching);
+            if (socket) {
+                if (controller.liveCollab) {
+                    controller.continueSketch();
+                    controller.liveCollab = false;
+                } else if (!noPrompt() && controller.doneSketching !== null) {
+                    //stopped with collab draw
+                    {
+                        clearTimeout(sketchTimer);
+                        sketchTimer = setTimeout(() => {
+                            controller.draw();
+                            let time = (Math.floor(Math.random() * 5) + 5) * 1000;
+                            setTimeout(() => {
+                                console.log("drawing for: ", time);
+                                controller.stop();
+                                controller.clipDrawing = false;
+                            }, time);
+                        }, controller.doneSketching);
+                    }
                 }
             }
-
 
             break;
         case "local":
@@ -293,7 +321,7 @@ sketchTool.onMouseUp = function () {
             const erasorItems = tmpGroup.getItems({
                 overlapping: deleteShape.bounds,
             });
-            erasorItems.forEach(function (erasorItem) {
+            erasorItems.forEach(function(erasorItem) {
                 const result = erasorItem.subtract(deleteShape, {
                     trace: false,
                     insert: false,
@@ -377,7 +405,7 @@ const setPenMode = (mode) => {
                     swatches.style.display = "flex";
                     swatches.style.top =
                         document.getElementById("pen-controls").getBoundingClientRect()
-                            .bottom +
+                        .bottom +
                         5 +
                         "px";
                 } else {

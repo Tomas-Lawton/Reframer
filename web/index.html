@@ -18,7 +18,6 @@
     <script src="https://unpkg.com/vanilla-picker@2"></script>
 
     <!-- Scripts -->
-    <script type="text/javascript" src="scripts/utility/util.js" defer></script>
     <script type="text/javascript" src="scripts/utility/network.js" defer></script>
     <script type="text/javascript" src="scripts/interface/ui.js" defer></script>
     <script type="text/javascript" src="scripts/setup/setup.js" defer></script>
@@ -27,16 +26,15 @@
     <script type="text/javascript" src="scripts/setup/spark.js" defer></script>
     <script type="text/javascript" src="scripts/state/history.js" defer></script>
     <script type="text/javascript" src="scripts/state/load.js" defer></script>
+    <script type="text/javascript" src="scripts/utility/util.js" defer></script>
 
-    <!-- UI -->
-    <script type="text/javascript" src="scripts/interface/explorer.js" defer></script>
     <script type="text/javascript" src="scripts/interface/interface-logic.js" defer></script>
+    <script type="text/javascript" src="scripts/interface/local-prompts.js" defer></script>
     <script type="text/javascript" src="scripts/interface/controls.js" defer></script>
     <script type="text/javascript" src="scripts/interface/action-states.js" defer></script>
     <script type="text/javascript" src="scripts/interface/canvas.js" defer></script>
     <script type="text/javascript" src="scripts/interface/style.js" defer></script>
 
-    <!-- Interactive -->
     <script type="text/javascript" src="scripts/state/pen.js" defer></script>
     <script type="text/javascript" src="scripts/utility/logger.js" defer></script>
     <script type="text/javascript" src="scripts/interface/interface.js" defer></script>
@@ -59,8 +57,7 @@
                 </h2>
             </div>
             <div class="panel-section">
-                <input type="text" tabIndex="0" class="prompt-input" id="messageText"
-                    placeholder="Start by describing your sketch..." autocomplete="off" />
+                <input type="text" tabIndex="0" class="prompt-input" id="messageText" placeholder="Start by describing your sketch..." autocomplete="off" />
             </div>
 
             <div class="panel-section">
@@ -70,10 +67,15 @@
                         <i class="fa-solid fa-robot fa-fw"></i>
                         <p>Draw</p>
                     </div>
+                    <div class="frame-ui action-default tooltip" id="focus">
+                        <span class="tooltiptext">Labeling parts the image helps AI focus</span>
+                        <i class="fa-solid fa-note-sticky fa-fw" id="focus-icon"></i>
+                        <p>Focus</p>
+                    </div>
                     <div class="action-default tooltip" id="explore">
                         <span class="tooltiptext">Get options for developing the sketch</span>
                         <i class="fa-solid fa-lightbulb fa-fw"></i>
-                        <p>Explorer</p>
+                        <p>Explore</p>
                     </div>
                     <div class="action-inactive" id="stop">
                         <i class="fa-solid fa-hand fa-fw" id="stop-icon"></i>
@@ -151,13 +153,15 @@
 
     <section class="project">
         <div class="project-actions">
+            <i class="frame-ui inactive-section canvas-focus fa-solid fa-note-sticky fa-fw"></i>
             <i class="undo fa-solid fa-rotate-left fa-fw"></i>
             <i class="redo fa-solid fa-rotate-right fa-fw"></i>
             <i class="fa-solid fa-cog fa-fw" id="settings"></i>
         </div>
 
         <div class="canvas-ui-container" id="canvas-drop">
-            <p>Tell Reframer what to draw on the left!</p>
+            <p>Add a prompt to draw together</p>
+            <i class="fa-solid fa-spinner button-animation " id="loading"></i>
             <div id="fixed-handler" class="select-ui tooltip">
                 <span class="tooltiptext">Checked lines won't move</span>
                 <div>
@@ -205,6 +209,10 @@
                 </div>
             </div>
             <canvas id="canvas"></canvas>
+            <div class="frame-ui inactive-section canvas-focus">
+                <p>Focus</p>
+                <i class="fa-solid fa-note-sticky fa-fw"></i>
+            </div>
         </div>
         <div class="hint">
             <span class="hint-text">Draw with AI by adding a prompt and clicking draw.</span>
@@ -250,58 +258,33 @@
         </div>
     </div>
 
-
-    <div class="generative-explorer">
-        <div class="drag-gutter">
-
-            <div class="explorer-header flex">
-                <div class="explorer-header-left">
-                    <div class="bulb-icon-background">
-                        <i class="fa fa-lightbulb"></i>
-                    </div>
-                    <!-- <h1>Explore</h1> -->
-                </div>
-
-                <div class="flex explorer-header-actions">
-                    <div class="input-container">
-                        <input class="input-field" type="text" placeholder="Dimension One" name="d0">
-                        <i class="fa fa-xmark icon" name="x-d0"></i>
-                    </div>
-                    <div class="input-container action-inactive">
-                        <input class="input-field" type="text" placeholder="Dimension Two" name="d1">
-                        <i class="fa fa-xmark icon" name="x-d1"></i>
-                    </div>
-                    <button class="action-inactive">Generate</button>
-                </div>
-            </div>
-
-            <div class="display-grid">
-                <p class="label-d0 dimension-label" label="d0">Dimension One (Left-Right) vs Realistic (Top-Bottom)</p>
-                    <div class="diverse-sketch-container flex">
-                        <div class="bias-label top">
-                            <p>Bias: -1.5</p>
-                            <p>Bias: 0</p>
-                            <p>Bias: +1.5</p>
-                        </div>
-                        <div class="bias-label left">
-                            <p>Bias: +1.5</p>
-                            <p>Bias: 0</p>
-                            <p>Bias: -1.5</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex loading-container">
-                <div class="loading-bar" style="display: block;"></div>
-                <h1 class="progress-count">0/16</h1>
-            </div>
-
-            <p>Add dimensions to search diverse sketching options of the prompt.</p>
+    <div class="local-prompts">
+        <div class="flex">
+            <h3>Focus Prompts</h3>
+            <i class="switch-mode fa-solid fa-repeat"></i>
         </div>
+        <div id="prompt-info">
+            <div>
+                <div class="list-circle">
+                    <i class="fa-solid fa-info"></i>
+                </div>
+                <p>Drag to a frame and type to add a local prompt</p>
+            </div>
+        </div>
+        <ul></ul>
+        <button>New Prompt</button>
+        <p class="reset-frames">Reset</p>
     </div>
 
-
+    <div class="explore-panel">
+        <div id="explore-sketches"></div>
+        <div id="explorer-buttons">
+            <h3 class="panel-subtitle">Explorer</h3>
+            <p class="control-subtitle">Try options by dragging sketches to the canvas</p>
+            <p class="pill" id="empty">Refresh</p>
+            <p class="pill" id="close-explorer">Close <i class="fa-solid fa-xmark"></i></p>
+        </div>
+    </div>
 
     <div class="sketch-card" id="sketch-template" draggable="true">
         <div class="card-info">
@@ -309,23 +292,64 @@
                 <i class="fa-solid fa-spinner button-animation card-loading"></i>
                 <h3></h3>
             </div>
-            <!-- <div class="card-icon-background">
+            <div class="card-icon-background">
                 <i class="fa-solid fa-hand fa-fw"></i>
                 <i class="fa-solid fa-minus fa-fw"></i>
-            </div> -->
+            </div>
         </div>
         <div class="sketch">
             <canvas id="template-sketch" class="sketch-canvas"></canvas>
         </div>
     </div>
 
+    <!-- <div id="sketchbook-panel">
+        <div id="sketchbook-content">
+            <div id="static-margin">
+                <div id="static-sketches">
+                    <div class="flex" id="title-block">
+                        <div class="tab-info">
+                            <div>
+                                <h1 class="panel-title">
+                                    Sketchbook
+                                </h1>
+
+                                <h2 class="panel-subtitle">Save sketches for later!</h2>
+                                <p class="pill" id="overwrite">Overwrite</p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="basic-background" id="grid-container">
+                        <div id="sketch-grid">
+                            <div class="sketch-card" id="sketch-template" draggable="true">
+                                <div class="card-info">
+                                    <div>
+                                        <i class="fa-solid fa-spinner button-animation card-loading"></i>
+                                        <h3></h3>
+                                    </div>
+                                    <div class="card-icon-background">
+                                        <i class="fa-solid fa-hand fa-fw"></i>
+                                        <i class="fa-solid fa-minus fa-fw"></i>
+                                    </div>
+                                </div>
+                                <div class="sketch">
+                                    <canvas id="template-sketch" class="sketch-canvas"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="pill" id="save-sketch">Add Sketch</hp>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
     <div class="drawing-tool-panel">
         <div></div>
         <div class="style-window tool-view">
             <div class="animation-window">
                 <!-- Inline SVGs -->
-                <svg draggable="false" class="finger-preview window-tool" width="366" height="77" viewBox="0 0 366 77"
-                    fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg draggable="false" class="finger-preview window-tool" width="366" height="77" viewBox="0 0 366 77" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_560_143)">
                         <path
                             d="M230.694 2.34161C232.661 2.24168 289.436 3.15687 289.436 3.15687L365.714 2.34161L369.667 76.5353C354.676 76.4572 339.692 75.8124 319.933 71.8513C287.422 65.3318 224.46 69.4698 168.867 67.0957C113.271 64.7217 56.6848 62.9117 39.8847 62.3831C23.0822 61.8546 1.92006 55.4463 1.4186 41.8616C0.605135 19.8245 17.0836 11.6407 109.881 7.73782C186.79 4.50528 221.165 2.82295 230.694 2.34161Z"
@@ -347,8 +371,7 @@
                             fill="#AF7E56" fill-opacity="0.6" />
                     </g>
                 </svg>
-                <svg draggable="false" class="erase-preview window-tool" width="189" height="41" viewBox="0 0 189 41"
-                    fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg draggable="false" class="erase-preview window-tool" width="189" height="41" viewBox="0 0 189 41" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_565_38)">
                         <path class="main-color"
                             d="M14.9754 4.00078L189 4.00077L189 36.8008L14.9754 36.8008L14.9754 4.00078Z"
@@ -370,8 +393,7 @@
                             fill="#F16C51" />
                     </g>
                 </svg>
-                <svg draggable="false" class="pencil-preview window-tool current-tool" width="366" height="80"
-                    viewBox="0 0 366 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg draggable="false" class="pencil-preview window-tool current-tool" width="366" height="80" viewBox="0 0 366 80" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path class="main-color"
                         d="M365.74 71.6499L53.3281 71.6499L53.3281 8L365.74 7.99995L365.74 71.6499Z" fill="#F5AB2A" />
                     <path

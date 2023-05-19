@@ -1,4 +1,67 @@
+const removeExploreSketches = () => {
+    if (controller.exploreScopes.length > 0) {
+        explorerPanel.firstElementChild.childNodes.forEach((child, i) => {
+            let stopButton = child.querySelector(".fa-hand");
+            let loader = child.querySelector(".card-loading");
+            loader.classList.remove("button-animation");
+            loader.classList.remove("fa-spinner");
+            loader.classList.add("fa-check");
+            stopButton.style.background = "#f5f5f5";
+            stopButton.style.background = "#d2d2d2";
+            controller.stopSingle(controller.exploreScopes[i]);
+        });
+        controller.exploreScopes = [];
+    }
+};
 
+const generateExploreSketches = () => {
+    // To do: make sketches fit in place holder rather than replace
+
+    // Remove the place holder ones
+    total = 4;
+    for (let i = 0; i < 4; i++) {
+        explorerPanel.firstElementChild.removeChild(
+            explorerPanel.firstElementChild.firstElementChild
+        );
+    }
+    // Replace
+    for (let i = 0; i < 4; i++) {
+        let sketch = new Sketch(
+            controller.sketchScopeIndex,
+            sketchScope,
+            sketchSize,
+            "AI"
+        );
+        let newElem = sketch.renderMini();
+        controller.exploreScopes.push(controller.sketchScopeIndex);
+        explorerPanel.firstElementChild.appendChild(newElem);
+        controller.newExploreSketch(controller.sketchScopeIndex);
+        controller.sketchScopeIndex += 1;
+    }
+    controller.clipDrawing = true;
+    setActionState("explore");
+    mainSketch.svg = paper.project.exportSVG({
+        asString: true,
+    });
+    logger.event("start-exploring");
+};
+
+const emptyExplorer = () => {
+    removeExploreSketches();
+    controller.clipDrawing = false;
+    // refactor into function
+    for (let i = 0; i < 4; i++) {
+        if (explorerPanel.firstElementChild) {
+            explorerPanel.firstElementChild.removeChild(
+                explorerPanel.firstElementChild.firstChild
+            );
+            let sketch = new Sketch(null, defaults, sketchSize);
+            let newElem = sketch.renderMini();
+            explorerPanel.firstElementChild.appendChild(newElem);
+            newElem.classList.add("inactive-sketch");
+        }
+    }
+};
 
 // Delete?
 // const inactiveStopUI = () => {
@@ -165,7 +228,6 @@ const openModal = (data) => {
     document.getElementById("confirm-modal").onclick = () => {
         confirm();
         close();
-        prompt.focus()
     };
     modal.style.display = "block";
 };

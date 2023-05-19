@@ -2,6 +2,12 @@ const spark = new PaperScope();
 spark.setup(sparkCanvas);
 spark.activate();
 
+// sparkCanvas.style.width =
+//     document.querySelector(".panel-section").clientWidth + "px";
+// sparkCanvas.style.height = 150 + "px";
+// sparkCanvas.width = document.querySelector(".panel-section").clientWidth;
+// sparkCanvas.height = 150;
+
 const easing = 0.98;
 const speed = 0.6;
 let renderShape, pointA, pointB, sparkPath;
