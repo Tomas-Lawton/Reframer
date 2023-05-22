@@ -51,7 +51,6 @@ sudo apt install ./google-chrome-stable_current_amd64.deb
 ```
 git clone https://github.com/Tomas-Lawton/Reframer.git
 cd Reframer/
-git checkout fi_alt_setup
 ```
 
 ## Installation
