@@ -1,4 +1,4 @@
-const useTool = true;
+const useTool = false;
 
 const socketLight = document.querySelector(".socket-connect");
 const canvas = document.getElementById("canvas");
