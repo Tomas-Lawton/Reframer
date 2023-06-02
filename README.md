@@ -58,7 +58,7 @@ cd Reframer/
 starting fom Reframer folder
 ```
 cd /server
-source dev_setup.sh
+source setup.sh
 ```
 
 ## Usage
